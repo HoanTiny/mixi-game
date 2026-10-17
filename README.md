@@ -53,6 +53,7 @@ scenes/
   board.tscn      Bảng cân bằng
 tests/
   sim.gd          tự chơi 200 ván để kiểm tra cân bằng
+  playtest.gd     người chơi máy chơi trên màn phố thật, in nhật ký từng ngày
 ```
 
 ## Thêm mô hình thật
@@ -88,6 +89,12 @@ Các file `.wav` trong `assets/sounds/` là **tiếng tạm** do `tools/gen_soun
 ```
 
 Kết quả gần nhất: chỉ làm chân tay thì thua cả 100 ván, học nghề điện lạnh thì 86/100 ván đạt kết đẹp.
+
+- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, nói chuyện, về phòng ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Thêm `--talk` để người chơi máy nói chuyện với nhân vật:
+
+```bash
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --talk --seed=1
+```
 
 - Chạy `-- --demo` để vào thẳng ngày 1 mà không ghi đè bản lưu; thêm `--demo-open=quan_com` để mở sẵn một địa điểm.
 
