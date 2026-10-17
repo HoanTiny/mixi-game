@@ -1,0 +1,272 @@
+[
+  {
+    "id": "xe_om", "day": 1,
+    "title": "Bến xe Miền Đông, 5 giờ sáng", "who": "Chú xe ôm",
+    "text": "\"Về Bình Thạnh hả con? Ba trăm nghìn, chú chở liền.\"",
+    "choices": [
+      { "label": "Đồng ý 300 nghìn", "effects": { "money": -300000, "money_label": "Xe ôm từ bến xe" } },
+      { "label": "Mặc cả", "hint": "Còn 120 nghìn", "require": { "skill.giaoTiep": 1 },
+        "effects": { "money": -120000, "money_label": "Xe ôm, sau khi mặc cả" } },
+      { "label": "Gọi Tuấn ra đón", "hint": "Chờ 2 giờ, không mất tiền",
+        "effects": { "hours": 2, "rep.tuan": 10, "log": "Tuấn tới bằng một chiếc tay ga mới cứng. Phụ hồ mà đi xe này sao?" } }
+    ]
+  },
+  {
+    "id": "phong_tro", "day": 1,
+    "title": "Tìm phòng trọ",
+    "text": "Trong con hẻm ở Bình Thạnh còn hai chỗ trống. Tiền trọ trả một lần cho cả tháng.",
+    "choices": [
+      { "label": "{room_ghep}: {rent_ghep}", "hint": "Rẻ hơn, nhưng Tinh thần giảm nhanh và dễ mất đồ",
+        "require": { "afford_room": "ghep" }, "effects": { "room": "ghep" } },
+      { "label": "{room_rieng}: {rent_rieng}", "hint": "Mở tuyến cô Sáu và bé Bin",
+        "require": { "afford_room": "rieng" }, "effects": { "room": "rieng", "rep.coSau": 10 } }
+    ]
+  },
+  {
+    "id": "chu_bay", "day": 3,
+    "title": "Tiệm chú Bảy đầu hẻm", "who": "Chú Bảy",
+    "text": "Một chiếc máy lạnh đang kêu rè rè. Chú Bảy cau mày, tháo ra lắp vào mãi không xong.",
+    "choices": [
+      { "label": "Ghé vào góp ý", "hint": "Chú Bảy +20", "require": { "skill.tayNghe": 1 },
+        "effects": { "rep.chuBay": 20, "log": "Minh chỉ đúng bệnh cái tụ điện. Chú Bảy nhìn Minh lâu hơn bình thường." } },
+      { "label": "Hỏi thăm vài câu", "hint": "Chú Bảy +5", "effects": { "rep.chuBay": 5 } },
+      { "label": "Đi tiếp" }
+    ]
+  },
+  {
+    "id": "be_bin", "day": 5, "when": { "room": "rieng" },
+    "title": "Bé Bin rớt bài kiểm tra", "who": "Cô Sáu",
+    "text": "Cô Sáu đứng giữa sân mắng con: \"Có mấy bài Toán mà cũng không làm được!\"",
+    "choices": [
+      { "label": "Đề nghị kèm Toán một buổi, không lấy tiền", "hint": "Mất 2 giờ, cô Sáu +20",
+        "require": { "hours_left": 2 },
+        "effects": { "hours": 2, "rep.coSau": 20, "log": "Bé Bin làm được bài. Cô Sáu bớt nghi ngờ cậu thanh niên mới tới." },
+        "bonus": [ { "when": { "flag.sach": true }, "effects": { "rep.coSau": 10 } } ] },
+      { "label": "Không xen vào" }
+    ]
+  },
+  {
+    "id": "lan_goi", "day": 7,
+    "title": "Cuộc gọi của Lan", "who": "Lan",
+    "text": "\"Anh Hai… thôi em không học nữa cũng được. Em đi làm công nhân phụ anh.\"",
+    "choices": [
+      { "label": "\"Không được! Em phải học.\"", "hint": "Tinh thần −10, Tinh thần tối đa +10", "effects": { "mood_max": 10, "mood": -10 } },
+      { "label": "\"Để anh tính…\"", "hint": "Lan đi làm thêm", "effects": { "flag.lanLamThem": true } }
+    ]
+  },
+  {
+    "id": "quyt_luong", "day": 8,
+    "title": "Chủ thầu bỏ trốn", "who": "Tuấn",
+    "text": "Nghe nói chủ thầu công trình đã bỏ trốn, quỵt lương anh em. May mà Minh không dính.",
+    "quote": "\"Ở đây vậy đó mày. Muốn có tiền thì phải biết đường.\"",
+    "variants": [
+      { "when": { "held_min": 1 },
+        "text": "Sáng ra công trình, chủ thầu đã biến mất. Minh mất {held} tiền công các ngày 5 đến 7.",
+        "choices": [ { "label": "Tiếp tục", "effects": { "special": "lose_held_wages" } } ] }
+    ],
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "loi_re", "day": 11,
+    "title": "Lối rẽ",
+    "text": "Chú Bảy: \"Muốn học nghề thì sáng mai ra đây. Tháng đầu không lương à nghen.\"\nVy ở quán cà phê: \"Bạn nói chuyện dễ thương mà, sao không xin vô đây làm?\"\nMột tờ rơi dán ở cột điện: lớp tiếng Anh buổi tối ở nhà văn hóa phường.\n\nCác lớp học đã mở.",
+    "choices": [ { "label": "Tiếp tục", "effects": { "rep.vy": 10 } } ]
+  },
+  {
+    "id": "vi_ong_tu", "day": 13,
+    "title": "Cái ví rơi trong hẻm",
+    "text": "Minh nhặt được một cái ví sờn. Bên trong có 2 triệu đồng và giấy tờ của một ông lão.",
+    "choices": [
+      { "label": "Giữ lại", "hint": "+2.000.000đ, cô Sáu và chú Bảy −10",
+        "effects": { "money": 2000000, "money_label": "Tiền trong ví nhặt được", "rep.coSau": -10, "rep.chuBay": -10, "flag.keptWallet": true } },
+      { "label": "Tìm người trả lại", "hint": "Ông Tư +30, cô Sáu +10",
+        "effects": { "rep.ongTu": 30, "rep.coSau": 10, "flag.returnedWallet": true,
+          "log": "Ông Tư: \"Mất đồ thì kiếm lại được, mất cái tử tế thì kiếm hoài không ra.\"" } }
+    ]
+  },
+  {
+    "id": "tuan_ru", "day": 15,
+    "title": "Tuấn rủ chạy hàng", "who": "Tuấn",
+    "text": "\"Một chuyến chở đồ từ Củ Chi về. {smuggle_pay}. Không hỏi bên trong là gì.\"",
+    "choices": [
+      { "label": "Đi một chuyến", "hint": "+{smuggle_pay}, mất {smuggle_hours} giờ", "effects": { "special": "smuggle_trip", "rep.tuan": 10 } },
+      { "label": "Từ chối", "hint": "Tuấn giận, mất mối phụ hồ", "effects": { "flag.matViecPhuHo": true, "rep.tuan": -20 } },
+      { "label": "Từ chối và khuyên Tuấn bỏ", "hint": "Mở tuyến cứu Tuấn", "require": { "rep.tuan": 50 },
+        "effects": { "flag.cuuTuan": true, "rep.tuan": 5 } }
+    ]
+  },
+  {
+    "id": "om", "day": 17, "when": { "health_below": 30 },
+    "title": "Minh sốt cao",
+    "text": "Minh sốt li bì. Không ai biết, cả ngày nằm một mình trong phòng.",
+    "variants": [
+      { "when": { "room": "rieng", "rep.coSau": 30 },
+        "text": "Cô Sáu thấy cửa phòng đóng im, gõ cửa rồi mang lên một tô cháo hành nóng.",
+        "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe +30", "effects": { "health": 30 } } ] }
+    ],
+    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true, "special": "count_faint" } } ]
+  },
+  {
+    "id": "tuan_ru_tiep", "days": [17, 19], "when": { "smuggle_min": 1, "smuggle_below_trips": true },
+    "title": "Thêm một chuyến nữa", "who": "Tuấn",
+    "text": "\"Chuyến trước êm mà. Thêm chuyến nữa đi, {smuggle_pay}.\"",
+    "choices": [
+      { "label": "Đi", "hint": "Đã đi {smuggle}/{trips} chuyến", "effects": { "special": "smuggle_trip" } },
+      { "label": "Thôi, không đi nữa" }
+    ]
+  },
+  {
+    "id": "vy_hop_dong", "day": 18,
+    "title": "Một buổi chiều ở quán", "who": "Vy",
+    "text": "Vy hỏi chuyện nhà. Minh ngại, không kể.",
+    "variants": [
+      { "when": { "rep.vy": 40 },
+        "title": "Tờ giấy vay nợ",
+        "text": "Minh kể chuyện nhà. Vy xin xem ảnh tờ giấy vay má gửi lên.\n\"Khoan… lãi này gần 200% một năm. Luật chỉ cho tối đa 20% thôi. Mấy ông này đang phạm luật đó Minh.\"",
+        "choices": [ { "label": "Tiếp tục", "hint": "Mở lớp Đọc sách luật với Vy", "effects": { "flag.phapLyMo": true } } ] }
+    ],
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "tang_lai", "day": 21,
+    "title": "Hưng Sẹo đổi luật chơi", "who": "Khoa (qua điện thoại)",
+    "text": "\"Anh Hưng nói tháng này lãi lên. Ngày 30 phải {debt_after_raise}.\"",
+    "variants": [
+      { "when": { "flag.phapLyMo": true },
+        "choices": [
+          { "label": "Ghi âm cuộc gọi", "hint": "Bằng chứng +1", "effects": { "special": "raise_debt", "evidence": 1 } },
+          { "label": "Nghe xong cúp máy", "effects": { "special": "raise_debt" } }
+        ] }
+    ],
+    "choices": [ { "label": "Nghe xong cúp máy", "effects": { "special": "raise_debt" } } ]
+  },
+  {
+    "id": "hop_dong_tin", "day": 22,
+    "title": "Máy lạnh cả dãy trọ",
+    "text": "Cô Sáu cần sửa máy lạnh cả dãy trọ. Chú Bảy nói Minh chưa đủ tay nghề để nhận.",
+    "variants": [
+      { "when": { "skill.tayNghe": 4 },
+        "text": "Chú Bảy giao cho Minh hợp đồng sửa máy lạnh 12 phòng của cô Sáu. Làm trong ngày 22 đến 26." }
+    ],
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "khach_uc_tin", "day": 23, "when": { "skill.ngoaiNgu": 3 },
+    "title": "Nhóm khách Úc", "who": "Vy",
+    "text": "\"Có nhóm khách Úc cần người dẫn đi chợ Bến Thành. Minh nói tiếng Anh được rồi, nhận không?\"",
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "livestream_tin", "day": 24, "when": { "skill.tinHoc": 2, "skill.giaoTiep": 2 },
+    "title": "Thùng cá khô của má",
+    "text": "Má gửi lên một thùng cá khô. Minh nghĩ tới chuyện livestream bán thử.",
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "tuan_nan", "day": 25, "when": { "flag.cuuTuan": true },
+    "title": "Cuộc gọi lúc nửa đêm", "who": "Tuấn",
+    "text": "\"Lô hàng bể rồi mày ơi. Tụi nó đang tìm tao. Cho tao trốn vài bữa…\"",
+    "choices": [
+      { "label": "Cho Tuấn trốn ở phòng trọ", "hint": "Mất trọn hôm nay, bằng chứng +1",
+        "effects": { "skip_day": true, "evidence": 1, "rep.tuan": 20, "log": "Tuấn khai ra đường dây. Đó cũng chính là đường dây của Hưng Sẹo." } },
+      { "label": "Từ chối", "hint": "Tinh thần −30", "effects": { "mood": -30 } }
+    ]
+  },
+  {
+    "id": "ong_tu", "day": 27, "when": { "flag.returnedWallet": true },
+    "title": "Ông Tư gõ cửa", "who": "Ông Tư",
+    "text": "\"Ông không có nhiều. Năm trăm nghìn, coi như tiền nước. Đừng từ chối, ông giận.\"",
+    "choices": [ { "label": "Nhận", "effects": { "money": 500000, "money_label": "Ông Tư gửi", "rep.ongTu": 10 } } ]
+  },
+
+  {
+    "id": "moc_10_ok", "system": true, "eyebrow": "Tối ngày 10 · Mốc 1",
+    "title": "Khoa đến thu lãi", "who": "Khoa",
+    "text": "Minh đưa {amount}. Khoa đếm từng tờ, liếc quanh căn phòng trọ.",
+    "quote": "\"Mày gan đấy.\"",
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "moc_10_fail", "system": true, "eyebrow": "Tối ngày 10 · Mốc 1",
+    "title": "Khoa đến thu lãi", "who": "Khoa",
+    "text": "Minh không có đủ {amount}. Khoa và hai thanh niên ra tay.\nSức khỏe {fail_health}, nợ ngày 30 tăng thêm {fail_debt}.",
+    "quote": "\"Lần sau thì không nhẹ vậy đâu.\"",
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "moc_20_ok", "system": true, "eyebrow": "Tối ngày 20 · Mốc 2",
+    "title": "Học phí của Lan",
+    "text": "Cuộc gọi video: Lan mặc áo dài trắng trong ngày nhập học. Má khóc phía sau.",
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "moc_20_fail", "system": true, "eyebrow": "Tối ngày 20 · Mốc 2",
+    "title": "Học phí của Lan",
+    "text": "Không đủ tiền học phí. Lan phải bảo lưu một năm.",
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+  {
+    "id": "skip_ngat", "system": true,
+    "title": "Minh ngất vì kiệt sức",
+    "text": "Hàng xóm đưa Minh về phòng. Cả ngày hôm nay mất trắng.",
+    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true } } ]
+  },
+  {
+    "id": "skip_chan_nan", "system": true,
+    "title": "Minh không muốn dậy",
+    "text": "Minh nằm nhìn trần nhà. Cả ngày không bước ra khỏi phòng.",
+    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true } } ]
+  },
+
+  {
+    "id": "mua", "random": true,
+    "title": "Mưa ngập đường",
+    "text": "Nước lên tới bánh xe. Công trình và việc ngoài trời nghỉ hôm nay.",
+    "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe −5", "effects": { "special": "rain", "health": -5 } } ]
+  },
+  {
+    "id": "moc_tui", "random": true, "when": { "money_min": 500001 },
+    "title": "Bị móc túi",
+    "text": "Trên xe buýt chật cứng, Minh mất {amt}.",
+    "choices": [ { "label": "Tiếp tục", "effects": { "special": "pickpocket" } } ]
+  },
+  {
+    "id": "ca_kho", "random": true,
+    "title": "Má gửi cá khô lên",
+    "text": "Gói cá khô bọc ba lớp ni lông, kèm mảnh giấy: \"Ăn cho có sức nghe con.\"",
+    "choices": [ { "label": "Tiếp tục", "hint": "Tinh thần +20", "effects": { "mood": 20, "flag.hasCaKho": true } } ]
+  },
+  {
+    "id": "nhau", "random": true,
+    "title": "Đồng hương rủ đi nhậu", "who": "Tuấn",
+    "text": "\"Tối nay anh em Hà Tĩnh tụ tập. Đi cho vui mày.\"",
+    "choices": [
+      { "label": "Đi", "hint": "Mất 3 giờ và 150k, Tinh thần +15", "require": { "money_min": 150000 },
+        "effects": { "hours": 3, "money": -150000, "money_label": "Đi nhậu với đồng hương", "mood": 15, "rep.tuan": 5 } },
+      { "label": "Từ chối", "hint": "Tuấn −5", "effects": { "rep.tuan": -5 } }
+    ]
+  },
+  {
+    "id": "dien_thoai", "random": true, "when": { "flag.phoneBroken": false },
+    "title": "Điện thoại hỏng",
+    "text": "Màn hình tối đen. Không nhận được việc online cho tới khi sửa.",
+    "choices": [ { "label": "Tiếp tục", "effects": { "flag.phoneBroken": true } } ]
+  },
+  {
+    "id": "kiem_tra_tam_tru", "random": true, "when": { "flag.tamTru": false },
+    "title": "Kiểm tra tạm trú",
+    "text": "Công an phường kiểm tra. Minh chưa đăng ký tạm trú, bị phạt 500.000đ.",
+    "variants": [
+      { "when": { "room": "rieng", "rep.coSau": 40 },
+        "text": "Công an phường kiểm tra. Cô Sáu ra nói vài câu rồi đăng ký luôn cho Minh.",
+        "choices": [ { "label": "Tiếp tục", "effects": { "flag.tamTru": true } } ] }
+    ],
+    "choices": [ { "label": "Tiếp tục", "effects": { "money": -500000, "money_label": "Phạt chưa đăng ký tạm trú" } } ]
+  },
+  {
+    "id": "tai_nan", "random": true, "when": { "did_yesterday_any": ["phu_ho", "boc_vac"] },
+    "title": "Tai nạn lao động nhỏ",
+    "text": "Hôm qua làm nặng, sáng nay Minh trượt chân ngã. Phải nghỉ cả ngày.",
+    "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe −20, mất trọn hôm nay", "effects": { "health": -20, "skip_day": true } } ]
+  }
+]

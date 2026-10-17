@@ -1,0 +1,1075 @@
+<title>Lên Phố 30 Ngày</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Patrick+Hand&display=swap">
+<style>
+/* Layout: trang vở ô li — cột sổ sách (tiền, chỉ số) bên trái, thẻ hành động ở giữa, nhật ký có lề tím bên phải */
+:root {
+  --paper: #f5f6fb;
+  --grid: #e2e5f3;
+  --card: #ffffff;
+  --line: #d3d8eb;
+  --ink: #1c2145;
+  --ink-soft: #596086;
+  --tim: #6a3db8;
+  --tim-soft: #eee7fb;
+  --stamp: #c0352b;
+  --stamp-soft: #fbe9e7;
+  --ok: #2d7a4c;
+  --warn: #a5690f;
+  --scrim: rgba(18, 20, 42, 0.5);
+  --f-hand: 'Patrick Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+  --f-body: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11142a; --grid: #1a1f3b; --card: #171b34; --line: #2b3157;
+    --ink: #e8eaf7; --ink-soft: #a2a8cb; --tim: #b99cf3; --tim-soft: #2a2352;
+    --stamp: #ff7b70; --stamp-soft: #3a1d26; --ok: #72d39d; --warn: #f0be5f;
+    --scrim: rgba(4, 5, 14, 0.7); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11142a; --grid: #1a1f3b; --card: #171b34; --line: #2b3157;
+  --ink: #e8eaf7; --ink-soft: #a2a8cb; --tim: #b99cf3; --tim-soft: #2a2352;
+  --stamp: #ff7b70; --stamp-soft: #3a1d26; --ok: #72d39d; --warn: #f0be5f;
+  --scrim: rgba(4, 5, 14, 0.7); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 14px;
+  line-height: 1.5;
+  padding-inline: 16px;
+  padding-block: 0 48px;
+}
+button, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--tim); outline-offset: 2px; }
+.shell { max-width: 1280px; margin: 0 auto; display: grid; gap: 18px; }
+
+/* Header */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-block: 18px 4px; }
+.brand { display: flex; flex-direction: column; margin-right: auto; }
+.logo { font-family: var(--f-hand); font-size: 34px; line-height: 1; color: var(--tim); letter-spacing: 0.5px; }
+.sub { font-size: 12px; color: var(--ink-soft); letter-spacing: 0.06em; text-transform: uppercase; }
+.daybox { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.dayno { font-family: var(--f-hand); font-size: 30px; line-height: 1; }
+.dayno small { font-size: 18px; color: var(--ink-soft); }
+.clock { font-variant-numeric: tabular-nums; font-weight: 600; }
+.clock span { color: var(--ink-soft); font-weight: 400; }
+.btn {
+  border: 1px solid var(--line); background: var(--card); border-radius: 8px;
+  padding: 7px 14px; font-weight: 500;
+}
+.btn:hover { border-color: var(--tim); }
+.btn.primary { background: var(--tim); border-color: var(--tim); color: var(--card); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--stamp); border-color: var(--stamp); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Board */
+.board { display: grid; grid-template-columns: 290px minmax(0, 1fr) 310px; gap: 18px; align-items: start; }
+@media (max-width: 1120px) { .board { grid-template-columns: 280px minmax(0, 1fr); } .journal { grid-column: 1 / -1; } }
+@media (max-width: 720px) { .board { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0; }
+.col { display: grid; gap: 14px; min-width: 0; }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); font-weight: 600; }
+h2 { font-family: var(--f-hand); font-weight: 400; font-size: 24px; line-height: 1.1; margin: 0; text-wrap: balance; }
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); margin: 0; font-weight: 600; }
+
+/* Status */
+.money { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; line-height: 1.1; }
+.goal { border: 1.5px dashed var(--stamp); border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; background: var(--stamp-soft); }
+.goal.met { border-color: var(--ok); background: transparent; }
+.goal-head { display: flex; justify-content: space-between; gap: 8px; font-weight: 600; }
+.goal-amt { font-variant-numeric: tabular-nums; }
+.goal-note { font-size: 12px; color: var(--ink-soft); }
+.goal.met .goal-note { color: var(--ok); }
+.bar { height: 8px; border-radius: 4px; background: var(--grid); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--ok); border-radius: 4px; transition: width .25s; }
+.bar.warn > i { background: var(--warn); }
+.bar.crit > i { background: var(--stamp); }
+.bar.tim > i { background: var(--tim); }
+.stat { display: grid; gap: 4px; }
+.stat-head { display: flex; justify-content: space-between; font-size: 13px; }
+.stat-head b { font-variant-numeric: tabular-nums; }
+.cal { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+.cal i { aspect-ratio: 1; border-radius: 3px; border: 1px solid var(--line); font-style: normal; font-size: 9px; display: grid; place-items: center; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cal i.past { background: var(--grid); border-color: transparent; }
+.cal i.today { background: var(--tim); border-color: var(--tim); color: var(--card); font-weight: 700; }
+.cal i.ms { border-color: var(--stamp); color: var(--stamp); font-weight: 700; }
+.cal i.ms.past { color: var(--ink-soft); border-color: transparent; }
+.skills { display: grid; gap: 8px; }
+.skill { display: grid; grid-template-columns: 82px 1fr 34px; align-items: center; gap: 8px; font-size: 13px; }
+.segs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.segs i { height: 8px; border-radius: 2px; background: var(--grid); position: relative; overflow: hidden; }
+.segs i b { position: absolute; inset: 0 auto 0 0; background: var(--tim); }
+.skill .lv { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-soft); font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; font-variant-numeric: tabular-nums; }
+.chip b { font-weight: 600; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13px; }
+.kv dt { color: var(--ink-soft); }
+.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.kv dd.bad { color: var(--stamp); }
+
+/* Actions */
+.toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; justify-content: space-between; }
+.field { display: grid; gap: 4px; }
+.field select { border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 6px 10px; min-width: 0; max-width: 100%; }
+.group { display: grid; gap: 10px; }
+.group-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.act {
+  text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: 8px;
+  padding: 10px 12px; display: grid; gap: 3px; transition: border-color .15s, transform .15s;
+}
+.act:hover:not(:disabled) { border-color: var(--tim); transform: translateY(-1px); }
+.act:disabled { cursor: not-allowed; background: transparent; }
+.act:disabled .act-name, .act:disabled .act-pay, .act:disabled .act-meta, .act:disabled .act-eff { opacity: 0.55; }
+.act-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.act-name { font-weight: 600; }
+.act-pay { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ok); white-space: nowrap; }
+.act-pay.cost { color: var(--stamp); }
+.act-meta { font-size: 12px; color: var(--ink-soft); }
+.act-eff { font-size: 12px; color: var(--ink-soft); }
+.act-lock { font-size: 12px; color: var(--stamp); font-weight: 500; }
+.act-hint { font-size: 12px; color: var(--tim); font-weight: 500; }
+.endday { display: flex; justify-content: flex-end; }
+
+/* Journal */
+.journal .panel { position: relative; }
+.margin-line { border-left: 2px solid var(--stamp); opacity: .35; position: absolute; top: 0; bottom: 0; left: 26px; pointer-events: none; }
+.log { max-height: 420px; overflow-y: auto; display: grid; gap: 10px; padding-left: 22px; }
+.log-day { display: grid; gap: 2px; }
+.log-day h4 { margin: 0; font-family: var(--f-hand); font-size: 18px; font-weight: 400; color: var(--tim); }
+.log p { margin: 0; font-size: 13px; }
+.log p.plus { color: var(--ok); }
+.log p.minus { color: var(--stamp); }
+.log p.event { font-family: var(--f-hand); font-size: 16px; }
+.log p.warn { color: var(--warn); font-weight: 500; }
+.notes { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-family: var(--f-hand); font-size: 16px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--f-body); font-size: 9px; fill: var(--ink-soft); }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+/* Tune */
+details.tune > summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+details.tune > summary::-webkit-details-marker { display: none; }
+details.tune > summary::before { content: '+'; font-family: var(--f-hand); font-size: 20px; line-height: 1; color: var(--tim); margin-right: 8px; }
+details.tune[open] > summary::before { content: '−'; }
+details.tune > summary span:first-child { margin-right: auto; }
+.tune-body { display: grid; gap: 10px; margin-top: 12px; }
+.tune textarea { width: 100%; min-height: 340px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--paper); font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 12px; line-height: 1.45; resize: vertical; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.msg { font-size: 13px; color: var(--ink-soft); }
+.msg.bad { color: var(--stamp); }
+.msg.good { color: var(--ok); }
+
+/* Overlay */
+.overlay { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 10; overflow-y: auto; }
+.dialog {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; width: min(560px, 100%);
+  padding: 22px 22px 18px; display: grid; gap: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  background-image: linear-gradient(90deg, transparent 30px, var(--stamp) 30px, var(--stamp) 31.5px, transparent 31.5px);
+  background-repeat: no-repeat; padding-left: 46px;
+}
+.dialog .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); font-weight: 600; }
+.dialog h2 { font-size: 28px; }
+.dialog .who { font-weight: 600; color: var(--tim); }
+.dialog .text { white-space: pre-line; }
+.dialog .quote { font-family: var(--f-hand); font-size: 20px; color: var(--tim); }
+.choices { display: grid; gap: 8px; }
+.choice { text-align: left; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
+.choice:hover:not(:disabled) { border-color: var(--tim); background: var(--tim-soft); }
+.choice:disabled { opacity: 0.55; cursor: not-allowed; }
+.choice b { font-weight: 600; }
+.choice small { color: var(--ink-soft); font-size: 12px; }
+.choice small.lock { color: var(--stamp); }
+.endtag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--stamp); border: 1.5px solid var(--stamp); border-radius: 4px; padding: 1px 8px; transform: rotate(-2deg); justify-self: start; }
+.endtag.good { color: var(--ok); border-color: var(--ok); }
+.toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; font-size: 13px; z-index: 20; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand"><span class="logo">Lên Phố</span><span class="sub">Bản thử cân bằng · vòng lặp 30 ngày</span></div>
+    <div class="daybox" id="daybox"></div>
+    <button class="btn" id="restart" type="button">Chơi lại</button>
+  </header>
+  <main class="board">
+    <section class="col" id="status"></section>
+    <section class="col" id="actions"></section>
+    <aside class="col journal" id="journal"></aside>
+  </main>
+  <section class="panel">
+    <details class="tune" id="tune">
+      <summary><span>Bảng số liệu cân bằng</span><span class="msg">Sửa con số rồi bấm Áp dụng để chơi lại với cấu hình mới</span></summary>
+      <div class="tune-body">
+        <textarea id="cfgText" spellcheck="false" aria-label="Cấu hình cân bằng dạng JSON"></textarea>
+        <div class="row">
+          <button class="btn primary" type="button" id="cfgApply">Áp dụng và chơi lại</button>
+          <button class="btn" type="button" id="cfgReset">Khôi phục mặc định</button>
+          <button class="btn" type="button" id="copyRun">Sao chép kết quả lượt chơi</button>
+          <span class="msg" id="cfgMsg"></span>
+        </div>
+        <textarea id="copyOut" hidden readonly aria-label="Kết quả lượt chơi"></textarea>
+      </div>
+    </details>
+  </section>
+</div>
+<div class="overlay" id="overlay" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const DEFAULT_CONFIG = {
+  startMoney: 2000000,
+  xpPerLevel: 6,
+  maxLevel: 5,
+  sleepHealth: 25,
+  freeHourHealth: 2,
+  moodDecay: 5,
+  sharedRoomMoodDecay: 3,
+  letterMood: 10,
+  rooms: {
+    ghep: { name: 'Phòng ghép 4 người', rent: 800000 },
+    rieng: { name: 'Phòng riêng của cô Sáu', rent: 1200000 }
+  },
+  food: {
+    com_bui: { name: 'Cơm bụi 3 bữa', cost: 90000, hours: 0, health: 0, mood: 0 },
+    tu_nau: { name: 'Tự nấu (mất 1 giờ)', cost: 45000, hours: 1, health: 0, mood: 5 },
+    tiet_kiem: { name: 'Ăn tiết kiệm 2 bữa', cost: 40000, hours: 0, health: -10, mood: -3 }
+  },
+  nightShift: { name: 'Bốc vác chợ đầu mối 2:00–6:00', pay: 250000, health: -30, mood: -5 },
+  milestones: {
+    day10: 3000000, day20: 5000000, day30: 15000000,
+    raiseDay21: 3000000, failDay10Health: -40, failDay10DebtAdd: 3000000, failDay20Mood: -50
+  },
+  legalDebt: 15000000,
+  smuggle: { pay: 3000000, hours: 6, tripsForBadEnding: 3 },
+  random: { mua: 0.15, moc_tui: 0.05, moc_tui_phong_ghep: 0.10, ca_kho: 0.08, nhau: 0.10, dien_thoai: 0.04, tam_tru: 0.05, tai_nan: 0.10 },
+  actions: [
+    { id: 'phat_to_roi', group: 'work', name: 'Phát tờ rơi', place: 'Ngã tư Hàng Xanh', hours: 3, pay: 100000, outdoor: true, eff: { health: -5, mood: -2, xp: { giaoTiep: 1.5 } } },
+    { id: 'rua_bat', group: 'work', name: 'Rửa bát quán cơm', place: 'Quán cơm tấm đầu hẻm', hours: 5, pay: 150000, note: 'Đã gồm một bữa ăn', eff: { health: -10, mood: -3 } },
+    { id: 'phu_ho', group: 'work', name: 'Phụ hồ', place: 'Công trình', hours: 8, pay: 350000, window: [7, 17], outdoor: true, holdDays: [5, 7], req: { notFlags: ['matViecPhuHo'] }, eff: { health: -25, mood: -5, xp: { tayNghe: 0.5 }, rep: { tuan: 2 } } },
+    { id: 'phuc_vu', group: 'work', name: 'Phục vụ cà phê', place: 'Quán cà phê Vy làm', hours: 6, pay: 180000, tip: [0, 80000], req: { skills: { giaoTiep: 1 } }, eff: { health: -8, mood: 2, xp: { giaoTiep: 1, ngoaiNgu: 0.3 }, rep: { vy: 5 } } },
+    { id: 'thu_ngan', group: 'work', name: 'Thu ngân cửa hàng tiện lợi', place: 'Cửa hàng 24 giờ', hours: 8, pay: 250000, req: { skills: { tinHoc: 1 } }, eff: { health: -8, mood: -2, xp: { tinHoc: 0.5 } } },
+    { id: 'gia_su', group: 'work', name: 'Gia sư Toán cho bé Bin', place: 'Nhà cô Sáu', hours: 2, pay: 150000, window: [18, 21], req: { room: 'rieng', rep: { coSau: 30 } }, eff: { mood: 3, rep: { coSau: 3 } } },
+    { id: 'tho_phu', group: 'work', name: 'Thợ phụ điện lạnh', place: 'Đi cùng chú Bảy', hours: 6, pay: 500000, req: { skills: { tayNghe: 2 } }, eff: { health: -10, xp: { tayNghe: 1 }, rep: { chuBay: 3 } } },
+    { id: 'ban_online', group: 'work', name: 'Bán hàng online', place: 'Điện thoại', hours: 4, payRange: [200000, 800000], failChance: 0.15, needsPhone: true, req: { skills: { tinHoc: 2, giaoTiep: 2 } }, eff: { mood: -3, xp: { giaoTiep: 0.5, tinHoc: 0.5 } } },
+    { id: 'tho_chinh', group: 'work', name: 'Thợ điện lạnh chính', place: 'Nhận việc riêng', hours: 6, pay: 900000, req: { skills: { tayNghe: 4 } }, eff: { health: -10, xp: { tayNghe: 0.5 } } },
+    { id: 'huong_dan', group: 'work', name: 'Hướng dẫn khách nước ngoài', place: 'Quận 1', hours: 5, pay: 700000, tip: [0, 300000], window: [8, 14], weekend: true, req: { skills: { ngoaiNgu: 3 } }, eff: { health: -8, mood: 5, xp: { ngoaiNgu: 0.5 } } },
+    { id: 'hop_dong_12', group: 'work', name: 'Sửa máy lạnh 12 phòng trọ', place: 'Dãy trọ cô Sáu', hours: 8, pay: 2000000, maxTimes: 2, days: [22, 26], req: { skills: { tayNghe: 4 } }, eff: { health: -15, rep: { coSau: 10, chuBay: 5 } } },
+    { id: 'khach_uc', group: 'work', name: 'Dẫn khách Úc đi chợ Bến Thành', place: 'Quận 1', hours: 6, pay: 1500000, tip: [0, 500000], maxTimes: 1, days: [23, 26], req: { skills: { ngoaiNgu: 3 } }, eff: { health: -8, mood: 8 } },
+    { id: 'livestream', group: 'work', name: 'Livestream bán cá khô của má', place: 'Phòng trọ', hours: 4, payRange: [500000, 2500000], maxTimes: 1, days: [24, 26], needsPhone: true, req: { skills: { tinHoc: 2, giaoTiep: 2 } }, eff: { mood: 5 } },
+
+    { id: 'tu_hoc', group: 'study', name: 'Tự học ở thư viện', place: 'Thư viện quận', hours: 2, focusXp: 1, note: 'Cộng vào kỹ năng đang chọn', eff: { mood: 5 } },
+    { id: 'hoc_viec', group: 'study', name: 'Học việc ở tiệm chú Bảy', place: 'Tiệm chú Bảy', hours: 3, req: { fromDay: 11, rep: { chuBay: 20 } }, eff: { health: -5, xp: { tayNghe: 3 }, rep: { chuBay: 3 } } },
+    { id: 'khoa_dien_lanh', group: 'study', name: 'Khóa điện lạnh ở trung tâm', place: 'Trung tâm dạy nghề', hours: 3, fee: 1500000, maxTimes: 10, window: [13, 16], req: { fromDay: 11 }, eff: { health: -3, xp: { tayNghe: 4.5 } } },
+    { id: 'tieng_anh', group: 'study', name: 'Lớp tiếng Anh buổi tối', place: 'Nhà văn hóa phường', hours: 2, fee: 300000, window: [19, 21], req: { fromDay: 11 }, eff: { mood: -2, xp: { ngoaiNgu: 2 } } },
+    { id: 'tin_hoc', group: 'study', name: 'Tin học văn phòng', place: 'Trung tâm tin học', hours: 2, fee: 500000, maxTimes: 6, window: [8, 10], req: { fromDay: 11 }, eff: { xp: { tinHoc: 2 } } },
+    { id: 'doc_luat', group: 'study', name: 'Đọc sách luật với Vy', place: 'Quán cà phê', hours: 1, window: [20, 22], showIf: 'phapLyMo', eff: { xp: { phapLy: 2 }, rep: { vy: 3 } } },
+
+    { id: 'nghi', group: 'life', name: 'Nghỉ ngơi', place: 'Phòng trọ', hours: 2, perDay: 2, eff: { health: 12, mood: 5 } },
+    { id: 'goi_ve', group: 'life', name: 'Gọi điện về nhà', place: 'Phòng trọ', hours: 1, window: [18, 22], eff: { mood: 10 } },
+    { id: 'tro_chuyen', group: 'life', name: 'Trò chuyện với hàng xóm', place: 'Trong hẻm', hours: 1, eff: { mood: 3, xp: { giaoTiep: 1 }, rep: { coSau: 2 } } },
+    { id: 'phu_chu_bay', group: 'life', name: 'Phụ chú Bảy dọn tiệm', place: 'Tiệm chú Bảy', hours: 2, req: { fromDay: 3 }, eff: { health: -3, xp: { tayNghe: 0.5 }, rep: { chuBay: 6 } } },
+    { id: 'cafe_vy', group: 'life', name: 'Uống cà phê với Vy', place: 'Quán cà phê', hours: 1, cost: 25000, req: { fromDay: 11 }, eff: { mood: 6, rep: { vy: 8 } } },
+    { id: 'tam_tru', group: 'life', name: 'Đăng ký tạm trú', place: 'Công an phường', hours: 2, window: [7, 16], maxTimes: 1, setFlag: 'tamTru', eff: {} },
+    { id: 'sua_dt', group: 'life', name: 'Sửa điện thoại', place: 'Tiệm sửa điện thoại', hours: 1, cost: 300000, showIf: 'phoneBroken', clearFlag: 'phoneBroken', eff: {} }
+  ]
+};
+
+const SKILLS = { tayNghe: 'Tay nghề', tinHoc: 'Tin học', ngoaiNgu: 'Ngoại ngữ', giaoTiep: 'Giao tiếp', phapLy: 'Pháp lý' };
+const REPS = { coSau: 'Cô Sáu', chuBay: 'Chú Bảy', vy: 'Vy', tuan: 'Tuấn', ongTu: 'Ông Tư' };
+const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+const GROUPS = { work: 'Làm việc', study: 'Học', life: 'Sinh hoạt' };
+const ITEMS = {
+  do_nghe: { name: 'Bộ đồ nghề của ba', desc: 'Tay nghề +1, chú Bảy chú ý ngay từ đầu' },
+  sach: { name: 'Chồng sách cũ thời cao đẳng', desc: 'Tin học +1, kèm Toán cho bé Bin dễ được tin hơn' },
+  ao_khoac: { name: 'Chiếc áo khoác má đan', desc: 'Tinh thần tối đa +20, gọi về nhà hồi thêm Tinh thần' }
+};
+const NOTE_TEXT = {
+  quyt_luong: 'Chủ thầu công trình sẽ trốn vào ngày 8, mang theo lương phụ hồ các ngày 5 đến 7.',
+  tang_lai: 'Ngày 21, Hưng Sẹo sẽ đòi 18 triệu thay vì 15.',
+  vy_luat: 'Vy học Luật. Thân với Vy trước ngày 18 có thể mở ra một lối thoát khác.',
+  hoc_nghe: 'Chỉ làm việc chân tay thì không đủ. Từ ngày 11 nên đi học một nghề.',
+  chu_bay: 'Chú Bảy chỉ dạy nghề cho người chú đã quen. Ghé phụ chú dọn tiệm từ sớm.'
+};
+
+let CFG = null;
+let s = null;
+const ui = { night: false, armed: false, armTimer: null };
+
+/* ---------- utilities ---------- */
+const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => Math.round(n).toLocaleString('vi-VN') + 'đ';
+const fmtK = n => {
+  const a = Math.abs(n);
+  if (a >= 1e6) return (n / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 2 }) + ' tr';
+  return Math.round(n / 1000).toLocaleString('vi-VN') + 'k';
+};
+const num = n => (Math.round(n * 10) / 10).toLocaleString('vi-VN');
+const hh = h => String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.round((h % 1) * 60)).padStart(2, '0');
+const rnd = (a, b) => a + Math.random() * (b - a);
+const roundK = n => Math.round(n / 10000) * 10000;
+const clone = o => JSON.parse(JSON.stringify(o));
+const isWeekend = d => d % 7 === 6 || d % 7 === 0;
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+function loadCfg() {
+  const raw = store.get('lenpho.cfg');
+  if (raw) { try { return JSON.parse(raw); } catch (e) {} }
+  return clone(DEFAULT_CONFIG);
+}
+function getNotes() { try { return JSON.parse(store.get('lenpho.notes') || '[]'); } catch (e) { return []; } }
+function hasNote(k) { return getNotes().includes(k); }
+function action(id) { return CFG.actions.find(a => a.id === id); }
+
+/* ---------- state ---------- */
+function newState(item) {
+  const st = {
+    day: 1, used: 0, money: CFG.startMoney, health: 100, mood: 80, healthMax: 100, moodMax: 100,
+    xp: { tayNghe: 0, tinHoc: 0, ngoaiNgu: 0, giaoTiep: 0, phapLy: 0 },
+    rep: { coSau: 10, chuBay: 0, vy: 0, tuan: 40, ongTu: 0 },
+    flags: {}, room: null, food: 'com_bui', focus: 'tinHoc', item,
+    debt: CFG.milestones.day30, interestPaid: 0, evidence: 0, smuggle: 0, held: 0,
+    counts: {}, today: { list: [] }, yesterday: { list: [] }, lastRandom: {},
+    queue: [], log: [], history: [], choices: [], skipReason: null, over: null,
+    stats: { earned: 0, spent: 0, faints: 0 }
+  };
+  if (item === 'do_nghe') st.xp.tayNghe = CFG.xpPerLevel;
+  if (item === 'sach') st.xp.tinHoc = CFG.xpPerLevel;
+  if (item === 'ao_khoac') { st.moodMax = 120; st.mood = 100; }
+  return st;
+}
+function lv(k) { return Math.min(CFG.maxLevel, Math.floor((s.xp[k] || 0) / CFG.xpPerLevel + 1e-9)); }
+function clampAll() {
+  s.health = Math.max(0, Math.min(s.healthMax, s.health));
+  s.mood = Math.max(0, Math.min(s.moodMax, s.mood));
+  for (const k in s.rep) s.rep[k] = Math.max(0, Math.min(100, s.rep[k]));
+}
+function adj(stat, d) { s[stat] += d; clampAll(); }
+function addRep(k, d) { s.rep[k] = (s.rep[k] || 0) + d; clampAll(); }
+function addXp(k, d) { s.xp[k] = Math.min(CFG.maxLevel * CFG.xpPerLevel, (s.xp[k] || 0) + d); }
+function log(t, k = 'info') { s.log.push({ day: s.day, t, k }); }
+function earn(n, why) { n = Math.round(n); s.money += n; s.stats.earned += n; log(`+${fmt(n)} · ${why}`, 'plus'); }
+function spend(n, why) { const t = Math.min(Math.round(n), s.money); s.money -= t; s.stats.spent += t; log(`−${fmt(t)} · ${why}`, 'minus'); return t; }
+function clock() { return 6 + s.used; }
+function dayEnd() { return 22 - ((CFG.food[s.food] || {}).hours || 0); }
+function applyEff(e = {}) {
+  if (e.health) adj('health', e.health);
+  if (e.mood) adj('mood', e.mood);
+  for (const k in (e.xp || {})) addXp(k, e.xp[k]);
+  for (const k in (e.rep || {})) addRep(k, e.rep[k]);
+}
+function maxSkill() { return Math.max(...Object.keys(SKILLS).map(lv)); }
+function nextMilestone() {
+  if (s.day <= 10) return { day: 10, label: 'Khoa thu lãi', amount: CFG.milestones.day10 };
+  if (s.day <= 20) return { day: 20, label: 'Học phí của Lan', amount: CFG.milestones.day20 };
+  return { day: 30, label: 'Trả nợ Hưng Sẹo', amount: s.debt };
+}
+
+/* ---------- actions ---------- */
+function hidden(a) {
+  if (a.days && (s.day < a.days[0] || s.day > a.days[1])) return true;
+  if (a.showIf && !s.flags[a.showIf]) return true;
+  if (a.maxTimes && (s.counts[a.id] || 0) >= a.maxTimes && (a.days || a.setFlag)) return true;
+  return false;
+}
+function status(a) {
+  const no = reason => ({ ok: false, reason });
+  if (s.over || s.queue.length) return no('');
+  const r = a.req || {};
+  if (r.fromDay && s.day < r.fromDay) return no(`Mở từ ngày ${r.fromDay}`);
+  if (a.weekend && !isWeekend(s.day)) return no('Chỉ có vào Thứ Bảy, Chủ Nhật');
+  if (a.outdoor && s.today.rain) return no('Mưa ngập, nghỉ hôm nay');
+  for (const k in (r.skills || {})) if (lv(k) < r.skills[k]) return no(`Cần ${SKILLS[k]} ${r.skills[k]}`);
+  if (r.room && s.room !== r.room) return no('Cần ở phòng riêng của cô Sáu');
+  for (const k in (r.rep || {})) if ((s.rep[k] || 0) < r.rep[k]) return no(`Cần thân với ${REPS[k]} (${s.rep[k] || 0}/${r.rep[k]})`);
+  for (const f of (r.notFlags || [])) if (s.flags[f]) return no(f === 'matViecPhuHo' ? 'Mất mối việc sau khi từ chối Tuấn' : 'Không còn mở');
+  if (a.needsPhone && s.flags.phoneBroken) return no('Điện thoại đang hỏng');
+  if (a.maxTimes && (s.counts[a.id] || 0) >= a.maxTimes) return no('Đã học đủ số buổi');
+  if ((s.today[a.id] || 0) >= (a.perDay || 1)) return no('Hôm nay đã làm rồi');
+  const money = (a.cost || 0) + (a.fee && !s.counts[a.id] ? a.fee : 0);
+  if (money > s.money) return no(`Không đủ tiền (cần ${fmtK(money)})`);
+  if (s.health <= 0 && a.group !== 'life') return no('Kiệt sức, cần nghỉ');
+  const c = clock();
+  const start = a.window ? Math.max(c, a.window[0]) : c;
+  const limit = a.window ? Math.min(a.window[1], dayEnd()) : dayEnd();
+  if (start + a.hours > limit) return no(a.window ? `Chỉ trong khung ${hh(a.window[0])}–${hh(a.window[1])}` : 'Không đủ giờ hôm nay');
+  return { ok: true, start };
+}
+function doAction(id) {
+  const a = action(id);
+  if (!a || hidden(a)) return;
+  const st = status(a);
+  if (!st.ok) return;
+  const startAt = st.start;
+  s.used = startAt - 6 + a.hours;
+  const first = !s.counts[a.id];
+  if (a.fee && first) spend(a.fee, `Học phí ${a.name}`);
+  if (a.cost) spend(a.cost, a.name);
+  let pay = 0;
+  if (a.pay) pay = a.pay;
+  if (a.payRange) pay = Math.random() < (a.failChance || 0) ? 0 : roundK(rnd(a.payRange[0], a.payRange[1]));
+  if (a.tip) pay += roundK(rnd(a.tip[0], a.tip[1]));
+  const label = `${hh(startAt)} ${a.name}`;
+  if (a.holdDays && s.day >= a.holdDays[0] && s.day <= a.holdDays[1]) {
+    s.held += pay;
+    log(`${label}: chủ thầu hẹn cuối tuần trả ${fmt(pay)}`, 'warn');
+  } else if (pay > 0) {
+    earn(pay, label);
+  } else if (a.payRange) {
+    log(`${label}: hôm nay không bán được gì`, 'warn');
+  } else {
+    log(label);
+  }
+  applyEff(a.eff);
+  if (a.focusXp) addXp(s.focus, a.focusXp);
+  if (a.id === 'goi_ve' && s.item === 'ao_khoac') adj('mood', 5);
+  if (a.setFlag) s.flags[a.setFlag] = true;
+  if (a.clearFlag) delete s.flags[a.clearFlag];
+  s.counts[a.id] = (s.counts[a.id] || 0) + 1;
+  s.today[a.id] = (s.today[a.id] || 0) + 1;
+  s.today.list.push(a.id);
+  commit();
+}
+
+/* ---------- events ---------- */
+const EV = {
+  xe_om: () => ({
+    eyebrow: 'Ngày 1', title: 'Bến xe Miền Đông, 5 giờ sáng', who: 'Chú xe ôm',
+    text: '"Về Bình Thạnh hả con? Ba trăm nghìn, chú chở liền."',
+    choices: [
+      { label: 'Đồng ý 300 nghìn', run() { spend(300000, 'Xe ôm từ bến xe'); } },
+      { label: 'Mặc cả', hint: 'Còn 120 nghìn', req: () => lv('giaoTiep') >= 1 ? null : 'Cần Giao tiếp 1', run() { spend(120000, 'Xe ôm, sau khi mặc cả'); } },
+      { label: 'Gọi Tuấn ra đón', hint: 'Chờ 2 giờ, không mất tiền', run() { s.used += 2; addRep('tuan', 10); log('Tuấn tới bằng một chiếc tay ga mới cứng. Phụ hồ mà đi xe này sao?', 'event'); } }
+    ]
+  }),
+  phong_tro: () => ({
+    eyebrow: 'Ngày 1', title: 'Tìm phòng trọ',
+    text: 'Trong con hẻm ở Bình Thạnh còn hai chỗ trống. Tiền trọ trả một lần cho cả tháng.',
+    choices: ['ghep', 'rieng'].map(k => ({
+      label: `${CFG.rooms[k].name}: ${fmt(CFG.rooms[k].rent)}`,
+      hint: k === 'ghep' ? 'Rẻ hơn, nhưng Tinh thần giảm nhanh và dễ mất đồ' : 'Mở tuyến cô Sáu và bé Bin',
+      req: () => s.money >= CFG.rooms[k].rent ? null : 'Không đủ tiền',
+      run() { s.room = k; spend(CFG.rooms[k].rent, `Tiền trọ: ${CFG.rooms[k].name}`); if (k === 'rieng') addRep('coSau', 10); }
+    }))
+  }),
+  chu_bay: () => ({
+    eyebrow: 'Ngày 3', title: 'Tiệm chú Bảy đầu hẻm', who: 'Chú Bảy',
+    text: 'Một chiếc máy lạnh đang kêu rè rè. Chú Bảy cau mày, tháo ra lắp vào mãi không xong.',
+    choices: [
+      { label: 'Ghé vào góp ý', hint: 'Chú Bảy +20', req: () => lv('tayNghe') >= 1 ? null : 'Cần Tay nghề 1', run() { addRep('chuBay', 20); log('Minh chỉ đúng bệnh cái tụ điện. Chú Bảy nhìn Minh lâu hơn bình thường.', 'event'); } },
+      { label: 'Hỏi thăm vài câu', hint: 'Chú Bảy +5', run() { addRep('chuBay', 5); } },
+      { label: 'Đi tiếp', run() {} }
+    ]
+  }),
+  be_bin: () => ({
+    eyebrow: 'Ngày 5', title: 'Bé Bin rớt bài kiểm tra', who: 'Cô Sáu',
+    text: 'Cô Sáu đứng giữa sân mắng con: "Có mấy bài Toán mà cũng không làm được!"',
+    choices: [
+      { label: 'Đề nghị kèm Toán một buổi, không lấy tiền', hint: 'Mất 2 giờ, cô Sáu +20', req: () => s.used + 2 <= 16 ? null : 'Không đủ giờ', run() { s.used += 2; addRep('coSau', s.item === 'sach' ? 30 : 20); log('Bé Bin làm được bài. Cô Sáu bớt nghi ngờ cậu thanh niên mới tới.', 'event'); } },
+      { label: 'Không xen vào', run() {} }
+    ]
+  }),
+  lan_goi: () => ({
+    eyebrow: 'Ngày 7', title: 'Cuộc gọi của Lan', who: 'Lan',
+    text: '"Anh Hai… thôi em không học nữa cũng được. Em đi làm công nhân phụ anh."',
+    choices: [
+      { label: '"Không được! Em phải học."', hint: 'Tinh thần −10, Tinh thần tối đa +10', run() { adj('mood', -10); s.moodMax += 10; } },
+      { label: '"Để anh tính…"', hint: 'Lan đi làm thêm', run() { s.flags.lanLamThem = true; } }
+    ]
+  }),
+  quyt_luong: () => ({
+    eyebrow: 'Ngày 8', title: 'Chủ thầu bỏ trốn',
+    text: s.held > 0
+      ? `Sáng ra công trình, chủ thầu đã biến mất. Minh mất ${fmt(s.held)} tiền công các ngày 5 đến 7.`
+      : 'Nghe nói chủ thầu công trình đã bỏ trốn, quỵt lương anh em. May mà Minh không dính.',
+    who: 'Tuấn', quote: '"Ở đây vậy đó mày. Muốn có tiền thì phải biết đường."',
+    choices: [{ label: 'Tiếp tục', run() { if (s.held > 0) { log(`Mất ${fmt(s.held)} tiền công bị quỵt`, 'minus'); s.flags.wageLost = true; } s.held = 0; } }]
+  }),
+  loi_re: () => ({
+    eyebrow: 'Ngày 11', title: 'Lối rẽ',
+    text: 'Chú Bảy: "Muốn học nghề thì sáng mai ra đây. Tháng đầu không lương à nghen."\nVy ở quán cà phê: "Bạn nói chuyện dễ thương mà, sao không xin vô đây làm?"\nMột tờ rơi dán ở cột điện: lớp tiếng Anh buổi tối ở nhà văn hóa phường.\n\nCác lớp học đã mở.',
+    choices: [{ label: 'Tiếp tục', run() { addRep('vy', 10); } }]
+  }),
+  vi_ong_tu: () => ({
+    eyebrow: 'Ngày 13', title: 'Cái ví rơi trong hẻm',
+    text: 'Minh nhặt được một cái ví sờn. Bên trong có 2 triệu đồng và giấy tờ của một ông lão.',
+    choices: [
+      { label: 'Giữ lại', hint: '+2.000.000đ, cô Sáu và chú Bảy −10', run() { earn(2000000, 'Tiền trong ví nhặt được'); addRep('coSau', -10); addRep('chuBay', -10); s.flags.keptWallet = true; } },
+      { label: 'Tìm người trả lại', hint: 'Ông Tư +30, cô Sáu +10', run() { addRep('ongTu', 30); addRep('coSau', 10); s.flags.returnedWallet = true; log('Ông Tư: "Mất đồ thì kiếm lại được, mất cái tử tế thì kiếm hoài không ra."', 'event'); } }
+    ]
+  }),
+  tuan_ru: () => ({
+    eyebrow: 'Ngày 15', title: 'Tuấn rủ chạy hàng', who: 'Tuấn',
+    text: `"Một chuyến chở đồ từ Củ Chi về. ${fmtK(CFG.smuggle.pay)}. Không hỏi bên trong là gì."`,
+    choices: [
+      { label: 'Đi một chuyến', hint: `+${fmt(CFG.smuggle.pay)}, mất ${CFG.smuggle.hours} giờ`, run() { s.used += CFG.smuggle.hours; s.smuggle++; addRep('tuan', 10); earn(CFG.smuggle.pay, 'Chạy hàng cho Tuấn'); } },
+      { label: 'Từ chối', hint: 'Tuấn giận, mất mối phụ hồ', run() { s.flags.matViecPhuHo = true; addRep('tuan', -20); } },
+      { label: 'Từ chối và khuyên Tuấn bỏ', hint: 'Mở tuyến cứu Tuấn', req: () => s.rep.tuan >= 50 ? null : `Cần thân với Tuấn (${s.rep.tuan}/50)`, run() { s.flags.cuuTuan = true; addRep('tuan', 5); } }
+    ]
+  }),
+  tuan_ru_tiep: () => ({
+    eyebrow: `Ngày ${s.day}`, title: 'Thêm một chuyến nữa', who: 'Tuấn',
+    text: `"Chuyến trước êm mà. Thêm chuyến nữa đi, ${fmtK(CFG.smuggle.pay)}."`,
+    choices: [
+      { label: 'Đi', hint: `Đã đi ${s.smuggle}/${CFG.smuggle.tripsForBadEnding} chuyến`, run() { s.used += CFG.smuggle.hours; s.smuggle++; earn(CFG.smuggle.pay, 'Chạy hàng cho Tuấn'); } },
+      { label: 'Thôi, không đi nữa', run() {} }
+    ]
+  }),
+  om: () => {
+    const care = s.room === 'rieng' && s.rep.coSau >= 30;
+    return {
+      eyebrow: 'Ngày 17', title: 'Minh sốt cao',
+      text: care ? 'Cô Sáu thấy cửa phòng đóng im, gõ cửa rồi mang lên một tô cháo hành nóng.' : 'Minh sốt li bì. Không ai biết, cả ngày nằm một mình trong phòng.',
+      choices: [{ label: 'Tiếp tục', hint: care ? 'Sức khỏe +30' : 'Mất trọn ngày hôm nay', run() { if (care) adj('health', 30); else { s.used = 16; s.stats.faints++; } } }]
+    };
+  },
+  vy_hop_dong: () => {
+    const close = s.rep.vy >= 40;
+    return {
+      eyebrow: 'Ngày 18', title: close ? 'Tờ giấy vay nợ' : 'Một buổi chiều ở quán', who: 'Vy',
+      text: close ? 'Minh kể chuyện nhà. Vy xin xem ảnh tờ giấy vay má gửi lên.\n"Khoan… lãi này gần 200% một năm. Luật chỉ cho tối đa 20% thôi. Mấy ông này đang phạm luật đó Minh."' : 'Vy hỏi chuyện nhà. Minh ngại, không kể.',
+      choices: [{ label: 'Tiếp tục', hint: close ? 'Mở lớp Đọc sách luật với Vy' : '', run() { if (close) s.flags.phapLyMo = true; } }]
+    };
+  },
+  tang_lai: () => ({
+    eyebrow: 'Ngày 21', title: 'Hưng Sẹo đổi luật chơi', who: 'Khoa (qua điện thoại)',
+    text: `"Anh Hưng nói tháng này lãi lên. Ngày 30 phải ${fmtK(s.debt + CFG.milestones.raiseDay21)}."`,
+    choices: s.flags.phapLyMo
+      ? [
+        { label: 'Ghi âm cuộc gọi', hint: 'Bằng chứng +1', run() { s.debt += CFG.milestones.raiseDay21; s.evidence++; } },
+        { label: 'Nghe xong cúp máy', run() { s.debt += CFG.milestones.raiseDay21; } }
+      ]
+      : [{ label: 'Nghe xong cúp máy', run() { s.debt += CFG.milestones.raiseDay21; } }]
+  }),
+  hop_dong_tin: () => ({
+    eyebrow: 'Ngày 22', title: 'Máy lạnh cả dãy trọ',
+    text: lv('tayNghe') >= 4 ? 'Chú Bảy giao cho Minh hợp đồng sửa máy lạnh 12 phòng của cô Sáu. Làm trong ngày 22 đến 26.' : 'Cô Sáu cần sửa máy lạnh cả dãy trọ. Chú Bảy nói Minh chưa đủ tay nghề để nhận.',
+    choices: [{ label: 'Tiếp tục', run() {} }]
+  }),
+  khach_uc_tin: () => ({ eyebrow: 'Ngày 23', title: 'Nhóm khách Úc', who: 'Vy', text: '"Có nhóm khách Úc cần người dẫn đi chợ Bến Thành. Minh nói tiếng Anh được rồi, nhận không?"', choices: [{ label: 'Tiếp tục', run() {} }] }),
+  livestream_tin: () => ({ eyebrow: 'Ngày 24', title: 'Thùng cá khô của má', text: 'Má gửi lên một thùng cá khô. Minh nghĩ tới chuyện livestream bán thử.', choices: [{ label: 'Tiếp tục', run() {} }] }),
+  tuan_nan: () => ({
+    eyebrow: 'Ngày 25', title: 'Cuộc gọi lúc nửa đêm', who: 'Tuấn',
+    text: '"Lô hàng bể rồi mày ơi. Tụi nó đang tìm tao. Cho tao trốn vài bữa…"',
+    choices: [
+      { label: 'Cho Tuấn trốn ở phòng trọ', hint: 'Mất trọn hôm nay, bằng chứng +1', run() { s.used = 16; s.evidence++; addRep('tuan', 20); log('Tuấn khai ra đường dây. Đó cũng chính là đường dây của Hưng Sẹo.', 'event'); } },
+      { label: 'Từ chối', hint: 'Tinh thần −30', run() { adj('mood', -30); } }
+    ]
+  }),
+  ong_tu: () => ({
+    eyebrow: 'Ngày 27', title: 'Ông Tư gõ cửa', who: 'Ông Tư',
+    text: '"Ông không có nhiều. Năm trăm nghìn, coi như tiền nước. Đừng từ chối, ông giận."',
+    choices: [{ label: 'Nhận', run() { earn(500000, 'Ông Tư gửi'); addRep('ongTu', 10); } }]
+  }),
+  moc_10: d => ({
+    eyebrow: 'Tối ngày 10 · Mốc 1', title: 'Khoa đến thu lãi', who: 'Khoa',
+    text: d.paid ? `Minh đưa ${fmt(d.amount)}. Khoa đếm từng tờ, liếc quanh căn phòng trọ.` : `Minh không có đủ ${fmt(d.amount)}. Khoa và hai thanh niên ra tay.\nSức khỏe ${CFG.milestones.failDay10Health}, nợ ngày 30 tăng thêm ${fmt(CFG.milestones.failDay10DebtAdd)}.`,
+    quote: d.paid ? '"Mày gan đấy."' : '"Lần sau thì không nhẹ vậy đâu."',
+    choices: [{ label: 'Tiếp tục', run() {} }]
+  }),
+  moc_20: d => ({
+    eyebrow: 'Tối ngày 20 · Mốc 2', title: 'Học phí của Lan',
+    text: d.paid ? 'Cuộc gọi video: Lan mặc áo dài trắng trong ngày nhập học. Má khóc phía sau.' : 'Không đủ tiền học phí. Lan phải bảo lưu một năm.',
+    choices: [{ label: 'Tiếp tục', run() {} }]
+  }),
+  nghi_ca_ngay: d => ({
+    eyebrow: `Ngày ${s.day}`, title: d.reason === 'ngat' ? 'Minh ngất vì kiệt sức' : 'Minh không muốn dậy',
+    text: d.reason === 'ngat' ? 'Hàng xóm đưa Minh về phòng. Cả ngày hôm nay mất trắng.' : 'Minh nằm nhìn trần nhà. Cả ngày không bước ra khỏi phòng.',
+    choices: [{ label: 'Tiếp tục', hint: 'Mất trọn ngày hôm nay', run() { s.used = 16; } }]
+  }),
+  mua: () => ({ eyebrow: `Ngày ${s.day}`, title: 'Mưa ngập đường', text: 'Nước lên tới bánh xe. Công trình và việc ngoài trời nghỉ hôm nay.', choices: [{ label: 'Tiếp tục', hint: 'Sức khỏe −5', run() { s.today.rain = true; adj('health', -5); } }] }),
+  moc_tui: d => ({ eyebrow: `Ngày ${s.day}`, title: 'Bị móc túi', text: `Trên xe buýt chật cứng, Minh mất ${fmt(d.amt)}.`, choices: [{ label: 'Tiếp tục', run() { spend(d.amt, 'Bị móc túi'); } }] }),
+  ca_kho: () => ({ eyebrow: `Ngày ${s.day}`, title: 'Má gửi cá khô lên', text: 'Gói cá khô bọc ba lớp ni lông, kèm mảnh giấy: "Ăn cho có sức nghe con."', choices: [{ label: 'Tiếp tục', hint: 'Tinh thần +20', run() { adj('mood', 20); s.flags.hasCaKho = true; } }] }),
+  nhau: () => ({
+    eyebrow: `Ngày ${s.day}`, title: 'Đồng hương rủ đi nhậu', who: 'Tuấn', text: '"Tối nay anh em Hà Tĩnh tụ tập. Đi cho vui mày."',
+    choices: [
+      { label: 'Đi', hint: 'Mất 3 giờ và 150k, Tinh thần +15', req: () => s.money >= 150000 ? null : 'Không đủ tiền', run() { s.used += 3; spend(150000, 'Đi nhậu với đồng hương'); adj('mood', 15); addRep('tuan', 5); } },
+      { label: 'Từ chối', hint: 'Tuấn −5', run() { addRep('tuan', -5); } }
+    ]
+  }),
+  dien_thoai: () => ({ eyebrow: `Ngày ${s.day}`, title: 'Điện thoại hỏng', text: 'Màn hình tối đen. Không nhận được việc online cho tới khi sửa.', choices: [{ label: 'Tiếp tục', run() { s.flags.phoneBroken = true; } }] }),
+  kiem_tra_tam_tru: () => {
+    const help = s.room === 'rieng' && s.rep.coSau >= 40;
+    return {
+      eyebrow: `Ngày ${s.day}`, title: 'Kiểm tra tạm trú',
+      text: help ? 'Công an phường kiểm tra. Cô Sáu ra nói vài câu rồi đăng ký luôn cho Minh.' : 'Công an phường kiểm tra. Minh chưa đăng ký tạm trú, bị phạt 500.000đ.',
+      choices: [{ label: 'Tiếp tục', run() { if (help) s.flags.tamTru = true; else spend(500000, 'Phạt chưa đăng ký tạm trú'); } }]
+    };
+  },
+  tai_nan: () => ({ eyebrow: `Ngày ${s.day}`, title: 'Tai nạn lao động nhỏ', text: 'Hôm qua làm nặng, sáng nay Minh trượt chân ngã. Phải nghỉ cả ngày.', choices: [{ label: 'Tiếp tục', hint: 'Sức khỏe −20, mất trọn hôm nay', run() { adj('health', -20); s.used = 16; } }] })
+};
+
+function fixedEvents(d) {
+  const L = [];
+  const smug = s.smuggle >= 1 && s.smuggle < CFG.smuggle.tripsForBadEnding;
+  if (d === 1) L.push('xe_om', 'phong_tro');
+  if (d === 3) L.push('chu_bay');
+  if (d === 5 && s.room === 'rieng') L.push('be_bin');
+  if (d === 7) L.push('lan_goi');
+  if (d === 8) L.push('quyt_luong');
+  if (d === 11) L.push('loi_re');
+  if (d === 13) L.push('vi_ong_tu');
+  if (d === 15) L.push('tuan_ru');
+  if (d === 17 && s.health < 30) L.push('om');
+  if ((d === 17 || d === 19) && smug) L.push('tuan_ru_tiep');
+  if (d === 18) L.push('vy_hop_dong');
+  if (d === 21) L.push('tang_lai');
+  if (d === 22) L.push('hop_dong_tin');
+  if (d === 23 && lv('ngoaiNgu') >= 3) L.push('khach_uc_tin');
+  if (d === 24 && lv('tinHoc') >= 2 && lv('giaoTiep') >= 2) L.push('livestream_tin');
+  if (d === 25 && s.flags.cuuTuan) L.push('tuan_nan');
+  if (d === 27 && s.flags.returnedWallet) L.push('ong_tu');
+  return L.map(id => ({ id }));
+}
+function rollRandom() {
+  const R = CFG.random;
+  const did = s.yesterday.list || [];
+  const cands = [
+    { id: 'mua', p: R.mua, ok: true },
+    { id: 'moc_tui', p: s.room === 'ghep' ? R.moc_tui_phong_ghep : R.moc_tui, ok: s.money > 500000 },
+    { id: 'ca_kho', p: R.ca_kho, ok: true },
+    { id: 'nhau', p: R.nhau, ok: true },
+    { id: 'dien_thoai', p: R.dien_thoai, ok: !s.flags.phoneBroken },
+    { id: 'kiem_tra_tam_tru', p: R.tam_tru, ok: !s.flags.tamTru },
+    { id: 'tai_nan', p: R.tai_nan, ok: did.includes('phu_ho') || did.includes('boc_vac') }
+  ].filter(c => c.ok && s.day - (s.lastRandom[c.id] ?? -99) > 3).sort(() => Math.random() - 0.5);
+  for (const c of cands) {
+    if (Math.random() < (c.p || 0)) {
+      s.lastRandom[c.id] = s.day;
+      const data = c.id === 'moc_tui' ? { amt: roundK(s.money * rnd(0.1, 0.3)) } : {};
+      return { id: c.id, data };
+    }
+  }
+  return null;
+}
+function morning() {
+  if (s.skipReason) { s.queue.push({ id: 'nghi_ca_ngay', data: { reason: s.skipReason } }); s.skipReason = null; }
+  if (s.day % 7 === 0) { adj('mood', CFG.letterMood); log('Thư tay của Lan: "Anh Hai nhớ ăn uống đầy đủ nghen."', 'event'); }
+  const fixed = fixedEvents(s.day);
+  s.queue.push(...fixed);
+  if (!fixed.length && s.day >= 2 && s.queue.length === 0) {
+    const r = rollRandom();
+    if (r) s.queue.push(r);
+  }
+}
+function resolveChoice(i) {
+  const q = s.queue[0];
+  if (!q) return;
+  const ev = EV[q.id](q.data || {});
+  const c = ev.choices[i];
+  if (!c || (c.req && c.req())) return;
+  s.queue.shift();
+  s.choices.push({ day: s.day, event: q.id, choice: c.label });
+  c.run();
+  clampAll();
+  commit();
+}
+
+/* ---------- end of day ---------- */
+function finishDay(shift) {
+  ui.night = false;
+  const f = CFG.food[s.food];
+  spend(f.cost, `Ăn uống: ${f.name}`);
+  if (f.health) adj('health', f.health);
+  if (f.mood) adj('mood', f.mood);
+  const free = Math.max(0, dayEnd() - clock());
+  if (shift) {
+    const n = CFG.nightShift;
+    earn(n.pay, n.name);
+    adj('health', n.health);
+    adj('mood', n.mood);
+    s.today.list.push('boc_vac');
+  }
+  adj('health', CFG.sleepHealth + free * CFG.freeHourHealth);
+  adj('mood', -(CFG.moodDecay + (s.room === 'ghep' ? CFG.sharedRoomMoodDecay : 0)));
+
+  if (s.day === 10) {
+    const amount = CFG.milestones.day10;
+    const paid = s.money >= amount;
+    if (paid) { spend(amount, 'Mốc 1: trả lãi cho Khoa'); s.interestPaid += amount; }
+    else { adj('health', CFG.milestones.failDay10Health); s.debt += CFG.milestones.failDay10DebtAdd; log('Không đủ tiền lãi. Bị đánh, nợ tăng.', 'warn'); }
+    s.queue.push({ id: 'moc_10', data: { paid, amount } });
+  }
+  if (s.day === 20) {
+    const amount = CFG.milestones.day20;
+    const paid = s.money >= amount;
+    if (paid) { spend(amount, 'Mốc 2: học phí cho Lan'); s.flags.lanNhapHoc = true; }
+    else { adj('mood', CFG.milestones.failDay20Mood); s.flags.lanBaoLuu = true; log('Không đủ học phí. Lan phải bảo lưu.', 'warn'); }
+    s.queue.push({ id: 'moc_20', data: { paid, amount } });
+  }
+
+  s.history.push({ day: s.day, money: s.money, health: s.health, mood: s.mood, actions: s.today.list.slice(), held: s.held });
+
+  if (s.day === 30) { resolveEnding(); commit(); return; }
+
+  if (s.health <= 0) { s.skipReason = 'ngat'; s.health = 30; s.stats.faints++; log('Sức khỏe về 0: ngày mai mất trắng.', 'warn'); }
+  else if (s.mood <= 0) { s.skipReason = 'chan_nan'; s.mood = 30; log('Tinh thần về 0: ngày mai mất trắng.', 'warn'); }
+
+  s.yesterday = s.today;
+  s.today = { list: [] };
+  s.used = 0;
+  s.day++;
+  morning();
+  commit();
+}
+
+const ENDINGS = {
+  duong_tat: { tag: 'Kết xấu', good: false, title: 'Đường tắt', text: 'Minh có đủ tiền. Nhưng sáng ngày 30, công an ập vào phòng trọ. Lô hàng chở cho Tuấn là hàng cấm. Lan đứng ngoài cổng trại giam, tay vẫn cầm tờ giấy báo nhập học.' },
+  cong_ly: { tag: 'Kết ẩn', good: true, title: 'Công lý', text: 'Khi Hưng Sẹo tới, Vy đi cùng một cán bộ công an phường. Hợp đồng vay bị xác định vi phạm pháp luật. Minh chỉ phải trả phần gốc hợp pháp.', quote: '"Hóa ra thứ đáng sợ nhất ở thành phố không phải là nợ, mà là không biết."' },
+  dat_lanh: { tag: 'Kết đẹp', good: true, title: 'Đất lành', text: 'Minh trả xong nợ. Chú Bảy mời Minh làm thợ chính, chia đôi lợi nhuận. Tháng sau má lên thăm, cả nhà ăn cơm trong căn phòng trọ chật mà ấm.' },
+  trang_tay: { tag: 'Buồn vui lẫn lộn', good: false, title: 'Trắng tay', text: 'Nợ đã trả xong, nhưng Minh nằm viện vì kiệt sức. Má hỏi: "Tháng sau con tính sao?" Minh không trả lời được.', quote: '"Có lẽ mình nên học một cái nghề."' },
+  game_over: { tag: 'Game over', good: false, title: 'Trở lại vạch xuất phát', text: 'Má gọi điện, giọng lạc đi: "Người ta tới đo đất rồi con ơi…"', quote: 'Sổ tay của Minh giữ lại vài điều cho lần sau.' }
+};
+function resolveEnding() {
+  const legal = Math.max(0, CFG.legalDebt - s.interestPaid);
+  let key;
+  if (s.smuggle >= CFG.smuggle.tripsForBadEnding) key = 'duong_tat';
+  else if (lv('phapLy') >= 3 && s.evidence >= 2 && s.money >= legal) { spend(legal, 'Trả phần gốc hợp pháp'); key = 'cong_ly'; }
+  else if (s.money >= s.debt) {
+    spend(s.debt, 'Mốc cuối: trả nợ Hưng Sẹo');
+    key = s.flags.lanNhapHoc && maxSkill() >= 4 ? 'dat_lanh' : 'trang_tay';
+  } else key = 'game_over';
+  const newNotes = [];
+  if (key === 'game_over') {
+    if (s.flags.wageLost) newNotes.push('quyt_luong');
+    newNotes.push('tang_lai', 'hoc_nghe');
+    if (!s.flags.phapLyMo) newNotes.push('vy_luat');
+    if (s.rep.chuBay < 20) newNotes.push('chu_bay');
+    const all = Array.from(new Set([...getNotes(), ...newNotes]));
+    store.set('lenpho.notes', JSON.stringify(all));
+  }
+  s.over = { key, short: Math.max(0, s.debt - s.money), legal, newNotes };
+}
+
+/* ---------- persistence ---------- */
+function commit() { clampAll(); store.set('lenpho.run', JSON.stringify(s)); render(); }
+
+/* ---------- rendering ---------- */
+const $ = id => document.getElementById(id);
+function barClass(v, max) { const r = v / max; return r < 0.3 ? 'crit' : r < 0.6 ? 'warn' : ''; }
+
+function renderHeader() {
+  if (!s) { $('daybox').innerHTML = ''; return; }
+  const left = Math.max(0, dayEnd() - clock());
+  $('daybox').innerHTML = `<span class="dayno">Ngày ${s.day}<small>/30</small></span>
+    <span class="clock">${WEEKDAYS[s.day % 7]} · ${hh(Math.min(clock(), 22))} <span>· còn ${num(left)} giờ</span></span>`;
+}
+
+function renderStatus() {
+  if (!s) { $('status').innerHTML = ''; return; }
+  const m = nextMilestone();
+  const lack = Math.max(0, m.amount - s.money);
+  const days = m.day - s.day;
+  const cal = Array.from({ length: 30 }, (_, i) => {
+    const d = i + 1;
+    const cls = [d < s.day ? 'past' : '', d === s.day ? 'today' : '', [10, 20, 30].includes(d) ? 'ms' : ''].join(' ');
+    return `<i class="${cls}">${d}</i>`;
+  }).join('');
+  const skills = Object.keys(SKILLS).map(k => {
+    const L = lv(k), per = CFG.xpPerLevel;
+    const frac = L >= CFG.maxLevel ? 0 : ((s.xp[k] || 0) - L * per) / per;
+    const segs = Array.from({ length: CFG.maxLevel }, (_, i) => `<i><b style="width:${i < L ? 100 : i === L ? Math.round(frac * 100) : 0}%"></b></i>`).join('');
+    return `<div class="skill"><span>${SKILLS[k]}</span><span class="segs">${segs}</span><span class="lv">${L}/${CFG.maxLevel}</span></div>`;
+  }).join('');
+  const reps = Object.keys(REPS).map(k => `<span class="chip">${REPS[k]} <b>${s.rep[k]}</b></span>`).join('');
+  const hint30 = m.day === 30 || !hasNote('tang_lai') ? '' : ' · Sổ tay: sẽ thành 18 triệu';
+  $('status').innerHTML = `
+    <div class="panel" style="display:grid;gap:12px">
+      <div><div class="label">Tiền đang có</div><div class="money">${fmt(s.money)}</div></div>
+      <div class="goal ${lack === 0 ? 'met' : ''}">
+        <div class="goal-head"><span>Ngày ${m.day} · ${m.label}</span><span class="goal-amt">${fmtK(m.amount)}</span></div>
+        <div class="bar ${lack === 0 ? '' : 'crit'}"><i style="width:${Math.min(100, s.money / m.amount * 100)}%"></i></div>
+        <div class="goal-note">${lack === 0 ? 'Đã đủ tiền cho mốc này' : `Còn thiếu ${fmt(lack)} · ${days === 0 ? 'hạn là tối nay' : `còn ${days} ngày`}`}${hint30}</div>
+      </div>
+      <div class="stat"><div class="stat-head"><span>Sức khỏe</span><b>${Math.round(s.health)}/${s.healthMax}</b></div><div class="bar ${barClass(s.health, s.healthMax)}"><i style="width:${s.health / s.healthMax * 100}%"></i></div></div>
+      <div class="stat"><div class="stat-head"><span>Tinh thần</span><b>${Math.round(s.mood)}/${s.moodMax}</b></div><div class="bar ${barClass(s.mood, s.moodMax)}"><i style="width:${s.mood / s.moodMax * 100}%"></i></div></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px"><h3>Lịch 30 ngày</h3><div class="cal">${cal}</div></div>
+    <div class="panel" style="display:grid;gap:10px"><h3>Kỹ năng</h3><div class="skills">${skills}</div></div>
+    <div class="panel" style="display:grid;gap:10px"><h3>Độ thân thiết</h3><div class="chips">${reps}</div>
+      <dl class="kv">
+        <dt>Phòng trọ</dt><dd>${s.room ? CFG.rooms[s.room].name : 'Chưa thuê'}</dd>
+        <dt>Nợ phải trả ngày 30</dt><dd>${fmt(s.debt)}</dd>
+        ${s.held ? `<dt>Lương đang bị giữ</dt><dd class="bad">${fmt(s.held)}</dd>` : ''}
+        <dt>Bằng chứng</dt><dd>${s.evidence}</dd>
+        <dt>Chuyến chạy hàng</dt><dd class="${s.smuggle ? 'bad' : ''}">${s.smuggle}/${CFG.smuggle.tripsForBadEnding}</dd>
+        <dt>Tạm trú</dt><dd>${s.flags.tamTru ? 'Đã đăng ký' : 'Chưa'}</dd>
+      </dl>
+    </div>`;
+}
+
+function effText(a) {
+  const e = a.eff || {}, out = [];
+  if (e.health) out.push(`Sức khỏe ${e.health > 0 ? '+' : '−'}${Math.abs(e.health)}`);
+  if (e.mood) out.push(`Tinh thần ${e.mood > 0 ? '+' : '−'}${Math.abs(e.mood)}`);
+  for (const k in (e.xp || {})) out.push(`${SKILLS[k]} +${num(e.xp[k])}`);
+  if (a.focusXp) out.push(`${SKILLS[s.focus]} +${num(a.focusXp)}`);
+  for (const k in (e.rep || {})) out.push(`${REPS[k]} ${e.rep[k] > 0 ? '+' : '−'}${Math.abs(e.rep[k])}`);
+  return out.join(' · ');
+}
+function payText(a) {
+  if (a.pay) return { t: '+' + fmtK(a.pay) + (a.tip ? ' + tip' : ''), cls: '' };
+  if (a.payRange) return { t: `+${fmtK(a.payRange[0])}–${fmtK(a.payRange[1])}`, cls: '' };
+  const cost = (a.cost || 0) + (a.fee && !s.counts[a.id] ? a.fee : 0);
+  if (cost) return { t: '−' + fmtK(cost), cls: 'cost' };
+  return { t: '', cls: '' };
+}
+function card(a) {
+  const st = status(a);
+  const p = payText(a);
+  const meta = [a.place, `${num(a.hours)} giờ`];
+  if (a.window) meta.push(`${hh(a.window[0])}–${hh(a.window[1])}`);
+  if (a.weekend) meta.push('cuối tuần');
+  if (a.maxTimes && !a.days && !a.setFlag) meta.push(`buổi ${(s.counts[a.id] || 0)}/${a.maxTimes}`);
+  if (a.days) meta.push(`đến hết ngày ${a.days[1]}`);
+  let foot = '';
+  if (!st.ok && st.reason) foot = `<span class="act-lock">${esc(st.reason)}</span>`;
+  else if (st.ok && st.start > clock()) foot = `<span class="act-hint">Chờ tới ${hh(st.start)} mới bắt đầu</span>`;
+  else if (a.note) foot = `<span class="act-hint">${esc(a.note)}</span>`;
+  if (st.ok && a.holdDays && s.day >= a.holdDays[0] && s.day <= a.holdDays[1]) foot = `<span class="act-lock">${hasNote('quyt_luong') ? 'Sổ tay: lương hôm nay sẽ bị quỵt' : 'Lương tuần này trả vào ngày 8'}</span>`;
+  if (st.ok && a.fee && !s.counts[a.id]) foot = `<span class="act-hint">Buổi đầu đóng học phí ${fmtK(a.fee)}</span>`;
+  return `<button type="button" class="act" data-act="${esc(a.id)}" ${st.ok ? '' : 'disabled'}>
+    <span class="act-top"><span class="act-name">${esc(a.name)}</span><span class="act-pay ${p.cls}">${p.t}</span></span>
+    <span class="act-meta">${esc(meta.join(' · '))}</span>
+    <span class="act-eff">${effText(a)}</span>${foot}</button>`;
+}
+function renderActions() {
+  if (!s) { $('actions').innerHTML = ''; return; }
+  const foodOpts = Object.keys(CFG.food).map(k => `<option value="${k}" ${s.food === k ? 'selected' : ''}>${esc(CFG.food[k].name)} · ${fmtK(CFG.food[k].cost)}</option>`).join('');
+  const focusOpts = Object.keys(SKILLS).filter(k => k !== 'phapLy').map(k => `<option value="${k}" ${s.focus === k ? 'selected' : ''}>${SKILLS[k]}</option>`).join('');
+  const blocked = !!(s.over || s.queue.length);
+  const groups = Object.keys(GROUPS).map(g => {
+    const list = CFG.actions.filter(a => a.group === g && !hidden(a));
+    const extra = g === 'study' ? `<label class="field"><span class="label">Tự học kỹ năng</span><select id="focus">${focusOpts}</select></label>` : '';
+    return `<div class="group"><div class="group-head"><h2>${GROUPS[g]}</h2>${extra}</div><div class="grid">${list.map(card).join('')}</div></div>`;
+  }).join('');
+  $('actions').innerHTML = `
+    <div class="panel toolbar">
+      <label class="field"><span class="label">Ăn uống hôm nay</span><select id="food" ${s.used > 0 || blocked ? 'disabled' : ''}>${foodOpts}</select></label>
+      <button type="button" class="btn primary" id="endDay" ${blocked ? 'disabled' : ''}>Kết thúc ngày ${s.day}</button>
+    </div>
+    <div class="panel" style="display:grid;gap:22px">${groups}</div>`;
+}
+
+function chartSvg() {
+  const H = s.history;
+  const W = 320, Ht = 150, l = 40, r = 10, t = 10, b = 22;
+  const targets = [{ d: 10, v: CFG.milestones.day10 }, { d: 20, v: CFG.milestones.day20 }, { d: 30, v: s.debt }];
+  const maxV = Math.max(5e6, ...H.map(h => h.money), ...targets.map(x => x.v)) * 1.08;
+  const step = maxV > 15e6 ? 5e6 : maxV > 6e6 ? 2e6 : 1e6;
+  const X = d => l + (d - 1) / 29 * (W - l - r);
+  const Y = v => Ht - b - v / maxV * (Ht - t - b);
+  let g = '';
+  for (let v = 0; v <= maxV; v += step) g += `<line x1="${l}" x2="${W - r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${l - 6}" y="${Y(v) + 3}" text-anchor="end">${v / 1e6}tr</text>`;
+  for (const d of [1, 10, 20, 30]) g += `<text x="${X(d)}" y="${Ht - 6}" text-anchor="middle">${d}</text>`;
+  const pts = H.map(h => `${X(h.day).toFixed(1)},${Y(h.money).toFixed(1)}`).join(' ');
+  const line = H.length > 1 ? `<polyline points="${pts}" fill="none" stroke="var(--tim)" stroke-width="2" stroke-linejoin="round"/>` : '';
+  const dots = H.length ? `<circle cx="${X(H[H.length - 1].day)}" cy="${Y(H[H.length - 1].money)}" r="3.5" fill="var(--tim)"/>` : '';
+  const ms = targets.map(x => `<line x1="${X(x.d) - 7}" x2="${X(x.d) + 7}" y1="${Y(x.v)}" y2="${Y(x.v)}" stroke="var(--stamp)" stroke-width="2.5"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Tiền cuối mỗi ngày so với các mốc">${g}${ms}${line}${dots}</svg>`;
+}
+function renderJournal() {
+  if (!s) { $('journal').innerHTML = ''; return; }
+  const notes = getNotes();
+  const byDay = {};
+  s.log.slice(-120).forEach(e => { (byDay[e.day] = byDay[e.day] || []).push(e); });
+  const days = Object.keys(byDay).map(Number).sort((a, b) => b - a);
+  const logHtml = days.map(d => `<div class="log-day"><h4>Ngày ${d}</h4>${byDay[d].map(e => `<p class="${e.k}">${esc(e.t)}</p>`).join('')}</div>`).join('') || '<p class="msg">Chưa có gì.</p>';
+  $('journal').innerHTML = `
+    <div class="panel chart" style="display:grid;gap:8px">
+      <h3>Tiền cuối mỗi ngày</h3>${chartSvg()}
+      <div class="legend"><span><i style="background:var(--tim)"></i>Tiền</span><span><i style="background:var(--stamp)"></i>Số tiền cần ở mốc</span></div>
+    </div>
+    ${notes.length ? `<div class="panel" style="display:grid;gap:8px"><h3>Sổ tay của Minh</h3><ul class="notes">${notes.map(n => `<li>${esc(NOTE_TEXT[n] || n)}</li>`).join('')}</ul></div>` : ''}
+    <div class="panel"><span class="margin-line"></span><div style="display:grid;gap:8px"><h3 style="padding-left:22px">Nhật ký</h3><div class="log">${logHtml}</div></div></div>`;
+}
+
+function renderOverlay() {
+  const o = $('overlay');
+  let html = '';
+  if (!s) {
+    const notes = getNotes();
+    html = `<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+      <span class="eyebrow">Mở đầu · Ngày 0</span>
+      <h2 id="dlgTitle">Đêm cuối ở quê</h2>
+      <div class="text">Tiếng sóng biển. Ngọn đèn dầu leo lét. Má ngồi đếm từng tờ tiền nhàu nát.
+<span class="who">Má:</span> "Có hai triệu thôi con. Má gom hết rồi đó."
+Tiếng đập cửa. Khoa bước vào, sau lưng là hai thanh niên.
+<span class="who">Khoa:</span> "Anh Hưng nhắn: 30 ngày. Ngày 10 đóng lãi 3 triệu. Ngày 30 trả đủ 15. Không thì cái nhà này với mấy sào đất là của anh Hưng."
+Lan đứng sau cánh cửa buồng, ôm chặt tờ giấy báo trúng tuyển.</div>
+      ${notes.length ? `<div style="display:grid;gap:6px"><span class="label">Sổ tay từ lần trước</span><ul class="notes">${notes.map(n => `<li>${esc(NOTE_TEXT[n] || n)}</li>`).join('')}</ul></div>` : ''}
+      <span class="label">Chọn một món mang theo</span>
+      <div class="choices">${Object.keys(ITEMS).map(k => `<button type="button" class="choice" data-item="${k}"><b>${ITEMS[k].name}</b><small>${ITEMS[k].desc}</small></button>`).join('')}</div>
+    </div>`;
+  } else if (s.over) {
+    const E = ENDINGS[s.over.key];
+    const best = Object.keys(SKILLS).map(k => `${SKILLS[k]} ${lv(k)}`).join(' · ');
+    html = `<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+      <span class="endtag ${E.good ? 'good' : ''}">${E.tag}</span>
+      <h2 id="dlgTitle">${E.title}</h2>
+      <div class="text">${E.text}</div>
+      ${E.quote ? `<div class="quote">${E.quote}</div>` : ''}
+      <dl class="kv">
+        ${s.over.key === 'game_over' ? `<dt>Còn thiếu</dt><dd class="bad">${fmt(s.over.short)}</dd>` : ''}
+        <dt>Tiền còn lại</dt><dd>${fmt(s.money)}</dd>
+        <dt>Tổng đã kiếm</dt><dd>${fmt(s.stats.earned)}</dd>
+        <dt>Tổng đã chi</dt><dd>${fmt(s.stats.spent)}</dd>
+        <dt>Số ngày mất trắng</dt><dd>${s.stats.faints}</dd>
+      </dl>
+      <div class="msg">${best}</div>
+      ${s.over.newNotes.length ? `<div style="display:grid;gap:6px"><span class="label">Sổ tay ghi thêm</span><ul class="notes">${s.over.newNotes.map(n => `<li>${esc(NOTE_TEXT[n])}</li>`).join('')}</ul></div>` : ''}
+      <div class="row"><button type="button" class="btn primary" data-restart="1">Chơi lại từ ngày 0</button><button type="button" class="btn" data-copy="1">Sao chép kết quả</button></div>
+    </div>`;
+  } else if (s.queue.length) {
+    const q = s.queue[0];
+    const ev = EV[q.id](q.data || {});
+    html = `<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+      <span class="eyebrow">${esc(ev.eyebrow || '')}</span>
+      <h2 id="dlgTitle">${esc(ev.title)}</h2>
+      ${ev.who ? `<span class="who">${esc(ev.who)}</span>` : ''}
+      <div class="text">${esc(ev.text)}</div>
+      ${ev.quote ? `<div class="quote">${esc(ev.quote)}</div>` : ''}
+      <div class="choices">${ev.choices.map((c, i) => {
+        const lock = c.req && c.req();
+        return `<button type="button" class="choice" data-choice="${i}" ${lock ? 'disabled' : ''}><b>${esc(c.label)}</b>${lock ? `<small class="lock">${esc(lock)}</small>` : c.hint ? `<small>${esc(c.hint)}</small>` : ''}</button>`;
+      }).join('')}</div>
+    </div>`;
+  } else if (ui.night) {
+    const f = CFG.food[s.food], n = CFG.nightShift;
+    const free = Math.max(0, dayEnd() - clock());
+    const ms = [10, 20, 30].includes(s.day) ? `<div class="goal"><div class="goal-head"><span>Tối nay xét mốc tiền</span><span class="goal-amt">${fmtK(nextMilestone().amount)}</span></div><div class="goal-note">Tiền ăn được trừ trước khi xét mốc. Nếu đi bốc vác, tiền công cũng được tính.</div></div>` : '';
+    html = `<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+      <span class="eyebrow">Ngày ${s.day} · ${hh(Math.min(clock(), 22))}</span>
+      <h2 id="dlgTitle">Tối nay làm gì?</h2>
+      <dl class="kv">
+        <dt>Ăn uống: ${esc(f.name)}</dt><dd>−${fmt(f.cost)}</dd>
+        <dt>Giờ còn trống (${num(free)} giờ)</dt><dd>Sức khỏe +${num(free * CFG.freeHourHealth)}</dd>
+        <dt>Ngủ</dt><dd>Sức khỏe +${CFG.sleepHealth}</dd>
+        <dt>Tinh thần cuối ngày</dt><dd>−${CFG.moodDecay + (s.room === 'ghep' ? CFG.sharedRoomMoodDecay : 0)}</dd>
+      </dl>
+      ${ms}
+      <div class="choices">
+        <button type="button" class="choice" data-night="sleep"><b>Đi ngủ</b><small>Sang ngày ${s.day + 1}</small></button>
+        <button type="button" class="choice" data-night="shift"><b>${esc(n.name)}</b><small>+${fmt(n.pay)} · Sức khỏe ${n.health} · Tinh thần ${n.mood}</small></button>
+        <button type="button" class="choice" data-night="cancel"><b>Quay lại</b><small>Tiếp tục ngày ${s.day}</small></button>
+      </div>
+    </div>`;
+  }
+  o.innerHTML = html;
+  o.hidden = !html;
+  if (html) { const first = o.querySelector('button:not(:disabled)'); if (first && !o.contains(document.activeElement)) first.focus({ preventScroll: true }); }
+}
+function render() {
+  renderHeader(); renderStatus(); renderActions(); renderJournal(); renderOverlay();
+  $('restart').textContent = ui.armed ? 'Bấm lần nữa để chơi lại' : 'Chơi lại';
+  $('restart').classList.toggle('danger', ui.armed);
+}
+
+/* ---------- tune panel ---------- */
+function fillCfg() { $('cfgText').value = JSON.stringify(CFG, null, 2); }
+function msg(t, k) { const m = $('cfgMsg'); m.textContent = t; m.className = 'msg ' + (k || ''); }
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { el.hidden = true; }, 2200); }
+function runSummary() {
+  return JSON.stringify({
+    ending: s && s.over ? s.over.key : null,
+    day: s ? s.day : 0,
+    money: s ? s.money : 0,
+    item: s ? s.item : null,
+    room: s ? s.room : null,
+    skills: s ? Object.fromEntries(Object.keys(SKILLS).map(k => [k, lv(k)])) : {},
+    rep: s ? s.rep : {},
+    stats: s ? s.stats : {},
+    history: s ? s.history : [],
+    choices: s ? s.choices : [],
+    config: CFG
+  }, null, 1);
+}
+function copyRun() {
+  const text = runSummary();
+  const fallback = () => { const out = $('copyOut'); out.hidden = false; out.value = text; $('tune').open = true; out.focus(); out.select(); msg('Không sao chép tự động được. Đã chọn sẵn văn bản bên dưới, bấm Ctrl+C.', 'bad'); };
+  try {
+    navigator.clipboard.writeText(text).then(() => toast('Đã sao chép kết quả lượt chơi'), fallback);
+  } catch (e) { fallback(); }
+}
+function restart() {
+  ui.armed = false; ui.night = false;
+  s = null;
+  store.del('lenpho.run');
+  render();
+}
+
+/* ---------- events wiring ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b || b.disabled) return;
+  if (b.dataset.item) { s = newState(b.dataset.item); morning(); commit(); return; }
+  if (b.dataset.act) { doAction(b.dataset.act); return; }
+  if (b.dataset.choice) { resolveChoice(Number(b.dataset.choice)); return; }
+  if (b.dataset.night) {
+    if (b.dataset.night === 'cancel') { ui.night = false; render(); }
+    else finishDay(b.dataset.night === 'shift');
+    return;
+  }
+  if (b.dataset.restart) { restart(); return; }
+  if (b.dataset.copy) { copyRun(); return; }
+  if (b.id === 'endDay') { ui.night = true; render(); return; }
+  if (b.id === 'restart') {
+    if (!s) return;
+    if (ui.armed) { restart(); return; }
+    ui.armed = true; render();
+    clearTimeout(ui.armTimer);
+    ui.armTimer = setTimeout(() => { ui.armed = false; render(); }, 3000);
+    return;
+  }
+  if (b.id === 'cfgApply') {
+    try {
+      const parsed = JSON.parse($('cfgText').value);
+      if (!Array.isArray(parsed.actions) || !parsed.food || !parsed.milestones) throw new Error('Thiếu mục actions, food hoặc milestones');
+      CFG = parsed; store.set('lenpho.cfg', JSON.stringify(CFG));
+      msg('Đã áp dụng. Chọn món mang theo để bắt đầu lượt mới.', 'good');
+      restart();
+    } catch (err) { msg('JSON không hợp lệ: ' + err.message, 'bad'); }
+    return;
+  }
+  if (b.id === 'cfgReset') { CFG = clone(DEFAULT_CONFIG); store.del('lenpho.cfg'); fillCfg(); msg('Đã khôi phục số liệu mặc định. Bấm Áp dụng để chơi lại với bộ số này.', 'good'); return; }
+  if (b.id === 'copyRun') { copyRun(); return; }
+});
+document.addEventListener('change', e => {
+  if (!s) return;
+  if (e.target.id === 'food' && s.used === 0) { s.food = e.target.value; commit(); }
+  if (e.target.id === 'focus') { s.focus = e.target.value; commit(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && ui.night) { ui.night = false; render(); }
+});
+
+/* ---------- boot ---------- */
+function start(data) {
+  CFG = (data && data.CFG) || loadCfg();
+  if (data && data.s !== undefined) s = data.s;
+  else { try { s = JSON.parse(store.get('lenpho.run') || 'null'); } catch (e) { s = null; } }
+  fillCfg();
+  render();
+}
+window.claude?.hot?.snapshot?.(() => ({ s, CFG }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
