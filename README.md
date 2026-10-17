@@ -19,6 +19,8 @@ Làm bằng **Godot 4.7**. Nhà cửa, người và xe hiện là khối hình t
 | E | Vào địa điểm đang đứng gần |
 | Esc | Đóng bảng |
 
+**Thời gian:** đi bộ trên phố tốn giờ (chỉnh bằng `walkHoursPerMeter`). Làm việc hay đi học thì Minh vào trong tiệm, thanh thời gian chạy (`workSecondsPerHour` giây thật cho mỗi giờ trong game) rồi mới tính kết quả. Nút **Về phòng trọ** dẫn Minh về nhà, vào phòng trọ để **Đi ngủ**. Tới 22 giờ mà chưa về thì Minh ngủ gục ngoài đường, bị trừ Sức khỏe và Tinh thần (`sleepOutside`).
+
 Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi lại** trong Bảng cân bằng xóa ván đang chơi.
 
 ## Cấu trúc thư mục

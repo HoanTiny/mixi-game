@@ -232,6 +232,8 @@ func _build_work(parent: Control) -> void:
 	_work_clock = UI.label("", 17, UI.GOLD)
 	head.add_child(_work_clock)
 	_work_bar = UI.bar(10)
+	_work_bar.max_value = 1.0
+	_work_bar.add_theme_stylebox_override("fill", UI.box(UI.GOLD, UI.GOLD, 5, 0))
 	v.add_child(_work_bar)
 	_work.visible = false
 
@@ -261,8 +263,6 @@ func _perform(id: String) -> void:
 		_work.visible = false
 		world.set_player_inside(false)
 		game.do_action(id))
-	_work_bar.max_value = 1.0
-	_work_bar.add_theme_stylebox_override("fill", UI.box(UI.GOLD, UI.GOLD, 5, 0))
 
 
 func _build_location(parent: Control) -> void:
@@ -373,7 +373,7 @@ func _refresh() -> void:
 	UI.set_bar(_mood_bar, float(s.mood), float(s.mood_max), UI.level_color(float(s.mood) / float(s.mood_max)))
 	_food_select.select(_food_keys.find(s.food))
 	_food_select.disabled = float(s.used) > 0.0 or not s.queue.is_empty()
-	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty()
+	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
 	_refresh_skills(s)
 	_log_text.text = UI.log_bbcode(game)
 	_refresh_location()
@@ -458,7 +458,8 @@ func _refresh_skills(s: Dictionary) -> void:
 
 
 func _refresh_location() -> void:
-	_location.visible = _loc_id != "" and not game.is_over()
+	# Đang làm thì Minh ở trong tiệm, giấu bảng cho tới khi xong việc.
+	_location.visible = _loc_id != "" and not game.is_over() and not _working
 	if not _location.visible:
 		return
 	var loc: Dictionary = world.location_info(_loc_id)
@@ -470,7 +471,11 @@ func _refresh_location() -> void:
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
 			if a.get("location", "") == _loc_id:
-				_loc_cards.add_child(UI.action_card(game, a, 320))
+				_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
 				found += 1
-	if found == 0:
+	if _loc_id == "phong_tro":
+		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d" % game.day(), "", func() -> void:
+			close_location()
+			dialogs.open_night()))
+	elif found == 0:
 		_loc_cards.add_child(UI.wrap("Hôm nay ở đây chưa có việc gì cho Minh.", 13, UI.INK_SOFT, 320))
