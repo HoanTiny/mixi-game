@@ -120,13 +120,14 @@ static func choice(title: String, hint: String, lock: String, on_press: Callable
 
 
 ## Thẻ một hành động (việc làm, lớp học, sinh hoạt) với tiền, giờ, hiệu ứng và lý do khóa.
-static func action_card(game, a: Dictionary, width := 270) -> Button:
+## on_press nhận id hành động; bỏ trống thì làm ngay (bảng cân bằng), màn phố truyền vào để chạy thanh thời gian.
+static func action_card(game, a: Dictionary, width := 270, on_press := Callable()) -> Button:
 	var st: Dictionary = game.action_status(a)
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(width, 104)
 	btn.disabled = not st.ok
 	btn.tooltip_text = effects_text(game, a)
-	btn.pressed.connect(game.do_action.bind(a.id))
+	btn.pressed.connect((on_press if on_press.is_valid() else game.do_action).bind(a.id))
 	var v := _inner(btn, 12)
 
 	var top := HBoxContainer.new()

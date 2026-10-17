@@ -34,6 +34,11 @@ var _log_text: RichTextLabel
 var _bottom: PanelContainer
 var _food_select: OptionButton
 var _end_day_btn: Button
+var _work: PanelContainer
+var _work_title: Label
+var _work_clock: Label
+var _work_bar: ProgressBar
+var _working := false
 var _food_keys: Array = []
 var _loc_id := ""
 var _prompt_id := "-"
@@ -68,10 +73,11 @@ func _ready() -> void:
 	_spacer(middle)
 	_build_location(middle)
 
-	# Lời nhắc tương tác ở giữa, phía trên thanh công cụ.
+	# Lời nhắc tương tác và thanh "đang làm" ở giữa, phía trên thanh công cụ.
 	var prompt_row := _pass(HBoxContainer.new(), rows)
 	prompt_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	_build_prompt(prompt_row)
+	_build_work(prompt_row)
 
 	# Hàng dưới: hướng dẫn điều khiển bên trái, thanh công cụ bên phải.
 	var bottom := _pass(HBoxContainer.new(), rows)
@@ -94,7 +100,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible
+	return dialogs.visible or _working
 
 
 func location_open() -> String:
@@ -212,6 +218,53 @@ func _build_prompt(parent: Control) -> void:
 	_prompt.visible = false
 
 
+func _build_work(parent: Control) -> void:
+	_work = _dark_panel(parent)
+	_work.custom_minimum_size = Vector2(420, 0)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	_work.add_child(v)
+	var head := HBoxContainer.new()
+	v.add_child(head)
+	_work_title = UI.label("", 17, UI.HUD_TEXT)
+	_work_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(_work_title)
+	_work_clock = UI.label("", 17, UI.GOLD)
+	head.add_child(_work_clock)
+	_work_bar = UI.bar(10)
+	v.add_child(_work_bar)
+	_work.visible = false
+
+
+## Làm một việc ở tiệm: Minh vào trong, thanh thời gian chạy, đồng hồ nhảy dần, xong mới tính kết quả.
+func _perform(id: String) -> void:
+	var a: Dictionary = game.get_action(id)
+	var st: Dictionary = game.action_status(a)
+	if not st.ok or _working:
+		return
+	var start: float = st.start
+	var finish: float = start + float(a.hours)
+	_working = true
+	world.set_player_inside(true)
+	_work_title.text = "Đang " + str(a.name).to_lower() if a.group == "work" else str(a.name)
+	_work.visible = true
+	_refresh()
+	var seconds := maxf(0.8, float(a.hours) * float(game.cfg.get("workSecondsPerHour", 0.35)))
+	var tw := create_tween()
+	tw.tween_method(func(t: float) -> void:
+		var now := lerpf(start, finish, t)
+		_work_bar.value = t
+		_work_clock.text = GameLogic.hh(now)
+		_clock_label.text = "%s  ·  đang bận" % GameLogic.hh(now), 0.0, 1.0, seconds)
+	tw.tween_callback(func() -> void:
+		_working = false
+		_work.visible = false
+		world.set_player_inside(false)
+		game.do_action(id))
+	_work_bar.max_value = 1.0
+	_work_bar.add_theme_stylebox_override("fill", UI.box(UI.GOLD, UI.GOLD, 5, 0))
+
+
 func _build_location(parent: Control) -> void:
 	_location = _light_panel(parent)
 	var v := VBoxContainer.new()
@@ -283,9 +336,9 @@ func _build_bottom(parent: Control) -> void:
 		_log.visible = not _log.visible
 		_skills.visible = false))
 	h.add_child(_tool_button("Bảng cân bằng", func() -> void: get_tree().change_scene_to_file("res://scenes/board.tscn")))
-	_end_day_btn = _tool_button("Kết thúc ngày", func() -> void:
+	_end_day_btn = _tool_button("Về phòng trọ", func() -> void:
 		close_location()
-		dialogs.open_night())
+		world.walk_to_location("phong_tro"))
 	_end_day_btn.add_theme_stylebox_override("normal", UI.box(UI.GOLD, UI.GOLD, 8, 10))
 	_end_day_btn.add_theme_stylebox_override("hover", UI.box(UI.GOLD.lightened(0.15), UI.GOLD, 8, 10))
 	h.add_child(_end_day_btn)

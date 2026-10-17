@@ -7,6 +7,12 @@
   "moodDecay": 5,
   "sharedRoomMoodDecay": 3,
   "letterMood": 10,
+  "walkHoursPerMeter": 0.004,
+  "workSecondsPerHour": 0.35,
+  "sleepOutside": {
+    "health": -15,
+    "mood": -10
+  },
   "rooms": {
     "ghep": {
       "name": "Phòng ghép 4 người",

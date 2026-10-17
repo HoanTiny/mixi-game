@@ -420,6 +420,33 @@ func do_action(id: String) -> void:
 	_commit()
 
 
+## Thời gian trôi khi đi bộ trên phố. Không vượt quá giờ đi ngủ.
+func walk(hours: float) -> void:
+	if not is_started() or is_over() or not s.queue.is_empty() or hours <= 0.0:
+		return
+	s["used"] = minf(float(s.used) + hours, day_end() - DAY_START)
+	_commit()
+
+
+## Đã hết giờ trong ngày, phải đi ngủ.
+func is_out_of_time() -> bool:
+	return is_started() and not is_over() and hours_left() <= 0.001
+
+
+## Hết giờ mà chưa về phòng trọ: ngủ gục ngoài đường, bị phạt rồi sang ngày mới.
+func sleep_outside() -> void:
+	if not is_started() or is_over() or not s.queue.is_empty():
+		return
+	var pen: Dictionary = cfg.get("sleepOutside", {})
+	adj("health", float(pen.get("health", 0)))
+	adj("mood", float(pen.get("mood", 0)))
+	add_log("Không kịp về phòng trọ, ngủ gục ngoài đường.", "warn")
+	finish_day(false)
+	if not is_over():
+		s.queue.push_front({"id": "ngu_gat", "data": {}})
+		_commit()
+
+
 func set_food(k: String) -> void:
 	if is_started() and float(s.used) == 0.0 and cfg.food.has(k):
 		s["food"] = k
@@ -516,6 +543,8 @@ func fill(text: String) -> String:
 		"room_rieng": str(cfg.rooms.rieng.name),
 		"rent_ghep": fmt_money(int(cfg.rooms.ghep.rent)),
 		"rent_rieng": fmt_money(int(cfg.rooms.rieng.rent)),
+		"sleep_out_health": str(int(cfg.get("sleepOutside", {}).get("health", 0))),
+		"sleep_out_mood": str(int(cfg.get("sleepOutside", {}).get("mood", 0))),
 		"fail_health": str(int(cfg.milestones.failDay10Health)),
 		"fail_debt": fmt_money(int(cfg.milestones.failDay10DebtAdd)),
 	}

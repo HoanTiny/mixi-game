@@ -47,7 +47,11 @@ var _target = null
 var _target_loc := ""
 var _pending_click = null
 var _last_money := -1
+var _last_day := -1
 var _walk_t := 0.0
+## Quãng đường đã đi nhưng chưa quy ra giờ; cộng dồn rồi trừ giờ theo từng nấc 5 phút.
+var _walk_meters := 0.0
+var _night_prompt_day := -1
 
 
 func _ready() -> void:
@@ -366,6 +370,7 @@ func _physics_process(delta: float) -> void:
 			step = to.normalized() * SPEED * delta
 	if step != Vector3.ZERO:
 		player.position += step
+		_add_walk(step.length())
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
 		_walk_t += delta * 11.0
 		player_body.position.y = absf(sin(_walk_t)) * 0.06
@@ -388,6 +393,41 @@ func _physics_process(delta: float) -> void:
 		hud.close_location()
 
 	_update_traffic(delta)
+	_check_day_end()
+
+
+## Đi bộ tốn giờ: cứ đủ 5 phút trong game thì trừ một lần, tránh lưu file mỗi khung hình.
+func _add_walk(meters: float) -> void:
+	if not game.is_started() or game.is_over():
+		return
+	_walk_meters += meters
+	var hours: float = _walk_meters * float(game.cfg.get("walkHoursPerMeter", 0.0))
+	if hours >= 1.0 / 12.0:
+		_walk_meters = 0.0
+		game.walk(hours)
+
+
+## Hết giờ trong ngày: đang ở nhà thì hỏi đi ngủ, còn ở ngoài thì ngủ gục ngoài đường.
+func _check_day_end() -> void:
+	if hud.blocking() or not game.is_out_of_time() or not game.s.queue.is_empty():
+		return
+	_target = null
+	_target_loc = ""
+	if door_of("phong_tro").distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
+		if _night_prompt_day != game.day():
+			_night_prompt_day = game.day()
+			hud.close_location()
+			hud.dialogs.open_night()
+	else:
+		hud.close_location()
+		game.sleep_outside()
+
+
+func set_player_inside(inside: bool) -> void:
+	player.visible = not inside
+	if inside:
+		_target = null
+		_target_loc = ""
 
 
 func _handle_click(screen_pos: Vector2) -> void:
@@ -439,6 +479,15 @@ func _on_changed() -> void:
 		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
 			Color("7fe0a0") if money > _last_money else Color("ff8a7a"))
 	_last_money = money
+	# Sang ngày mới: Minh thức dậy trước cửa phòng trọ.
+	if game.day() != _last_day:
+		if _last_day != -1:
+			player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
+			camera.position = player.position + CAM_OFFSET
+			_target = null
+			_target_loc = ""
+			_walk_meters = 0.0
+		_last_day = game.day()
 	_update_lighting(game.clock())
 
 
