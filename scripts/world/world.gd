@@ -1,10 +1,11 @@
 extends Node3D
 ## Màn phố 3D kiểu Nobody: con phố ở Bình Thạnh nhìn chéo từ trên xuống. Bấm chuột để đi,
 ## bấm vào cửa tiệm hoặc người đứng trước cửa để mở việc làm, lớp học ở đó (phím E khi đứng gần).
-## Nhà cửa, người, xe đều là khối tạm; sau này thay bằng mô hình thật mà không đổi logic.
+## Nhà cửa, người, xe lấy mô hình thật theo data/models.json; thiếu file thì dựng khối hình tạm.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
+const Models := preload("res://scripts/world/models.gd")
 
 ## Mỗi địa điểm nằm phía bắc con phố, mặt tiền nhìn ra đường (z = -5).
 ## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm),
@@ -33,6 +34,7 @@ const INTERACT_RANGE := 2.4
 
 var game
 var hud
+var models := Models.new()
 var camera: Camera3D
 var sun: DirectionalLight3D
 var env: Environment
@@ -65,7 +67,7 @@ func _ready() -> void:
 		_build_location(id, LOCATIONS[id])
 	_build_props()
 	_build_traffic()
-	player = _person(Color("3d6fa8"), Color("2c2f3a"))
+	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
 	add_child(player)
 	# Vòng vàng dưới chân để luôn nhận ra Minh giữa đám đông.
@@ -159,22 +161,28 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	holder.name = id
 	add_child(holder)
 	var sign_height := 3.4
+	var model := models.spawn("buildings." + id, null, size) if size.x > 0.0 else null
+	if model:
+		model.position = Vector3(x, 0, FRONT_Z)
+		holder.add_child(model)
+		sign_height = float(model.get_meta("height")) + 0.8
 	if size.x > 0.0:
 		var center := Vector3(x, 0, FRONT_Z - size.z / 2.0)
-		_block(size, center, color, holder)
-		# Cửa, mái hiên và bảng hiệu ở mặt tiền.
-		_block(Vector3(1.6, 2.3, 0.1), Vector3(x, 0, FRONT_Z + 0.02), Color("2a2a2e"), holder)
-		if size.y < 3.5:
-			sign_height = size.y + 0.6
-		else:
-			_block(Vector3(size.x * 0.9, 0.12, 1.6), Vector3(x, 2.7, FRONT_Z + 0.8), color.darkened(0.25), holder)
-			_block(Vector3(size.x * 0.7, 0.9, 0.12), Vector3(x, 3.0, FRONT_Z + 0.06), Color("f4efe1"), holder)
-			for floor_y in range(4, int(size.y) - 1, 3):
-				for wx in [-size.x * 0.3, size.x * 0.3]:
-					_block(Vector3(1.4, 1.2, 0.08), Vector3(x + wx, floor_y, FRONT_Z + 0.03), Color("5c6f80"), holder)
-			sign_height = size.y + 0.8
-		if id == "cong_trinh":
-			_scaffold(x, size, holder)
+		if model == null:
+			_block(size, center, color, holder)
+			# Cửa, mái hiên và bảng hiệu ở mặt tiền.
+			_block(Vector3(1.6, 2.3, 0.1), Vector3(x, 0, FRONT_Z + 0.02), Color("2a2a2e"), holder)
+			if size.y < 3.5:
+				sign_height = size.y + 0.6
+			else:
+				_block(Vector3(size.x * 0.9, 0.12, 1.6), Vector3(x, 2.7, FRONT_Z + 0.8), color.darkened(0.25), holder)
+				_block(Vector3(size.x * 0.7, 0.9, 0.12), Vector3(x, 3.0, FRONT_Z + 0.06), Color("f4efe1"), holder)
+				for floor_y in range(4, int(size.y) - 1, 3):
+					for wx in [-size.x * 0.3, size.x * 0.3]:
+						_block(Vector3(1.4, 1.2, 0.08), Vector3(x + wx, floor_y, FRONT_Z + 0.03), Color("5c6f80"), holder)
+				sign_height = size.y + 0.8
+			if id == "cong_trinh":
+				_scaffold(x, size, holder)
 		if id == "tra_da":
 			for sx in [-1.2, 0.0, 1.2]:
 				_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0, -3.4), Color("2f6fb0"), holder)
@@ -221,7 +229,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	door_rings[id] = ring
 
 	if loc.has("npc"):
-		var npc := _person(Color(loc.npc_color), Color("3a3a40"))
+		var npc := _character("npc." + str(loc.get("npc_id", "")), Color(loc.npc_color), Color("3a3a40"))
 		npc.position = door_of(id) + Vector3(1.6, 0, 0.2)
 		npc.rotation.y = PI
 		holder.add_child(npc)
@@ -270,7 +278,16 @@ func _build_props() -> void:
 		_block(Vector3(0.08, 1.1, 0.08), Vector3(fx, 0, 5.25), Color("7d7f84"))
 		fx += 4.0
 	var tx := -62.0
+	var tree_rng := RandomNumberGenerator.new()
+	tree_rng.seed = 5
 	while tx < 58.0:
+		var tree := models.spawn("tree", tree_rng)
+		if tree:
+			tree.position = Vector3(tx, 0, 6.6)
+			tree.rotation.y = tree_rng.randf() * TAU
+			add_child(tree)
+			tx += 11.0
+			continue
 		_block(Vector3(0.35, 3.2, 0.35), Vector3(tx, 0, 6.6), Color("5a4634"))
 		var crown := MeshInstance3D.new()
 		var sm := SphereMesh.new()
@@ -285,7 +302,7 @@ func _build_props() -> void:
 	rng.seed = 7
 	for i in 16:
 		var bx := rng.randf_range(-60.0, 56.0)
-		var bike := _motorbike(Color.from_hsv(rng.randf(), 0.45, 0.7))
+		var bike := _bike(Color.from_hsv(rng.randf(), 0.45, 0.7), rng)
 		bike.position = Vector3(bx, 0, 3.7)
 		bike.rotation.y = rng.randf_range(-0.3, 0.3)
 		add_child(bike)
@@ -307,9 +324,12 @@ func _build_traffic() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 11
 	for i in 8:
-		var bike := _motorbike(Color.from_hsv(rng.randf(), 0.5, 0.75))
-		var rider := _person(Color.from_hsv(rng.randf(), 0.35, 0.6), Color("30323a"))
+		var bike := _bike(Color.from_hsv(rng.randf(), 0.5, 0.75), rng)
+		var rider := _character("people", Color.from_hsv(rng.randf(), 0.35, 0.6), Color("30323a"), rng)
 		rider.position = Vector3(0, 0.45, 0)
+		# Người mẫu nhìn theo trục z, xe chạy theo trục x: quay người cho ngồi đúng chiều xe.
+		rider.rotation.y = PI / 2.0
+		Models.play(rider.get_child(0), "sit")
 		bike.add_child(rider)
 		var lane := -1.4 if i % 2 == 0 else 1.4
 		var dir := 1.0 if lane > 0 else -1.0
@@ -318,7 +338,7 @@ func _build_traffic() -> void:
 		add_child(bike)
 		bikes.append({"node": bike, "dir": dir, "speed": rng.randf_range(6.0, 10.0)})
 	for i in 10:
-		var w := _person(Color.from_hsv(rng.randf(), 0.3, 0.65), Color.from_hsv(rng.randf(), 0.2, 0.35))
+		var w := _character("people", Color.from_hsv(rng.randf(), 0.3, 0.65), Color.from_hsv(rng.randf(), 0.2, 0.35), rng)
 		var side := -3.8 if i % 2 == 0 else 3.9
 		w.position = Vector3(rng.randf_range(-62, 56), 0, side)
 		add_child(w)
@@ -373,9 +393,10 @@ func _physics_process(delta: float) -> void:
 		player.position += step
 		_add_walk(step.length())
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
-		_walk_t += delta * 11.0
-		player_body.position.y = absf(sin(_walk_t)) * 0.06
-	else:
+		if not Models.play(player_body, "walk"):
+			_walk_t += delta * 11.0
+			player_body.position.y = absf(sin(_walk_t)) * 0.06
+	elif not Models.play(player_body, "idle"):
 		player_body.position.y = 0.0
 	player.position.x = clampf(player.position.x, STREET_X.x, STREET_X.y)
 	player.position.z = clampf(player.position.z, STREET_Z.x, STREET_Z.y)
@@ -460,7 +481,9 @@ func _update_traffic(delta: float) -> void:
 		var n: Node3D = w.node
 		if float(w.wait) > 0.0:
 			w["wait"] = float(w.wait) - delta
+			Models.play(n.get_child(0), "idle")
 			continue
+		Models.play(n.get_child(0), "walk")
 		var to: Vector3 = w.goal - n.position
 		if to.length() < 0.2:
 			w["goal"] = Vector3(clampf(n.position.x + randf_range(-14, 14), -62, 56), 0, n.position.z)
@@ -614,6 +637,26 @@ func _label3d(text: String, pos: Vector3, size: int) -> Label3D:
 
 
 ## Người khối tạm: chân, thân, đầu. Con đầu tiên là phần thân để nhún khi đi.
+## Người theo mô hình trong models.json (key như "player", "npc.vy", "people"), thiếu thì dựng khối.
+## Con đầu tiên luôn là phần thân (mô hình hoặc khối) để nhún nhảy hay phát hoạt cảnh.
+func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenerator = null) -> Node3D:
+	var m := models.spawn(key, rng)
+	if m == null:
+		return _person(shirt, pants)
+	var root := Node3D.new()
+	root.add_child(m)
+	return root
+
+
+func _bike(color: Color, rng: RandomNumberGenerator) -> Node3D:
+	var m := models.spawn("bike", rng)
+	if m == null:
+		return _motorbike(color)
+	var root := Node3D.new()
+	root.add_child(m)
+	return root
+
+
 func _person(shirt: Color, pants: Color) -> Node3D:
 	var root := Node3D.new()
 	var body := Node3D.new()

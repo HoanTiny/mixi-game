@@ -2,7 +2,7 @@
 
 Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh một con phố ở Bình Thạnh, Sài Gòn. Minh từ Hà Tĩnh lên thành phố, có 30 ngày để trả nợ nặng lãi cho gia đình và lo học phí cho em gái.
 
-Làm bằng **Godot 4.7**. Nhà cửa, người và xe hiện là khối hình tạm, sau này sẽ thay bằng mô hình thật.
+Làm bằng **Godot 4.7**. Nhà cửa, người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
 
 ## Mở project
 
@@ -33,10 +33,13 @@ data/
   events.json     sự kiện cố định theo ngày, sự kiện ngẫu nhiên, mốc tiền
   story.json      mở đầu, món mang theo, 5 kết thúc, Sổ tay của Minh
   talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
+  models.json     file mô hình cho nhà, người, xe, cây và cách co giãn
+assets/           mô hình .glb (chưa có thì dùng khối hình)
 scripts/
   game_logic.gd   toàn bộ luật chơi, không phụ thuộc giao diện
   game_state.gd   autoload GameState: giữ ván chơi, tự lưu
   world/world.gd  phố 3D: dựng cảnh, nhân vật, xe máy, người đi đường, ánh sáng theo giờ
+  world/models.gd nạp mô hình .glb, co giãn cho vừa chỗ, phát hoạt cảnh đứng, đi, ngồi
   world/hud.gd    HUD kiểu Nobody: mục tiêu, trạng thái, bảng địa điểm, thanh công cụ
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động dùng chung
   ui/dialog_layer.gd  hộp thoại mở đầu, sự kiện, buổi tối, kết thúc
@@ -47,6 +50,19 @@ scenes/
 tests/
   sim.gd          tự chơi 200 ván để kiểm tra cân bằng
 ```
+
+## Thêm mô hình thật
+
+Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file mô hình nào. Thiếu file nào thì chỗ đó vẫn là khối hình, nên có thể thêm dần từng cái.
+
+1. Tải các bộ miễn phí (giấy phép CC0, dùng thương mại được):
+   - Người: [Kenney Mini Characters](https://kenney.nl/assets/mini-characters), có sẵn hoạt cảnh đứng, đi, ngồi.
+   - Nhà: [Kenney City Kit Commercial](https://kenney.nl/assets/city-kit-commercial) và [City Kit Suburban](https://kenney.nl/assets/city-kit-suburban).
+   - Xe máy, cây: [Quaternius](https://quaternius.com) (các bộ Vehicles, Nature).
+2. Chép file `.glb` vào `assets/characters/`, `assets/buildings/`, `assets/vehicles/`, `assets/props/` đúng tên trong `data/models.json`, hoặc sửa `path` cho khớp tên file của bạn.
+3. Mở Godot cho nó nhập file, rồi chạy game.
+
+Không cần chỉnh kích thước bằng tay: `fit` co giãn mô hình cho vừa khung có sẵn. `height` khớp chiều cao người, `length` khớp chiều dài xe, `width` khớp bề ngang mặt tiền. Mô hình bị quay ngược thì sửa `rot` (độ). Tên hoạt cảnh khác bộ Kenney (ví dụ file từ Mixamo) thì khai báo trong `anims`, ví dụ `{"walk": "mixamo.com"}`.
 
 ## Chỉnh cân bằng
 
