@@ -6,6 +6,7 @@ extends Node3D
 const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
 const Models := preload("res://scripts/world/models.gd")
+const Audio := preload("res://scripts/world/audio.gd")
 
 ## Mỗi địa điểm nằm phía bắc con phố, mặt tiền nhìn ra đường (z = -5).
 ## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm),
@@ -35,6 +36,7 @@ const INTERACT_RANGE := 2.4
 var game
 var hud
 var models := Models.new()
+var audio
 var camera: Camera3D
 var sun: DirectionalLight3D
 var env: Environment
@@ -98,6 +100,13 @@ func _ready() -> void:
 	hud.world = self
 	hud.game = game
 	add_child(hud)
+	audio = Audio.new()
+	audio.world = self
+	audio.game = game
+	add_child(audio)
+	hud.dialogs.visibility_changed.connect(func() -> void:
+		if hud.dialogs.visible:
+			audio.play("dialog"))
 	game.changed.connect(_on_changed)
 	_on_changed()
 	# Dùng khi chụp màn hình kiểm tra: "-- --demo --demo-open=quan_com" mở sẵn một địa điểm.
@@ -392,6 +401,7 @@ func _physics_process(delta: float) -> void:
 	if step != Vector3.ZERO:
 		player.position += step
 		_add_walk(step.length())
+		audio.step(delta)
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
 		if not Models.play(player_body, "walk"):
 			_walk_t += delta * 11.0
@@ -502,6 +512,7 @@ func _on_changed() -> void:
 	if _last_money >= 0 and money != _last_money:
 		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
 			Color("7fe0a0") if money > _last_money else Color("ff8a7a"))
+		audio.play("earn" if money > _last_money else "spend")
 	_last_money = money
 	# Sang ngày mới: Minh thức dậy trước cửa phòng trọ.
 	if game.day() != _last_day:

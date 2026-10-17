@@ -262,6 +262,7 @@ func _perform(id: String) -> void:
 		_working = false
 		_work.visible = false
 		world.set_player_inside(false)
+		world.audio.play("done")
 		game.do_action(id))
 
 

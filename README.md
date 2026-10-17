@@ -34,12 +34,16 @@ data/
   story.json      mở đầu, món mang theo, 5 kết thúc, Sổ tay của Minh
   talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
   models.json     file mô hình cho nhà, người, xe, cây và cách co giãn
-assets/           mô hình .glb (chưa có thì dùng khối hình)
+  sounds.json     âm nền, tiếng rao, còi xe, tiếng hiệu ứng
+assets/           mô hình .glb (chưa có thì dùng khối hình), sounds/ âm thanh
+tools/
+  gen_sounds.py   tổng hợp âm thanh tạm
 scripts/
   game_logic.gd   toàn bộ luật chơi, không phụ thuộc giao diện
   game_state.gd   autoload GameState: giữ ván chơi, tự lưu
   world/world.gd  phố 3D: dựng cảnh, nhân vật, xe máy, người đi đường, ánh sáng theo giờ
   world/models.gd nạp mô hình .glb, co giãn cho vừa chỗ, phát hoạt cảnh đứng, đi, ngồi
+  world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/hud.gd    HUD kiểu Nobody: mục tiêu, trạng thái, bảng địa điểm, thanh công cụ
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động dùng chung
   ui/dialog_layer.gd  hộp thoại mở đầu, sự kiện, buổi tối, kết thúc
@@ -63,6 +67,15 @@ Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file m
 3. Mở Godot cho nó nhập file, rồi chạy game.
 
 Không cần chỉnh kích thước bằng tay: `fit` co giãn mô hình cho vừa khung có sẵn. `height` khớp chiều cao người, `length` khớp chiều dài xe, `width` khớp bề ngang mặt tiền. Mô hình bị quay ngược thì sửa `rot` (độ). Tên hoạt cảnh khác bộ Kenney (ví dụ file từ Mixamo) thì khai báo trong `anims`, ví dụ `{"walk": "mixamo.com"}`.
+
+## Âm thanh
+
+`data/sounds.json` khai báo âm nền theo giờ (phố ban ngày, đêm trong hẻm, mưa khi có sự kiện mưa), tiếng rao (bánh mì, xôi, ve chai, chè, hủ tiếu gõ), còi xe, bước chân và tiếng tiền. Thiếu file nào thì chỗ đó im, riêng tiếng rao vẫn hiện chữ nổi trên phố.
+
+Các file `.wav` trong `assets/sounds/` là **tiếng tạm** do `tools/gen_sounds.py` tổng hợp (`python tools/gen_sounds.py`, cần numpy). Thay bằng file thu thật cùng tên khi có:
+
+- Tiếng rao: thu giọng người thật rồi lưu thành `assets/sounds/rao_banh_mi.ogg`, `rao_xoi.ogg`, `rao_ve_chai.ogg`, `rao_che.ogg`, `rao_hu_tieu.ogg` (hiện chưa có file nào, nên chỉ hiện chữ).
+- Tiếng phố, mưa trên mái tôn, còi xe: tìm trên [freesound.org](https://freesound.org) với giấy phép CC0.
 
 ## Chỉnh cân bằng
 

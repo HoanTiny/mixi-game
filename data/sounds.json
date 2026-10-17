@@ -1,0 +1,24 @@
+{
+  "_ghi_chu": "Âm thanh màn phố. Thiếu file nào thì chỗ đó im. Các file .wav trong assets/sounds/ là tiếng tạm do tools/gen_sounds.py tổng hợp; thay bằng file thu thật (.ogg hoặc .wav) cùng tên, hoặc sửa path. hours: [từ, đến) giờ trong ngày, đến > 24 là qua nửa đêm. rain: true chỉ phát khi mưa. every: [ít nhất, nhiều nhất] giây giữa hai lần. x, z: chỗ phát trên phố. text: chữ nổi hiện cùng tiếng rao.",
+  "ambience": {
+    "pho_ngay": { "path": "res://assets/sounds/traffic.wav", "volume_db": -12, "hours": [6, 20] },
+    "pho_dem":  { "path": "res://assets/sounds/night.wav",   "volume_db": -14, "hours": [19, 30] },
+    "mua":      { "path": "res://assets/sounds/rain.wav",    "volume_db": -6,  "rain": true }
+  },
+  "calls": [
+    { "path": "res://assets/sounds/rao_banh_mi.ogg", "text": "Bánh mì nóng giòn đây!", "hours": [6, 9],   "every": [25, 45], "x": 6.0,   "volume_db": -2 },
+    { "path": "res://assets/sounds/rao_xoi.ogg",     "text": "Xôi nóng đây, xôi đậu xôi bắp!", "hours": [6, 9], "every": [35, 60], "x": -26.0, "volume_db": -2 },
+    { "path": "res://assets/sounds/rao_ve_chai.ogg", "text": "Ai ve chai đồng nát, mua đồ cũ hông?", "hours": [9, 17], "every": [40, 70], "x": 30.0, "volume_db": -2 },
+    { "path": "res://assets/sounds/rao_che.ogg",     "text": "Chè đậu đỏ, chè bưởi đây!", "hours": [17, 22], "every": [35, 60], "x": 14.0, "volume_db": -2 },
+    { "path": "res://assets/sounds/rao_hu_tieu.ogg", "text": "Hủ tiếu gõ đây!", "hours": [19, 30], "every": [30, 50], "x": -10.0, "volume_db": -2 }
+  ],
+  "horn": { "path": "res://assets/sounds/horn.wav", "volume_db": -6, "hours": [6, 21], "every": [6, 14] },
+  "stepEvery": 0.36,
+  "sfx": {
+    "step":    { "path": "res://assets/sounds/step.wav",   "volume_db": -16 },
+    "earn":    { "path": "res://assets/sounds/earn.wav",   "volume_db": -6 },
+    "spend":   { "path": "res://assets/sounds/spend.wav",  "volume_db": -8 },
+    "dialog":  { "path": "res://assets/sounds/dialog.wav", "volume_db": -10 },
+    "done":    { "path": "res://assets/sounds/done.wav",   "volume_db": -8 }
+  }
+}
