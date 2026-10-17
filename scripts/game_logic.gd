@@ -746,11 +746,12 @@ func finish_day(night_shift: bool) -> void:
 
 
 func _resolve_ending() -> void:
-	var legal := maxi(0, int(cfg.legalDebt) - int(s.interest_paid))
+	# Kết ẩn: trả đủ tiền gốc hợp pháp; tiền lãi đã đóng ở mốc ngày 10 thì mất, không được trừ vào gốc.
+	var legal := int(cfg.legalDebt)
 	var key := ""
 	if int(s.smuggle) >= int(cfg.smuggle.tripsForBadEnding):
 		key = "duong_tat"
-	elif level("phapLy") >= 3 and int(s.evidence) >= 2 and int(s.money) >= legal:
+	elif level("phapLy") >= 3 and int(s.evidence) >= int(cfg.get("legalEvidence", 2)) and int(s.money) >= legal:
 		spend(legal, "Trả phần gốc hợp pháp")
 		key = "cong_ly"
 	elif int(s.money) >= int(s.debt):

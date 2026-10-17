@@ -128,8 +128,9 @@
         "title": "Chuyện cũ của ông Tư",
         "text": "\"Hồi trước thằng con ông cũng bị vay nặng lãi, tụi nó tới tận nhà. Ông đi kiện, thắng. Con nhớ nghen: giấy vay giữ cho kỹ, tụi nó gọi điện thì ghi âm lại.\"",
         "choices": [
-          { "label": "Ghi nhớ lời ông", "hint": "Ông Tư +5, biết cách giữ bằng chứng",
-            "effects": { "rep.ongTu": 5, "log": "Ông Tư dặn: giữ giấy vay, ghi âm cuộc gọi đòi nợ." } }
+          { "label": "Gọi má gửi bản gốc giấy vay lên", "hint": "Bằng chứng +1, Ông Tư +5",
+            "effects": { "rep.ongTu": 5, "evidence": 1, "log": "Ông Tư dặn: giữ giấy vay, ghi âm cuộc gọi đòi nợ. Má gửi bản gốc giấy vay lên theo xe khách." } },
+          { "label": "Ghi nhớ lời ông", "hint": "Ông Tư +5", "effects": { "rep.ongTu": 5 } }
         ] }
     ],
     "chat": [

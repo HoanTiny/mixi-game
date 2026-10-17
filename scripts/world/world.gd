@@ -32,6 +32,8 @@ const STREET_Z := Vector2(-4.6, 4.6)
 const SPEED := 6.0
 const CAM_OFFSET := Vector3(0, 24, 17)
 const INTERACT_RANGE := 2.4
+## Bảng tên tiệm treo ở mặt tiền, không cao hơn mức này để không lọt lên mép trên màn hình dưới bảng mục tiêu.
+const SIGN_MAX := 4.6
 
 var game
 var hud
@@ -174,7 +176,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	if model:
 		model.position = Vector3(x, 0, FRONT_Z)
 		holder.add_child(model)
-		sign_height = float(model.get_meta("height")) + 0.8
+		sign_height = minf(float(model.get_meta("height")) + 0.8, SIGN_MAX)
 	if size.x > 0.0:
 		var center := Vector3(x, 0, FRONT_Z - size.z / 2.0)
 		if model == null:
@@ -189,7 +191,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 				for floor_y in range(4, int(size.y) - 1, 3):
 					for wx in [-size.x * 0.3, size.x * 0.3]:
 						_block(Vector3(1.4, 1.2, 0.08), Vector3(x + wx, floor_y, FRONT_Z + 0.03), Color("5c6f80"), holder)
-				sign_height = size.y + 0.8
+				sign_height = minf(size.y + 0.8, SIGN_MAX)
 			if id == "cong_trinh":
 				_scaffold(x, size, holder)
 		if id == "tra_da":
@@ -297,14 +299,15 @@ func _build_props() -> void:
 			add_child(tree)
 			tx += 11.0
 			continue
-		_block(Vector3(0.35, 3.2, 0.35), Vector3(tx, 0, 6.6), Color("5a4634"))
+		# Cây ở vỉa hè phía nam nằm giữa camera và phố: để thấp và nhỏ cho khỏi che đường.
+		_block(Vector3(0.3, 2.4, 0.3), Vector3(tx, 0, 6.6), Color("5a4634"))
 		var crown := MeshInstance3D.new()
 		var sm := SphereMesh.new()
-		sm.radius = 1.6
-		sm.height = 2.6
+		sm.radius = 1.1
+		sm.height = 1.8
 		crown.mesh = sm
 		crown.material_override = _mat(Color("4f6b45"))
-		crown.position = Vector3(tx, 4.0, 6.6)
+		crown.position = Vector3(tx, 3.0, 6.6)
 		add_child(crown)
 		tx += 11.0
 	var rng := RandomNumberGenerator.new()

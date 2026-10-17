@@ -20,7 +20,7 @@
     { "path": "res://assets/vehicles/scooter.glb", "rot": 90, "fit": "length", "size": [1.8, 0, 0] }
   ],
   "tree": [
-    { "path": "res://assets/props/tree.glb", "rot": 0, "fit": "height", "size": [0, 5.2, 0] }
+    { "path": "res://assets/props/tree.glb", "rot": 0, "fit": "height", "size": [0, 3.8, 0] }
   ],
   "buildings": {
     "tram_xe_buyt": { "path": "res://assets/buildings/bus-stop.glb",   "rot": 0, "fit": "width" },

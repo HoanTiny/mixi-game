@@ -64,6 +64,7 @@
     "failDay20Mood": -50
   },
   "legalDebt": 15000000,
+  "legalEvidence": 3,
   "smuggle": {
     "pay": 3000000,
     "hours": 6,

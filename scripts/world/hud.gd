@@ -6,12 +6,15 @@ extends CanvasLayer
 const GameLogic := preload("res://scripts/game_logic.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
+const StreetMap := preload("res://scripts/world/street_map.gd")
 
 var world
 var game
 var dialogs: DialogLayer
 
 var _objectives: PanelContainer
+var _map: Control
+var _loc_scroll: ScrollContainer
 var _objective_box: VBoxContainer
 var _status: PanelContainer
 var _day_label: Label
@@ -61,6 +64,10 @@ func _ready() -> void:
 	# Hàng trên: mục tiêu bên trái, trạng thái bên phải.
 	var top := _pass(HBoxContainer.new(), rows)
 	_build_objectives(top)
+	_spacer(top)
+	_map = StreetMap.new()
+	_map.world = world
+	top.add_child(_map)
 	_spacer(top)
 	_build_status(top)
 
@@ -278,9 +285,10 @@ func _build_location(parent: Control) -> void:
 	_loc_desc.custom_minimum_size = Vector2(320, 0)
 	v.add_child(_loc_desc)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(336, 340)
+	scroll.custom_minimum_size = Vector2(336, 0)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	v.add_child(scroll)
+	_loc_scroll = scroll
 	_loc_cards = VBoxContainer.new()
 	_loc_cards.add_theme_constant_override("separation", 8)
 	scroll.add_child(_loc_cards)
@@ -356,7 +364,7 @@ func _tool_button(text: String, on_press: Callable) -> Button:
 
 func _refresh() -> void:
 	var started: bool = game.is_started()
-	for p in [_objectives, _status, _bottom]:
+	for p in [_objectives, _status, _bottom, _map]:
 		p.visible = started
 	if not started:
 		_loc_id = ""
@@ -450,7 +458,7 @@ func _refresh_skills(s: Dictionary) -> void:
 		room_name = game.cfg.rooms[s.room].name
 	var lines := [
 		"Phòng trọ: " + room_name,
-		"Bằng chứng: %d · Chuyến chạy hàng: %d/%d" % [int(s.evidence), int(s.smuggle), int(game.cfg.smuggle.tripsForBadEnding)],
+		"Bằng chứng: %d/%d · Chuyến chạy hàng: %d/%d" % [int(s.evidence), int(game.cfg.get("legalEvidence", 2)), int(s.smuggle), int(game.cfg.smuggle.tripsForBadEnding)],
 		"Tạm trú: " + ("Đã đăng ký" if s.flags.get("tamTru", false) else "Chưa"),
 	]
 	if int(s.held) > 0:
@@ -472,7 +480,7 @@ func _refresh_location() -> void:
 	if loc.has("npc_id"):
 		var npc: String = loc.npc_id
 		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(loc.npc),
-			"%s phút · Thân thiết %d/100" % [GameLogic.num(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
+			"%d phút · Thân thiết %d/100" % [roundi(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
 			game.talk_lock(npc), game.talk.bind(npc)))
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
@@ -485,3 +493,9 @@ func _refresh_location() -> void:
 			dialogs.open_night()))
 	elif found == 0:
 		_loc_cards.add_child(UI.wrap("Hôm nay ở đây chưa có việc gì cho Minh.", 13, UI.INK_SOFT, 320))
+	_fit_location.call_deferred()
+
+
+## Bảng địa điểm cao vừa đủ số thẻ, nhiều quá thì cuộn (tránh khoảng trắng thừa khi chỉ có một việc).
+func _fit_location() -> void:
+	_loc_scroll.custom_minimum_size.y = minf(_loc_cards.get_combined_minimum_size().y, 420.0)
