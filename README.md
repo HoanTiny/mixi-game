@@ -21,6 +21,8 @@ Làm bằng **Godot 4.7**. Nhà cửa, người và xe hiện là khối hình t
 
 **Thời gian:** đi bộ trên phố tốn giờ (chỉnh bằng `walkHoursPerMeter`). Làm việc hay đi học thì Minh vào trong tiệm, thanh thời gian chạy (`workSecondsPerHour` giây thật cho mỗi giờ trong game) rồi mới tính kết quả. Nút **Về phòng trọ** dẫn Minh về nhà, vào phòng trọ để **Đi ngủ**. Tới 22 giờ mà chưa về thì Minh ngủ gục ngoài đường, bị trừ Sức khỏe và Tinh thần (`sleepOutside`).
 
+**Nói chuyện:** vào tiệm có người đứng trước cửa (Cô Sáu, Chú Bảy, Vy, Tuấn, Ông Tư) sẽ thấy nút **Nói chuyện**, tốn 30 phút, mỗi người một lần mỗi ngày. Mỗi người có vài đoạn mạch chuyện mở dần theo độ thân thiết và ngày; kể hết thì tán gẫu, được thêm chút thân thiết. Hội thoại viết trong `data/talks.json`.
+
 Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi lại** trong Bảng cân bằng xóa ván đang chơi.
 
 ## Cấu trúc thư mục
@@ -30,6 +32,7 @@ data/
   config.json     số liệu cân bằng: tiền, lương, học phí, xác suất, việc làm và địa điểm của từng việc
   events.json     sự kiện cố định theo ngày, sự kiện ngẫu nhiên, mốc tiền
   story.json      mở đầu, món mang theo, 5 kết thúc, Sổ tay của Minh
+  talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
 scripts/
   game_logic.gd   toàn bộ luật chơi, không phụ thuộc giao diện
   game_state.gd   autoload GameState: giữ ván chơi, tự lưu

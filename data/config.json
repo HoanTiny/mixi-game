@@ -8,6 +8,8 @@
   "sharedRoomMoodDecay": 3,
   "letterMood": 10,
   "walkHoursPerMeter": 0.004,
+  "talkHours": 0.5,
+  "chatRep": 2,
   "workSecondsPerHour": 0.35,
   "sleepOutside": {
     "health": -15,

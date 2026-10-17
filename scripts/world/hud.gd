@@ -468,6 +468,11 @@ func _refresh_location() -> void:
 	for c in _loc_cards.get_children():
 		c.queue_free()
 	var found := 0
+	if loc.has("npc_id"):
+		var npc: String = loc.npc_id
+		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(loc.npc),
+			"%s phút · Thân thiết %d/100" % [GameLogic.num(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
+			game.talk_lock(npc), game.talk.bind(npc)))
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
 			if a.get("location", "") == _loc_id:

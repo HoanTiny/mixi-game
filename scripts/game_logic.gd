@@ -20,6 +20,8 @@ const LAST_DAY := 30
 var cfg: Dictionary = {}
 var events: Array = []
 var story: Dictionary = {}
+## Hội thoại với nhân vật, theo khóa trong REPS (data/talks.json).
+var talks: Dictionary = {}
 ## Trạng thái ván chơi. Rỗng nghĩa là chưa bắt đầu (đang ở màn mở đầu).
 var s: Dictionary = {}
 ## Sổ tay của Minh: giữ lại qua các lần thua.
@@ -33,6 +35,8 @@ func load_data(dir := "res://data") -> void:
 	cfg = _read_json(dir + "/config.json")
 	events = _read_json(dir + "/events.json")
 	story = _read_json(dir + "/story.json")
+	talks = _read_json(dir + "/talks.json")
+	talks.erase("_ghi_chu")
 
 
 static func _read_json(path: String) -> Variant:
@@ -55,7 +59,7 @@ func new_game(item: String) -> void:
 		"debt": int(cfg.milestones.day30), "interest_paid": 0, "evidence": 0, "smuggle": 0, "held": 0,
 		"counts": {}, "today": {"list": []}, "yesterday": {"list": []}, "last_random": {},
 		"queue": [], "log": [], "history": [], "choices": [], "skip_reason": "", "over": {},
-		"stats": {"earned": 0, "spent": 0, "faints": 0},
+		"stats": {"earned": 0, "spent": 0, "faints": 0}, "talks_done": [],
 	}
 	apply_effects(story.items[item].get("effects", {}))
 	_morning()
@@ -466,7 +470,54 @@ func find_event(id: String) -> Dictionary:
 	for e in events:
 		if e.id == id:
 			return e
+	if id == "talk_chat":
+		return {"id": id, "title": "{npc}", "text": "{line}", "choices": [{"label": "Chào rồi đi", "hint": "{npc} +{chat_rep}"}]}
+	for npc in talks:
+		for b in talks[npc].get("story", []):
+			if b.id == id:
+				var e: Dictionary = b.duplicate()
+				e["who"] = REPS.get(npc, npc)
+				return e
 	return {}
+
+
+# ---------------------------------------------------------------- nói chuyện
+
+## "" nếu nói chuyện được với nhân vật, ngược lại là lý do khóa.
+func talk_lock(npc: String) -> String:
+	if not is_started() or is_over() or not s.queue.is_empty() or not talks.has(npc):
+		return "-"
+	if today_count("talk_" + npc) > 0:
+		return "Hôm nay đã nói chuyện rồi"
+	if hours_left() < float(cfg.get("talkHours", 0.5)):
+		return "Không đủ giờ"
+	return ""
+
+
+## Nói chuyện: kể đoạn mạch chuyện kế tiếp nếu đã mở, không thì tán gẫu vài câu.
+func talk(npc: String) -> void:
+	if talk_lock(npc) != "":
+		return
+	s["used"] = float(s.used) + float(cfg.get("talkHours", 0.5))
+	s.today["talk_" + npc] = 1
+	if not s.has("talks_done"):
+		s["talks_done"] = []
+	var who: String = REPS.get(npc, npc)
+	for b in talks[npc].get("story", []):
+		if not s.talks_done.has(b.id) and check(b.get("when", {})) == "":
+			s.talks_done.append(b.id)
+			s.queue.append({"id": b.id, "data": {}})
+			add_log("Nói chuyện với " + who)
+			_commit()
+			return
+	var lines := []
+	for c in talks[npc].get("chat", []):
+		if check(c.get("when", {})) == "":
+			lines.append(c.text)
+	add_rep(npc, float(cfg.get("chatRep", 2)))
+	s.queue.append({"id": "talk_chat", "data": {"npc": who, "line": lines.pick_random() if not lines.is_empty() else "..."}})
+	add_log("Tán gẫu với " + who)
+	_commit()
 
 
 ## Sự kiện đang chờ người chơi chọn, đã gộp biến thể phù hợp. Rỗng nếu không có.
@@ -548,6 +599,9 @@ func fill(text: String) -> String:
 		"sleep_out_mood": str(int(cfg.get("sleepOutside", {}).get("mood", 0))),
 		"fail_health": str(int(cfg.milestones.failDay10Health)),
 		"fail_debt": fmt_money(int(cfg.milestones.failDay10DebtAdd)),
+		"npc": str(_event_data.get("npc", "")),
+		"line": str(_event_data.get("line", "")),
+		"chat_rep": str(int(cfg.get("chatRep", 2))),
 	}
 	for k in vals:
 		text = text.replace("{" + k + "}", vals[k])
@@ -741,7 +795,7 @@ func summary() -> String:
 		skills[k] = level(k)
 	return JSON.stringify({
 		"ending": s.over.get("key", null), "day": day(), "money": int(s.money),
-		"item": s.item, "room": s.room, "skills": skills, "rep": s.rep, "stats": s.stats,
+		"item": s.item, "room": s.room, "skills": skills, "rep": s.rep, "stats": s.stats, "talks": s.get("talks_done", []),
 		"history": s.history, "choices": s.choices,
 	}, " ")
 

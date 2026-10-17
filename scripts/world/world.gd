@@ -7,7 +7,8 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
 
 ## Mỗi địa điểm nằm phía bắc con phố, mặt tiền nhìn ra đường (z = -5).
-## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm).
+## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm),
+## npc_id: khóa của người đó trong REPS và data/talks.json.
 const LOCATIONS := {
 	"nga_tu": {"name": "Ngã tư Hàng Xanh", "desc": "Phát tờ rơi cho người qua đường.", "x": -64.0, "size": Vector3(0, 0, 0), "color": "8d8a83"},
 	"tram_xe_buyt": {"name": "Trạm xe buýt đi Quận 1", "desc": "Đón khách nước ngoài, việc cuối tuần.", "x": -55.0, "size": Vector3(5, 3, 2.8), "color": "3c7d6b"},
@@ -15,12 +16,12 @@ const LOCATIONS := {
 	"thu_vien": {"name": "Thư viện quận", "desc": "Tự học miễn phí.", "x": -32.0, "size": Vector3(10, 8, 6), "color": "a98467"},
 	"trung_tam": {"name": "Trung tâm dạy nghề", "desc": "Khóa điện lạnh và tin học văn phòng.", "x": -19.5, "size": Vector3(11, 8, 8.5), "color": "b9b2dc"},
 	"cua_hang": {"name": "Cửa hàng 24 giờ", "desc": "Tuyển thu ngân. Quầy sửa điện thoại bên cạnh.", "x": -8.5, "size": Vector3(8, 7, 4.5), "color": "8cc3df"},
-	"quan_ca_phe": {"name": "Cà phê Góc Phố", "desc": "Quán Vy làm thêm.", "x": 1.0, "size": Vector3(9, 7, 4.5), "color": "6f9474", "npc": "Vy", "npc_color": "d9776b"},
+	"quan_ca_phe": {"name": "Cà phê Góc Phố", "desc": "Quán Vy làm thêm.", "x": 1.0, "size": Vector3(9, 7, 4.5), "color": "6f9474", "npc": "Vy", "npc_id": "vy", "npc_color": "d9776b"},
 	"quan_com": {"name": "Quán cơm tấm", "desc": "Cần người rửa bát.", "x": 10.5, "size": Vector3(8, 7, 4.2), "color": "e39a66"},
-	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "color": "c8503f", "npc": "Ông Tư", "npc_color": "8a8a7a"},
-	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "color": "6f8fa8", "npc": "Chú Bảy", "npc_color": "3f5f7a"},
-	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "color": "eadcae", "npc": "Cô Sáu", "npc_color": "b5577a"},
-	"cong_trinh": {"name": "Công trình", "desc": "Phụ hồ, công nhật.", "x": 51.0, "size": Vector3(14, 9, 10), "color": "9c9a93", "npc": "Tuấn", "npc_color": "c9853a"},
+	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "color": "c8503f", "npc": "Ông Tư", "npc_id": "ongTu", "npc_color": "8a8a7a"},
+	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "color": "6f8fa8", "npc": "Chú Bảy", "npc_id": "chuBay", "npc_color": "3f5f7a"},
+	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "color": "eadcae", "npc": "Cô Sáu", "npc_id": "coSau", "npc_color": "b5577a"},
+	"cong_trinh": {"name": "Công trình", "desc": "Phụ hồ, công nhật.", "x": 51.0, "size": Vector3(14, 9, 10), "color": "9c9a93", "npc": "Tuấn", "npc_id": "tuan", "npc_color": "c9853a"},
 }
 const FRONT_Z := -5.0
 const DOOR_Z := -4.1
