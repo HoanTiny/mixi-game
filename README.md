@@ -2,7 +2,7 @@
 
 Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh một con phố ở Bình Thạnh, Sài Gòn. Minh từ Hà Tĩnh lên thành phố, có 30 ngày để trả nợ nặng lãi cho gia đình và lo học phí cho em gái.
 
-Làm bằng **Godot 4.7**. Nhà cửa, người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
+Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
 
 ## Mở project
 
@@ -44,6 +44,8 @@ scripts/
   world/world.gd  phố 3D: dựng cảnh, nhân vật, xe máy, người đi đường, ánh sáng theo giờ
   world/models.gd nạp mô hình .glb, co giãn cho vừa chỗ, phát hoạt cảnh đứng, đi, ngồi
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
+  world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
+  world/street_map.gd  bản đồ phố thu nhỏ, bấm để đi tới
   world/hud.gd    HUD kiểu Nobody: mục tiêu, trạng thái, bảng địa điểm, thanh công cụ
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động dùng chung
   ui/dialog_layer.gd  hộp thoại mở đầu, sự kiện, buổi tối, kết thúc

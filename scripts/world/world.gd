@@ -7,22 +7,24 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
 const Models := preload("res://scripts/world/models.gd")
 const Audio := preload("res://scripts/world/audio.gd")
+const TubeHouse := preload("res://scripts/world/tube_house.gd")
 
 ## Mỗi địa điểm nằm phía bắc con phố, mặt tiền nhìn ra đường (z = -5).
 ## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm),
 ## npc_id: khóa của người đó trong REPS và data/talks.json.
+## tube: dựng thành nhà ống (floors tầng, sign chữ biển hiệu, units số căn liền nhau, shop tầng trệt buôn bán).
 const LOCATIONS := {
 	"nga_tu": {"name": "Ngã tư Hàng Xanh", "desc": "Phát tờ rơi cho người qua đường.", "x": -64.0, "size": Vector3(0, 0, 0), "color": "8d8a83"},
 	"tram_xe_buyt": {"name": "Trạm xe buýt đi Quận 1", "desc": "Đón khách nước ngoài, việc cuối tuần.", "x": -55.0, "size": Vector3(5, 3, 2.8), "color": "3c7d6b"},
 	"phuong": {"name": "UBND phường", "desc": "Nhà văn hóa có lớp tiếng Anh tối. Công an phường đăng ký tạm trú.", "x": -45.0, "size": Vector3(12, 8, 7), "color": "e2c55c"},
 	"thu_vien": {"name": "Thư viện quận", "desc": "Tự học miễn phí.", "x": -32.0, "size": Vector3(10, 8, 6), "color": "a98467"},
 	"trung_tam": {"name": "Trung tâm dạy nghề", "desc": "Khóa điện lạnh và tin học văn phòng.", "x": -19.5, "size": Vector3(11, 8, 8.5), "color": "b9b2dc"},
-	"cua_hang": {"name": "Cửa hàng 24 giờ", "desc": "Tuyển thu ngân. Quầy sửa điện thoại bên cạnh.", "x": -8.5, "size": Vector3(8, 7, 4.5), "color": "8cc3df"},
-	"quan_ca_phe": {"name": "Cà phê Góc Phố", "desc": "Quán Vy làm thêm.", "x": 1.0, "size": Vector3(9, 7, 4.5), "color": "6f9474", "npc": "Vy", "npc_id": "vy", "npc_color": "d9776b"},
-	"quan_com": {"name": "Quán cơm tấm", "desc": "Cần người rửa bát.", "x": 10.5, "size": Vector3(8, 7, 4.2), "color": "e39a66"},
-	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "color": "c8503f", "npc": "Ông Tư", "npc_id": "ongTu", "npc_color": "8a8a7a"},
-	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "color": "6f8fa8", "npc": "Chú Bảy", "npc_id": "chuBay", "npc_color": "3f5f7a"},
-	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "color": "eadcae", "npc": "Cô Sáu", "npc_id": "coSau", "npc_color": "b5577a"},
+	"cua_hang": {"name": "Cửa hàng 24 giờ", "desc": "Tuyển thu ngân. Quầy sửa điện thoại bên cạnh.", "x": -8.5, "size": Vector3(8, 7, 4.5), "tube": {"floors": 3, "sign": "CỬA HÀNG 24H"}, "color": "8cc3df"},
+	"quan_ca_phe": {"name": "Cà phê Góc Phố", "desc": "Quán Vy làm thêm.", "x": 1.0, "size": Vector3(9, 7, 4.5), "tube": {"floors": 3, "sign": "CÀ PHÊ GÓC PHỐ"}, "color": "6f9474", "npc": "Vy", "npc_id": "vy", "npc_color": "d9776b"},
+	"quan_com": {"name": "Quán cơm tấm", "desc": "Cần người rửa bát.", "x": 10.5, "size": Vector3(8, 7, 4.2), "tube": {"floors": 3, "sign": "CƠM TẤM"}, "color": "e39a66"},
+	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "tube": {"floors": 2, "shop": false}, "color": "c8503f", "npc": "Ông Tư", "npc_id": "ongTu", "npc_color": "8a8a7a"},
+	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "tube": {"floors": 3, "sign": "ĐIỆN LẠNH BẢY"}, "color": "6f8fa8", "npc": "Chú Bảy", "npc_id": "chuBay", "npc_color": "3f5f7a"},
+	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "tube": {"floors": 3, "sign": "NHÀ TRỌ CÔ SÁU", "units": 3}, "color": "eadcae", "npc": "Cô Sáu", "npc_id": "coSau", "npc_color": "b5577a"},
 	"cong_trinh": {"name": "Công trình", "desc": "Phụ hồ, công nhật.", "x": 51.0, "size": Vector3(14, 9, 10), "color": "9c9a93", "npc": "Tuấn", "npc_id": "tuan", "npc_color": "c9853a"},
 }
 const FRONT_Z := -5.0
@@ -38,6 +40,7 @@ const SIGN_MAX := 4.6
 var game
 var hud
 var models := Models.new()
+var tubes
 var audio
 var camera: Camera3D
 var sun: DirectionalLight3D
@@ -66,9 +69,11 @@ func _ready() -> void:
 	font = SystemFont.new()
 	font.font_names = PackedStringArray(["Segoe UI", "Arial", "Noto Sans"])
 	_build_environment()
+	tubes = TubeHouse.new(FRONT_Z, font)
 	_build_street()
 	for id in LOCATIONS:
 		_build_location(id, LOCATIONS[id])
+	_build_fillers()
 	_build_props()
 	_build_traffic()
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
@@ -179,7 +184,9 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		sign_height = minf(float(model.get_meta("height")) + 0.8, SIGN_MAX)
 	if size.x > 0.0:
 		var center := Vector3(x, 0, FRONT_Z - size.z / 2.0)
-		if model == null:
+		if model == null and loc.has("tube"):
+			sign_height = _build_tube(id, loc, holder)
+		elif model == null:
 			_block(size, center, color, holder)
 			# Cửa, mái hiên và bảng hiệu ở mặt tiền.
 			_block(Vector3(1.6, 2.3, 0.1), Vector3(x, 0, FRONT_Z + 0.02), Color("2a2a2e"), holder)
@@ -257,6 +264,46 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		npc.add_child(nb)
 
 
+## Tiệm dựng thành một hoặc vài căn nhà ống liền nhau; biển hiệu đặt ở căn giữa.
+func _build_tube(id: String, loc: Dictionary, holder: Node3D) -> float:
+	var tube: Dictionary = loc.tube
+	var size: Vector3 = loc.size
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(id)
+	var units := int(tube.get("units", 1))
+	var w := size.x / float(units)
+	var top := 0.0
+	for u in units:
+		var x: float = float(loc.x) - size.x / 2.0 + w * (float(u) + 0.5)
+		var main := u == units / 2
+		var wall := Color(loc.color) if main else Color(loc.color).darkened(0.06 * float(u % 2 + 1))
+		top = maxf(top, tubes.house(holder, x, w, maxf(size.z, 8.0), int(tube.get("floors", 3)), wall, rng,
+			str(tube.get("sign", "")) if main else "", bool(tube.get("shop", true)) and main))
+	return minf(top + 0.8, SIGN_MAX)
+
+
+## Nhà ống chen vào các khoảng trống dọc phố và một dãy nhà cao phía sau cho phố có chiều sâu.
+func _build_fillers() -> void:
+	var holder := Node3D.new()
+	holder.name = "nha_pho"
+	add_child(holder)
+	var used := [Vector2(-67.5, -60.5)]
+	for id in LOCATIONS:
+		var loc: Dictionary = LOCATIONS[id]
+		if loc.size.x > 0.0:
+			used.append(Vector2(float(loc.x) - loc.size.x / 2.0, float(loc.x) + loc.size.x / 2.0))
+	used.sort_custom(func(a, b) -> bool: return a.x < b.x)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2024
+	var x := -92.0
+	for r in used:
+		if r.x > x:
+			tubes.fill(holder, x, r.x, rng)
+		x = maxf(x, r.y)
+	tubes.fill(holder, x, 78.0, rng)
+	tubes.back_row(holder, -92.0, 78.0, FRONT_Z - 16.0, rng)
+
+
 func _scaffold(x: float, size: Vector3, parent: Node3D) -> void:
 	var front := FRONT_Z + 0.6
 	var px := x - size.x / 2.0
@@ -270,13 +317,24 @@ func _scaffold(x: float, size: Vector3, parent: Node3D) -> void:
 
 func _build_props() -> void:
 	# Cột điện và dây điện chằng chịt dọc vỉa hè phía bắc.
+	# Cột đặt ở chỗ giáp ranh hai căn nhà để không che biển hiệu, cách nhau chừng 10 đến 16 m.
+	var edges := []
+	for id in LOCATIONS:
+		var loc: Dictionary = LOCATIONS[id]
+		if loc.size.x > 0.0:
+			edges.append(float(loc.x) - loc.size.x / 2.0)
+			edges.append(float(loc.x) + loc.size.x / 2.0)
+	edges.sort()
 	var poles := []
-	var px := -60.0
-	while px < 58.0:
+	var last := -70.0
+	for e in edges + [58.0]:
+		if e - last < 10.0:
+			continue
+		var px: float = e if e - last <= 16.0 else last + 14.0
 		_block(Vector3(0.28, 7.5, 0.28), Vector3(px, 0, -3.3), Color("6b6a66"))
 		_block(Vector3(1.6, 0.12, 0.12), Vector3(px, 6.9, -3.3), Color("55544f"))
 		poles.append(px)
-		px += 14.0
+		last = px
 	for i in range(poles.size() - 1):
 		for k in 3:
 			var a := Vector3(poles[i], 6.95 - k * 0.25, -3.3 + (k - 1) * 0.5)
