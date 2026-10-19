@@ -38,6 +38,10 @@ var _bottom: PanelContainer
 var _food_select: OptionButton
 var _end_day_btn: Button
 var _work: PanelContainer
+var _pd_label: Label
+var _pd_bar: ProgressBar
+var _needs_label: Label
+var _food_label: Label
 var _phone: PanelContainer
 var _phone_box: VBoxContainer
 var _order_strip: PanelContainer
@@ -143,7 +147,10 @@ func set_prompt(id: String) -> void:
 	if id == _prompt_id:
 		return
 	_prompt_id = id
-	if id != "":
+	if id.begins_with("bin:"):
+		var lock: String = game.scrap_lock(id.substr(4))
+		_prompt_label.text = "E  ·  Lục thùng rác tìm ve chai" if lock == "" else "Thùng rác · " + lock
+	elif id != "":
 		_prompt_label.text = "E  ·  Vào " + str(world.location_info(id).name)
 	_update_prompt()
 
@@ -227,6 +234,12 @@ func _build_status(parent: Control) -> void:
 	v.add_child(_mood_label)
 	_mood_bar = UI.bar(8)
 	v.add_child(_mood_bar)
+	_pd_label = UI.label("", 12, UI.HUD_SOFT)
+	v.add_child(_pd_label)
+	_pd_bar = UI.bar(8)
+	v.add_child(_pd_bar)
+	_needs_label = UI.label("", 12, UI.HUD_SOFT)
+	v.add_child(_needs_label)
 
 
 func _build_prompt(parent: Control) -> void:
@@ -359,9 +372,24 @@ func _process(delta: float) -> void:
 	_phone_tick -= delta
 	if _phone_tick <= 0.0:
 		_phone_tick = 0.25
+		_warn_needs()
 		_update_order_strip(active)
 		if _phone.visible:
 			_refresh_phone()
+
+
+## Nhắc một lần mỗi ngày khi đói hay bẩn quá, để người chơi kịp xử lý trước khi mất Sức khỏe.
+var _warned := {}
+
+
+func _warn_needs() -> void:
+	if not game.has_needs() or blocking():
+		return
+	for w in [["fed", 20.0, "Bụng đói cồn cào, đi ăn thôi!"], ["clean", 15.0, "Người bốc mùi, về phòng tắm đi"], ["neat", 15.0, "Quần áo dơ quá, phải giặt"]]:
+		var key := "%s_%d" % [w[0], game.day()]
+		if game.need(w[0]) < float(w[1]) and not _warned.has(key):
+			_warned[key] = true
+			world._float_text(str(w[2]), Color("ffb27a"))
 
 
 func _new_offer() -> void:
@@ -457,6 +485,7 @@ func _build_bottom(parent: Control) -> void:
 	var food_label := UI.label("Ăn uống", 13, UI.HUD_SOFT)
 	food_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(food_label)
+	_food_label = food_label
 	_food_select = OptionButton.new()
 	for k in game.cfg.food:
 		var f: Dictionary = game.cfg.food[k]
@@ -511,6 +540,19 @@ func _refresh() -> void:
 	UI.set_bar(_health_bar, float(s.health), float(s.health_max), UI.level_color(float(s.health) / float(s.health_max)))
 	_mood_label.text = "Tinh thần %d/%d" % [int(s.mood), int(s.mood_max)]
 	UI.set_bar(_mood_bar, float(s.mood), float(s.mood_max), UI.level_color(float(s.mood) / float(s.mood_max)))
+	var needs: bool = game.has_needs()
+	for c in [_pd_label, _pd_bar, _needs_label]:
+		c.visible = needs
+	_food_select.visible = not needs
+	_food_label.visible = not needs
+	if needs:
+		var pd: float = game.phong_do()
+		var mult: float = game.pay_mult()
+		_pd_label.text = "Phong độ %d · %s" % [int(pd), "đủ lương" if mult >= 1.0 else "chỉ được %d%% lương" % int(mult * 100.0)]
+		UI.set_bar(_pd_bar, pd, 100.0, UI.level_color(pd / 100.0))
+		_needs_label.text = "No bụng %d · Vệ sinh %d · Quần áo %d" % [int(game.need("fed")), int(game.need("clean")), int(game.need("neat"))]
+		var worst := minf(game.need("fed"), minf(game.need("clean"), game.need("neat")))
+		_needs_label.add_theme_color_override("font_color", UI.HUD_SOFT if worst >= 35.0 else (UI.GOLD if worst >= 15.0 else Color("ff8a7a")))
 	_food_select.select(_food_keys.find(s.food))
 	_food_select.disabled = float(s.used) > 0.0 or not s.queue.is_empty()
 	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
@@ -594,6 +636,12 @@ func _refresh_skills(s: Dictionary) -> void:
 	]
 	if int(s.held) > 0:
 		lines.append("Lương đang bị giữ: " + GameLogic.fmt_money(int(s.held)))
+	var inv := []
+	for k in s.get("inv", {}):
+		if int(s.inv[k]) > 0:
+			inv.append("%d %s" % [int(s.inv[k]), game.cfg.scrap[k].name])
+	if not inv.is_empty():
+		lines.append("Ve chai: %s (≈ %s)" % [", ".join(inv), GameLogic.fmt_k(game.scrap_value())])
 	_skills_box.add_child(UI.label("\n".join(lines), 12, UI.HUD_SOFT))
 
 
@@ -618,11 +666,18 @@ func _refresh_location() -> void:
 			if a.get("location", "") == _loc_id:
 				_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
 				found += 1
+	if _loc_id == "vua_ve_chai":
+		var v: int = game.scrap_value()
+		_loc_cards.add_child(UI.choice("Bán hết ve chai", ("Được " + GameLogic.fmt_k(v)) if v > 0 else "", "Chưa nhặt được gì, lục thùng rác dọc phố (phím E)" if v <= 0 else "",
+			func() -> void:
+				var got: int = game.sell_scrap()
+				if got > 0:
+					world._float_text("+" + GameLogic.fmt_k(got), Color("7fe0a0"))))
 	if _loc_id == "phong_tro":
 		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d" % game.day(), "", func() -> void:
 			close_location()
 			dialogs.open_night()))
-	elif found == 0:
+	elif found == 0 and _loc_id != "vua_ve_chai":
 		_loc_cards.add_child(UI.wrap("Hôm nay ở đây chưa có việc gì cho Minh.", 13, UI.INK_SOFT, 320))
 	_fit_location.call_deferred()
 

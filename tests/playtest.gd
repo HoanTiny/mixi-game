@@ -64,7 +64,9 @@ func _play_day() -> void:
 	for id in _plan():
 		if game.day() != d or game.is_over():
 			break
+		await _care()
 		await _do(id)
+	await _scrap(d)
 	if game.day() == d and not game.is_over():
 		var t0: float = game.clock()
 		await _walk("phong_tro")
@@ -91,6 +93,46 @@ func _talk_plan() -> Array:
 		if beat or grind:
 			out.append(npc)
 	return out
+
+
+## Cuối ngày còn giờ thì lục vài thùng rác gần đó; đủ hàng thì mang ra vựa bán.
+func _scrap(d: int) -> void:
+	if not game.has_needs() or float(game.s.health) < 60.0:
+		return
+	var near: Array = w.bins.duplicate()
+	near.sort_custom(func(a, b) -> bool: return absf(a.pos.x - w.player.position.x) < absf(b.pos.x - w.player.position.x))
+	var done := 0
+	for b in near:
+		if done >= 3 or game.day() != d or game.hours_left() < 1.5:
+			break
+		if game.scrap_lock(b.id) != "":
+			continue
+		hud.close_location()
+		w._target = b.pos
+		var f := 0
+		while w._target != null and f < 3000 and game.day() == d:
+			f += 1
+			await physics_frame
+		w._scavenge(b.id)
+		done += 1
+	if done > 0:
+		_day_log.append("lục %d thùng rác" % done)
+	if game.scrap_value() >= 60000 and game.hours_left() > 1.2 and game.day() == d:
+		await _walk("vua_ve_chai")
+		var v: int = game.sell_scrap()
+		_day_log.append("bán ve chai %s" % GameLogic.fmt_k(v))
+
+
+## Trước mỗi việc: đói thì ăn, bẩn thì tắm, đồ dơ thì giặt, như người chơi thật.
+func _care() -> void:
+	if not game.has_needs():
+		return
+	if game.need("fed") < 45.0:
+		await _do("an_mi_ly" if game.need("fed") > 30.0 else ("banh_mi" if game.clock() < 10.0 else "an_com_tam"))
+	if game.need("clean") < 30.0:
+		await _do("tam_rua")
+	if game.need("neat") < 30.0:
+		await _do("giat_do")
 
 
 func _plan() -> Array:

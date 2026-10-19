@@ -1,5 +1,5 @@
 {
-  "startMoney": 2000000,
+  "startMoney": 2300000,
   "xpPerLevel": 6,
   "maxLevel": 5,
   "sleepHealth": 25,
@@ -32,7 +32,23 @@
       "rent": 1200000
     }
   },
+  "needs": {
+    "start": {"fed": 80, "clean": 90, "neat": 90},
+    "perHour": {"fed": -6, "clean": -2, "neat": -1},
+    "overnight": {"fed": -20, "clean": -10, "neat": -5},
+    "starveHealthPerHour": 4,
+    "weights": {"fed": 0.35, "clean": 0.2, "neat": 0.15, "mood": 0.3},
+    "payTiers": [[55, 1.0], [30, 0.7], [0, 0.5]],
+    "slowBelow": 30
+  },
+  "scrap": {
+    "chai": {"name": "chai nhựa", "price": 3000},
+    "lon": {"name": "lon nhôm", "price": 5000},
+    "giay": {"name": "bìa giấy", "price": 2000},
+    "binHours": 0.25, "dirty": {"clean": -6, "neat": -8}, "mood": -1
+  },
   "food": {
+    "tu_lo": {"name": "Tự lo, mua ở quán", "cost": 0, "hours": 0, "health": 0, "mood": 0},
     "com_bui": {
       "name": "Cơm bụi 3 bữa",
       "cost": 90000,
@@ -88,15 +104,15 @@
     "tai_nan": 0.1
   },
   "actions": [
-    {"id": "phat_to_roi", "group": "work", "location": "nga_tu", "name": "Phát tờ rơi", "place": "Ngã tư Hàng Xanh", "hours": 3, "pay": 100000, "outdoor": true, "effects": {"health": -5, "mood": -2, "xp.giaoTiep": 1.5}},
-    {"id": "rua_bat", "group": "work", "location": "quan_com", "name": "Rửa bát quán cơm", "place": "Quán cơm tấm đầu hẻm", "hours": 5, "pay": 150000, "note": "Đã gồm một bữa ăn", "effects": {"health": -10, "mood": -3}},
-    {"id": "phu_ho", "group": "work", "location": "cong_trinh", "name": "Phụ hồ", "place": "Công trình", "hours": 8, "pay": 350000, "window": [7,17], "outdoor": true, "hold_days": [5,7], "require": {"flag.matViecPhuHo": false}, "lock_text": {"flag.matViecPhuHo": "Mất mối việc sau khi từ chối Tuấn"}, "effects": {"health": -25, "mood": -5, "xp.tayNghe": 0.5, "rep.tuan": 2}},
+    {"id": "phat_to_roi", "dirty": {"clean": -8, "neat": -5}, "group": "work", "location": "nga_tu", "name": "Phát tờ rơi", "place": "Ngã tư Hàng Xanh", "hours": 3, "pay": 100000, "outdoor": true, "effects": {"health": -5, "mood": -2, "xp.giaoTiep": 1.5}},
+    {"id": "rua_bat", "dirty": {"clean": -10, "neat": -10}, "group": "work", "location": "quan_com", "name": "Rửa bát quán cơm", "place": "Quán cơm tấm đầu hẻm", "hours": 5, "pay": 150000, "note": "Đã gồm một bữa ăn", "effects": {"health": -10, "mood": -3}},
+    {"id": "phu_ho", "dirty": {"clean": -18, "neat": -15}, "group": "work", "location": "cong_trinh", "name": "Phụ hồ", "place": "Công trình", "hours": 8, "pay": 350000, "window": [7,17], "outdoor": true, "hold_days": [5,7], "require": {"flag.matViecPhuHo": false}, "lock_text": {"flag.matViecPhuHo": "Mất mối việc sau khi từ chối Tuấn"}, "effects": {"health": -25, "mood": -5, "xp.tayNghe": 0.5, "rep.tuan": 2}},
     {"id": "phuc_vu", "group": "work", "location": "quan_ca_phe", "name": "Phục vụ cà phê", "place": "Quán cà phê Vy làm", "hours": 6, "pay": 180000, "tip": [0,80000], "require": {"skill.giaoTiep": 1}, "effects": {"health": -8, "mood": 2, "xp.giaoTiep": 1, "xp.ngoaiNgu": 0.3, "rep.vy": 5}},
     {"id": "thu_ngan", "group": "work", "location": "cua_hang", "name": "Thu ngân cửa hàng tiện lợi", "place": "Cửa hàng 24 giờ", "hours": 8, "pay": 250000, "require": {"skill.tinHoc": 1}, "effects": {"health": -8, "mood": -2, "xp.tinHoc": 0.5}},
     {"id": "gia_su", "group": "work", "location": "phong_tro", "name": "Gia sư Toán cho bé Bin", "place": "Nhà cô Sáu", "hours": 2, "pay": 150000, "window": [18,21], "require": {"room": "rieng", "rep.coSau": 30}, "effects": {"mood": 3, "rep.coSau": 3}},
-    {"id": "tho_phu", "group": "work", "location": "tiem_chu_bay", "name": "Thợ phụ điện lạnh", "place": "Đi cùng chú Bảy", "hours": 6, "pay": 500000, "require": {"skill.tayNghe": 2}, "effects": {"health": -10, "xp.tayNghe": 1, "rep.chuBay": 3}},
+    {"id": "tho_phu", "dirty": {"clean": -12, "neat": -15}, "group": "work", "location": "tiem_chu_bay", "name": "Thợ phụ điện lạnh", "place": "Đi cùng chú Bảy", "hours": 6, "pay": 500000, "require": {"skill.tayNghe": 2}, "effects": {"health": -10, "xp.tayNghe": 1, "rep.chuBay": 3}},
     {"id": "ban_online", "group": "work", "location": "phong_tro", "name": "Bán hàng online", "place": "Điện thoại", "hours": 4, "pay_range": [200000,800000], "fail_chance": 0.15, "needs_phone": true, "require": {"skill.tinHoc": 2, "skill.giaoTiep": 2}, "effects": {"mood": -3, "xp.giaoTiep": 0.5, "xp.tinHoc": 0.5}},
-    {"id": "tho_chinh", "group": "work", "location": "tiem_chu_bay", "name": "Thợ điện lạnh chính", "place": "Nhận việc riêng", "hours": 6, "pay": 900000, "require": {"skill.tayNghe": 4}, "effects": {"health": -10, "xp.tayNghe": 0.5}},
+    {"id": "tho_chinh", "dirty": {"clean": -12, "neat": -15}, "group": "work", "location": "tiem_chu_bay", "name": "Thợ điện lạnh chính", "place": "Nhận việc riêng", "hours": 6, "pay": 900000, "require": {"skill.tayNghe": 4}, "effects": {"health": -10, "xp.tayNghe": 0.5}},
     {"id": "huong_dan", "group": "work", "location": "tram_xe_buyt", "name": "Hướng dẫn khách nước ngoài", "place": "Quận 1", "hours": 5, "pay": 700000, "tip": [0,300000], "window": [8,14], "weekend": true, "require": {"skill.ngoaiNgu": 3}, "effects": {"health": -8, "mood": 5, "xp.ngoaiNgu": 0.5}},
     {"id": "hop_dong_12", "group": "work", "location": "tiem_chu_bay", "name": "Sửa máy lạnh 12 phòng trọ", "place": "Dãy trọ cô Sáu", "hours": 8, "pay": 2000000, "max_times": 2, "days": [22,26], "require": {"skill.tayNghe": 4}, "effects": {"health": -15, "rep.coSau": 10, "rep.chuBay": 5}},
     {"id": "khach_uc", "group": "work", "location": "tram_xe_buyt", "name": "Dẫn khách Úc đi chợ Bến Thành", "place": "Quận 1", "scene": "res://scenes/quan1.tscn", "hours": 6, "pay": 1500000, "tip": [0,500000], "max_times": 1, "days": [23,26], "require": {"skill.ngoaiNgu": 3}, "effects": {"health": -8, "mood": 8}},
@@ -107,6 +123,12 @@
     {"id": "tieng_anh", "group": "study", "location": "phuong", "name": "Lớp tiếng Anh buổi tối", "place": "Nhà văn hóa phường", "hours": 2, "fee": 300000, "window": [19,21], "require": {"from_day": 11}, "effects": {"mood": -2, "xp.ngoaiNgu": 2}},
     {"id": "tin_hoc", "group": "study", "location": "trung_tam", "name": "Tin học văn phòng", "place": "Trung tâm tin học", "hours": 2, "fee": 500000, "max_times": 6, "window": [8,10], "require": {"from_day": 11}, "effects": {"xp.tinHoc": 2}},
     {"id": "doc_luat", "group": "study", "location": "quan_ca_phe", "name": "Đọc sách luật với Vy", "place": "Quán cà phê", "hours": 1, "window": [20,22], "show_if_flag": "phapLyMo", "effects": {"xp.phapLy": 2, "rep.vy": 3}},
+    {"id": "an_com_tam", "group": "life", "location": "quan_com", "name": "Ăn dĩa cơm tấm sườn", "place": "Quán cơm tấm", "hours": 0.33, "cost": 35000, "per_day": 3, "effects": {"need.fed": 60, "mood": 3}},
+    {"id": "an_mi_ly", "group": "life", "location": "cua_hang", "name": "Ăn ly mì, uống chai nước", "place": "Cửa hàng 24 giờ", "hours": 0.15, "cost": 15000, "per_day": 3, "effects": {"need.fed": 30}},
+    {"id": "banh_mi", "group": "life", "location": "cua_hang", "name": "Mua ổ bánh mì thịt, vừa đi vừa ăn", "place": "Xe bánh mì trước cửa hàng", "hours": 0.1, "cost": 20000, "per_day": 3, "window": [6, 10], "effects": {"need.fed": 40, "mood": 1}},
+    {"id": "tra_da_hat", "group": "life", "location": "tra_da", "name": "Uống trà đá, cắn hướng dương", "place": "Quán trà đá", "hours": 0.5, "cost": 5000, "per_day": 2, "effects": {"need.fed": 5, "mood": 4}},
+    {"id": "tam_rua", "group": "life", "location": "phong_tro", "name": "Tắm rửa", "place": "Phòng trọ", "hours": 0.25, "per_day": 3, "effects": {"need.clean": 100}},
+    {"id": "giat_do", "group": "life", "location": "phong_tro", "name": "Giặt đồ, phơi lên ban công", "place": "Phòng trọ", "hours": 0.5, "cost": 5000, "per_day": 1, "effects": {"need.neat": 100}},
     {"id": "nghi", "group": "life", "location": "phong_tro", "name": "Nghỉ ngơi", "place": "Phòng trọ", "hours": 2, "per_day": 2, "effects": {"health": 12, "mood": 5}},
     {"id": "goi_ve", "group": "life", "location": "phong_tro", "name": "Gọi điện về nhà", "place": "Phòng trọ", "hours": 1, "window": [18,22], "effects": {"mood": 10}},
     {"id": "tro_chuyen", "group": "life", "location": "tra_da", "name": "Trò chuyện với hàng xóm", "place": "Trong hẻm", "hours": 1, "effects": {"mood": 3, "xp.giaoTiep": 1, "rep.coSau": 2}},

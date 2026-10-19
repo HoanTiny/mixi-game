@@ -26,6 +26,7 @@ const LOCATIONS := {
 	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "tube": {"floors": 2, "shop": false}, "color": "c8503f", "npc": "Ông Tư", "npc_id": "ongTu", "npc_color": "8a8a7a"},
 	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "tube": {"floors": 3, "sign": "ĐIỆN LẠNH BẢY"}, "color": "6f8fa8", "npc": "Chú Bảy", "npc_id": "chuBay", "npc_color": "3f5f7a"},
 	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "tube": {"floors": 3, "sign": "NHÀ TRỌ CÔ SÁU", "units": 3}, "color": "eadcae", "npc": "Cô Sáu", "npc_id": "coSau", "npc_color": "b5577a"},
+	"vua_ve_chai": {"name": "Vựa ve chai cô Tám", "desc": "Thu mua chai nhựa, lon nhôm, bìa giấy.", "x": 66.0, "size": Vector3(7, 3.2, 5), "color": "8b7d5b", "npc": "Cô Tám", "npc_color": "6b4f3a"},
 	"cong_trinh": {"name": "Công trình", "desc": "Phụ hồ, công nhật.", "x": 51.0, "size": Vector3(14, 9, 10), "color": "9c9a93", "npc": "Tuấn", "npc_id": "tuan", "npc_color": "c9853a"},
 }
 const FRONT_Z := -5.0
@@ -46,6 +47,9 @@ var tubes
 var homes: Array = []
 ## Mũi tên lơ lửng chỉ chỗ lấy món hoặc nhà khách của đơn giao hàng đang chạy.
 var _marker: Node3D
+## Thùng rác dọc vỉa hè để lục ve chai: {"id", "pos"}.
+var bins: Array = []
+const BIN_RANGE := 1.4
 var audio
 var camera: Camera3D
 var sun: DirectionalLight3D
@@ -79,6 +83,7 @@ func _ready() -> void:
 		_build_location(id, LOCATIONS[id])
 	_build_fillers()
 	_build_props()
+	_build_bins()
 	_build_traffic()
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
@@ -458,6 +463,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_pending_click = event.position
 	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
+		var bin := nearest_bin()
+		if bin != "":
+			_scavenge(bin)
+			return
 		var near := nearest_location()
 		if near != "":
 			hud.open_location(near)
@@ -482,18 +491,18 @@ func _physics_process(delta: float) -> void:
 	if key_dir != Vector3.ZERO:
 		_target = null
 		_target_loc = ""
-		step = key_dir.normalized() * SPEED * delta
+		step = key_dir.normalized() * _speed() * delta
 	elif _target != null:
 		var to: Vector3 = _target - player.position
 		to.y = 0
-		if to.length() <= SPEED * delta:
+		if to.length() <= _speed() * delta:
 			player.position = Vector3(_target.x, 0, _target.z)
 			_target = null
 			if _target_loc != "":
 				hud.open_location(_target_loc)
 				_target_loc = ""
 		else:
-			step = to.normalized() * SPEED * delta
+			step = to.normalized() * _speed() * delta
 	if step != Vector3.ZERO:
 		player.position += step
 		_add_walk(step.length())
@@ -512,7 +521,8 @@ func _physics_process(delta: float) -> void:
 	camera.look_at(camera.position - CAM_OFFSET + Vector3(0, 1, 0), Vector3.UP)
 
 	var near := nearest_location()
-	hud.set_prompt(near)
+	var bin := nearest_bin()
+	hud.set_prompt("bin:" + bin if bin != "" else near)
 	for id in door_rings:
 		var ring: MeshInstance3D = door_rings[id]
 		var pulse := 1.0 + (0.12 * sin(Time.get_ticks_msec() / 180.0) if id == near else 0.0)
@@ -523,6 +533,51 @@ func _physics_process(delta: float) -> void:
 	_update_traffic(delta)
 	_update_delivery()
 	_check_day_end()
+
+
+# ---------------------------------------------------------------- ve chai, phong độ
+
+## Phong độ thấp thì lê bước, đi chậm hẳn.
+func _speed() -> float:
+	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
+		return SPEED * 0.7
+	return SPEED
+
+
+func nearest_bin() -> String:
+	for b in bins:
+		if Vector3(player.position.x, 0, player.position.z).distance_to(b.pos) < BIN_RANGE:
+			return b.id
+	return ""
+
+
+func _scavenge(id: String) -> void:
+	var lock: String = game.scrap_lock(id)
+	if lock != "":
+		_float_text(lock, Color("ffd27a"))
+		return
+	var got: Dictionary = game.scavenge(id)
+	var parts := []
+	for k in got:
+		if int(got[k]) > 0:
+			parts.append("+%d %s" % [int(got[k]), game.cfg.scrap[k].name])
+	_float_text(", ".join(parts) if not parts.is_empty() else "Trống trơn", Color("c8e6a0") if not parts.is_empty() else Color("bbbbbb"))
+	audio.play("step", 0.6)
+
+
+func _build_bins() -> void:
+	var x := -86.0
+	var i := 0
+	while x < 74.0:
+		var pos := Vector3(x, 0, -3.0 if i % 2 == 0 else 3.4)
+		var holder := Node3D.new()
+		holder.position = pos
+		add_child(holder)
+		_block(Vector3(0.6, 0.85, 0.55), Vector3.ZERO, Color("2e7d32"), holder)
+		_block(Vector3(0.66, 0.08, 0.6), Vector3(0, 0.85, 0), Color("1b4d20"), holder)
+		bins.append({"id": "t%d" % i, "pos": pos})
+		x += 10.5 + float(i % 3)
+		i += 1
 
 
 # ---------------------------------------------------------------- giao đồ ăn

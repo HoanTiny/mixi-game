@@ -29,6 +29,9 @@ func _init() -> void:
 
 func _play(g, strategy: String) -> void:
 	g.new_game("do_nghe")
+	# Mô phỏng giữ luật ăn uống cũ (gói ăn theo ngày), không mô phỏng đói, tắm, giặt.
+	g.s.erase("needs")
+	g.s["food"] = "com_bui"
 	var guard := 0
 	while not g.is_over() and guard < 200:
 		guard += 1
