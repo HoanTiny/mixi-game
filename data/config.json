@@ -9,6 +9,13 @@
   "letterMood": 10,
   "walkHoursPerMeter": 0.004,
   "talkHours": 0.5,
+  "minigames": {
+    "bricks": {
+      "seconds": 60, "target": 8, "carry": 2, "minRatio": 0.5, "stepSec": 0.35,
+      "types": {"do": {"name": "Gạch đỏ", "color": "b5482f"}, "block": {"name": "Gạch block", "color": "8d8f93"}, "ong": {"name": "Gạch ống", "color": "e0a46a"}},
+      "sizes": [2, 3, 4], "bonusPerBrick": 2000
+    }
+  },
   "delivery": {
     "shops": {"quan_com": "2 hộp cơm tấm sườn", "quan_ca_phe": "3 ly cà phê sữa đá", "cua_hang": "túi đồ tạp hóa", "tra_da": "trà đá và bánh tráng trộn"},
     "base": 12000, "perMeter": 100, "cookHours": 0.15, "slackFactor": 1.5, "slackHours": 0.2,
@@ -106,7 +113,7 @@
   "actions": [
     {"id": "phat_to_roi", "dirty": {"clean": -8, "neat": -5}, "group": "work", "location": "nga_tu", "name": "Phát tờ rơi", "place": "Ngã tư Hàng Xanh", "hours": 3, "pay": 100000, "outdoor": true, "effects": {"health": -5, "mood": -2, "xp.giaoTiep": 1.5}},
     {"id": "rua_bat", "dirty": {"clean": -10, "neat": -10}, "group": "work", "location": "quan_com", "name": "Rửa bát quán cơm", "place": "Quán cơm tấm đầu hẻm", "hours": 5, "pay": 150000, "note": "Đã gồm một bữa ăn", "effects": {"health": -10, "mood": -3}},
-    {"id": "phu_ho", "dirty": {"clean": -18, "neat": -15}, "group": "work", "location": "cong_trinh", "name": "Phụ hồ", "place": "Công trình", "hours": 8, "pay": 350000, "window": [7,17], "outdoor": true, "hold_days": [5,7], "require": {"flag.matViecPhuHo": false}, "lock_text": {"flag.matViecPhuHo": "Mất mối việc sau khi từ chối Tuấn"}, "effects": {"health": -25, "mood": -5, "xp.tayNghe": 0.5, "rep.tuan": 2}},
+    {"id": "phu_ho", "minigame": "bricks", "dirty": {"clean": -18, "neat": -15}, "group": "work", "location": "cong_trinh", "name": "Phụ hồ", "place": "Công trình", "hours": 8, "pay": 350000, "window": [7,17], "outdoor": true, "hold_days": [5,7], "require": {"flag.matViecPhuHo": false}, "lock_text": {"flag.matViecPhuHo": "Mất mối việc sau khi từ chối Tuấn"}, "effects": {"health": -25, "mood": -5, "xp.tayNghe": 0.5, "rep.tuan": 2}},
     {"id": "phuc_vu", "group": "work", "location": "quan_ca_phe", "name": "Phục vụ cà phê", "place": "Quán cà phê Vy làm", "hours": 6, "pay": 180000, "tip": [0,80000], "require": {"skill.giaoTiep": 1}, "effects": {"health": -8, "mood": 2, "xp.giaoTiep": 1, "xp.ngoaiNgu": 0.3, "rep.vy": 5}},
     {"id": "thu_ngan", "group": "work", "location": "cua_hang", "name": "Thu ngân cửa hàng tiện lợi", "place": "Cửa hàng 24 giờ", "hours": 8, "pay": 250000, "require": {"skill.tinHoc": 1}, "effects": {"health": -8, "mood": -2, "xp.tinHoc": 0.5}},
     {"id": "gia_su", "group": "work", "location": "phong_tro", "name": "Gia sư Toán cho bé Bin", "place": "Nhà cô Sáu", "hours": 2, "pay": 150000, "window": [18,21], "require": {"room": "rieng", "rep.coSau": 30}, "effects": {"mood": 3, "rep.coSau": 3}},

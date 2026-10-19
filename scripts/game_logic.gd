@@ -384,7 +384,9 @@ func action_status(a: Dictionary) -> Dictionary:
 	return {"ok": true, "reason": "", "start": start}
 
 
-func do_action(id: String) -> void:
+## result: kết quả trò chơi nhỏ khi tự làm {"ratio": 0..1 phần chỉ tiêu, "bonus": tiền thưởng}.
+## Không truyền thì tính đủ công như trước (làm tự động hoặc mô phỏng).
+func do_action(id: String, result: Dictionary = {}) -> void:
 	var a := get_action(id)
 	if a.is_empty() or is_hidden(a):
 		return
@@ -407,6 +409,12 @@ func do_action(id: String) -> void:
 			pay = round_k(randf_range(float(a.pay_range[0]), float(a.pay_range[1])))
 	if a.has("tip"):
 		pay += round_k(randf_range(float(a.tip[0]), float(a.tip[1])))
+	if not result.is_empty():
+		pay = round_k(float(pay) * float(result.get("ratio", 1.0))) + int(result.get("bonus", 0))
+		if not s.has("job_last"):
+			s["job_last"] = {}
+		if not bool(result.get("auto", false)):
+			s.job_last[id] = {"ratio": float(result.get("ratio", 1.0)), "bonus": int(result.get("bonus", 0))}
 	if a.group == "work" and pay > 0 and pay_mult() < 1.0:
 		pay = round_k(float(pay) * pay_mult())
 		add_log("Phong độ kém, chỉ được %d%% tiền công" % int(pay_mult() * 100.0), "warn")

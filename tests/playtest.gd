@@ -168,6 +168,10 @@ func _do(id: String) -> void:
 		return
 	var t1: float = game.clock()
 	hud._perform(id)
+	# Trò chơi nhỏ (phụ hồ bưng gạch): coi như làm đủ chỉ tiêu, không thưởng, bằng tiền công cũ.
+	if hud.minigame != null:
+		hud.minigame.finished.emit({"ratio": 1.0, "bonus": 0})
+		await process_frame
 	while hud._working:
 		await process_frame
 	stats.work += game.clock() - t1

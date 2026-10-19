@@ -23,6 +23,8 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Nhu cầu cơ thể và Phong độ (kiểu Nobody):** No bụng, Vệ sinh, Quần áo tự giảm theo giờ; việc bẩn (phụ hồ, rửa bát, lục rác) làm bẩn người và đồ. Cùng Tinh thần, chúng gộp thành **Phong độ**: từ 55 trở lên đủ lương, 30–55 chỉ được 70%, dưới 30 chỉ 50% và đi chậm. Nhịn đói tới 0 thì mất Sức khỏe. Ăn ở quán cơm tấm, cửa hàng 24 giờ, xe bánh mì; tắm và giặt đồ ở phòng trọ. Số liệu trong `needs` của `data/config.json`.
 
+**Trò chơi nhỏ khi đi làm (kiểu Nobody):** phụ hồ là tự bưng đúng loại gạch (đỏ, block, ống) bỏ vào thùng cẩu trong 60 giây. Đủ 8 thùng thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%); thùng càng nhiều gạch thưởng càng cao; bỏ nhầm loại là đổ bỏ. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, giao diện ở `scripts/ui/minigame_bricks.gd`.
+
 **Ve chai:** thùng rác xanh dọc vỉa hè, đứng gần bấm **E** để lục (mỗi thùng một lần mỗi ngày): được chai nhựa, lon, bìa giấy nhưng bẩn người. Mang ra **Vựa ve chai cô Tám** cuối phố để bán.
 
 **Giao đồ ăn (kiểu Nobody):** bấm **Điện thoại** ở thanh dưới, bật *App Giao Nhanh*. Đơn hiện lên (lấy món ở quán nào, giao tới nhà số mấy, tiền công, hạn giờ), nhận thì tự đi tới quán lấy món rồi tìm đúng nhà để giao: mũi tên cam chỉ quán, xanh chỉ nhà khách, chấm trên bản đồ phố. Giao sớm có tip, trễ bị trừ tiền và mất Tinh thần. Giờ cao điểm 10:00–13:30 và 17:00–21:00 đơn nhiều, ngoài giờ ít. Số liệu trong `delivery` của `data/config.json`.

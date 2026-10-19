@@ -7,9 +7,12 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
+const MinigameBricks := preload("res://scripts/ui/minigame_bricks.gd")
 
 var world
 var game
+## Trò chơi nhỏ đang mở (phụ hồ bưng gạch), null nếu không có.
+var minigame: Control
 var dialogs: DialogLayer
 
 var _objectives: PanelContainer
@@ -122,7 +125,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible or _working
+	return dialogs.visible or _working or minigame != null
 
 
 func location_open() -> String:
@@ -270,10 +273,14 @@ func _build_work(parent: Control) -> void:
 
 
 ## Làm một việc ở tiệm: Minh vào trong, thanh thời gian chạy, đồng hồ nhảy dần, xong mới tính kết quả.
-func _perform(id: String) -> void:
+## result: kết quả trò chơi nhỏ (tự làm hoặc làm tự động); việc có minigame mà chưa có kết quả thì mở trò chơi trước.
+func _perform(id: String, result: Dictionary = {}) -> void:
 	var a: Dictionary = game.get_action(id)
 	var st: Dictionary = game.action_status(a)
-	if not st.ok or _working:
+	if not st.ok or _working or minigame != null:
+		return
+	if a.has("minigame") and result.is_empty():
+		_open_minigame(id, a)
 		return
 	# Việc làm ở màn riêng (dẫn khách Úc ở Quận 1): sang màn đó, tiền công tính khi về.
 	if a.has("scene"):
@@ -299,7 +306,7 @@ func _perform(id: String) -> void:
 		_work.visible = false
 		world.set_player_inside(false)
 		world.audio.play("done")
-		game.do_action(id))
+		game.do_action(id, result))
 
 
 func _build_location(parent: Control) -> void:
@@ -335,6 +342,21 @@ func _build_skills(parent: Control) -> void:
 	_skills_box.add_theme_constant_override("separation", 6)
 	_skills.add_child(_skills_box)
 	_skills.visible = false
+
+
+## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
+func _open_minigame(id: String, a: Dictionary) -> void:
+	minigame = MinigameBricks.new()
+	minigame.cfg = game.cfg.minigames[a.minigame]
+	minigame.last = game.s.get("job_last", {}).get(id, {})
+	minigame.title = str(a.name)
+	minigame.finished.connect(func(r: Dictionary) -> void:
+		minigame.queue_free()
+		minigame = null
+		if not r.is_empty():
+			_perform(id, r))
+	add_child(minigame)
+	_refresh()
 
 
 # ---------------------------------------------------------------- điện thoại: app giao hàng
