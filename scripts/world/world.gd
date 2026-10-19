@@ -7,6 +7,7 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const Models := preload("res://scripts/world/models.gd")
+const Character := preload("res://scripts/world/character.gd")
 const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 
@@ -34,7 +35,9 @@ const DOOR_Z := -4.1
 const STREET_X := Vector2(-90.0, 76.0)
 const STREET_Z := Vector2(-4.6, 4.6)
 const SPEED := 6.0
+## Camera xa nhất (nhìn toàn phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức.
 const CAM_OFFSET := Vector3(0, 24, 17)
+const CAM_NEAR := Vector3(0, 6.5, 9.0)
 const INTERACT_RANGE := 2.4
 ## Bảng tên tiệm treo ở mặt tiền, không cao hơn mức này để không lọt lên mép trên màn hình dưới bảng mục tiêu.
 const SIGN_MAX := 4.6
@@ -47,6 +50,10 @@ var tubes
 var homes: Array = []
 ## Mũi tên lơ lửng chỉ chỗ lấy món hoặc nhà khách của đơn giao hàng đang chạy.
 var _marker: Node3D
+## Nhân vật đứng một chỗ (nhân vật phụ trước cửa) cần chạy hoạt cảnh đứng thở.
+var idlers: Array = []
+## 0 là gần nhất, 1 là xa nhất.
+var zoom := 0.3
 ## Thùng rác dọc vỉa hè để lục ve chai: {"id", "pos"}.
 var bins: Array = []
 const BIN_RANGE := 1.4
@@ -103,7 +110,7 @@ func _ready() -> void:
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	marker.position = Vector3(0, 0.1, 0)
 	player.add_child(marker)
-	player.add_child(_label3d("Minh", Vector3(0, 2.3, 0), 34))
+	player.add_child(_label3d("Minh", Vector3(0, 2.15, 0), 22))
 	player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
 	# Về từ màn khác (xe buýt từ Quận 1) thì hiện ra ở chỗ đó.
 	var gs := get_node("/root/GameState")
@@ -113,7 +120,7 @@ func _ready() -> void:
 	camera = Camera3D.new()
 	camera.fov = 34
 	add_child(camera)
-	camera.position = player.position + CAM_OFFSET
+	camera.position = player.position + cam_offset()
 	camera.look_at(player.position + Vector3(0, 1, 0), Vector3.UP)
 	camera.current = true
 
@@ -135,7 +142,7 @@ func _ready() -> void:
 		if arg.begins_with("--demo-open="):
 			var id := arg.substr(12)
 			player.position = door_of(id)
-			camera.position = player.position + CAM_OFFSET
+			camera.position = player.position + cam_offset()
 			hud.open_location.call_deferred(id)
 
 
@@ -241,7 +248,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		cs.position = Vector3(x, 1, -6)
 		area.add_child(cs)
 		holder.add_child(area)
-	holder.add_child(_label3d(loc.name, Vector3(x, sign_height, FRONT_Z + 0.5), 46))
+	holder.add_child(_label3d(loc.name, Vector3(x, sign_height, FRONT_Z + 0.5), 36))
 
 	# Vòng sáng trước cửa: điểm tương tác.
 	var ring := MeshInstance3D.new()
@@ -265,7 +272,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		npc.position = door_of(id) + Vector3(1.6, 0, 0.2)
 		npc.rotation.y = PI
 		holder.add_child(npc)
-		npc.add_child(_label3d(loc.npc, Vector3(0, 2.25, 0), 34))
+		npc.add_child(_label3d(loc.npc, Vector3(0, 2.0, 0), 22))
 		var nb := StaticBody3D.new()
 		nb.set_meta("loc", id)
 		var ncs := CollisionShape3D.new()
@@ -435,11 +442,15 @@ func _build_traffic() -> void:
 	rng.seed = 11
 	for i in 8:
 		var bike := _bike(Color.from_hsv(rng.randf(), 0.5, 0.75), rng)
-		var rider := _character("people", Color.from_hsv(rng.randf(), 0.35, 0.6), Color("30323a"), rng)
+		var rider := _character("people", Color.from_hsv(rng.randf(), 0.35, 0.6), Color("30323a"), rng, "helmet")
 		rider.position = Vector3(0, 0.45, 0)
 		# Người mẫu nhìn theo trục z, xe chạy theo trục x: quay người cho ngồi đúng chiều xe.
 		rider.rotation.y = PI / 2.0
 		Models.play(rider.get_child(0), "sit")
+		if rider.get_child(0).has_method("sit"):
+			var c: Node3D = rider.get_child(0)
+			c.sit(true)
+			c.animate(0.0, 0.0)
 		bike.add_child(rider)
 		var lane := -1.4 if i % 2 == 0 else 1.4
 		var dir := 1.0 if lane > 0 else -1.0
@@ -457,7 +468,14 @@ func _build_traffic() -> void:
 
 # ---------------------------------------------------------------- vòng lặp
 
+func cam_offset() -> Vector3:
+	return CAM_NEAR.lerp(CAM_OFFSET, zoom)
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		zoom = clampf(zoom + (-0.08 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 0.08), 0.0, 1.0)
+		return
 	if hud.blocking():
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -508,17 +526,23 @@ func _physics_process(delta: float) -> void:
 		_add_walk(step.length())
 		audio.step(delta)
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
-		if not Models.play(player_body, "walk"):
+		if player_body.has_method("animate"):
+			player_body.animate(delta, _speed() / SPEED)
+		elif not Models.play(player_body, "walk"):
 			_walk_t += delta * 11.0
 			player_body.position.y = absf(sin(_walk_t)) * 0.06
+	elif player_body.has_method("animate"):
+		player_body.animate(delta, 0.0)
 	elif not Models.play(player_body, "idle"):
 		player_body.position.y = 0.0
+	for c in idlers:
+		c.animate(delta, 0.0)
 	player.position.x = clampf(player.position.x, STREET_X.x, STREET_X.y)
 	player.position.z = clampf(player.position.z, STREET_Z.x, STREET_Z.y)
 
-	var cam_goal := player.position + CAM_OFFSET
+	var cam_goal := player.position + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
-	camera.look_at(camera.position - CAM_OFFSET + Vector3(0, 1, 0), Vector3.UP)
+	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, zoom), 0), Vector3.UP)
 
 	var near := nearest_location()
 	var bin := nearest_bin()
@@ -713,8 +737,12 @@ func _update_traffic(delta: float) -> void:
 		var n: Node3D = w.node
 		if float(w.wait) > 0.0:
 			w["wait"] = float(w.wait) - delta
+			if n.get_child(0).has_method("animate"):
+				n.get_child(0).animate(delta, 0.0)
 			Models.play(n.get_child(0), "idle")
 			continue
+		if n.get_child(0).has_method("animate"):
+			n.get_child(0).animate(delta, float(w.speed) / 4.0)
 		Models.play(n.get_child(0), "walk")
 		var to: Vector3 = w.goal - n.position
 		if to.length() < 0.2:
@@ -740,7 +768,7 @@ func _on_changed() -> void:
 	if game.day() != _last_day:
 		if _last_day != -1:
 			player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
-			camera.position = player.position + CAM_OFFSET
+			camera.position = player.position + cam_offset()
 			_target = null
 			_target_loc = ""
 			_walk_meters = 0.0
@@ -872,10 +900,23 @@ func _label3d(text: String, pos: Vector3, size: int) -> Label3D:
 ## Người khối tạm: chân, thân, đầu. Con đầu tiên là phần thân để nhún khi đi.
 ## Người theo mô hình trong models.json (key như "player", "npc.vy", "people"), thiếu thì dựng khối.
 ## Con đầu tiên luôn là phần thân (mô hình hoặc khối) để nhún nhảy hay phát hoạt cảnh.
-func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenerator = null) -> Node3D:
+## Không có file mô hình thì dựng nhân vật có khớp (character.gd): Minh và nhân vật phụ có ngoại hình riêng,
+## người đi đường ngẫu nhiên.
+func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenerator = null, hat := "") -> Node3D:
 	var m := models.spawn(key, rng)
 	if m == null:
-		return _person(shirt, pants)
+		var id := "minh" if key == "player" else key.trim_prefix("npc.")
+		var look: Dictionary = Character.LOOKS.get(id, {})
+		if look.is_empty():
+			var r := rng if rng != null else RandomNumberGenerator.new()
+			look = Character.random_look(r)
+		if hat != "":
+			look["hat"] = hat
+		var root := Node3D.new()
+		root.add_child(Character.make(look))
+		if key.begins_with("npc."):
+			idlers.append(root.get_child(0))
+		return root
 	var root := Node3D.new()
 	root.add_child(m)
 	return root

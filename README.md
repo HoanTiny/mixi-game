@@ -53,6 +53,7 @@ scripts/
   world/world.gd  phố 3D: dựng cảnh, nhân vật, xe máy, người đi đường, ánh sáng theo giờ
   world/models.gd nạp mô hình .glb, co giãn cho vừa chỗ, phát hoạt cảnh đứng, đi, ngồi
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
+  world/character.gd   nhân vật có khớp dựng bằng khối: Minh, nhân vật phụ, người đi đường; hoạt cảnh đi, đứng, ngồi xe
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
   world/street_map.gd  bản đồ phố thu nhỏ, bấm để đi tới
   world/landmarks.gd   địa danh dựng bằng khối (Chợ Bến Thành) có đèn neon
