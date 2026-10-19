@@ -65,6 +65,11 @@ func _draw() -> void:
 		draw_circle(p, r, Color(loc.color))
 		if id == open or id == near:
 			draw_arc(p, r + 3.0, 0, TAU, 20, UI.GOLD, 1.5)
+	var target = world.delivery_target()
+	if target != null:
+		var tp := Vector2(_px(target.x), LINE_Y)
+		draw_circle(tp, 7.0, Color("2ecc71") if world.game.delivery_active().picked else Color("ff9f1c"))
+		draw_arc(tp, 10.0, 0, TAU, 20, Color.WHITE, 1.5)
 	var px := _px(world.player.position.x)
 	draw_colored_polygon(PackedVector2Array([Vector2(px, LINE_Y - 9), Vector2(px - 6, LINE_Y - 19), Vector2(px + 6, LINE_Y - 19)]), UI.GOLD)
 	var title := "Bản đồ phố · bấm chấm để đi tới"

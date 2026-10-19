@@ -178,8 +178,9 @@ func house(parent: Node3D, x: float, w: float, d: float, floors: int, wall: Colo
 
 
 ## Nhà ống chen vào khoảng trống [a, b] trên mặt phố: chia thành các căn rộng 3,8 đến 5,5 m.
-## Khoảng hẹp hơn 3,5 m để trống làm hẻm.
-func fill(parent: Node3D, a: float, b: float, rng: RandomNumberGenerator) -> void:
+## Khoảng hẹp hơn 3,5 m để trống làm hẻm. Trả về tâm mặt tiền từng căn (để đánh số nhà).
+func fill(parent: Node3D, a: float, b: float, rng: RandomNumberGenerator) -> Array:
+	var out := []
 	var x := a
 	while b - x >= 3.5:
 		var w := minf(rng.randf_range(3.8, 5.5), b - x)
@@ -187,7 +188,9 @@ func fill(parent: Node3D, a: float, b: float, rng: RandomNumberGenerator) -> voi
 			w = b - x
 		var sign: String = FILLER_SIGNS[rng.randi() % FILLER_SIGNS.size()] if rng.randf() < 0.55 else ""
 		house(parent, x + w / 2.0, w, rng.randf_range(9.0, 14.0), rng.randi_range(2, 5), pick(rng, WALLS), rng, sign, sign != "" or rng.randf() < 0.3)
+		out.append(x + w / 2.0)
 		x += w
+	return out
 
 
 ## Dãy nhà cao phía sau (chỉ thấy phần trên mái): khối, cửa sổ và bồn nước, ít chi tiết cho nhẹ.

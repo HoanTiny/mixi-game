@@ -21,6 +21,8 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Thời gian:** đi bộ trên phố tốn giờ (chỉnh bằng `walkHoursPerMeter`). Làm việc hay đi học thì Minh vào trong tiệm, thanh thời gian chạy (`workSecondsPerHour` giây thật cho mỗi giờ trong game) rồi mới tính kết quả. Nút **Về phòng trọ** dẫn Minh về nhà, vào phòng trọ để **Đi ngủ**. Tới 22 giờ mà chưa về thì Minh ngủ gục ngoài đường, bị trừ Sức khỏe và Tinh thần (`sleepOutside`).
 
+**Giao đồ ăn (kiểu Nobody):** bấm **Điện thoại** ở thanh dưới, bật *App Giao Nhanh*. Đơn hiện lên (lấy món ở quán nào, giao tới nhà số mấy, tiền công, hạn giờ), nhận thì tự đi tới quán lấy món rồi tìm đúng nhà để giao: mũi tên cam chỉ quán, xanh chỉ nhà khách, chấm trên bản đồ phố. Giao sớm có tip, trễ bị trừ tiền và mất Tinh thần. Giờ cao điểm 10:00–13:30 và 17:00–21:00 đơn nhiều, ngoài giờ ít. Số liệu trong `delivery` của `data/config.json`.
+
 **Nói chuyện:** vào tiệm có người đứng trước cửa (Cô Sáu, Chú Bảy, Vy, Tuấn, Ông Tư) sẽ thấy nút **Nói chuyện**, tốn 30 phút, mỗi người một lần mỗi ngày. Mỗi người có vài đoạn mạch chuyện mở dần theo độ thân thiết và ngày; kể hết thì tán gẫu, được thêm chút thân thiết. Hội thoại viết trong `data/talks.json`.
 
 **Quận 1:** từ ngày 23, khi Ngoại ngữ đủ 3, trạm xe buýt có việc *Dẫn khách Úc đi chợ Bến Thành*. Nhận việc thì sang màn Quận 1 (`scenes/quan1.tscn`): dẫn ba vị khách qua cổng chợ, sạp lưu niệm, xe bánh xèo, mỗi chỗ một lựa chọn. Xong chuyến thì đón xe buýt về, tiền công và giờ tính lúc đó. Nội dung chuyến đi viết trong `data/tour_ben_thanh.json`.

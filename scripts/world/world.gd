@@ -30,7 +30,7 @@ const LOCATIONS := {
 }
 const FRONT_Z := -5.0
 const DOOR_Z := -4.1
-const STREET_X := Vector2(-68.0, 60.0)
+const STREET_X := Vector2(-90.0, 76.0)
 const STREET_Z := Vector2(-4.6, 4.6)
 const SPEED := 6.0
 const CAM_OFFSET := Vector3(0, 24, 17)
@@ -42,6 +42,10 @@ var game
 var hud
 var models := Models.new()
 var tubes
+## Nhà dân có số (địa chỉ giao hàng): {"x", "no", "name"}.
+var homes: Array = []
+## Mũi tên lơ lửng chỉ chỗ lấy món hoặc nhà khách của đơn giao hàng đang chạy.
+var _marker: Node3D
 var audio
 var camera: Camera3D
 var sun: DirectionalLight3D
@@ -157,13 +161,13 @@ func _build_environment() -> void:
 
 func _build_street() -> void:
 	# Mặt đường, vỉa hè, vạch kẻ và phần đất trống phía sau (nền sẽ thay bằng texture gạch sau).
-	_block(Vector3(150, 0.1, 60), Vector3(-4, -0.1, 0), Color("4a4b4e"))
-	_block(Vector3(130, 0.05, 6), Vector3(-4, 0, 0), Color("3d3e41"))
-	_block(Vector3(130, 0.16, 2.2), Vector3(-4, 0, -4.1), Color("8a8780"))
-	_block(Vector3(130, 0.16, 2.2), Vector3(-4, 0, 4.1), Color("8a8780"))
+	_block(Vector3(200, 0.1, 60), Vector3(-7, -0.1, 0), Color("4a4b4e"))
+	_block(Vector3(176, 0.05, 6), Vector3(-7, 0, 0), Color("3d3e41"))
+	_block(Vector3(176, 0.16, 2.2), Vector3(-7, 0, -4.1), Color("8a8780"))
+	_block(Vector3(176, 0.16, 2.2), Vector3(-7, 0, 4.1), Color("8a8780"))
 	_block(Vector3(6, 0.06, 26), Vector3(-64, 0, -18), Color("3d3e41"))
-	var x := -66.0
-	while x < 60.0:
+	var x := -94.0
+	while x < 80.0:
 		_block(Vector3(1.6, 0.07, 0.12), Vector3(x, 0, 0), Color("d8d4c8"))
 		x += 3.4
 	# Mặt đất để bấm chuột đi.
@@ -300,13 +304,39 @@ func _build_fillers() -> void:
 	used.sort_custom(func(a, b) -> bool: return a.x < b.x)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 2024
-	var x := -92.0
+	var x := -96.0
+	var centers := []
 	for r in used:
 		if r.x > x:
-			tubes.fill(holder, x, r.x, rng)
+			centers.append_array(tubes.fill(holder, x, r.x, rng))
 		x = maxf(x, r.y)
-	tubes.fill(holder, x, 78.0, rng)
-	tubes.back_row(holder, -92.0, 78.0, FRONT_Z - 16.0, rng)
+	centers.append_array(tubes.fill(holder, x, 80.0, rng))
+	tubes.back_row(holder, -96.0, 80.0, FRONT_Z - 16.0, rng)
+	# Đánh số nhà lẻ từ đầu phố (phía bắc đường), gắn biển số nhỏ cạnh cửa: địa chỉ để giao hàng.
+	centers.sort()
+	homes = []
+	for i in centers.size():
+		var hx: float = centers[i]
+		if hx < STREET_X.x - 1.0 or hx > STREET_X.y + 1.0:
+			continue
+		var no := 1 + 2 * homes.size()
+		homes.append({"x": hx, "no": no, "name": "Nhà số %d" % no})
+		var plate := Label3D.new()
+		plate.text = str(no)
+		plate.font = font
+		plate.font_size = 40
+		plate.pixel_size = 0.01
+		plate.modulate = Color("ffffff")
+		plate.outline_size = 0
+		plate.position = Vector3(hx + 1.2, 2.25, FRONT_Z + 0.2)
+		holder.add_child(plate)
+		var board := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.5, 0.35, 0.04)
+		board.mesh = bm
+		board.material_override = _mat(Color("1e5aa8"))
+		board.position = Vector3(hx + 1.2, 2.25, FRONT_Z + 0.16)
+		holder.add_child(board)
 
 
 func _scaffold(x: float, size: Vector3, parent: Node3D) -> void:
@@ -331,8 +361,8 @@ func _build_props() -> void:
 			edges.append(float(loc.x) + loc.size.x / 2.0)
 	edges.sort()
 	var poles := []
-	var last := -70.0
-	for e in edges + [58.0]:
+	var last := -92.0
+	for e in edges + [76.0]:
 		if e - last < 10.0:
 			continue
 		var px: float = e if e - last <= 16.0 else last + 14.0
@@ -346,15 +376,15 @@ func _build_props() -> void:
 			var b := Vector3(poles[i + 1], 6.95 - k * 0.25, -3.3 + (k - 1) * 0.5)
 			_wire(a, b)
 	# Hàng rào sắt, cây và xe máy dựng phía nam như hình mẫu.
-	var fx := -68.0
-	while fx < 60.0:
+	var fx := -94.0
+	while fx < 80.0:
 		_block(Vector3(3.8, 0.08, 0.08), Vector3(fx + 1.9, 1.05, 5.25), Color("7d7f84"))
 		_block(Vector3(0.08, 1.1, 0.08), Vector3(fx, 0, 5.25), Color("7d7f84"))
 		fx += 4.0
-	var tx := -62.0
+	var tx := -88.0
 	var tree_rng := RandomNumberGenerator.new()
 	tree_rng.seed = 5
-	while tx < 58.0:
+	while tx < 76.0:
 		var tree := models.spawn("tree", tree_rng)
 		if tree:
 			tree.position = Vector3(tx, 0, 6.6)
@@ -376,14 +406,14 @@ func _build_props() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 	for i in 16:
-		var bx := rng.randf_range(-60.0, 56.0)
+		var bx := rng.randf_range(-86.0, 72.0)
 		var bike := _bike(Color.from_hsv(rng.randf(), 0.45, 0.7), rng)
 		bike.position = Vector3(bx, 0, 3.7)
 		bike.rotation.y = rng.randf_range(-0.3, 0.3)
 		add_child(bike)
 	# Đèn đường, bật khi trời tối.
-	var lx := -58.0
-	while lx < 58.0:
+	var lx := -86.0
+	while lx < 76.0:
 		_block(Vector3(0.14, 5.2, 0.14), Vector3(lx, 0, 4.7), Color("4b4d52"))
 		var lamp := OmniLight3D.new()
 		lamp.position = Vector3(lx, 5.0, 3.8)
@@ -408,14 +438,14 @@ func _build_traffic() -> void:
 		bike.add_child(rider)
 		var lane := -1.4 if i % 2 == 0 else 1.4
 		var dir := 1.0 if lane > 0 else -1.0
-		bike.position = Vector3(rng.randf_range(-66, 58), 0, lane)
+		bike.position = Vector3(rng.randf_range(-92, 78), 0, lane)
 		bike.rotation.y = 0.0 if dir > 0 else PI
 		add_child(bike)
 		bikes.append({"node": bike, "dir": dir, "speed": rng.randf_range(6.0, 10.0)})
 	for i in 10:
 		var w := _character("people", Color.from_hsv(rng.randf(), 0.3, 0.65), Color.from_hsv(rng.randf(), 0.2, 0.35), rng)
 		var side := -3.8 if i % 2 == 0 else 3.9
-		w.position = Vector3(rng.randf_range(-62, 56), 0, side)
+		w.position = Vector3(rng.randf_range(-86, 72), 0, side)
 		add_child(w)
 		walkers.append({"node": w, "goal": w.position, "speed": rng.randf_range(1.2, 2.0), "wait": rng.randf_range(0, 3)})
 
@@ -491,7 +521,78 @@ func _physics_process(delta: float) -> void:
 		hud.close_location()
 
 	_update_traffic(delta)
+	_update_delivery()
 	_check_day_end()
+
+
+# ---------------------------------------------------------------- giao đồ ăn
+
+## Chỗ cần tới của đơn đang chạy: quán (chưa lấy món) hoặc nhà khách. null nếu không có đơn.
+func delivery_target():
+	var o: Dictionary = game.delivery_active()
+	if o.is_empty():
+		return null
+	if not o.picked:
+		return door_of(str(o.shop))
+	return Vector3(float(o.dest_x), 0, DOOR_Z)
+
+
+## Tạo một đơn mới từ vị trí thật trên phố: quán ngẫu nhiên, giao tới nhà dân hoặc một chỗ khác
+## cách quán 15 đến 110 m. Tiền công tính theo cả quãng đi lấy lẫn đi giao.
+func make_offer() -> Dictionary:
+	var shops: Array = game.cfg.delivery.shops.keys()
+	var shop: String = shops.pick_random()
+	var sx := door_of(shop).x
+	var dests := []
+	for h in homes:
+		dests.append({"name": h.name, "x": h.x})
+	for id in LOCATIONS:
+		if id != shop and id != "nga_tu":
+			dests.append({"name": str(LOCATIONS[id].name), "x": door_of(id).x})
+	dests = dests.filter(func(d) -> bool: return absf(float(d.x) - sx) >= 15.0 and absf(float(d.x) - sx) <= 110.0)
+	if dests.is_empty():
+		return {}
+	var dest: Dictionary = dests.pick_random()
+	var meters := absf(player.position.x - sx) + absf(sx - float(dest.x)) + 4.0
+	return game.delivery_offer(shop, str(LOCATIONS[shop].name), str(dest.name), float(dest.x), meters)
+
+
+func _update_delivery() -> void:
+	var target = delivery_target()
+	if _marker == null:
+		_marker = Node3D.new()
+		var cone := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.45
+		cm.bottom_radius = 0.0
+		cm.height = 0.9
+		cone.mesh = cm
+		var m := StandardMaterial3D.new()
+		m.emission_enabled = true
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		cone.material_override = m
+		_marker.add_child(cone)
+		add_child(_marker)
+	_marker.visible = target != null
+	if target == null:
+		return
+	var picked: bool = game.delivery_active().picked
+	var c := Color("ff9f1c") if not picked else Color("2ecc71")
+	var mat: StandardMaterial3D = _marker.get_child(0).material_override
+	mat.albedo_color = c
+	_marker.position = target + Vector3(0, 3.4 + 0.25 * sin(Time.get_ticks_msec() / 220.0), 0)
+	_marker.rotation.y += 0.04
+	if hud.blocking() or Vector3(player.position.x, 0, player.position.z).distance_to(target) > INTERACT_RANGE:
+		return
+	if not picked:
+		game.delivery_pickup()
+		_float_text("Đã lấy món", Color("ffd27a"))
+		audio.play("done")
+	else:
+		var r: Dictionary = game.delivery_drop()
+		if not r.is_empty():
+			_float_text("Giao trễ!" if r.late else ("Tip +" + GameLogic.fmt_k(int(r.tip)) if int(r.tip) > 0 else "Đã giao"),
+				Color("ff8a7a") if r.late else Color("7fe0a0"))
 
 
 ## Đi bộ tốn giờ: cứ đủ 5 phút trong game thì trừ một lần, tránh lưu file mỗi khung hình.
@@ -549,10 +650,10 @@ func _update_traffic(delta: float) -> void:
 	for b in bikes:
 		var n: Node3D = b.node
 		n.position.x += b.dir * b.speed * delta
-		if n.position.x > 64.0:
-			n.position.x = -70.0
-		elif n.position.x < -70.0:
-			n.position.x = 64.0
+		if n.position.x > 82.0:
+			n.position.x = -96.0
+		elif n.position.x < -96.0:
+			n.position.x = 82.0
 	for w in walkers:
 		var n: Node3D = w.node
 		if float(w.wait) > 0.0:
@@ -562,7 +663,7 @@ func _update_traffic(delta: float) -> void:
 		Models.play(n.get_child(0), "walk")
 		var to: Vector3 = w.goal - n.position
 		if to.length() < 0.2:
-			w["goal"] = Vector3(clampf(n.position.x + randf_range(-14, 14), -62, 56), 0, n.position.z)
+			w["goal"] = Vector3(clampf(n.position.x + randf_range(-14, 14), -86, 72), 0, n.position.z)
 			w["wait"] = randf_range(0.5, 4.0)
 		else:
 			var stp: Vector3 = to.normalized() * w.speed * delta

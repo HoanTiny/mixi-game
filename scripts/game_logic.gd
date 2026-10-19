@@ -481,6 +481,98 @@ func find_event(id: String) -> Dictionary:
 	return {}
 
 
+# ---------------------------------------------------------------- giao đồ ăn
+
+## "" nếu bật app giao hàng nhận đơn được, ngược lại là lý do.
+func delivery_lock() -> String:
+	if not is_started() or is_over():
+		return "-"
+	if s.flags.get("phoneBroken", false):
+		return "Điện thoại đang hỏng"
+	if hours_left() < 0.5:
+		return "Sắp hết ngày"
+	return ""
+
+
+func delivery_active() -> Dictionary:
+	return s.get("delivery", {})
+
+
+## Giờ cao điểm bữa trưa, bữa tối thì đơn nổ liên tục.
+func delivery_rush() -> bool:
+	for r in cfg.delivery.rush:
+		if clock() >= float(r[0]) and clock() < float(r[1]):
+			return true
+	return false
+
+
+## Đơn mới: lấy ở tiệm shop, giao tới dest; meters là quãng đường cả đi lấy lẫn đi giao.
+func delivery_offer(shop: String, shop_name: String, dest: String, dest_x: float, meters: float) -> Dictionary:
+	var d: Dictionary = cfg.delivery
+	var walk_h := meters * float(cfg.get("walkHoursPerMeter", 0.004))
+	return {
+		"shop": shop, "shop_name": shop_name, "item": str(d.shops[shop]), "dest": dest, "dest_x": dest_x,
+		"pay": round_k(float(d.base) + meters * float(d.perMeter)),
+		"deadline": clock() + walk_h * float(d.slackFactor) + float(d.cookHours) + float(d.slackHours),
+		"picked": false,
+	}
+
+
+func delivery_accept(o: Dictionary) -> void:
+	if delivery_lock() != "" or not delivery_active().is_empty():
+		return
+	var a := o.duplicate()
+	a["given"] = clock()
+	s["delivery"] = a
+	add_log("Nhận đơn: %s → %s" % [a.item, a.dest])
+	_commit()
+
+
+## Tới quán: chờ quán làm món rồi cầm đi.
+func delivery_pickup() -> void:
+	var o := delivery_active()
+	if o.is_empty() or o.picked:
+		return
+	o["picked"] = true
+	s["used"] = float(s.used) + float(cfg.delivery.cookHours)
+	_commit()
+
+
+## Tới nhà khách: trả tiền theo giờ giao, sớm thì có tip, trễ thì bị trừ.
+## Trả về {"pay", "tip", "late"} để hiện cho người chơi.
+func delivery_drop() -> Dictionary:
+	var o := delivery_active()
+	if o.is_empty() or not o.picked:
+		return {}
+	var d: Dictionary = cfg.delivery
+	var late := clock() > float(o.deadline)
+	var pay := int(o.pay)
+	var tip := 0
+	if late:
+		pay = round_k(float(pay) * float(d.latePay))
+		adj("mood", float(d.lateMood))
+	elif (float(o.deadline) - clock()) / maxf(0.01, float(o.deadline) - float(o.given)) >= float(d.tipIfLeft):
+		tip = round_k(randf_range(float(d.tip[0]), float(d.tip[1])))
+	adj("health", float(d.health))
+	adj("mood", float(d.mood))
+	earn(pay + tip, "Giao %s tới %s%s" % [o.item, o.dest, " (trễ)" if late else (" · tip %s" % fmt_k(tip) if tip > 0 else "")])
+	s.counts["giao_hang"] = count("giao_hang") + 1
+	s.today["giao_hang"] = today_count("giao_hang") + 1
+	s.erase("delivery")
+	clamp_all()
+	_commit()
+	return {"pay": pay, "tip": tip, "late": late}
+
+
+func delivery_cancel() -> void:
+	if delivery_active().is_empty():
+		return
+	adj("mood", float(cfg.delivery.cancelMood))
+	add_log("Hủy đơn giao hàng, bị khách đánh giá 1 sao", "warn")
+	s.erase("delivery")
+	_commit()
+
+
 # ---------------------------------------------------------------- nói chuyện
 
 ## "" nếu nói chuyện được với nhân vật, ngược lại là lý do khóa.
@@ -677,6 +769,9 @@ func night_preview() -> Dictionary:
 func finish_day(night_shift: bool) -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
+	if not delivery_active().is_empty():
+		add_log("Hết ngày, đơn giao hàng đang chạy bị hủy", "warn")
+		s.erase("delivery")
 	var food: Dictionary = cfg.food[s.food]
 	spend(int(food.cost), "Ăn uống: " + str(food.name))
 	adj("health", float(food.get("health", 0)))

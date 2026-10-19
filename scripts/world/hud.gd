@@ -38,6 +38,15 @@ var _bottom: PanelContainer
 var _food_select: OptionButton
 var _end_day_btn: Button
 var _work: PanelContainer
+var _phone: PanelContainer
+var _phone_box: VBoxContainer
+var _order_strip: PanelContainer
+var _order_label: Label
+var _app_on := false
+var _offer: Dictionary = {}
+var _offer_left := 0.0
+var _offer_wait := 3.0
+var _phone_tick := 0.0
 var _work_title: Label
 var _work_clock: Label
 var _work_bar: ProgressBar
@@ -77,6 +86,7 @@ func _ready() -> void:
 	var left := _pass(VBoxContainer.new(), middle)
 	_build_skills(left)
 	_build_log(left)
+	_build_phone(left)
 	_spacer(middle)
 	_build_location(middle)
 
@@ -85,6 +95,7 @@ func _ready() -> void:
 	prompt_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	_build_prompt(prompt_row)
 	_build_work(prompt_row)
+	_build_order_strip(prompt_row)
 
 	# Hàng dưới: hướng dẫn điều khiển bên trái, thanh công cụ bên phải.
 	var bottom := _pass(HBoxContainer.new(), rows)
@@ -313,6 +324,116 @@ func _build_skills(parent: Control) -> void:
 	_skills.visible = false
 
 
+# ---------------------------------------------------------------- điện thoại: app giao hàng
+
+func _build_phone(parent: Control) -> void:
+	_phone = _light_panel(parent)
+	_phone.custom_minimum_size = Vector2(330, 0)
+	_phone_box = VBoxContainer.new()
+	_phone_box.add_theme_constant_override("separation", 8)
+	_phone.add_child(_phone_box)
+	_phone.visible = false
+
+
+func _build_order_strip(parent: Control) -> void:
+	_order_strip = _dark_panel(parent)
+	_order_label = UI.label("", 15, UI.HUD_TEXT)
+	_order_strip.add_child(_order_label)
+	_order_strip.visible = false
+
+
+func _process(delta: float) -> void:
+	if not game.is_started() or game.is_over():
+		return
+	var active: Dictionary = game.delivery_active()
+	# Đơn mới tới khi app đang bật, rảnh tay và không có hộp thoại.
+	if _app_on and active.is_empty() and _offer.is_empty() and not blocking():
+		_offer_wait -= delta
+		if _offer_wait <= 0.0:
+			_new_offer()
+	if not _offer.is_empty():
+		_offer_left -= delta
+		if _offer_left <= 0.0:
+			_offer = {}
+			_refresh_phone()
+	_phone_tick -= delta
+	if _phone_tick <= 0.0:
+		_phone_tick = 0.25
+		_update_order_strip(active)
+		if _phone.visible:
+			_refresh_phone()
+
+
+func _new_offer() -> void:
+	var d: Dictionary = game.cfg.delivery
+	var r: Array = d.offerSec if game.delivery_rush() else d.offPeakSec
+	_offer_wait = randf_range(float(r[0]), float(r[1]))
+	if game.delivery_lock() != "":
+		return
+	_offer = world.make_offer()
+	if _offer.is_empty():
+		return
+	_offer_left = 12.0
+	_phone.visible = true
+	_skills.visible = false
+	_log.visible = false
+	world.audio.play("dialog")
+	_refresh_phone()
+
+
+func _minutes_left(o: Dictionary) -> int:
+	return int(round((float(o.deadline) - game.clock()) * 60.0))
+
+
+func _update_order_strip(o: Dictionary) -> void:
+	_order_strip.visible = not o.is_empty() and not _working
+	if o.is_empty():
+		return
+	var left := _minutes_left(o)
+	var where: String = ("Lấy %s ở %s" % [o.item, o.shop_name]) if not o.picked else ("Giao tới %s" % o.dest)
+	_order_label.text = "Đơn: %s · %s" % [where, ("còn %d phút" % left) if left >= 0 else ("trễ %d phút" % -left)]
+	_order_label.add_theme_color_override("font_color", UI.HUD_TEXT if left >= 10 else (UI.GOLD if left >= 0 else Color("ff8a7a")))
+
+
+func _refresh_phone() -> void:
+	if not _phone.visible:
+		return
+	for c in _phone_box.get_children():
+		c.queue_free()
+	_phone_box.add_child(UI.label("App Giao Nhanh", 20, UI.INK))
+	var lock: String = game.delivery_lock()
+	var rush: bool = game.delivery_rush()
+	_phone_box.add_child(UI.wrap(("Giờ cao điểm: đơn nhiều." if rush else "Ngoài giờ cao điểm (10:00–13:30, 17:00–21:00): ít đơn.")
+		+ " Đã giao hôm nay: %d đơn." % game.today_count("giao_hang"), 13, UI.INK_SOFT, 300))
+	var o: Dictionary = game.delivery_active()
+	if not o.is_empty():
+		var left := _minutes_left(o)
+		_phone_box.add_child(UI.label("ĐƠN ĐANG GIAO", 11, UI.INK_SOFT))
+		_phone_box.add_child(UI.wrap("%s\nLấy ở: %s%s\nGiao tới: %s\nTiền công: %s · hạn %s (%s)" % [o.item, o.shop_name, " ✓" if o.picked else "",
+			o.dest, GameLogic.fmt_k(int(o.pay)), GameLogic.hh(float(o.deadline)), ("còn %d phút" % left) if left >= 0 else "đã trễ"], 14, UI.INK, 300))
+		_phone_box.add_child(UI.choice("Hủy đơn", "Khách đánh giá 1 sao · Tinh thần %d" % int(game.cfg.delivery.cancelMood), "", func() -> void:
+			game.delivery_cancel()
+			_refresh_phone()))
+	elif not _offer.is_empty():
+		_phone_box.add_child(UI.label("ĐƠN MỚI · tự hủy sau %d giây" % ceili(_offer_left), 11, UI.TIM))
+		_phone_box.add_child(UI.wrap("%s\nLấy ở: %s\nGiao tới: %s\nTiền công: %s · giao trước %s" % [_offer.item, _offer.shop_name, _offer.dest,
+			GameLogic.fmt_k(int(_offer.pay)), GameLogic.hh(float(_offer.deadline))], 14, UI.INK, 300))
+		_phone_box.add_child(UI.choice("Nhận đơn", "Mũi tên cam chỉ quán, xanh chỉ nhà khách", "", func() -> void:
+			game.delivery_accept(_offer)
+			_offer = {}
+			_refresh_phone()))
+		_phone_box.add_child(UI.choice("Bỏ qua", "", "", func() -> void:
+			_offer = {}
+			_refresh_phone()))
+	_phone_box.add_child(UI.choice("Tắt nhận đơn" if _app_on else "Bật nhận đơn",
+		"Đang chờ đơn…" if _app_on and o.is_empty() and _offer.is_empty() else "", lock, func() -> void:
+			_app_on = not _app_on
+			_offer = {}
+			_offer_wait = 2.0
+			_refresh_phone()))
+	_phone_box.add_child(UI.choice("Cất điện thoại", "", "", func() -> void: _phone.visible = false))
+
+
 func _build_log(parent: Control) -> void:
 	_log = _light_panel(parent)
 	var v := VBoxContainer.new()
@@ -343,6 +464,11 @@ func _build_bottom(parent: Control) -> void:
 		_food_select.add_item("%s · %s" % [f.name, GameLogic.fmt_k(int(f.cost))])
 	_food_select.item_selected.connect(func(i: int) -> void: game.set_food(_food_keys[i]))
 	h.add_child(_food_select)
+	h.add_child(_tool_button("Điện thoại", func() -> void:
+		_phone.visible = not _phone.visible
+		_skills.visible = false
+		_log.visible = false
+		_refresh_phone()))
 	h.add_child(_tool_button("Kỹ năng", func() -> void:
 		_skills.visible = not _skills.visible
 		_log.visible = false))

@@ -9,6 +9,13 @@
   "letterMood": 10,
   "walkHoursPerMeter": 0.004,
   "talkHours": 0.5,
+  "delivery": {
+    "shops": {"quan_com": "2 hộp cơm tấm sườn", "quan_ca_phe": "3 ly cà phê sữa đá", "cua_hang": "túi đồ tạp hóa", "tra_da": "trà đá và bánh tráng trộn"},
+    "base": 12000, "perMeter": 100, "cookHours": 0.15, "slackFactor": 1.5, "slackHours": 0.2,
+    "tip": [3000, 10000], "tipIfLeft": 0.35, "latePay": 0.6,
+    "health": -3, "mood": -1, "lateMood": -3, "cancelMood": -4,
+    "rush": [[10, 13.5], [17, 21]], "offerSec": [3, 7], "offPeakSec": [25, 45]
+  },
   "chatRep": 2,
   "workSecondsPerHour": 0.35,
   "sleepOutside": {
