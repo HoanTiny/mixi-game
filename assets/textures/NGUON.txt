@@ -1,0 +1,8 @@
+Texture và HDRI từ Poly Haven (polyhaven.com), giấy phép CC0, dùng tự do kể cả thương mại.
+ton: https://polyhaven.com/a/corrugated_iron_02
+duong: https://polyhaven.com/a/asphalt_02
+tuong_cu: https://polyhaven.com/a/damaged_plaster
+tuong: https://polyhaven.com/a/painted_plaster_wall
+kim_loai: https://polyhaven.com/a/metal_plate
+via_he: https://polyhaven.com/a/concrete_tiles_02
+pho_chieu.hdr: https://polyhaven.com/a/urban_street_01

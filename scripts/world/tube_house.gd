@@ -44,9 +44,8 @@ func _begin() -> void:
 
 func _end(parent: Node3D) -> void:
 	if _vc_mat == null:
-		_vc_mat = StandardMaterial3D.new()
-		_vc_mat.vertex_color_use_as_albedo = true
-		_vc_mat.roughness = 0.9
+		# Tường vữa sơn tả thực (texture Poly Haven) nhân với màu sơn từng căn.
+		_vc_mat = load("res://scripts/world/surfaces.gd").get_mat("tuong", 2.5, Color.WHITE, true)
 	var mi := MeshInstance3D.new()
 	mi.mesh = _st.commit()
 	mi.material_override = _vc_mat
@@ -77,8 +76,9 @@ func _box(_parent: Node3D, size: Vector3, pos: Vector3, c: Color, tilt := 0.0) -
 				_st.add_vertex(corners[i])
 
 
+## Màu sơn phố thật đã bạc vì nắng mưa: pha về màu bụi đất cho bớt rực.
 func pick(rng: RandomNumberGenerator, list: Array) -> Color:
-	return Color(list[rng.randi() % list.size()])
+	return Color(list[rng.randi() % list.size()]).lerp(Color("8f8270"), 0.28)
 
 
 ## Một căn nhà ống mặt tiền rộng w, sâu d, n tầng, tâm mặt tiền tại x. Trả về chiều cao nóc.

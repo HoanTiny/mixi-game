@@ -8,6 +8,7 @@ const Hud := preload("res://scripts/world/hud.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const Models := preload("res://scripts/world/models.gd")
 const Character := preload("res://scripts/world/character.gd")
+const Surfaces := preload("res://scripts/world/surfaces.gd")
 const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 
@@ -91,6 +92,7 @@ func _ready() -> void:
 	_build_fillers()
 	_build_props()
 	_build_bins()
+	_build_grime()
 	_build_traffic()
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
@@ -155,7 +157,16 @@ func _build_environment() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("c9c6be")
 	env.ambient_light_energy = 0.55
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	# Phản chiếu lấy từ ảnh HDRI phố lúc chiều; vùng bóng được hắt sáng màu vàng nâu ấm như Nobody.
+	var sky := Surfaces.sky()
+	if sky:
+		env.sky = sky
+		env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.15
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.08
+	env.adjustment_saturation = 0.82
 	env.ssao_enabled = true
 	env.ssao_radius = 1.2
 	env.ssao_intensity = 1.6
@@ -167,17 +178,21 @@ func _build_environment() -> void:
 	add_child(we)
 	sun = DirectionalLight3D.new()
 	sun.shadow_enabled = true
+	sun.shadow_blur = 1.5
 	sun.directional_shadow_max_distance = 70.0
 	add_child(sun)
 
 
 func _build_street() -> void:
 	# Mặt đường, vỉa hè, vạch kẻ và phần đất trống phía sau (nền sẽ thay bằng texture gạch sau).
-	_block(Vector3(200, 0.1, 60), Vector3(-7, -0.1, 0), Color("4a4b4e"))
-	_block(Vector3(176, 0.05, 6), Vector3(-7, 0, 0), Color("3d3e41"))
-	_block(Vector3(176, 0.16, 2.2), Vector3(-7, 0, -4.1), Color("8a8780"))
-	_block(Vector3(176, 0.16, 2.2), Vector3(-7, 0, 4.1), Color("8a8780"))
-	_block(Vector3(6, 0.06, 26), Vector3(-64, 0, -18), Color("3d3e41"))
+	# Nhựa đường, vỉa hè lát gạch: texture tả thực Poly Haven (thiếu file thì màu trơn).
+	var asphalt := Surfaces.get_mat("duong", 4.0, Color("9a9a9a"))
+	var paving := Surfaces.get_mat("via_he", 1.85, Color("efe2cc"))
+	_block(Vector3(200, 0.1, 60), Vector3(-7, -0.1, 0), Color("4a4b4e")).material_override = asphalt
+	_block(Vector3(176, 0.05, 6), Vector3(-7, 0, 0), Color("3d3e41")).material_override = asphalt
+	_block(Vector3(176, 0.16, 2.2), Vector3(-7, 0, -4.1), Color("8a8780")).material_override = paving
+	_block(Vector3(176, 0.16, 2.2), Vector3(-7, 0, 4.1), Color("8a8780")).material_override = paving
+	_block(Vector3(6, 0.06, 26), Vector3(-64, 0, -18), Color("3d3e41")).material_override = asphalt
 	var x := -94.0
 	while x < 80.0:
 		_block(Vector3(1.6, 0.07, 0.12), Vector3(x, 0, 0), Color("d8d4c8"))
@@ -589,6 +604,63 @@ func _scavenge(id: String) -> void:
 	audio.play("step", 0.6)
 
 
+## Vết bẩn, nước đọng, giấy rác vương vãi và nắp cống: phố Sài Gòn không bao giờ sạch bong.
+func _build_grime() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 77
+	var stain_tex := GradientTexture2D.new()
+	stain_tex.fill = GradientTexture2D.FILL_RADIAL
+	stain_tex.fill_from = Vector2(0.5, 0.5)
+	stain_tex.fill_to = Vector2(1.0, 0.5)
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	stain_tex.gradient = g
+	for i in 40:
+		var mi := MeshInstance3D.new()
+		var qm := QuadMesh.new()
+		var s := rng.randf_range(0.8, 2.8)
+		qm.size = Vector2(s, s * rng.randf_range(0.5, 1.0))
+		mi.mesh = qm
+		var m := StandardMaterial3D.new()
+		m.albedo_texture = stain_tex
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		var wet := rng.randf() < 0.4
+		m.albedo_color = Color(0.12, 0.1, 0.08, 0.45) if wet else Color(0.25, 0.2, 0.14, 0.35)
+		m.roughness = 0.15 if wet else 0.9
+		m.metallic_specular = 0.8 if wet else 0.5
+		mi.material_override = m
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var side: float = [-4.1, 4.1, rng.randf_range(-2.5, 2.5)][rng.randi() % 3]
+		mi.position = Vector3(rng.randf_range(STREET_X.x, STREET_X.y), 0.17 if absf(side) > 3.0 else 0.06, side)
+		mi.rotation = Vector3(-PI / 2.0, 0, 0)
+		mi.rotation.y = rng.randf() * TAU
+		add_child(mi)
+	var paper := StandardMaterial3D.new()
+	paper.albedo_color = Color("e9e2d0")
+	paper.roughness = 0.95
+	for i in 70:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(rng.randf_range(0.15, 0.32), 0.008, rng.randf_range(0.2, 0.35))
+		mi.mesh = bm
+		mi.material_override = paper
+		mi.position = Vector3(rng.randf_range(STREET_X.x, STREET_X.y), 0.17, rng.randf_range(-4.9, -3.2) if rng.randf() < 0.6 else rng.randf_range(3.2, 4.9))
+		mi.rotation = Vector3(rng.randf_range(-0.1, 0.1), rng.randf() * TAU, rng.randf_range(-0.15, 0.15))
+		add_child(mi)
+	var lid := Surfaces.get_mat("kim_loai", 0.9, Color("6b6660"))
+	for i in 8:
+		var mi := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.42
+		cm.bottom_radius = 0.42
+		cm.height = 0.04
+		mi.mesh = cm
+		mi.material_override = lid
+		mi.position = Vector3(-80.0 + i * 20.0 + rng.randf_range(-4, 4), 0.05 if i % 2 == 0 else 0.17, rng.randf_range(-1.5, 1.5) if i % 2 == 0 else -3.9)
+		add_child(mi)
+
+
 func _build_bins() -> void:
 	var x := -86.0
 	var i := 0
@@ -779,10 +851,11 @@ func _on_changed() -> void:
 ## Ánh sáng theo giờ trong game: sáng vàng nhạt, trưa gắt, chiều cam, tối đèn đường.
 func _update_lighting(hour: float) -> void:
 	var t := clampf((hour - 6.0) / 16.0, 0.0, 1.0)
-	var elevation := lerpf(18.0, 70.0, sin(t * PI))
-	sun.rotation_degrees = Vector3(-elevation, -35.0 + t * 70.0, 0)
-	var warm := Color("ffe9cf")
-	var noon := Color("fff6e8")
+	var elevation := lerpf(24.0, 60.0, sin(t * PI))
+	# Nắng chiếu từ phía sau dãy nhà ra đường: bóng nhà đổ dài trên vỉa hè như Nobody.
+	sun.rotation_degrees = Vector3(-elevation, 115.0 + t * 130.0, 0)
+	var warm := Color("ffd9a8")
+	var noon := Color("fff0dc")
 	var dusk := Color("ff9a5c")
 	var night := Color("5b6c9a")
 	var c: Color
@@ -796,8 +869,8 @@ func _update_lighting(hour: float) -> void:
 		c = dusk.lerp(night, clampf((hour - 19.0) / 2.0, 0.0, 1.0))
 	sun.light_color = c
 	sun.light_energy = 0.35 if hour >= 20.0 else 1.1
-	env.ambient_light_color = c.lerp(Color("c9c6be"), 0.5)
-	env.ambient_light_energy = 0.35 if hour >= 20.0 else 0.55
+	env.ambient_light_color = c.lerp(Color("b49a7c"), 0.6)
+	env.ambient_light_energy = 0.45 if hour >= 20.0 else 0.95
 	for lamp in lamps:
 		lamp.light_energy = 2.2 if hour >= 18.0 else 0.0
 

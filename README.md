@@ -71,6 +71,10 @@ tests/
   playtest.gd     người chơi máy chơi trên màn phố thật, in nhật ký từng ngày
 ```
 
+## Texture và ánh sáng tả thực
+
+Mặt đường, vỉa hè, tường nhà ống và nắp cống dùng texture Poly Haven (CC0) trong `assets/textures/` (nguồn từng bộ ghi ở `NGUON.txt`), chiếu theo tọa độ thế giới nên dán lên mọi khối không cần UV (`scripts/world/surfaces.gd`). Ảnh HDRI `assets/hdri/pho_chieu.hdr` dùng cho phản chiếu. Nắng chiếu xiên từ phía sau dãy nhà để bóng đổ dài ra vỉa hè, tông màu vàng ấm như Nobody. Thay texture: chép bộ `<tên>_albedo.jpg`, `_normal.jpg`, `_rough.jpg` cùng tên.
+
 ## Thêm mô hình thật
 
 Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file mô hình nào. Thiếu file nào thì chỗ đó vẫn là khối hình, nên có thể thêm dần từng cái.
