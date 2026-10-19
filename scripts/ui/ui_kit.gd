@@ -21,11 +21,22 @@ const HUD_SOFT := Color("b9bccb")
 const LOG_COLORS := {"plus": "2d7a4c", "minus": "c0352b", "warn": "a5690f", "event": "6a3db8", "info": "1c2145"}
 
 
+static var _text_font: SystemFont
+
+
+## Phông chữ chung: phông hệ thống, thiếu ký hiệu (◆ ✓ ○ ♪) thì lấy từ DejaVu Sans đóng kèm.
+## Bản web không có phông hệ thống nên cần phông dự phòng này, nếu không ký hiệu hiện thành ô vuông.
+static func text_font() -> SystemFont:
+	if _text_font == null:
+		_text_font = SystemFont.new()
+		_text_font.font_names = PackedStringArray(["Segoe UI", "Arial", "Noto Sans"])
+		_text_font.fallbacks = [load("res://assets/fonts/DejaVuSans.ttf")]
+	return _text_font
+
+
 static func make_theme() -> Theme:
 	var t := Theme.new()
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["Segoe UI", "Arial", "Noto Sans"])
-	t.default_font = font
+	t.default_font = text_font()
 	t.default_font_size = 15
 	t.set_color("font_color", "Label", INK)
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:

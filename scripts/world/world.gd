@@ -5,6 +5,7 @@ extends Node3D
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
+const UI := preload("res://scripts/ui/ui_kit.gd")
 const Models := preload("res://scripts/world/models.gd")
 const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
@@ -66,8 +67,7 @@ var _night_prompt_day := -1
 
 func _ready() -> void:
 	game = GameState.game
-	font = SystemFont.new()
-	font.font_names = PackedStringArray(["Segoe UI", "Arial", "Noto Sans"])
+	font = UI.text_font()
 	_build_environment()
 	tubes = TubeHouse.new(FRONT_Z, font)
 	_build_street()
