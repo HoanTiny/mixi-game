@@ -249,6 +249,36 @@ func _build_work(parent: Control) -> void:
 	_work_bar.add_theme_stylebox_override("fill", UI.box(UI.GOLD, UI.GOLD, 5, 0))
 	v.add_child(_work_bar)
 	_work.visible = false
+<<<<<<< HEAD
+=======
+
+
+## Làm một việc ở tiệm: Minh vào trong, thanh thời gian chạy, đồng hồ nhảy dần, xong mới tính kết quả.
+func _perform(id: String) -> void:
+	var a: Dictionary = game.get_action(id)
+	var st: Dictionary = game.action_status(a)
+	if not st.ok or _working:
+		return
+	var start: float = st.start
+	var finish: float = start + float(a.hours)
+	_working = true
+	world.set_player_inside(true)
+	_work_title.text = "Đang " + str(a.name).to_lower() if a.group == "work" else str(a.name)
+	_work.visible = true
+	_refresh()
+	var seconds := maxf(0.8, float(a.hours) * float(game.cfg.get("workSecondsPerHour", 0.35)))
+	var tw := create_tween()
+	tw.tween_method(func(t: float) -> void:
+		var now := lerpf(start, finish, t)
+		_work_bar.value = t
+		_work_clock.text = GameLogic.hh(now)
+		_clock_label.text = "%s  ·  đang bận" % GameLogic.hh(now), 0.0, 1.0, seconds)
+	tw.tween_callback(func() -> void:
+		_working = false
+		_work.visible = false
+		world.set_player_inside(false)
+		game.do_action(id))
+>>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
 
 
 func _build_location(parent: Control) -> void:
@@ -357,6 +387,7 @@ func _refresh() -> void:
 	var s: Dictionary = game.s
 	_refresh_objectives(s)
 	_day_label.text = "Ngày %d/30 · %s" % [game.day(), game.weekday_name()]
+<<<<<<< HEAD
 	if not _working:
 		_clock_label.text = "%s  ·  còn %s giờ trong ngày" % [GameLogic.hh(minf(game.clock(), 22.0)), GameLogic.num(game.hours_left())]
 	_cash_label.text = GameLogic.fmt_money(int(s.cash))
@@ -366,6 +397,19 @@ func _refresh() -> void:
 	_fatigue_label.text = "Mệt %d/100%s" % [int(s.fatigue), "  · cần nghỉ" if game.fatigue_warn() else ""]
 	UI.set_bar(_fatigue_bar, float(s.fatigue), 100.0, UI.STAMP if float(s.fatigue) >= warn else (UI.WARN if float(s.fatigue) >= warn - 20 else UI.GOOD))
 	_home_btn.disabled = game.is_over() or not s.queue.is_empty()
+=======
+	_clock_label.text = "%s  ·  còn %s giờ trong ngày" % [GameLogic.hh(minf(game.clock(), 22.0)), GameLogic.num(game.hours_left())]
+	_money_label.text = GameLogic.fmt_money(int(s.money))
+	_health_label.text = "Sức khỏe %d/%d" % [int(s.health), int(s.health_max)]
+	UI.set_bar(_health_bar, float(s.health), float(s.health_max), UI.level_color(float(s.health) / float(s.health_max)))
+	_mood_label.text = "Tinh thần %d/%d" % [int(s.mood), int(s.mood_max)]
+	UI.set_bar(_mood_bar, float(s.mood), float(s.mood_max), UI.level_color(float(s.mood) / float(s.mood_max)))
+	_food_select.select(_food_keys.find(s.food))
+	_food_select.disabled = float(s.used) > 0.0 or not s.queue.is_empty()
+	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
+	_refresh_skills(s)
+	_log_text.text = UI.log_bbcode(game)
+>>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
 	_refresh_location()
 	_update_prompt()
 
@@ -424,6 +468,10 @@ func _refresh_objectives(s: Dictionary) -> void:
 
 
 func _refresh_location() -> void:
+<<<<<<< HEAD
+=======
+	# Đang làm thì Minh ở trong tiệm, giấu bảng cho tới khi xong việc.
+>>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
 	_location.visible = _loc_id != "" and not game.is_over() and not _working
 	if not _location.visible:
 		return
@@ -437,8 +485,22 @@ func _refresh_location() -> void:
 		var hint := "Kết thúc ngày %d · Mệt −%d qua đêm" % [game.day(), int(n.recover)]
 		_loc_cards.add_child(UI.choice("Đi ngủ", hint, "" if game.s.queue.is_empty() else "Còn việc phải chọn", _go_to_sleep))
 	var found := 0
+<<<<<<< HEAD
 	for a in game.actions_at(_loc_id):
 		_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
 		found += 1
 	if found == 0 and _loc_id != world.home:
 		_loc_cards.add_child(UI.wrap("Hôm nay ở đây chưa có việc gì cho An.", 13, UI.INK_SOFT, 320))
+=======
+	for g in GameLogic.GROUPS:
+		for a in game.visible_actions(g):
+			if a.get("location", "") == _loc_id:
+				_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
+				found += 1
+	if _loc_id == "phong_tro":
+		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d" % game.day(), "", func() -> void:
+			close_location()
+			dialogs.open_night()))
+	elif found == 0:
+		_loc_cards.add_child(UI.wrap("Hôm nay ở đây chưa có việc gì cho Minh.", 13, UI.INK_SOFT, 320))
+>>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5

@@ -87,6 +87,7 @@ func _night() -> void:
 		"Sinh hoạt cả nhà: −%s" % GameLogic.fmt_money(n.living),
 		"Ngủ và %s giờ còn trống: Mệt −%d" % [GameLogic.num(n.free_hours), int(n.recover)],
 	]
+<<<<<<< HEAD
 	if int(n.due_pay) > 0:
 		lines.append("Đến hạn trả tối nay: %s" % GameLogic.fmt_money(n.due_pay))
 	for label in n.due_recv:
@@ -98,6 +99,16 @@ func _night() -> void:
 	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Đi ngủ?", "", "\n".join(lines), "")
 	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1) if not n.slice_end else "Xem tổng kết", "", _end_day))
 	_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
+=======
+	if n.milestone_tonight:
+		lines.append("Tối nay xét mốc tiền %s. Tiền ăn được trừ trước, tiền bốc vác được cộng trước khi xét." % GameLogic.fmt_money(game.next_milestone().amount))
+	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Tối nay làm gì?", "", "\n".join(lines), "")
+	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1), "", _end_day.bind(false)))
+	_box.add_child(UI.choice(shift.name, "+%s · Sức khỏe %d · Tinh thần %d" % [GameLogic.fmt_money(int(shift.pay)), int(shift.health), int(shift.mood)], "", _end_day.bind(true)))
+	# Hết giờ thì không quay lại được nữa, chỉ còn ngủ hoặc làm ca đêm.
+	if not game.is_out_of_time():
+		_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
+>>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
 
 
 func _report() -> void:

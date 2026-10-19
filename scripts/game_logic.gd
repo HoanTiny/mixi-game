@@ -491,10 +491,19 @@ func is_out_of_time() -> bool:
 func sleep_outside() -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
+<<<<<<< HEAD
 	add_fatigue(float(cfg.fatigue.sleepOutside))
 	add_log("Không kịp về xóm trọ, ngủ gục ngoài đường.", "warn")
 	finish_day()
+=======
+	add_log("Không kịp về phòng trọ, ngủ gục ngoài đường.", "warn")
+	finish_day(false)
+	# Trừ sau khi ngủ, nếu không phần hồi sức khi ngủ sẽ xóa mất hình phạt.
+>>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
 	if not is_over():
+		var pen: Dictionary = cfg.get("sleepOutside", {})
+		adj("health", float(pen.get("health", 0)))
+		adj("mood", float(pen.get("mood", 0)))
 		s.queue.push_front({"id": "ngu_gat", "data": {}})
 		_commit()
 
