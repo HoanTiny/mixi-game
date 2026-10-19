@@ -23,7 +23,7 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Nhu cầu cơ thể và Phong độ (kiểu Nobody):** No bụng, Vệ sinh, Quần áo tự giảm theo giờ; việc bẩn (phụ hồ, rửa bát, lục rác) làm bẩn người và đồ. Cùng Tinh thần, chúng gộp thành **Phong độ**: từ 55 trở lên đủ lương, 30–55 chỉ được 70%, dưới 30 chỉ 50% và đi chậm. Nhịn đói tới 0 thì mất Sức khỏe. Ăn ở quán cơm tấm, cửa hàng 24 giờ, xe bánh mì; tắm và giặt đồ ở phòng trọ. Số liệu trong `needs` của `data/config.json`.
 
-**Trò chơi nhỏ khi đi làm (kiểu Nobody):** phụ hồ là tự bưng đúng loại gạch (đỏ, block, ống) bỏ vào thùng cẩu trong 60 giây. Đủ 8 thùng thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%); thùng càng nhiều gạch thưởng càng cao; bỏ nhầm loại là đổ bỏ. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, giao diện ở `scripts/ui/minigame_bricks.gd`.
+**Trò chơi nhỏ khi đi làm (kiểu Nobody):** phụ hồ là tự bưng đúng loại gạch (đỏ, block, ống) bỏ vào thùng cẩu trong 60 giây. Đủ 8 thùng thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%); thùng càng nhiều gạch thưởng càng cao; bỏ nhầm loại là đổ bỏ. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Rửa bát là bấm từng vết bẩn trên bát để kỳ cọ (vết to chà hai lần), sạch thì xếp lên giá (phím cách); xếp bát còn bẩn bị trả lại; 45 giây, chỉ tiêu 12 cái, rửa vượt và không lỗi được thưởng. Thông số trong `minigames` của `data/config.json`, giao diện ở `scripts/ui/minigame_bricks.gd` và `minigame_dishes.gd`.
 
 **Ve chai:** thùng rác xanh dọc vỉa hè, đứng gần bấm **E** để lục (mỗi thùng một lần mỗi ngày): được chai nhựa, lon, bìa giấy nhưng bẩn người. Mang ra **Vựa ve chai cô Tám** cuối phố để bán.
 

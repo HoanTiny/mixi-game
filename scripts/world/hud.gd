@@ -7,7 +7,11 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
-const MinigameBricks := preload("res://scripts/ui/minigame_bricks.gd")
+## Trò chơi nhỏ theo trường minigame của việc trong config.json.
+const MINIGAMES := {
+	"bricks": preload("res://scripts/ui/minigame_bricks.gd"),
+	"dishes": preload("res://scripts/ui/minigame_dishes.gd"),
+}
 
 var world
 var game
@@ -346,7 +350,7 @@ func _build_skills(parent: Control) -> void:
 
 ## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
 func _open_minigame(id: String, a: Dictionary) -> void:
-	minigame = MinigameBricks.new()
+	minigame = MINIGAMES[a.minigame].new()
 	minigame.cfg = game.cfg.minigames[a.minigame]
 	minigame.last = game.s.get("job_last", {}).get(id, {})
 	minigame.title = str(a.name)
