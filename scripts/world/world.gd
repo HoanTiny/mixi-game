@@ -93,6 +93,7 @@ func _ready() -> void:
 	_build_props()
 	_build_bins()
 	_build_grime()
+	_build_clutter()
 	_build_traffic()
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
@@ -239,7 +240,8 @@ func _build_location(id: String, loc: Dictionary) -> void:
 				_scaffold(x, size, holder)
 		if id == "tra_da":
 			for sx in [-1.2, 0.0, 1.2]:
-				_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0, -3.4), Color("2f6fb0"), holder)
+				if not _prop("stool", Vector3(x + sx, 0.16, -3.4), randf() * TAU, holder):
+					_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0, -3.4), Color("2f6fb0"), holder)
 		var body := StaticBody3D.new()
 		body.set_meta("loc", id)
 		var cs := CollisionShape3D.new()
@@ -394,6 +396,8 @@ func _build_props() -> void:
 			continue
 		var px: float = e if e - last <= 16.0 else last + 14.0
 		_block(Vector3(0.28, 7.5, 0.28), Vector3(px, 0, -3.3), Color("6b6a66"))
+		if poles.size() % 2 == 0:
+			_prop("utility_box", Vector3(px, 1.1, -3.05))
 		_block(Vector3(1.6, 0.12, 0.12), Vector3(px, 6.9, -3.3), Color("55544f"))
 		poles.append(px)
 		last = px
@@ -421,14 +425,18 @@ func _build_props() -> void:
 			continue
 		# Cây ở vỉa hè phía nam nằm giữa camera và phố: để thấp và nhỏ cho khỏi che đường.
 		_block(Vector3(0.3, 2.4, 0.3), Vector3(tx, 0, 6.6), Color("5a4634"))
-		var crown := MeshInstance3D.new()
-		var sm := SphereMesh.new()
-		sm.radius = 1.1
-		sm.height = 1.8
-		crown.mesh = sm
-		crown.material_override = _mat(Color("4f6b45"))
-		crown.position = Vector3(tx, 3.0, 6.6)
-		add_child(crown)
+		# Tán lá gồm nhiều chùm xanh đậm nhạt khác nhau cho đỡ giống quả bóng.
+		for k in 7:
+			var crown := MeshInstance3D.new()
+			var sm := SphereMesh.new()
+			sm.radius = tree_rng.randf_range(0.45, 0.75)
+			sm.height = sm.radius * 1.6
+			sm.radial_segments = 10
+			sm.rings = 6
+			crown.mesh = sm
+			crown.material_override = _mat(Color("3d5531").lerp(Color("5f7a3f"), tree_rng.randf()))
+			crown.position = Vector3(tx + tree_rng.randf_range(-0.8, 0.8), 2.7 + tree_rng.randf_range(0.0, 0.9), 6.6 + tree_rng.randf_range(-0.7, 0.7))
+			add_child(crown)
 		tx += 11.0
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
@@ -441,7 +449,8 @@ func _build_props() -> void:
 	# Đèn đường, bật khi trời tối.
 	var lx := -86.0
 	while lx < 76.0:
-		_block(Vector3(0.14, 5.2, 0.14), Vector3(lx, 0, 4.7), Color("4b4d52"))
+		if not _prop("lamp", Vector3(lx, 0.16, 4.7), PI):
+			_block(Vector3(0.14, 5.2, 0.14), Vector3(lx, 0, 4.7), Color("4b4d52"))
 		var lamp := OmniLight3D.new()
 		lamp.position = Vector3(lx, 5.0, 3.8)
 		lamp.omni_range = 9.0
@@ -604,6 +613,55 @@ func _scavenge(id: String) -> void:
 	audio.play("step", 0.6)
 
 
+var _prop_rng := RandomNumberGenerator.new()
+
+
+## Đặt một món đồ trên phố theo models.json (props.<key>). false nếu chưa có file mô hình.
+func _prop(key: String, pos: Vector3, rot_y := 0.0, parent: Node = null) -> bool:
+	var m := models.spawn("props." + key, _prop_rng)
+	if m == null:
+		return false
+	m.position = pos
+	m.rotation.y = rot_y
+	(parent if parent != null else self).add_child(m)
+	return true
+
+
+## Đồ đạc bày trước nhà: thùng nhựa chồng lên nhau, thùng các-tông, chậu cây, giỏ mây; bao xi măng ở công trình.
+func _build_clutter() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 404
+	_prop_rng.seed = 405
+	var xs := []
+	for h in homes:
+		xs.append(float(h.x))
+	for id in LOCATIONS:
+		if LOCATIONS[id].has("tube"):
+			xs.append(float(LOCATIONS[id].x) - 2.5)
+			xs.append(float(LOCATIONS[id].x) + 2.5)
+	for x in xs:
+		for k in rng.randi_range(1, 3):
+			var key: String = ["crate", "crate", "box", "plant", "basket", "plant"][rng.randi() % 6]
+			var pos := Vector3(x + rng.randf_range(-1.8, 1.8), 0.16, rng.randf_range(-4.75, -4.35))
+			if door_of_near(pos):
+				continue
+			_prop(key, pos, rng.randf_range(-0.4, 0.4) + (PI if rng.randf() < 0.5 else 0.0))
+			if key == "crate" and rng.randf() < 0.5:
+				_prop("crate", pos + Vector3(0, 0.3, 0), rng.randf_range(-0.2, 0.2))
+	var cx: float = LOCATIONS.cong_trinh.x
+	for layer in 3:
+		for j in 4 - layer:
+			_prop("cement_bag", Vector3(cx - 4.0 + j * 0.8 + layer * 0.4, 0.16 + layer * 0.22, -4.4), rng.randf_range(-0.1, 0.1))
+
+
+## Không bày đồ chắn ngay trước cửa tiệm (vòng sáng tương tác).
+func door_of_near(pos: Vector3) -> bool:
+	for id in LOCATIONS:
+		if absf(door_of(id).x - pos.x) < 1.3:
+			return true
+	return false
+
+
 ## Vết bẩn, nước đọng, giấy rác vương vãi và nắp cống: phố Sài Gòn không bao giờ sạch bong.
 func _build_grime() -> void:
 	var rng := RandomNumberGenerator.new()
@@ -669,8 +727,12 @@ func _build_bins() -> void:
 		var holder := Node3D.new()
 		holder.position = pos
 		add_child(holder)
-		_block(Vector3(0.6, 0.85, 0.55), Vector3.ZERO, Color("2e7d32"), holder)
-		_block(Vector3(0.66, 0.08, 0.6), Vector3(0, 0.85, 0), Color("1b4d20"), holder)
+		if _prop("trash_can", Vector3(0, 0.16, 0), randf() * TAU, holder):
+			if i % 3 != 1:
+				_prop("trashbag", Vector3(0.75, 0.16, 0.15), randf() * TAU, holder)
+		else:
+			_block(Vector3(0.6, 0.85, 0.55), Vector3.ZERO, Color("2e7d32"), holder)
+			_block(Vector3(0.66, 0.08, 0.6), Vector3(0, 0.85, 0), Color("1b4d20"), holder)
 		bins.append({"id": "t%d" % i, "pos": pos})
 		x += 10.5 + float(i % 3)
 		i += 1

@@ -1,0 +1,12 @@
+Mô hình từ Poly Haven (polyhaven.com), giấy phép CC0.
+metal_trash_can: https://polyhaven.com/a/metal_trash_can
+trashbag: https://polyhaven.com/a/trashbag
+plastic_crate_01: https://polyhaven.com/a/plastic_crate_01
+cardboard_box_01: https://polyhaven.com/a/cardboard_box_01
+potted_plant_01: https://polyhaven.com/a/potted_plant_01
+potted_plant_02: https://polyhaven.com/a/potted_plant_02
+painted_wooden_stool: https://polyhaven.com/a/painted_wooden_stool
+utility_box_01: https://polyhaven.com/a/utility_box_01
+cement_bag: https://polyhaven.com/a/cement_bag
+wicker_basket_01: https://polyhaven.com/a/wicker_basket_01
+street_lamp_01: https://polyhaven.com/a/street_lamp_01

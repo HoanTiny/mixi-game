@@ -17,7 +17,11 @@ var font: Font
 var _mats := {}
 ## Mỗi căn gộp mọi khối thành một lưới tô màu theo đỉnh, cả căn chỉ tốn một lần vẽ.
 var _st: SurfaceTool
+## Mặt thứ hai của lưới: mái hiên, mái tôn dán texture tôn gợn sóng.
+var _st_ton: SurfaceTool
+var _ton_used := false
 var _vc_mat: StandardMaterial3D
+var _ton_mat: StandardMaterial3D
 
 
 func _init(front: float, label_font: Font) -> void:
@@ -40,26 +44,38 @@ func _mat(c: Color) -> StandardMaterial3D:
 func _begin() -> void:
 	_st = SurfaceTool.new()
 	_st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_st_ton = SurfaceTool.new()
+	_st_ton.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_ton_used = false
 
 
 func _end(parent: Node3D) -> void:
 	if _vc_mat == null:
 		# Tường vữa sơn tả thực (texture Poly Haven) nhân với màu sơn từng căn.
 		_vc_mat = load("res://scripts/world/surfaces.gd").get_mat("tuong", 2.5, Color.WHITE, true)
+	if _ton_mat == null:
+		_ton_mat = load("res://scripts/world/surfaces.gd").get_mat("ton", 1.2, Color.WHITE, true)
+	var mesh := _st.commit()
+	mesh.surface_set_material(0, _vc_mat)
+	if _ton_used:
+		_st_ton.commit(mesh)
+		mesh.surface_set_material(1, _ton_mat)
 	var mi := MeshInstance3D.new()
-	mi.mesh = _st.commit()
-	mi.material_override = _vc_mat
+	mi.mesh = mesh
 	parent.add_child(mi)
 	_st = null
+	_st_ton = null
 
 
 ## Thêm một khối hộp vào lưới của căn đang dựng, đáy tại pos (pos.y là cao độ đáy).
 ## tilt: nghiêng quanh trục x (mái hiên, mái tôn), xoay quanh tâm khối.
-func _box(_parent: Node3D, size: Vector3, pos: Vector3, c: Color, tilt := 0.0) -> void:
+func _box(_parent: Node3D, size: Vector3, pos: Vector3, c: Color, tilt := 0.0, ton := false) -> void:
+	var st := _st_ton if ton else _st
+	_ton_used = _ton_used or ton
 	var center := pos + Vector3(0, size.y / 2.0, 0)
 	var b := Basis(Vector3.RIGHT, tilt)
 	var hs := size / 2.0
-	_st.set_color(c)
+	st.set_color(c)
 	for axis in 3:
 		for s in [-1.0, 1.0]:
 			var n := Vector3.ZERO
@@ -71,9 +87,9 @@ func _box(_parent: Node3D, size: Vector3, pos: Vector3, c: Color, tilt := 0.0) -
 			var corners := []
 			for q in [[-1, -1], [1, -1], [1, 1], [-1, 1]]:
 				corners.append(center + b * ((n + u * q[0] + v * q[1]) * hs))
-			_st.set_normal(b * n)
+			st.set_normal(b * n)
 			for i in [0, 2, 1, 0, 3, 2]:
-				_st.add_vertex(corners[i])
+				st.add_vertex(corners[i])
 
 
 ## Màu sơn phố thật đã bạc vì nắng mưa: pha về màu bụi đất cho bớt rực.
@@ -106,7 +122,7 @@ func house(parent: Node3D, x: float, w: float, d: float, floors: int, wall: Colo
 			_box(parent, Vector3(0.05, 2.4, 0.06), Vector3(x + bx, 0, f + 0.06), Color("6b7178"))
 			bx += 0.32
 	# Mái hiên tôn nghiêng ra đường.
-	_box(parent, Vector3(w - 0.1, 0.05, 1.5), Vector3(x, 2.62, f + 0.75), pick(rng, AWNINGS), 0.18)
+	_box(parent, Vector3(w - 0.1, 0.05, 1.5), Vector3(x, 2.62, f + 0.75), pick(rng, AWNINGS), 0.18, true)
 	if sign != "":
 		var board := pick(rng, BOARDS)
 		# Biển treo ở mép ban công tầng hai, trên mái hiên, để nhìn từ trên xuống vẫn thấy.
@@ -170,7 +186,7 @@ func house(parent: Node3D, x: float, w: float, d: float, floors: int, wall: Colo
 	tank.position = Vector3(x + rng.randf_range(-w / 4.0, w / 4.0), h + 0.6, f - d * 0.6)
 	parent.add_child(tank)
 	if rng.randf() < 0.5:
-		_box(parent, Vector3(w - 0.1, 0.06, d * 0.55), Vector3(x, h + 2.0, f - d * 0.65), Color("8e9aa3") if rng.randf() < 0.6 else Color("b5651d"), -0.15)
+		_box(parent, Vector3(w - 0.1, 0.06, d * 0.55), Vector3(x, h + 2.0, f - d * 0.65), Color("8e9aa3") if rng.randf() < 0.6 else Color("b5651d"), -0.15, true)
 		for px in [-w / 2.0 + 0.2, w / 2.0 - 0.2]:
 			_box(parent, Vector3(0.08, 2.0, 0.08), Vector3(x + px, h, f - d * 0.4), Color("5d6166"))
 	_end(parent)
