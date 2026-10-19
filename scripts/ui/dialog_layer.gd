@@ -99,7 +99,9 @@ func _night() -> void:
 	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Tối nay làm gì?", "", "\n".join(lines), "")
 	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1), "", _end_day.bind(false)))
 	_box.add_child(UI.choice(shift.name, "+%s · Sức khỏe %d · Tinh thần %d" % [GameLogic.fmt_money(int(shift.pay)), int(shift.health), int(shift.mood)], "", _end_day.bind(true)))
-	_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
+	# Hết giờ thì không quay lại được nữa, chỉ còn ngủ hoặc làm ca đêm.
+	if not game.is_out_of_time():
+		_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
 
 
 func _ending() -> void:

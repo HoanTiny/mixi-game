@@ -1,0 +1,142 @@
+{
+  "_ghi_chu": "Hội thoại khi bấm Nói chuyện với nhân vật. story: các đoạn mạch chuyện, mở lần lượt khi thỏa 'when' (cùng cú pháp điều kiện với events.json), mỗi đoạn chỉ kể một lần. chat: chuyện phiếm khi chưa có đoạn mạch nào mở, mỗi lần cộng chatRep thân thiết.",
+  "coSau": {
+    "story": [
+      { "id": "cs_noi_quy", "when": { "from_day": 1 },
+        "title": "Nội quy dãy trọ",
+        "text": "\"Cổng khóa lúc 11 giờ. Điện 3.500 một số, nước tính theo đầu người. Đi đâu khuya thì nhắn cô một tiếng.\"",
+        "choices": [
+          { "label": "\"Dạ, con nhớ rồi cô.\"", "hint": "Cô Sáu +3", "effects": { "rep.coSau": 3 } },
+          { "label": "Hỏi chỗ mua đồ ăn rẻ", "hint": "Cô Sáu +2, Tinh thần +2",
+            "effects": { "rep.coSau": 2, "mood": 2, "log": "Cô Sáu: \"Cơm tấm đầu hẻm, nói người quen của cô là được thêm chén canh.\"" } }
+        ] },
+      { "id": "cs_mot_minh", "when": { "room": "rieng", "rep.coSau": 25, "from_day": 4 },
+        "title": "Cô Sáu ngồi ở bậc thềm",
+        "text": "\"Chồng cô đi làm Bình Dương, ba tháng mới về một lần. Một mình cô vừa coi dãy trọ vừa lo cho thằng Bin.\" Cô thở dài, nhìn vô trong nhà.",
+        "choices": [
+          { "label": "Ngồi nghe cô kể", "hint": "Cô Sáu +5, Tinh thần +3", "effects": { "rep.coSau": 5, "mood": 3 } },
+          { "label": "\"Bin có bài khó thì cô cứ kêu con.\"", "hint": "Cô Sáu +8", "effects": { "rep.coSau": 8 } }
+        ] },
+      { "id": "cs_bua_com", "when": { "rep.coSau": 45, "from_day": 12 },
+        "title": "Mâm cơm chiều",
+        "text": "\"Bữa nay cô nấu canh chua cá lóc, dư nhiều lắm. Vô ăn chung với cô và thằng Bin đi, khách sáo gì.\"",
+        "choices": [
+          { "label": "Vô ăn cơm", "hint": "Sức khỏe +10, Tinh thần +8", "effects": { "health": 10, "mood": 8, "rep.coSau": 3 } }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Hôm nay trời oi quá ha. Ra đường nhớ mang theo chai nước.\"" },
+      { "text": "\"Thằng Bin nó cứ hỏi anh Minh hoài đó.\"", "when": { "room": "rieng" } },
+      { "text": "\"Phòng ghép bên kia nghe nói lại mất đồ. Con giữ đồ cho kỹ nghen.\"", "when": { "room": "ghep" } },
+      { "text": "\"Con ăn uống gì chưa? Nhìn ốm nhom vậy.\"" }
+    ]
+  },
+  "chuBay": {
+    "story": [
+      { "id": "cb_nghe", "when": { "from_day": 3 },
+        "title": "Tiệm điện lạnh đầu hẻm",
+        "text": "Chú Bảy lau tay vào cái giẻ. \"Chú làm nghề này ba chục năm rồi. Máy móc nó không biết nói dối đâu con, hư chỗ nào là hư chỗ đó.\"",
+        "choices": [
+          { "label": "Hỏi chú về nghề", "hint": "Chú Bảy +4", "effects": { "rep.chuBay": 4 } },
+          { "label": "Chào chú rồi đi", "effects": { "rep.chuBay": 1 } }
+        ] },
+      { "id": "cb_thieu_nguoi", "when": { "rep.chuBay": 20, "from_day": 6 },
+        "title": "Tiệm thiếu người",
+        "text": "\"Mùa nóng máy lạnh hư quá trời, một mình chú làm không xuể. Qua ngày 11 rảnh thì ghé đây, chú chỉ cho vài đường.\"",
+        "choices": [
+          { "label": "\"Dạ, con nhất định ghé.\"", "hint": "Chú Bảy +5, Tinh thần +3", "effects": { "rep.chuBay": 5, "mood": 3 } }
+        ] },
+      { "id": "cb_con_trai", "when": { "rep.chuBay": 40, "from_day": 14 },
+        "title": "Tấm hình trên vách",
+        "text": "Trên vách có tấm hình một thanh niên mặc áo thợ. \"Thằng con chú đó. Nó chê nghề cực, lên Quận 1 đi buôn, mấy năm nay không về.\"",
+        "choices": [
+          { "label": "\"Con sẽ theo nghề tới cùng.\"", "hint": "Chú Bảy +8, Tay nghề tăng", "effects": { "rep.chuBay": 8, "xp.tayNghe": 1 } },
+          { "label": "Im lặng ngồi phụ chú", "hint": "Chú Bảy +5", "effects": { "rep.chuBay": 5 } }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Cái máy này thay cái tụ là chạy ngon. Nhìn đây nè.\"" },
+      { "text": "\"Học nghề thì phải chịu dơ tay. Sạch sẽ quá thì đi làm văn phòng.\"" },
+      { "text": "\"Uống miếng trà đi con, nóng quá.\"" }
+    ]
+  },
+  "vy": {
+    "story": [
+      { "id": "vy_chao", "when": { "from_day": 2 },
+        "title": "Cô phục vụ quán Góc Phố",
+        "text": "\"Bạn mới tới khu này hả? Mình là Vy, học năm ba Luật, làm thêm ở đây buổi chiều.\" Trên bàn thu ngân để cuốn Bộ luật Dân sự dày cộm.",
+        "choices": [
+          { "label": "Giới thiệu mình", "hint": "Vy +4", "effects": { "rep.vy": 4 } },
+          { "label": "Hỏi cuốn sách dày vậy đọc hết hả", "hint": "Vy +3, Tinh thần +2", "effects": { "rep.vy": 3, "mood": 2 } }
+        ] },
+      { "id": "vy_bai_tap", "when": { "rep.vy": 15, "from_day": 8 },
+        "title": "Bài tập luật dân sự",
+        "text": "Vy gõ bút xuống tập. \"Đề bài: một người cho vay lãi 10% một tháng. Hỏi hợp đồng có hợp pháp không. Bạn đoán thử?\"",
+        "choices": [
+          { "label": "\"Người ta chịu vay thì chắc hợp pháp chớ.\"", "hint": "Vy +3",
+            "effects": { "rep.vy": 3, "log": "Vy cười: \"Sai rồi. Lãi vay có mức trần đó, mai mốt mình chỉ cho.\"" } },
+          { "label": "Kể nhà mình cũng đang vay lãi", "hint": "Vy +6", "require": { "skill.giaoTiep": 1 },
+            "effects": { "rep.vy": 6, "log": "Vy nhíu mày: \"Nghe không ổn rồi. Hôm nào rảnh kể kỹ mình nghe.\"" } }
+        ] },
+      { "id": "vy_ap_luc", "when": { "rep.vy": 28, "from_day": 12 },
+        "title": "Vy về muộn",
+        "text": "Quán vắng. Vy ngồi đếm tiền tip. \"Học phí kỳ này tăng. Mẹ mình bán hàng ở chợ, mình không muốn xin thêm.\"",
+        "choices": [
+          { "label": "Kể chuyện Lan và học phí", "hint": "Vy +8", "effects": { "rep.vy": 8, "mood": 3 } },
+          { "label": "Ngồi nghe Vy nói", "hint": "Vy +5", "effects": { "rep.vy": 5 } }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Bữa nay quán đông quá trời. Bạn uống gì không, mình pha cho.\"" },
+      { "text": "\"Thi giữa kỳ xong rồi, nhẹ cả người.\"" },
+      { "text": "\"Đi đâu nhớ mang giấy tờ theo nghen. Công an phường hay kiểm tra tạm trú lắm.\"" }
+    ]
+  },
+  "tuan": {
+    "story": [
+      { "id": "tu_xe_moi", "when": { "from_day": 1 },
+        "title": "Chiếc tay ga mới",
+        "text": "Tuấn vỗ yên chiếc xe tay ga bóng loáng. \"Lên đây cực mấy tháng đầu thôi. Biết đường làm ăn là có hết mày ơi.\"",
+        "choices": [
+          { "label": "Khen xe đẹp", "hint": "Tuấn +3", "effects": { "rep.tuan": 3 } },
+          { "label": "Hỏi phụ hồ sao mua nổi xe này", "hint": "Tuấn −2",
+            "effects": { "rep.tuan": -2, "log": "Tuấn cười trừ, đánh trống lảng sang chuyện khác." } }
+        ] },
+      { "id": "tu_say", "when": { "rep.tuan": 42, "from_day": 9 },
+        "title": "Tuấn ngồi một mình",
+        "text": "Tuấn ngồi bệt trước công trình, mùi bia nồng nặc. \"Tao muốn về quê mở tiệm sửa xe. Mà tao nợ người ta, đâu có dễ rút ra…\"",
+        "choices": [
+          { "label": "\"Mày tính đường khác đi Tuấn.\"", "hint": "Tuấn +6", "effects": { "rep.tuan": 6 } },
+          { "label": "Đưa Tuấn về rồi thôi", "hint": "Tuấn +3", "effects": { "rep.tuan": 3 } }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Ê Minh! Bữa nào làm vài ly không?\"" },
+      { "text": "\"Phụ hồ cực mà lương bèo. Tao kiếm mối khác ngon hơn rồi.\"" },
+      { "text": "\"Thành phố này không có chỗ cho người hiền đâu mày.\"" }
+    ]
+  },
+  "ongTu": {
+    "story": [
+      { "id": "ot_tra", "when": { "from_day": 2 },
+        "title": "Ly trà đá đầu hẻm",
+        "text": "Ông Tư rót cho Minh ly trà. \"Hồi ông mới lên, khúc này còn là ruộng rau muống. Giờ nhà cao như vầy đó.\"",
+        "choices": [
+          { "label": "Ngồi nghe ông kể chuyện phố xưa", "hint": "Ông Tư +4, Tinh thần +3", "effects": { "rep.ongTu": 4, "mood": 3 } }
+        ] },
+      { "id": "ot_kien", "when": { "flag.returnedWallet": true, "from_day": 14 },
+        "title": "Chuyện cũ của ông Tư",
+        "text": "\"Hồi trước thằng con ông cũng bị vay nặng lãi, tụi nó tới tận nhà. Ông đi kiện, thắng. Con nhớ nghen: giấy vay giữ cho kỹ, tụi nó gọi điện thì ghi âm lại.\"",
+        "choices": [
+          { "label": "Gọi má gửi bản gốc giấy vay lên", "hint": "Bằng chứng +1, Ông Tư +5",
+            "effects": { "rep.ongTu": 5, "evidence": 1, "log": "Ông Tư dặn: giữ giấy vay, ghi âm cuộc gọi đòi nợ. Má gửi bản gốc giấy vay lên theo xe khách." } },
+          { "label": "Ghi nhớ lời ông", "hint": "Ông Tư +5", "effects": { "rep.ongTu": 5 } }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Ngồi xuống uống ly trà đã con, đi đâu mà vội.\"" },
+      { "text": "\"Sống ở đâu cũng vậy, cái tử tế là vốn liếng lớn nhất.\"" },
+      { "text": "\"Bữa nay trời mát, ông ngồi đây từ sáng tới giờ.\"" }
+    ]
+  }
+}

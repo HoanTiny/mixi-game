@@ -8,6 +8,9 @@ const NOTES_PATH := "user://notes.json"
 var game: GameLogic
 ## Chạy với "-- --demo" để vào thẳng ngày 1 (bỏ qua mở đầu) mà không ghi đè bản lưu thật.
 var _persist := true
+## Việc đang làm ở màn khác (ví dụ khach_uc ở màn Quận 1) và chỗ Minh hiện ra khi về lại phố.
+var tour := ""
+var spawn_at := ""
 
 
 func _ready() -> void:

@@ -206,6 +206,12 @@
     "choices": [ { "label": "Tiếp tục" } ]
   },
   {
+    "id": "ngu_gat", "system": true,
+    "title": "Ngủ gục ngoài đường",
+    "text": "22 giờ, Minh không kịp về phòng trọ. Cả đêm co ro trên ghế đá, muỗi đốt, sáng ra người ê ẩm.",
+    "choices": [ { "label": "Tiếp tục", "hint": "Đã trừ Sức khỏe {sleep_out_health}, Tinh thần {sleep_out_mood}" } ]
+  },
+  {
     "id": "skip_ngat", "system": true,
     "title": "Minh ngất vì kiệt sức",
     "text": "Hàng xóm đưa Minh về phòng. Cả ngày hôm nay mất trắng.",

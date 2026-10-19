@@ -1,0 +1,346 @@
+{
+  "_ghi_chu": "Mô hình thật cho màn phố. Đặt file vào thư mục assets/ đúng đường dẫn dưới đây (hoặc sửa path). Thiếu file nào thì chỗ đó vẫn là khối hình tạm. Tên file đang theo bộ Kenney Mini Characters và City Kit (CC0). rot: xoay cho mặt trước nhìn ra đường (độ). fit: height | length | width | none. size: [dài, cao, sâu] mét. anims: tên hoạt cảnh trong file cho từng vai idle, walk, sit. props: đồ vật trên phố (Poly Haven, CC0) đặt bằng code trong world.gd.",
+  "player": {
+    "path": "res://assets/characters/character-male-a.glb",
+    "rot": 0,
+    "fit": "height",
+    "size": [
+      0,
+      1.75,
+      0
+    ],
+    "anims": {
+      "idle": "idle",
+      "walk": "walk",
+      "sit": "sit"
+    }
+  },
+  "npc": {
+    "coSau": {
+      "path": "res://assets/characters/character-female-b.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.6,
+        0
+      ],
+      "anims": {
+        "idle": "idle"
+      }
+    },
+    "chuBay": {
+      "path": "res://assets/characters/character-male-d.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.7,
+        0
+      ],
+      "anims": {
+        "idle": "idle"
+      }
+    },
+    "vy": {
+      "path": "res://assets/characters/character-female-a.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.6,
+        0
+      ],
+      "anims": {
+        "idle": "idle"
+      }
+    },
+    "tuan": {
+      "path": "res://assets/characters/character-male-b.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.75,
+        0
+      ],
+      "anims": {
+        "idle": "idle"
+      }
+    },
+    "ongTu": {
+      "path": "res://assets/characters/character-male-f.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.65,
+        0
+      ],
+      "anims": {
+        "idle": "idle"
+      }
+    }
+  },
+  "people": [
+    {
+      "path": "res://assets/characters/character-male-c.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.7,
+        0
+      ],
+      "anims": {
+        "idle": "idle",
+        "walk": "walk",
+        "sit": "sit"
+      }
+    },
+    {
+      "path": "res://assets/characters/character-male-e.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.7,
+        0
+      ],
+      "anims": {
+        "idle": "idle",
+        "walk": "walk",
+        "sit": "sit"
+      }
+    },
+    {
+      "path": "res://assets/characters/character-female-c.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.6,
+        0
+      ],
+      "anims": {
+        "idle": "idle",
+        "walk": "walk",
+        "sit": "sit"
+      }
+    },
+    {
+      "path": "res://assets/characters/character-female-d.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.6,
+        0
+      ],
+      "anims": {
+        "idle": "idle",
+        "walk": "walk",
+        "sit": "sit"
+      }
+    },
+    {
+      "path": "res://assets/characters/character-female-e.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        1.6,
+        0
+      ],
+      "anims": {
+        "idle": "idle",
+        "walk": "walk",
+        "sit": "sit"
+      }
+    }
+  ],
+  "bike": [
+    {
+      "path": "res://assets/vehicles/scooter.glb",
+      "rot": 90,
+      "fit": "length",
+      "size": [
+        1.8,
+        0,
+        0
+      ]
+    }
+  ],
+  "tree": [
+    {
+      "path": "res://assets/props/tree.glb",
+      "rot": 0,
+      "fit": "height",
+      "size": [
+        0,
+        3.8,
+        0
+      ]
+    }
+  ],
+  "buildings": {
+    "tram_xe_buyt": {
+      "path": "res://assets/buildings/bus-stop.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "phuong": {
+      "path": "res://assets/buildings/building-h.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "thu_vien": {
+      "path": "res://assets/buildings/building-e.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "trung_tam": {
+      "path": "res://assets/buildings/building-g.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "cua_hang": {
+      "path": "res://assets/buildings/building-c.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "quan_ca_phe": {
+      "path": "res://assets/buildings/building-b.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "quan_com": {
+      "path": "res://assets/buildings/building-a.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "tra_da": {
+      "path": "res://assets/buildings/stall.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "tiem_chu_bay": {
+      "path": "res://assets/buildings/building-d.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "phong_tro": {
+      "path": "res://assets/buildings/building-f.glb",
+      "rot": 0,
+      "fit": "width"
+    },
+    "cong_trinh": {
+      "path": "res://assets/buildings/building-skyscraper-a.glb",
+      "rot": 0,
+      "fit": "width"
+    }
+  },
+  "props": {
+    "trash_can": {
+      "path": "res://assets/models/metal_trash_can/metal_trash_can.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        0.95,
+        0
+      ]
+    },
+    "trashbag": {
+      "path": "res://assets/models/trashbag/trashbag.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        0.55,
+        0
+      ]
+    },
+    "crate": {
+      "path": "res://assets/models/plastic_crate_01/plastic_crate_01.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        0.3,
+        0
+      ]
+    },
+    "box": {
+      "path": "res://assets/models/cardboard_box_01/cardboard_box_01.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        0.4,
+        0
+      ]
+    },
+    "plant": [
+      {
+        "path": "res://assets/models/potted_plant_01/potted_plant_01.gltf",
+        "fit": "height",
+        "size": [
+          0,
+          0.9,
+          0
+        ]
+      },
+      {
+        "path": "res://assets/models/potted_plant_02/potted_plant_02.gltf",
+        "fit": "height",
+        "size": [
+          0,
+          0.7,
+          0
+        ]
+      }
+    ],
+    "stool": {
+      "path": "res://assets/models/painted_wooden_stool/painted_wooden_stool.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        0.45,
+        0
+      ]
+    },
+    "utility_box": {
+      "path": "res://assets/models/utility_box_01/utility_box_01.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        0.9,
+        0
+      ]
+    },
+    "cement_bag": {
+      "path": "res://assets/models/cement_bag/cement_bag.gltf",
+      "fit": "length",
+      "size": [
+        0.75,
+        0,
+        0
+      ]
+    },
+    "basket": {
+      "path": "res://assets/models/wicker_basket_01/wicker_basket_01.gltf",
+      "fit": "length",
+      "size": [
+        0.5,
+        0,
+        0
+      ]
+    },
+    "lamp": {
+      "path": "res://assets/models/street_lamp_01/street_lamp_01.gltf",
+      "fit": "height",
+      "size": [
+        0,
+        5.6,
+        0
+      ]
+    }
+  }
+}

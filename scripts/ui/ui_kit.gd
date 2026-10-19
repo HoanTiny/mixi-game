@@ -21,11 +21,22 @@ const HUD_SOFT := Color("b9bccb")
 const LOG_COLORS := {"plus": "2d7a4c", "minus": "c0352b", "warn": "a5690f", "event": "6a3db8", "info": "1c2145"}
 
 
+static var _text_font: SystemFont
+
+
+## Phông chữ chung: phông hệ thống, thiếu ký hiệu (◆ ✓ ○ ♪) thì lấy từ DejaVu Sans đóng kèm.
+## Bản web không có phông hệ thống nên cần phông dự phòng này, nếu không ký hiệu hiện thành ô vuông.
+static func text_font() -> SystemFont:
+	if _text_font == null:
+		_text_font = SystemFont.new()
+		_text_font.font_names = PackedStringArray(["Segoe UI", "Arial", "Noto Sans"])
+		_text_font.fallbacks = [load("res://assets/fonts/DejaVuSans.ttf")]
+	return _text_font
+
+
 static func make_theme() -> Theme:
 	var t := Theme.new()
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["Segoe UI", "Arial", "Noto Sans"])
-	t.default_font = font
+	t.default_font = text_font()
 	t.default_font_size = 15
 	t.set_color("font_color", "Label", INK)
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
@@ -120,13 +131,14 @@ static func choice(title: String, hint: String, lock: String, on_press: Callable
 
 
 ## Thẻ một hành động (việc làm, lớp học, sinh hoạt) với tiền, giờ, hiệu ứng và lý do khóa.
-static func action_card(game, a: Dictionary, width := 270) -> Button:
+## on_press nhận id hành động; bỏ trống thì làm ngay (bảng cân bằng), màn phố truyền vào để chạy thanh thời gian.
+static func action_card(game, a: Dictionary, width := 270, on_press := Callable()) -> Button:
 	var st: Dictionary = game.action_status(a)
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(width, 104)
 	btn.disabled = not st.ok
 	btn.tooltip_text = effects_text(game, a)
-	btn.pressed.connect(game.do_action.bind(a.id))
+	btn.pressed.connect((on_press if on_press.is_valid() else game.do_action).bind(a.id))
 	var v := _inner(btn, 12)
 
 	var top := HBoxContainer.new()

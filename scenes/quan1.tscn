@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/quan1.gd" id="1_quan1"]
+
+[node name="Quan1" type="Node3D"]
+script = ExtResource("1_quan1")

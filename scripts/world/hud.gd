@@ -6,12 +6,18 @@ extends CanvasLayer
 const GameLogic := preload("res://scripts/game_logic.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
+const StreetMap := preload("res://scripts/world/street_map.gd")
+const MinigameBricks := preload("res://scripts/ui/minigame_bricks.gd")
 
 var world
 var game
+## Trò chơi nhỏ đang mở (phụ hồ bưng gạch), null nếu không có.
+var minigame: Control
 var dialogs: DialogLayer
 
 var _objectives: PanelContainer
+var _map: Control
+var _loc_scroll: ScrollContainer
 var _objective_box: VBoxContainer
 var _status: PanelContainer
 var _day_label: Label
@@ -34,6 +40,24 @@ var _log_text: RichTextLabel
 var _bottom: PanelContainer
 var _food_select: OptionButton
 var _end_day_btn: Button
+var _work: PanelContainer
+var _pd_label: Label
+var _pd_bar: ProgressBar
+var _needs_label: Label
+var _food_label: Label
+var _phone: PanelContainer
+var _phone_box: VBoxContainer
+var _order_strip: PanelContainer
+var _order_label: Label
+var _app_on := false
+var _offer: Dictionary = {}
+var _offer_left := 0.0
+var _offer_wait := 3.0
+var _phone_tick := 0.0
+var _work_title: Label
+var _work_clock: Label
+var _work_bar: ProgressBar
+var _working := false
 var _food_keys: Array = []
 var _loc_id := ""
 var _prompt_id := "-"
@@ -57,6 +81,10 @@ func _ready() -> void:
 	var top := _pass(HBoxContainer.new(), rows)
 	_build_objectives(top)
 	_spacer(top)
+	_map = StreetMap.new()
+	_map.world = world
+	top.add_child(_map)
+	_spacer(top)
 	_build_status(top)
 
 	# Hàng giữa: kỹ năng / nhật ký bên trái, bảng địa điểm bên phải.
@@ -65,17 +93,20 @@ func _ready() -> void:
 	var left := _pass(VBoxContainer.new(), middle)
 	_build_skills(left)
 	_build_log(left)
+	_build_phone(left)
 	_spacer(middle)
 	_build_location(middle)
 
-	# Lời nhắc tương tác ở giữa, phía trên thanh công cụ.
+	# Lời nhắc tương tác và thanh "đang làm" ở giữa, phía trên thanh công cụ.
 	var prompt_row := _pass(HBoxContainer.new(), rows)
 	prompt_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	_build_prompt(prompt_row)
+	_build_work(prompt_row)
+	_build_order_strip(prompt_row)
 
 	# Hàng dưới: hướng dẫn điều khiển bên trái, thanh công cụ bên phải.
 	var bottom := _pass(HBoxContainer.new(), rows)
-	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · Esc: đóng", 12, UI.HUD_TEXT)
+	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · Esc: đóng", 12, UI.HUD_TEXT)
 	hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	hint.add_theme_constant_override("outline_size", 5)
 	hint.size_flags_vertical = Control.SIZE_SHRINK_END
@@ -94,7 +125,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible
+	return dialogs.visible or _working or minigame != null
 
 
 func location_open() -> String:
@@ -119,7 +150,10 @@ func set_prompt(id: String) -> void:
 	if id == _prompt_id:
 		return
 	_prompt_id = id
-	if id != "":
+	if id.begins_with("bin:"):
+		var lock: String = game.scrap_lock(id.substr(4))
+		_prompt_label.text = "E  ·  Lục thùng rác tìm ve chai" if lock == "" else "Thùng rác · " + lock
+	elif id != "":
 		_prompt_label.text = "E  ·  Vào " + str(world.location_info(id).name)
 	_update_prompt()
 
@@ -203,6 +237,12 @@ func _build_status(parent: Control) -> void:
 	v.add_child(_mood_label)
 	_mood_bar = UI.bar(8)
 	v.add_child(_mood_bar)
+	_pd_label = UI.label("", 12, UI.HUD_SOFT)
+	v.add_child(_pd_label)
+	_pd_bar = UI.bar(8)
+	v.add_child(_pd_bar)
+	_needs_label = UI.label("", 12, UI.HUD_SOFT)
+	v.add_child(_needs_label)
 
 
 func _build_prompt(parent: Control) -> void:
@@ -210,6 +250,63 @@ func _build_prompt(parent: Control) -> void:
 	_prompt_label = UI.label("", 16, UI.HUD_TEXT)
 	_prompt.add_child(_prompt_label)
 	_prompt.visible = false
+
+
+func _build_work(parent: Control) -> void:
+	_work = _dark_panel(parent)
+	_work.custom_minimum_size = Vector2(420, 0)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	_work.add_child(v)
+	var head := HBoxContainer.new()
+	v.add_child(head)
+	_work_title = UI.label("", 17, UI.HUD_TEXT)
+	_work_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(_work_title)
+	_work_clock = UI.label("", 17, UI.GOLD)
+	head.add_child(_work_clock)
+	_work_bar = UI.bar(10)
+	_work_bar.max_value = 1.0
+	_work_bar.add_theme_stylebox_override("fill", UI.box(UI.GOLD, UI.GOLD, 5, 0))
+	v.add_child(_work_bar)
+	_work.visible = false
+
+
+## Làm một việc ở tiệm: Minh vào trong, thanh thời gian chạy, đồng hồ nhảy dần, xong mới tính kết quả.
+## result: kết quả trò chơi nhỏ (tự làm hoặc làm tự động); việc có minigame mà chưa có kết quả thì mở trò chơi trước.
+func _perform(id: String, result: Dictionary = {}) -> void:
+	var a: Dictionary = game.get_action(id)
+	var st: Dictionary = game.action_status(a)
+	if not st.ok or _working or minigame != null:
+		return
+	if a.has("minigame") and result.is_empty():
+		_open_minigame(id, a)
+		return
+	# Việc làm ở màn riêng (dẫn khách Úc ở Quận 1): sang màn đó, tiền công tính khi về.
+	if a.has("scene"):
+		get_node("/root/GameState").tour = id
+		get_tree().change_scene_to_file(str(a.scene))
+		return
+	var start: float = st.start
+	var finish: float = start + float(a.hours)
+	_working = true
+	world.set_player_inside(true)
+	_work_title.text = "Đang " + str(a.name).to_lower() if a.group == "work" else str(a.name)
+	_work.visible = true
+	_refresh()
+	var seconds := maxf(0.8, float(a.hours) * float(game.cfg.get("workSecondsPerHour", 0.35)))
+	var tw := create_tween()
+	tw.tween_method(func(t: float) -> void:
+		var now := lerpf(start, finish, t)
+		_work_bar.value = t
+		_work_clock.text = GameLogic.hh(now)
+		_clock_label.text = "%s  ·  đang bận" % GameLogic.hh(now), 0.0, 1.0, seconds)
+	tw.tween_callback(func() -> void:
+		_working = false
+		_work.visible = false
+		world.set_player_inside(false)
+		world.audio.play("done")
+		game.do_action(id, result))
 
 
 func _build_location(parent: Control) -> void:
@@ -224,9 +321,10 @@ func _build_location(parent: Control) -> void:
 	_loc_desc.custom_minimum_size = Vector2(320, 0)
 	v.add_child(_loc_desc)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(336, 340)
+	scroll.custom_minimum_size = Vector2(336, 0)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	v.add_child(scroll)
+	_loc_scroll = scroll
 	_loc_cards = VBoxContainer.new()
 	_loc_cards.add_theme_constant_override("separation", 8)
 	scroll.add_child(_loc_cards)
@@ -244,6 +342,146 @@ func _build_skills(parent: Control) -> void:
 	_skills_box.add_theme_constant_override("separation", 6)
 	_skills.add_child(_skills_box)
 	_skills.visible = false
+
+
+## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
+func _open_minigame(id: String, a: Dictionary) -> void:
+	minigame = MinigameBricks.new()
+	minigame.cfg = game.cfg.minigames[a.minigame]
+	minigame.last = game.s.get("job_last", {}).get(id, {})
+	minigame.title = str(a.name)
+	minigame.finished.connect(func(r: Dictionary) -> void:
+		minigame.queue_free()
+		minigame = null
+		if not r.is_empty():
+			_perform(id, r))
+	add_child(minigame)
+	_refresh()
+
+
+# ---------------------------------------------------------------- điện thoại: app giao hàng
+
+func _build_phone(parent: Control) -> void:
+	_phone = _light_panel(parent)
+	_phone.custom_minimum_size = Vector2(330, 0)
+	_phone_box = VBoxContainer.new()
+	_phone_box.add_theme_constant_override("separation", 8)
+	_phone.add_child(_phone_box)
+	_phone.visible = false
+
+
+func _build_order_strip(parent: Control) -> void:
+	_order_strip = _dark_panel(parent)
+	_order_label = UI.label("", 15, UI.HUD_TEXT)
+	_order_strip.add_child(_order_label)
+	_order_strip.visible = false
+
+
+func _process(delta: float) -> void:
+	if not game.is_started() or game.is_over():
+		return
+	var active: Dictionary = game.delivery_active()
+	# Đơn mới tới khi app đang bật, rảnh tay và không có hộp thoại.
+	if _app_on and active.is_empty() and _offer.is_empty() and not blocking():
+		_offer_wait -= delta
+		if _offer_wait <= 0.0:
+			_new_offer()
+	if not _offer.is_empty():
+		_offer_left -= delta
+		if _offer_left <= 0.0:
+			_offer = {}
+			_refresh_phone()
+	_phone_tick -= delta
+	if _phone_tick <= 0.0:
+		_phone_tick = 0.25
+		_warn_needs()
+		_update_order_strip(active)
+		if _phone.visible:
+			_refresh_phone()
+
+
+## Nhắc một lần mỗi ngày khi đói hay bẩn quá, để người chơi kịp xử lý trước khi mất Sức khỏe.
+var _warned := {}
+
+
+func _warn_needs() -> void:
+	if not game.has_needs() or blocking():
+		return
+	for w in [["fed", 20.0, "Bụng đói cồn cào, đi ăn thôi!"], ["clean", 15.0, "Người bốc mùi, về phòng tắm đi"], ["neat", 15.0, "Quần áo dơ quá, phải giặt"]]:
+		var key := "%s_%d" % [w[0], game.day()]
+		if game.need(w[0]) < float(w[1]) and not _warned.has(key):
+			_warned[key] = true
+			world._float_text(str(w[2]), Color("ffb27a"))
+
+
+func _new_offer() -> void:
+	var d: Dictionary = game.cfg.delivery
+	var r: Array = d.offerSec if game.delivery_rush() else d.offPeakSec
+	_offer_wait = randf_range(float(r[0]), float(r[1]))
+	if game.delivery_lock() != "":
+		return
+	_offer = world.make_offer()
+	if _offer.is_empty():
+		return
+	_offer_left = 12.0
+	_phone.visible = true
+	_skills.visible = false
+	_log.visible = false
+	world.audio.play("dialog")
+	_refresh_phone()
+
+
+func _minutes_left(o: Dictionary) -> int:
+	return int(round((float(o.deadline) - game.clock()) * 60.0))
+
+
+func _update_order_strip(o: Dictionary) -> void:
+	_order_strip.visible = not o.is_empty() and not _working
+	if o.is_empty():
+		return
+	var left := _minutes_left(o)
+	var where: String = ("Lấy %s ở %s" % [o.item, o.shop_name]) if not o.picked else ("Giao tới %s" % o.dest)
+	_order_label.text = "Đơn: %s · %s" % [where, ("còn %d phút" % left) if left >= 0 else ("trễ %d phút" % -left)]
+	_order_label.add_theme_color_override("font_color", UI.HUD_TEXT if left >= 10 else (UI.GOLD if left >= 0 else Color("ff8a7a")))
+
+
+func _refresh_phone() -> void:
+	if not _phone.visible:
+		return
+	for c in _phone_box.get_children():
+		c.queue_free()
+	_phone_box.add_child(UI.label("App Giao Nhanh", 20, UI.INK))
+	var lock: String = game.delivery_lock()
+	var rush: bool = game.delivery_rush()
+	_phone_box.add_child(UI.wrap(("Giờ cao điểm: đơn nhiều." if rush else "Ngoài giờ cao điểm (10:00–13:30, 17:00–21:00): ít đơn.")
+		+ " Đã giao hôm nay: %d đơn." % game.today_count("giao_hang"), 13, UI.INK_SOFT, 300))
+	var o: Dictionary = game.delivery_active()
+	if not o.is_empty():
+		var left := _minutes_left(o)
+		_phone_box.add_child(UI.label("ĐƠN ĐANG GIAO", 11, UI.INK_SOFT))
+		_phone_box.add_child(UI.wrap("%s\nLấy ở: %s%s\nGiao tới: %s\nTiền công: %s · hạn %s (%s)" % [o.item, o.shop_name, " ✓" if o.picked else "",
+			o.dest, GameLogic.fmt_k(int(o.pay)), GameLogic.hh(float(o.deadline)), ("còn %d phút" % left) if left >= 0 else "đã trễ"], 14, UI.INK, 300))
+		_phone_box.add_child(UI.choice("Hủy đơn", "Khách đánh giá 1 sao · Tinh thần %d" % int(game.cfg.delivery.cancelMood), "", func() -> void:
+			game.delivery_cancel()
+			_refresh_phone()))
+	elif not _offer.is_empty():
+		_phone_box.add_child(UI.label("ĐƠN MỚI · tự hủy sau %d giây" % ceili(_offer_left), 11, UI.TIM))
+		_phone_box.add_child(UI.wrap("%s\nLấy ở: %s\nGiao tới: %s\nTiền công: %s · giao trước %s" % [_offer.item, _offer.shop_name, _offer.dest,
+			GameLogic.fmt_k(int(_offer.pay)), GameLogic.hh(float(_offer.deadline))], 14, UI.INK, 300))
+		_phone_box.add_child(UI.choice("Nhận đơn", "Mũi tên cam chỉ quán, xanh chỉ nhà khách", "", func() -> void:
+			game.delivery_accept(_offer)
+			_offer = {}
+			_refresh_phone()))
+		_phone_box.add_child(UI.choice("Bỏ qua", "", "", func() -> void:
+			_offer = {}
+			_refresh_phone()))
+	_phone_box.add_child(UI.choice("Tắt nhận đơn" if _app_on else "Bật nhận đơn",
+		"Đang chờ đơn…" if _app_on and o.is_empty() and _offer.is_empty() else "", lock, func() -> void:
+			_app_on = not _app_on
+			_offer = {}
+			_offer_wait = 2.0
+			_refresh_phone()))
+	_phone_box.add_child(UI.choice("Cất điện thoại", "", "", func() -> void: _phone.visible = false))
 
 
 func _build_log(parent: Control) -> void:
@@ -269,6 +507,7 @@ func _build_bottom(parent: Control) -> void:
 	var food_label := UI.label("Ăn uống", 13, UI.HUD_SOFT)
 	food_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(food_label)
+	_food_label = food_label
 	_food_select = OptionButton.new()
 	for k in game.cfg.food:
 		var f: Dictionary = game.cfg.food[k]
@@ -276,6 +515,11 @@ func _build_bottom(parent: Control) -> void:
 		_food_select.add_item("%s · %s" % [f.name, GameLogic.fmt_k(int(f.cost))])
 	_food_select.item_selected.connect(func(i: int) -> void: game.set_food(_food_keys[i]))
 	h.add_child(_food_select)
+	h.add_child(_tool_button("Điện thoại", func() -> void:
+		_phone.visible = not _phone.visible
+		_skills.visible = false
+		_log.visible = false
+		_refresh_phone()))
 	h.add_child(_tool_button("Kỹ năng", func() -> void:
 		_skills.visible = not _skills.visible
 		_log.visible = false))
@@ -283,9 +527,9 @@ func _build_bottom(parent: Control) -> void:
 		_log.visible = not _log.visible
 		_skills.visible = false))
 	h.add_child(_tool_button("Bảng cân bằng", func() -> void: get_tree().change_scene_to_file("res://scenes/board.tscn")))
-	_end_day_btn = _tool_button("Kết thúc ngày", func() -> void:
+	_end_day_btn = _tool_button("Về phòng trọ", func() -> void:
 		close_location()
-		dialogs.open_night())
+		world.walk_to_location("phong_tro"))
 	_end_day_btn.add_theme_stylebox_override("normal", UI.box(UI.GOLD, UI.GOLD, 8, 10))
 	_end_day_btn.add_theme_stylebox_override("hover", UI.box(UI.GOLD.lightened(0.15), UI.GOLD, 8, 10))
 	h.add_child(_end_day_btn)
@@ -302,7 +546,7 @@ func _tool_button(text: String, on_press: Callable) -> Button:
 
 func _refresh() -> void:
 	var started: bool = game.is_started()
-	for p in [_objectives, _status, _bottom]:
+	for p in [_objectives, _status, _bottom, _map]:
 		p.visible = started
 	if not started:
 		_loc_id = ""
@@ -318,9 +562,22 @@ func _refresh() -> void:
 	UI.set_bar(_health_bar, float(s.health), float(s.health_max), UI.level_color(float(s.health) / float(s.health_max)))
 	_mood_label.text = "Tinh thần %d/%d" % [int(s.mood), int(s.mood_max)]
 	UI.set_bar(_mood_bar, float(s.mood), float(s.mood_max), UI.level_color(float(s.mood) / float(s.mood_max)))
+	var needs: bool = game.has_needs()
+	for c in [_pd_label, _pd_bar, _needs_label]:
+		c.visible = needs
+	_food_select.visible = not needs
+	_food_label.visible = not needs
+	if needs:
+		var pd: float = game.phong_do()
+		var mult: float = game.pay_mult()
+		_pd_label.text = "Phong độ %d · %s" % [int(pd), "đủ lương" if mult >= 1.0 else "chỉ được %d%% lương" % int(mult * 100.0)]
+		UI.set_bar(_pd_bar, pd, 100.0, UI.level_color(pd / 100.0))
+		_needs_label.text = "No bụng %d · Vệ sinh %d · Quần áo %d" % [int(game.need("fed")), int(game.need("clean")), int(game.need("neat"))]
+		var worst := minf(game.need("fed"), minf(game.need("clean"), game.need("neat")))
+		_needs_label.add_theme_color_override("font_color", UI.HUD_SOFT if worst >= 35.0 else (UI.GOLD if worst >= 15.0 else Color("ff8a7a")))
 	_food_select.select(_food_keys.find(s.food))
 	_food_select.disabled = float(s.used) > 0.0 or not s.queue.is_empty()
-	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty()
+	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
 	_refresh_skills(s)
 	_log_text.text = UI.log_bbcode(game)
 	_refresh_location()
@@ -396,16 +653,23 @@ func _refresh_skills(s: Dictionary) -> void:
 		room_name = game.cfg.rooms[s.room].name
 	var lines := [
 		"Phòng trọ: " + room_name,
-		"Bằng chứng: %d · Chuyến chạy hàng: %d/%d" % [int(s.evidence), int(s.smuggle), int(game.cfg.smuggle.tripsForBadEnding)],
+		"Bằng chứng: %d/%d · Chuyến chạy hàng: %d/%d" % [int(s.evidence), int(game.cfg.get("legalEvidence", 2)), int(s.smuggle), int(game.cfg.smuggle.tripsForBadEnding)],
 		"Tạm trú: " + ("Đã đăng ký" if s.flags.get("tamTru", false) else "Chưa"),
 	]
 	if int(s.held) > 0:
 		lines.append("Lương đang bị giữ: " + GameLogic.fmt_money(int(s.held)))
+	var inv := []
+	for k in s.get("inv", {}):
+		if int(s.inv[k]) > 0:
+			inv.append("%d %s" % [int(s.inv[k]), game.cfg.scrap[k].name])
+	if not inv.is_empty():
+		lines.append("Ve chai: %s (≈ %s)" % [", ".join(inv), GameLogic.fmt_k(game.scrap_value())])
 	_skills_box.add_child(UI.label("\n".join(lines), 12, UI.HUD_SOFT))
 
 
 func _refresh_location() -> void:
-	_location.visible = _loc_id != "" and not game.is_over()
+	# Đang làm thì Minh ở trong tiệm, giấu bảng cho tới khi xong việc.
+	_location.visible = _loc_id != "" and not game.is_over() and not _working
 	if not _location.visible:
 		return
 	var loc: Dictionary = world.location_info(_loc_id)
@@ -414,10 +678,32 @@ func _refresh_location() -> void:
 	for c in _loc_cards.get_children():
 		c.queue_free()
 	var found := 0
+	if loc.has("npc_id"):
+		var npc: String = loc.npc_id
+		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(loc.npc),
+			"%d phút · Thân thiết %d/100" % [roundi(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
+			game.talk_lock(npc), game.talk.bind(npc)))
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
 			if a.get("location", "") == _loc_id:
-				_loc_cards.add_child(UI.action_card(game, a, 320))
+				_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
 				found += 1
-	if found == 0:
+	if _loc_id == "vua_ve_chai":
+		var v: int = game.scrap_value()
+		_loc_cards.add_child(UI.choice("Bán hết ve chai", ("Được " + GameLogic.fmt_k(v)) if v > 0 else "", "Chưa nhặt được gì, lục thùng rác dọc phố (phím E)" if v <= 0 else "",
+			func() -> void:
+				var got: int = game.sell_scrap()
+				if got > 0:
+					world._float_text("+" + GameLogic.fmt_k(got), Color("7fe0a0"))))
+	if _loc_id == "phong_tro":
+		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d" % game.day(), "", func() -> void:
+			close_location()
+			dialogs.open_night()))
+	elif found == 0 and _loc_id != "vua_ve_chai":
 		_loc_cards.add_child(UI.wrap("Hôm nay ở đây chưa có việc gì cho Minh.", 13, UI.INK_SOFT, 320))
+	_fit_location.call_deferred()
+
+
+## Bảng địa điểm cao vừa đủ số thẻ, nhiều quá thì cuộn (tránh khoảng trắng thừa khi chỉ có một việc).
+func _fit_location() -> void:
+	_loc_scroll.custom_minimum_size.y = minf(_loc_cards.get_combined_minimum_size().y, 420.0)

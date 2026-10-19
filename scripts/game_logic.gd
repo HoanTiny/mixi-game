@@ -20,6 +20,8 @@ const LAST_DAY := 30
 var cfg: Dictionary = {}
 var events: Array = []
 var story: Dictionary = {}
+## Hội thoại với nhân vật, theo khóa trong REPS (data/talks.json).
+var talks: Dictionary = {}
 ## Trạng thái ván chơi. Rỗng nghĩa là chưa bắt đầu (đang ở màn mở đầu).
 var s: Dictionary = {}
 ## Sổ tay của Minh: giữ lại qua các lần thua.
@@ -33,6 +35,8 @@ func load_data(dir := "res://data") -> void:
 	cfg = _read_json(dir + "/config.json")
 	events = _read_json(dir + "/events.json")
 	story = _read_json(dir + "/story.json")
+	talks = _read_json(dir + "/talks.json")
+	talks.erase("_ghi_chu")
 
 
 static func _read_json(path: String) -> Variant:
@@ -55,8 +59,14 @@ func new_game(item: String) -> void:
 		"debt": int(cfg.milestones.day30), "interest_paid": 0, "evidence": 0, "smuggle": 0, "held": 0,
 		"counts": {}, "today": {"list": []}, "yesterday": {"list": []}, "last_random": {},
 		"queue": [], "log": [], "history": [], "choices": [], "skip_reason": "", "over": {},
-		"stats": {"earned": 0, "spent": 0, "faints": 0},
+		"stats": {"earned": 0, "spent": 0, "faints": 0}, "talks_done": [],
 	}
+	# Nhu cầu cơ thể (đói, vệ sinh, quần áo) kiểu Nobody: ăn uống tự mua ở quán thay vì gói ăn theo ngày.
+	if cfg.has("needs"):
+		s["needs"] = cfg.needs.start.duplicate()
+		s["needs_t"] = DAY_START
+		s["food"] = "tu_lo"
+		s["inv"] = {}
 	apply_effects(story.items[item].get("effects", {}))
 	_morning()
 	_commit()
@@ -197,6 +207,8 @@ func apply_effects(eff: Dictionary) -> void:
 					add_xp(key.substr(3), float(v))
 				elif key.begins_with("rep."):
 					add_rep(key.substr(4), float(v))
+				elif key.begins_with("need."):
+					need_adj(key.substr(5), float(v))
 				elif key.begins_with("flag."):
 					if v:
 						s.flags[key.substr(5)] = true
@@ -372,7 +384,9 @@ func action_status(a: Dictionary) -> Dictionary:
 	return {"ok": true, "reason": "", "start": start}
 
 
-func do_action(id: String) -> void:
+## result: kết quả trò chơi nhỏ khi tự làm {"ratio": 0..1 phần chỉ tiêu, "bonus": tiền thưởng}.
+## Không truyền thì tính đủ công như trước (làm tự động hoặc mô phỏng).
+func do_action(id: String, result: Dictionary = {}) -> void:
 	var a := get_action(id)
 	if a.is_empty() or is_hidden(a):
 		return
@@ -395,6 +409,17 @@ func do_action(id: String) -> void:
 			pay = round_k(randf_range(float(a.pay_range[0]), float(a.pay_range[1])))
 	if a.has("tip"):
 		pay += round_k(randf_range(float(a.tip[0]), float(a.tip[1])))
+	if not result.is_empty():
+		pay = round_k(float(pay) * float(result.get("ratio", 1.0))) + int(result.get("bonus", 0))
+		if not s.has("job_last"):
+			s["job_last"] = {}
+		if not bool(result.get("auto", false)):
+			s.job_last[id] = {"ratio": float(result.get("ratio", 1.0)), "bonus": int(result.get("bonus", 0))}
+	if a.group == "work" and pay > 0 and pay_mult() < 1.0:
+		pay = round_k(float(pay) * pay_mult())
+		add_log("Phong độ kém, chỉ được %d%% tiền công" % int(pay_mult() * 100.0), "warn")
+	for k in a.get("dirty", {}):
+		need_adj(k, float(a.dirty[k]))
 	var label := "%s %s" % [hh(start), a.name]
 	if a.has("hold_days") and day() >= int(a.hold_days[0]) and day() <= int(a.hold_days[1]):
 		s["held"] = int(s.held) + pay
@@ -420,6 +445,34 @@ func do_action(id: String) -> void:
 	_commit()
 
 
+## Thời gian trôi khi đi bộ trên phố. Không vượt quá giờ đi ngủ.
+func walk(hours: float) -> void:
+	if not is_started() or is_over() or not s.queue.is_empty() or hours <= 0.0:
+		return
+	s["used"] = minf(float(s.used) + hours, day_end() - DAY_START)
+	_commit()
+
+
+## Đã hết giờ trong ngày, phải đi ngủ.
+func is_out_of_time() -> bool:
+	return is_started() and not is_over() and hours_left() <= 0.001
+
+
+## Hết giờ mà chưa về phòng trọ: ngủ gục ngoài đường, bị phạt rồi sang ngày mới.
+func sleep_outside() -> void:
+	if not is_started() or is_over() or not s.queue.is_empty():
+		return
+	add_log("Không kịp về phòng trọ, ngủ gục ngoài đường.", "warn")
+	finish_day(false)
+	# Trừ sau khi ngủ, nếu không phần hồi sức khi ngủ sẽ xóa mất hình phạt.
+	if not is_over():
+		var pen: Dictionary = cfg.get("sleepOutside", {})
+		adj("health", float(pen.get("health", 0)))
+		adj("mood", float(pen.get("mood", 0)))
+		s.queue.push_front({"id": "ngu_gat", "data": {}})
+		_commit()
+
+
 func set_food(k: String) -> void:
 	if is_started() and float(s.used) == 0.0 and cfg.food.has(k):
 		s["food"] = k
@@ -438,7 +491,146 @@ func find_event(id: String) -> Dictionary:
 	for e in events:
 		if e.id == id:
 			return e
+	if id == "talk_chat":
+		return {"id": id, "title": "{npc}", "text": "{line}", "choices": [{"label": "Chào rồi đi", "hint": "{npc} +{chat_rep}"}]}
+	for npc in talks:
+		for b in talks[npc].get("story", []):
+			if b.id == id:
+				var e: Dictionary = b.duplicate()
+				e["who"] = REPS.get(npc, npc)
+				return e
 	return {}
+
+
+# ---------------------------------------------------------------- giao đồ ăn
+
+## "" nếu bật app giao hàng nhận đơn được, ngược lại là lý do.
+func delivery_lock() -> String:
+	if not is_started() or is_over():
+		return "-"
+	if s.flags.get("phoneBroken", false):
+		return "Điện thoại đang hỏng"
+	if hours_left() < 0.5:
+		return "Sắp hết ngày"
+	return ""
+
+
+func delivery_active() -> Dictionary:
+	return s.get("delivery", {})
+
+
+## Giờ cao điểm bữa trưa, bữa tối thì đơn nổ liên tục.
+func delivery_rush() -> bool:
+	for r in cfg.delivery.rush:
+		if clock() >= float(r[0]) and clock() < float(r[1]):
+			return true
+	return false
+
+
+## Đơn mới: lấy ở tiệm shop, giao tới dest; meters là quãng đường cả đi lấy lẫn đi giao.
+func delivery_offer(shop: String, shop_name: String, dest: String, dest_x: float, meters: float) -> Dictionary:
+	var d: Dictionary = cfg.delivery
+	var walk_h := meters * float(cfg.get("walkHoursPerMeter", 0.004))
+	return {
+		"shop": shop, "shop_name": shop_name, "item": str(d.shops[shop]), "dest": dest, "dest_x": dest_x,
+		"pay": round_k(float(d.base) + meters * float(d.perMeter)),
+		"deadline": clock() + walk_h * float(d.slackFactor) + float(d.cookHours) + float(d.slackHours),
+		"picked": false,
+	}
+
+
+func delivery_accept(o: Dictionary) -> void:
+	if delivery_lock() != "" or not delivery_active().is_empty():
+		return
+	var a := o.duplicate()
+	a["given"] = clock()
+	s["delivery"] = a
+	add_log("Nhận đơn: %s → %s" % [a.item, a.dest])
+	_commit()
+
+
+## Tới quán: chờ quán làm món rồi cầm đi.
+func delivery_pickup() -> void:
+	var o := delivery_active()
+	if o.is_empty() or o.picked:
+		return
+	o["picked"] = true
+	s["used"] = float(s.used) + float(cfg.delivery.cookHours)
+	_commit()
+
+
+## Tới nhà khách: trả tiền theo giờ giao, sớm thì có tip, trễ thì bị trừ.
+## Trả về {"pay", "tip", "late"} để hiện cho người chơi.
+func delivery_drop() -> Dictionary:
+	var o := delivery_active()
+	if o.is_empty() or not o.picked:
+		return {}
+	var d: Dictionary = cfg.delivery
+	var late := clock() > float(o.deadline)
+	var pay := round_k(float(o.pay) * pay_mult())
+	var tip := 0
+	if late:
+		pay = round_k(float(pay) * float(d.latePay))
+		adj("mood", float(d.lateMood))
+	elif (float(o.deadline) - clock()) / maxf(0.01, float(o.deadline) - float(o.given)) >= float(d.tipIfLeft):
+		tip = round_k(randf_range(float(d.tip[0]), float(d.tip[1])))
+	adj("health", float(d.health))
+	adj("mood", float(d.mood))
+	earn(pay + tip, "Giao %s tới %s%s" % [o.item, o.dest, " (trễ)" if late else (" · tip %s" % fmt_k(tip) if tip > 0 else "")])
+	s.counts["giao_hang"] = count("giao_hang") + 1
+	s.today["giao_hang"] = today_count("giao_hang") + 1
+	s.erase("delivery")
+	clamp_all()
+	_commit()
+	return {"pay": pay, "tip": tip, "late": late}
+
+
+func delivery_cancel() -> void:
+	if delivery_active().is_empty():
+		return
+	adj("mood", float(cfg.delivery.cancelMood))
+	add_log("Hủy đơn giao hàng, bị khách đánh giá 1 sao", "warn")
+	s.erase("delivery")
+	_commit()
+
+
+# ---------------------------------------------------------------- nói chuyện
+
+## "" nếu nói chuyện được với nhân vật, ngược lại là lý do khóa.
+func talk_lock(npc: String) -> String:
+	if not is_started() or is_over() or not s.queue.is_empty() or not talks.has(npc):
+		return "-"
+	if today_count("talk_" + npc) > 0:
+		return "Hôm nay đã nói chuyện rồi"
+	if hours_left() < float(cfg.get("talkHours", 0.5)):
+		return "Không đủ giờ"
+	return ""
+
+
+## Nói chuyện: kể đoạn mạch chuyện kế tiếp nếu đã mở, không thì tán gẫu vài câu.
+func talk(npc: String) -> void:
+	if talk_lock(npc) != "":
+		return
+	s["used"] = float(s.used) + float(cfg.get("talkHours", 0.5))
+	s.today["talk_" + npc] = 1
+	if not s.has("talks_done"):
+		s["talks_done"] = []
+	var who: String = REPS.get(npc, npc)
+	for b in talks[npc].get("story", []):
+		if not s.talks_done.has(b.id) and check(b.get("when", {})) == "":
+			s.talks_done.append(b.id)
+			s.queue.append({"id": b.id, "data": {}})
+			add_log("Nói chuyện với " + who)
+			_commit()
+			return
+	var lines := []
+	for c in talks[npc].get("chat", []):
+		if check(c.get("when", {})) == "":
+			lines.append(c.text)
+	add_rep(npc, float(cfg.get("chatRep", 2)))
+	s.queue.append({"id": "talk_chat", "data": {"npc": who, "line": lines.pick_random() if not lines.is_empty() else "..."}})
+	add_log("Tán gẫu với " + who)
+	_commit()
 
 
 ## Sự kiện đang chờ người chơi chọn, đã gộp biến thể phù hợp. Rỗng nếu không có.
@@ -516,8 +708,13 @@ func fill(text: String) -> String:
 		"room_rieng": str(cfg.rooms.rieng.name),
 		"rent_ghep": fmt_money(int(cfg.rooms.ghep.rent)),
 		"rent_rieng": fmt_money(int(cfg.rooms.rieng.rent)),
+		"sleep_out_health": str(int(cfg.get("sleepOutside", {}).get("health", 0))),
+		"sleep_out_mood": str(int(cfg.get("sleepOutside", {}).get("mood", 0))),
 		"fail_health": str(int(cfg.milestones.failDay10Health)),
 		"fail_debt": fmt_money(int(cfg.milestones.failDay10DebtAdd)),
+		"npc": str(_event_data.get("npc", "")),
+		"line": str(_event_data.get("line", "")),
+		"chat_rep": str(int(cfg.get("chatRep", 2))),
 	}
 	for k in vals:
 		text = text.replace("{" + k + "}", vals[k])
@@ -593,6 +790,14 @@ func night_preview() -> Dictionary:
 func finish_day(night_shift: bool) -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
+	if not delivery_active().is_empty():
+		add_log("Hết ngày, đơn giao hàng đang chạy bị hủy", "warn")
+		s.erase("delivery")
+	_tick_needs()
+	if has_needs():
+		for k in cfg.needs.overnight:
+			need_adj(k, float(cfg.needs.overnight[k]))
+		s["needs_t"] = DAY_START
 	var food: Dictionary = cfg.food[s.food]
 	spend(int(food.cost), "Ăn uống: " + str(food.name))
 	adj("health", float(food.get("health", 0)))
@@ -662,11 +867,12 @@ func finish_day(night_shift: bool) -> void:
 
 
 func _resolve_ending() -> void:
-	var legal := maxi(0, int(cfg.legalDebt) - int(s.interest_paid))
+	# Kết ẩn: trả đủ tiền gốc hợp pháp; tiền lãi đã đóng ở mốc ngày 10 thì mất, không được trừ vào gốc.
+	var legal := int(cfg.legalDebt)
 	var key := ""
 	if int(s.smuggle) >= int(cfg.smuggle.tripsForBadEnding):
 		key = "duong_tat"
-	elif level("phapLy") >= 3 and int(s.evidence) >= 2 and int(s.money) >= legal:
+	elif level("phapLy") >= 3 and int(s.evidence) >= int(cfg.get("legalEvidence", 2)) and int(s.money) >= legal:
 		spend(legal, "Trả phần gốc hợp pháp")
 		key = "cong_ly"
 	elif int(s.money) >= int(s.debt):
@@ -698,8 +904,111 @@ func _resolve_ending() -> void:
 
 
 func _commit() -> void:
+	_tick_needs()
 	clamp_all()
 	changed.emit()
+
+
+# ---------------------------------------------------------------- nhu cầu cơ thể
+
+func has_needs() -> bool:
+	return s.has("needs")
+
+
+func need(k: String) -> float:
+	return float(s.needs.get(k, 100.0)) if has_needs() else 100.0
+
+
+func need_adj(k: String, d: float) -> void:
+	if has_needs():
+		s.needs[k] = clampf(float(s.needs.get(k, 0.0)) + d, 0.0, 100.0)
+
+
+## Đói, bẩn dần theo giờ đã trôi; nhịn tới 0 thì mất Sức khỏe.
+func _tick_needs() -> void:
+	if not has_needs() or not is_started():
+		return
+	var dt := clock() - float(s.get("needs_t", DAY_START))
+	if dt <= 0.0:
+		return
+	s["needs_t"] = clock()
+	var starving := need("fed") <= 0.0
+	for k in cfg.needs.perHour:
+		need_adj(k, float(cfg.needs.perHour[k]) * dt)
+	if starving or need("fed") <= 0.0:
+		s["health"] = float(s.health) - float(cfg.needs.starveHealthPerHour) * dt
+
+
+## Phong độ 0..100 gộp từ no bụng, vệ sinh, quần áo và tinh thần (kiểu "Cool" của Nobody).
+func phong_do() -> float:
+	if not has_needs():
+		return 100.0
+	var w: Dictionary = cfg.needs.weights
+	var mood_pct := float(s.mood) / maxf(1.0, float(s.mood_max)) * 100.0
+	return need("fed") * float(w.fed) + need("clean") * float(w.clean) + need("neat") * float(w.neat) + mood_pct * float(w.mood)
+
+
+## Hệ số tiền công theo phong độ: đủ thì 100%, kém thì 70%, tệ thì 50%.
+func pay_mult() -> float:
+	if not has_needs():
+		return 1.0
+	var p := phong_do()
+	for tier in cfg.needs.payTiers:
+		if p >= float(tier[0]):
+			return float(tier[1])
+	return 0.5
+
+
+# ---------------------------------------------------------------- ve chai
+
+func scrap_lock(bin_id: String) -> String:
+	if not is_started() or is_over() or not s.queue.is_empty():
+		return "-"
+	if today_count("bin_" + bin_id) > 0:
+		return "Thùng này hôm nay lục rồi"
+	if hours_left() < float(cfg.scrap.binHours):
+		return "Không đủ giờ"
+	return ""
+
+
+## Lục một thùng rác: mất ít phút, bẩn người, được vài chai, lon, bìa giấy. Trả về số món nhặt được.
+func scavenge(bin_id: String) -> Dictionary:
+	if scrap_lock(bin_id) != "":
+		return {}
+	var c: Dictionary = cfg.scrap
+	s["used"] = float(s.used) + float(c.binHours)
+	s.today["bin_" + bin_id] = 1
+	var got := {"chai": randi_range(0, 3), "lon": randi_range(0, 2), "giay": 1 if randf() < 0.4 else 0}
+	if not s.has("inv"):
+		s["inv"] = {}
+	var parts := []
+	for k in got:
+		if int(got[k]) > 0:
+			s.inv[k] = int(s.inv.get(k, 0)) + int(got[k])
+			parts.append("%d %s" % [int(got[k]), c[k].name])
+	for k in c.dirty:
+		need_adj(k, float(c.dirty[k]))
+	adj("mood", float(c.mood))
+	add_log("Lục thùng rác: " + (", ".join(parts) if not parts.is_empty() else "không có gì"))
+	_commit()
+	return got
+
+
+func scrap_value() -> int:
+	var total := 0
+	for k in s.get("inv", {}):
+		total += int(s.inv[k]) * int(cfg.scrap[k].price)
+	return total
+
+
+func sell_scrap() -> int:
+	var v := scrap_value()
+	if v <= 0:
+		return 0
+	earn(v, "Bán ve chai")
+	s["inv"] = {}
+	_commit()
+	return v
 
 
 ## Kết quả lượt chơi dạng JSON để dán ra ngoài phân tích cân bằng.
@@ -711,7 +1020,7 @@ func summary() -> String:
 		skills[k] = level(k)
 	return JSON.stringify({
 		"ending": s.over.get("key", null), "day": day(), "money": int(s.money),
-		"item": s.item, "room": s.room, "skills": skills, "rep": s.rep, "stats": s.stats,
+		"item": s.item, "room": s.room, "skills": skills, "rep": s.rep, "stats": s.stats, "talks": s.get("talks_done", []),
 		"history": s.history, "choices": s.choices,
 	}, " ")
 
