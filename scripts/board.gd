@@ -1,5 +1,5 @@
 extends Control
-## Bảng cân bằng: chơi toàn bộ vòng lặp bằng nút bấm, thấy hết chỉ số và mọi hành động một lúc.
+## Bảng cân bằng: chơi lát cắt bằng nút bấm, thấy hết dòng tiền, Mệt, sổ lời hứa và sổ gia đình.
 ## Dùng để thử số liệu nhanh; màn chơi chính là scenes/world.tscn.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
@@ -13,23 +13,15 @@ var dialogs: DialogLayer
 var day_label: Label
 var clock_label: Label
 var restart_btn: Button
-var money_label: Label
-var goal_label: Label
-var goal_bar: ProgressBar
-var health_label: Label
-var health_bar: ProgressBar
-var mood_label: Label
-var mood_bar: ProgressBar
-var skill_rows := {}
-var reps_label: Label
-var misc_label: Label
-var food_select: OptionButton
-var focus_select: OptionButton
+var money_grid: GridContainer
+var fatigue_label: Label
+var fatigue_bar: ProgressBar
+var progress_label: Label
+var people_label: Label
 var end_day_btn: Button
 var flows := {}
+var ledger: RichTextLabel
 var log_label: RichTextLabel
-var food_keys: Array = []
-var focus_keys: Array = []
 
 
 func _ready() -> void:
@@ -63,8 +55,8 @@ func _build() -> void:
 	var brand := VBoxContainer.new()
 	brand.add_theme_constant_override("separation", 0)
 	header.add_child(brand)
-	brand.add_child(UI.label("Lên Phố", 30, UI.TIM))
-	brand.add_child(UI.label("BẢNG CÂN BẰNG · VÒNG LẶP 30 NGÀY", 11, UI.INK_SOFT))
+	brand.add_child(UI.label("Trước mùa mưa", 28, UI.TIM))
+	brand.add_child(UI.label("BẢNG CÂN BẰNG · LÁT CẮT NGÀY 18–22", 11, UI.INK_SOFT))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(spacer)
@@ -90,63 +82,40 @@ func _build() -> void:
 	root.add_child(body)
 	body.add_child(_build_status())
 	body.add_child(_build_actions())
-	body.add_child(_build_log())
+	body.add_child(_build_right())
 
 
 func _build_status() -> Control:
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(300, 0)
+	scroll.custom_minimum_size = Vector2(320, 0)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.add_theme_constant_override("separation", 12)
 	scroll.add_child(col)
 
-	var top := _panel(col)
-	top.add_child(UI.label("TIỀN ĐANG CÓ", 11, UI.INK_SOFT))
-	money_label = UI.label("", 28, UI.INK)
-	top.add_child(money_label)
-	goal_label = UI.label("", 13, UI.INK)
-	goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	top.add_child(goal_label)
-	goal_bar = UI.bar()
-	top.add_child(goal_bar)
-	health_label = UI.label("", 13, UI.INK)
-	top.add_child(health_label)
-	health_bar = UI.bar()
-	top.add_child(health_bar)
-	mood_label = UI.label("", 13, UI.INK)
-	top.add_child(mood_label)
-	mood_bar = UI.bar()
-	top.add_child(mood_bar)
+	var money := _panel(col)
+	money.add_child(UI.label("HAI CỘT TIỀN", 11, UI.INK_SOFT))
+	money_grid = GridContainer.new()
+	money_grid.columns = 2
+	money_grid.add_theme_constant_override("h_separation", 12)
+	money_grid.add_theme_constant_override("v_separation", 4)
+	money.add_child(money_grid)
 
-	var skill_panel := _panel(col)
-	skill_panel.add_child(UI.label("KỸ NĂNG", 11, UI.INK_SOFT))
-	for k in GameLogic.SKILLS:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		var name_label := UI.label(GameLogic.SKILLS[k], 13, UI.INK)
-		name_label.custom_minimum_size = Vector2(80, 0)
-		row.add_child(name_label)
-		var b := UI.bar()
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(b)
-		var lv := UI.label("", 12, UI.INK_SOFT)
-		lv.custom_minimum_size = Vector2(32, 0)
-		lv.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		row.add_child(lv)
-		skill_panel.add_child(row)
-		skill_rows[k] = [b, lv]
+	var body := _panel(col)
+	fatigue_label = UI.label("", 13, UI.INK)
+	body.add_child(fatigue_label)
+	fatigue_bar = UI.bar()
+	body.add_child(fatigue_bar)
+	progress_label = UI.label("", 13, UI.INK_SOFT)
+	progress_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(progress_label)
 
-	var rep_panel := _panel(col)
-	rep_panel.add_child(UI.label("ĐỘ THÂN THIẾT", 11, UI.INK_SOFT))
-	reps_label = UI.label("", 13, UI.INK)
-	reps_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rep_panel.add_child(reps_label)
-	misc_label = UI.label("", 13, UI.INK_SOFT)
-	misc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rep_panel.add_child(misc_label)
+	var people := _panel(col)
+	people.add_child(UI.label("QUAN HỆ", 11, UI.INK_SOFT))
+	people_label = UI.label("", 13, UI.INK)
+	people_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	people.add_child(people_label)
 	return scroll
 
 
@@ -157,25 +126,8 @@ func _build_actions() -> Control:
 	var bar_panel := PanelContainer.new()
 	col.add_child(bar_panel)
 	var toolbar := HBoxContainer.new()
-	toolbar.add_theme_constant_override("separation", 12)
 	bar_panel.add_child(toolbar)
-	toolbar.add_child(UI.label("Ăn uống hôm nay", 13, UI.INK_SOFT))
-	food_select = OptionButton.new()
-	for k in game.cfg.food:
-		var f: Dictionary = game.cfg.food[k]
-		food_keys.append(k)
-		food_select.add_item("%s · %s" % [f.name, GameLogic.fmt_k(int(f.cost))])
-	food_select.item_selected.connect(func(i: int) -> void: game.set_food(food_keys[i]))
-	toolbar.add_child(food_select)
-	toolbar.add_child(UI.label("Tự học", 13, UI.INK_SOFT))
-	focus_select = OptionButton.new()
-	for k in GameLogic.SKILLS:
-		if k == "phapLy":
-			continue
-		focus_keys.append(k)
-		focus_select.add_item(GameLogic.SKILLS[k])
-	focus_select.item_selected.connect(func(i: int) -> void: game.set_focus(focus_keys[i]))
-	toolbar.add_child(focus_select)
+	toolbar.add_child(UI.label("Mỗi tối trừ %s tiền sinh hoạt cả nhà" % GameLogic.fmt_money(int(game.cfg.livingCostPerDay)), 13, UI.INK_SOFT))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	toolbar.add_child(spacer)
@@ -202,29 +154,30 @@ func _build_actions() -> Control:
 	return col
 
 
-func _build_log() -> Control:
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(330, 0)
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 8)
-	panel.add_child(v)
-	v.add_child(UI.label("NHẬT KÝ", 11, UI.INK_SOFT))
-	log_label = RichTextLabel.new()
-	log_label.bbcode_enabled = true
-	log_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	log_label.add_theme_font_size_override("normal_font_size", 13)
-	log_label.add_theme_font_size_override("bold_font_size", 15)
-	v.add_child(log_label)
-	var copy_btn := Button.new()
-	copy_btn.text = "Sao chép kết quả lượt chơi"
-	copy_btn.pressed.connect(func() -> void: DisplayServer.clipboard_set(game.summary()))
-	v.add_child(copy_btn)
-	return panel
+func _build_right() -> Control:
+	var tabs := TabContainer.new()
+	tabs.custom_minimum_size = Vector2(380, 0)
+	ledger = _rich()
+	tabs.add_child(ledger)
+	tabs.set_tab_title(0, "Sổ")
+	log_label = _rich()
+	tabs.add_child(log_label)
+	tabs.set_tab_title(1, "Nhật ký")
+	return tabs
+
+
+func _rich() -> RichTextLabel:
+	var r := RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.add_theme_font_size_override("normal_font_size", 13)
+	r.add_theme_font_size_override("bold_font_size", 14)
+	return r
 
 
 func _refresh() -> void:
 	restart_btn.text = "Bấm lần nữa để chơi lại" if restart_armed else "Chơi lại"
 	log_label.text = UI.log_bbcode(game)
+	ledger.text = UI.ledger_bbcode(game)
 	if not game.is_started():
 		day_label.text = ""
 		clock_label.text = ""
@@ -232,45 +185,30 @@ func _refresh() -> void:
 	var s: Dictionary = game.s
 	day_label.text = "Ngày %d/30" % game.day()
 	clock_label.text = "%s · %s · còn %s giờ" % [game.weekday_name(), GameLogic.hh(minf(game.clock(), 22.0)), GameLogic.num(game.hours_left())]
-	money_label.text = GameLogic.fmt_money(int(s.money))
-	var m: Dictionary = game.next_milestone()
-	var lack := maxi(0, int(m.amount) - int(s.money))
-	var days_left: int = int(m.day) - game.day()
-	var when := "hạn là tối nay" if days_left == 0 else "còn %d ngày" % days_left
-	if lack == 0:
-		goal_label.text = "Ngày %d · %s: %s\nĐã đủ tiền cho mốc này" % [m.day, m.label, GameLogic.fmt_money(m.amount)]
-	else:
-		goal_label.text = "Ngày %d · %s: %s\nCòn thiếu %s · %s" % [m.day, m.label, GameLogic.fmt_money(m.amount), GameLogic.fmt_money(lack), when]
-	UI.set_bar(goal_bar, float(s.money), float(m.amount), UI.GOOD if lack == 0 else UI.STAMP)
-	health_label.text = "Sức khỏe  %d/%d" % [int(s.health), int(s.health_max)]
-	UI.set_bar(health_bar, float(s.health), float(s.health_max), UI.level_color(float(s.health) / float(s.health_max)))
-	mood_label.text = "Tinh thần  %d/%d" % [int(s.mood), int(s.mood_max)]
-	UI.set_bar(mood_bar, float(s.mood), float(s.mood_max), UI.level_color(float(s.mood) / float(s.mood_max)))
-	var per := float(game.cfg.xpPerLevel)
-	var max_lv := int(game.cfg.maxLevel)
-	for k in skill_rows:
-		var row: Array = skill_rows[k]
-		UI.set_bar(row[0], float(s.xp[k]), per * max_lv, UI.TIM)
-		row[1].text = "%d/%d" % [game.level(k), max_lv]
+
+	for c in money_grid.get_children():
+		c.queue_free()
+	for row in UI.money_lines(game):
+		money_grid.add_child(UI.label(row[0], 13, UI.INK_SOFT))
+		var v := UI.label(row[1], 14, UI.INK)
+		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		money_grid.add_child(v)
+
+	var warn := float(game.cfg.fatigue.warn)
+	fatigue_label.text = "Mệt  %d/100%s" % [int(s.fatigue), "  · cảnh báo" if game.fatigue_warn() else ""]
+	UI.set_bar(fatigue_bar, float(s.fatigue), 100.0, UI.STAMP if float(s.fatigue) >= warn else (UI.WARN if float(s.fatigue) >= warn - 20 else UI.GOOD))
+	var info := ["Tuyến " + str(s.route)]
+	if s.route != "A":
+		info.append("Tiến độ hợp đồng %d/%d buổi trước nghiệm thu" % [int(s.progress), int(s.progress_need)])
+	info.append("Ngày ở mức cảnh báo: %d · bỏ qua nghỉ: %d" % [int(s.warn_days), int(s.rest_skips)])
+	info.append("Linh tin An: %d · Linh muốn: %s" % [int(s.respect), "chỗ xa" if s.linh.wish == "xa" else "chỗ gần"])
+	progress_label.text = "\n".join(info)
 	var reps := []
-	for k in GameLogic.REPS:
-		reps.append("%s %d" % [GameLogic.REPS[k], int(s.rep[k])])
-	reps_label.text = "  ·  ".join(reps)
-	var room_name := "Chưa thuê"
-	if s.room != "":
-		room_name = game.cfg.rooms[s.room].name
-	var lines := [
-		"Phòng trọ: " + room_name,
-		"Nợ phải trả ngày 30: " + GameLogic.fmt_money(int(s.debt)),
-		"Bằng chứng: %d · Chuyến chạy hàng: %d/%d" % [int(s.evidence), int(s.smuggle), int(game.cfg.smuggle.tripsForBadEnding)],
-		"Tạm trú: " + ("Đã đăng ký" if s.flags.get("tamTru", false) else "Chưa"),
-	]
-	if int(s.held) > 0:
-		lines.append("Lương đang bị giữ: " + GameLogic.fmt_money(int(s.held)))
-	misc_label.text = "\n".join(lines)
-	food_select.select(food_keys.find(s.food))
-	food_select.disabled = float(s.used) > 0.0 or not s.queue.is_empty()
-	focus_select.select(focus_keys.find(s.focus))
+	for k in game.story.reps:
+		reps.append("%s %d" % [game.rep_name(k), int(s.rep.get(k, 0))])
+	people_label.text = "  ·  ".join(reps)
+
 	end_day_btn.text = "Kết thúc ngày %d" % game.day()
 	end_day_btn.disabled = game.is_over() or not s.queue.is_empty()
 	for g in flows:

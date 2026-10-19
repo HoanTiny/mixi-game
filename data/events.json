@@ -1,278 +1,209 @@
 [
   {
-    "id": "xe_om", "day": 1,
-    "title": "Bến xe Miền Đông, 5 giờ sáng", "who": "Chú xe ôm",
-    "text": "\"Về Bình Thạnh hả con? Ba trăm nghìn, chú chở liền.\"",
-    "choices": [
-      { "label": "Đồng ý 300 nghìn", "effects": { "money": -300000, "money_label": "Xe ôm từ bến xe" } },
-      { "label": "Mặc cả", "hint": "Còn 120 nghìn", "require": { "skill.giaoTiep": 1 },
-        "effects": { "money": -120000, "money_label": "Xe ôm, sau khi mặc cả" } },
-      { "label": "Gọi Tuấn ra đón", "hint": "Chờ 2 giờ, không mất tiền",
-        "effects": { "hours": 2, "rep.tuan": 10, "log": "Tuấn tới bằng một chiếc tay ga mới cứng. Phụ hồ mà đi xe này sao?" } }
-    ]
-  },
-  {
-    "id": "phong_tro", "day": 1,
-    "title": "Tìm phòng trọ",
-    "text": "Trong con hẻm ở Bình Thạnh còn hai chỗ trống. Tiền trọ trả một lần cho cả tháng.",
-    "choices": [
-      { "label": "{room_ghep}: {rent_ghep}", "hint": "Rẻ hơn, nhưng Tinh thần giảm nhanh và dễ mất đồ",
-        "require": { "afford_room": "ghep" }, "effects": { "room": "ghep" } },
-      { "label": "{room_rieng}: {rent_rieng}", "hint": "Mở tuyến cô Sáu và bé Bin",
-        "require": { "afford_room": "rieng" }, "effects": { "room": "rieng", "rep.coSau": 10 } }
-    ]
-  },
-  {
-    "id": "chu_bay", "day": 3,
-    "title": "Tiệm chú Bảy đầu hẻm", "who": "Chú Bảy",
-    "text": "Một chiếc máy lạnh đang kêu rè rè. Chú Bảy cau mày, tháo ra lắp vào mãi không xong.",
-    "choices": [
-      { "label": "Ghé vào góp ý", "hint": "Chú Bảy +20", "require": { "skill.tayNghe": 1 },
-        "effects": { "rep.chuBay": 20, "log": "Minh chỉ đúng bệnh cái tụ điện. Chú Bảy nhìn Minh lâu hơn bình thường." } },
-      { "label": "Hỏi thăm vài câu", "hint": "Chú Bảy +5", "effects": { "rep.chuBay": 5 } },
-      { "label": "Đi tiếp" }
-    ]
-  },
-  {
-    "id": "be_bin", "day": 5, "when": { "room": "rieng" },
-    "title": "Bé Bin rớt bài kiểm tra", "who": "Cô Sáu",
-    "text": "Cô Sáu đứng giữa sân mắng con: \"Có mấy bài Toán mà cũng không làm được!\"",
-    "choices": [
-      { "label": "Đề nghị kèm Toán một buổi, không lấy tiền", "hint": "Mất 2 giờ, cô Sáu +20",
-        "require": { "hours_left": 2 },
-        "effects": { "hours": 2, "rep.coSau": 20, "log": "Bé Bin làm được bài. Cô Sáu bớt nghi ngờ cậu thanh niên mới tới." },
-        "bonus": [ { "when": { "flag.sach": true }, "effects": { "rep.coSau": 10 } } ] },
-      { "label": "Không xen vào" }
-    ]
-  },
-  {
-    "id": "lan_goi", "day": 7,
-    "title": "Cuộc gọi của Lan", "who": "Lan",
-    "text": "\"Anh Hai… thôi em không học nữa cũng được. Em đi làm công nhân phụ anh.\"",
-    "choices": [
-      { "label": "\"Không được! Em phải học.\"", "hint": "Tinh thần −10, Tinh thần tối đa +10", "effects": { "mood_max": 10, "mood": -10 } },
-      { "label": "\"Để anh tính…\"", "hint": "Lan đi làm thêm", "effects": { "flag.lanLamThem": true } }
-    ]
-  },
-  {
-    "id": "quyt_luong", "day": 8,
-    "title": "Chủ thầu bỏ trốn", "who": "Tuấn",
-    "text": "Nghe nói chủ thầu công trình đã bỏ trốn, quỵt lương anh em. May mà Minh không dính.",
-    "quote": "\"Ở đây vậy đó mày. Muốn có tiền thì phải biết đường.\"",
+    "id": "lat_cat_mo", "day": 18, "eyebrow": "Lát cắt ngày 18–22",
+    "title": "Mười hai ngày trước khi trả chìa khóa",
+    "text": "Đã là ngày 18. Ngày 26 phải chốt chỗ ở, ngày 30 trả chìa khóa phòng cũ cho cô Duyên.\nAn đang đi theo đường làm công: ca kho, ca phụ quán, sửa đồ lẻ. Tiền về ngay, nhưng mỗi ca là một ngày sức.",
     "variants": [
-      { "when": { "held_min": 1 },
-        "text": "Sáng ra công trình, chủ thầu đã biến mất. Minh mất {held} tiền công các ngày 5 đến 7.",
-        "choices": [ { "label": "Tiếp tục", "effects": { "special": "lose_held_wages" } } ] }
+      { "when": { "route": "B" },
+        "text": "Đã là ngày 18. Ngày 26 phải chốt chỗ ở, ngày 30 trả chìa khóa phòng cũ cho cô Duyên.\nAn nhận hợp đồng Bến Cạn cùng tổ: Trâm, Minh, chú Sáu. Đợt giữa {hd_giua} chỉ về khi nghiệm thu, cần thêm {need_left} buổi làm trước tối ngày 20. Đợt cuối về ngày 32, sau ngày trả phòng." },
+      { "when": { "route": "C" },
+        "text": "Đã là ngày 18. Ngày 26 phải chốt chỗ ở, ngày 30 trả chìa khóa phòng cũ cho cô Duyên.\nAn tự điều phối hợp đồng Bến Cạn, tự ứng vật tư. Đợt giữa {hd_giua} chỉ về khi nghiệm thu, cần thêm {need_left} buổi làm trước tối ngày 20. Đợt cuối về ngày 32, sau ngày trả phòng." }
     ],
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "loi_re", "day": 11,
-    "title": "Lối rẽ",
-    "text": "Chú Bảy: \"Muốn học nghề thì sáng mai ra đây. Tháng đầu không lương à nghen.\"\nVy ở quán cà phê: \"Bạn nói chuyện dễ thương mà, sao không xin vô đây làm?\"\nMột tờ rơi dán ở cột điện: lớp tiếng Anh buổi tối ở nhà văn hóa phường.\n\nCác lớp học đã mở.",
-    "choices": [ { "label": "Tiếp tục", "effects": { "rep.vy": 10 } } ]
-  },
-  {
-    "id": "vi_ong_tu", "day": 13,
-    "title": "Cái ví rơi trong hẻm",
-    "text": "Minh nhặt được một cái ví sờn. Bên trong có 2 triệu đồng và giấy tờ của một ông lão.",
-    "choices": [
-      { "label": "Giữ lại", "hint": "+2.000.000đ, cô Sáu và chú Bảy −10",
-        "effects": { "money": 2000000, "money_label": "Tiền trong ví nhặt được", "rep.coSau": -10, "rep.chuBay": -10, "flag.keptWallet": true } },
-      { "label": "Tìm người trả lại", "hint": "Ông Tư +30, cô Sáu +10",
-        "effects": { "rep.ongTu": 30, "rep.coSau": 10, "flag.returnedWallet": true,
-          "log": "Ông Tư: \"Mất đồ thì kiếm lại được, mất cái tử tế thì kiếm hoài không ra.\"" } }
-    ]
-  },
-  {
-    "id": "tuan_ru", "day": 15,
-    "title": "Tuấn rủ chạy hàng", "who": "Tuấn",
-    "text": "\"Một chuyến chở đồ từ Củ Chi về. {smuggle_pay}. Không hỏi bên trong là gì.\"",
-    "choices": [
-      { "label": "Đi một chuyến", "hint": "+{smuggle_pay}, mất {smuggle_hours} giờ", "effects": { "special": "smuggle_trip", "rep.tuan": 10 } },
-      { "label": "Từ chối", "hint": "Tuấn giận, mất mối phụ hồ", "effects": { "flag.matViecPhuHo": true, "rep.tuan": -20 } },
-      { "label": "Từ chối và khuyên Tuấn bỏ", "hint": "Mở tuyến cứu Tuấn", "require": { "rep.tuan": 50 },
-        "effects": { "flag.cuuTuan": true, "rep.tuan": 5 } }
-    ]
-  },
-  {
-    "id": "om", "day": 17, "when": { "health_below": 30 },
-    "title": "Minh sốt cao",
-    "text": "Minh sốt li bì. Không ai biết, cả ngày nằm một mình trong phòng.",
-    "variants": [
-      { "when": { "room": "rieng", "rep.coSau": 30 },
-        "text": "Cô Sáu thấy cửa phòng đóng im, gõ cửa rồi mang lên một tô cháo hành nóng.",
-        "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe +30", "effects": { "health": 30 } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true, "special": "count_faint" } } ]
-  },
-  {
-    "id": "tuan_ru_tiep", "days": [17, 19], "when": { "smuggle_min": 1, "smuggle_below_trips": true },
-    "title": "Thêm một chuyến nữa", "who": "Tuấn",
-    "text": "\"Chuyến trước êm mà. Thêm chuyến nữa đi, {smuggle_pay}.\"",
-    "choices": [
-      { "label": "Đi", "hint": "Đã đi {smuggle}/{trips} chuyến", "effects": { "special": "smuggle_trip" } },
-      { "label": "Thôi, không đi nữa" }
-    ]
-  },
-  {
-    "id": "vy_hop_dong", "day": 18,
-    "title": "Một buổi chiều ở quán", "who": "Vy",
-    "text": "Vy hỏi chuyện nhà. Minh ngại, không kể.",
-    "variants": [
-      { "when": { "rep.vy": 40 },
-        "title": "Tờ giấy vay nợ",
-        "text": "Minh kể chuyện nhà. Vy xin xem ảnh tờ giấy vay má gửi lên.\n\"Khoan… lãi này gần 200% một năm. Luật chỉ cho tối đa 20% thôi. Mấy ông này đang phạm luật đó Minh.\"",
-        "choices": [ { "label": "Tiếp tục", "hint": "Mở lớp Đọc sách luật với Vy", "effects": { "flag.phapLyMo": true } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "tang_lai", "day": 21,
-    "title": "Hưng Sẹo đổi luật chơi", "who": "Khoa (qua điện thoại)",
-    "text": "\"Anh Hưng nói tháng này lãi lên. Ngày 30 phải {debt_after_raise}.\"",
-    "variants": [
-      { "when": { "flag.phapLyMo": true },
-        "choices": [
-          { "label": "Ghi âm cuộc gọi", "hint": "Bằng chứng +1", "effects": { "special": "raise_debt", "evidence": 1 } },
-          { "label": "Nghe xong cúp máy", "effects": { "special": "raise_debt" } }
-        ] }
-    ],
-    "choices": [ { "label": "Nghe xong cúp máy", "effects": { "special": "raise_debt" } } ]
-  },
-  {
-    "id": "hop_dong_tin", "day": 22,
-    "title": "Máy lạnh cả dãy trọ",
-    "text": "Cô Sáu cần sửa máy lạnh cả dãy trọ. Chú Bảy nói Minh chưa đủ tay nghề để nhận.",
-    "variants": [
-      { "when": { "skill.tayNghe": 4 },
-        "text": "Chú Bảy giao cho Minh hợp đồng sửa máy lạnh 12 phòng của cô Sáu. Làm trong ngày 22 đến 26." }
-    ],
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "khach_uc_tin", "day": 23, "when": { "skill.ngoaiNgu": 3 },
-    "title": "Nhóm khách Úc", "who": "Vy",
-    "text": "\"Có nhóm khách Úc cần người dẫn đi chợ Bến Thành. Minh nói tiếng Anh được rồi, nhận không?\"",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "livestream_tin", "day": 24, "when": { "skill.tinHoc": 2, "skill.giaoTiep": 2 },
-    "title": "Thùng cá khô của má",
-    "text": "Má gửi lên một thùng cá khô. Minh nghĩ tới chuyện livestream bán thử.",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "tuan_nan", "day": 25, "when": { "flag.cuuTuan": true },
-    "title": "Cuộc gọi lúc nửa đêm", "who": "Tuấn",
-    "text": "\"Lô hàng bể rồi mày ơi. Tụi nó đang tìm tao. Cho tao trốn vài bữa…\"",
-    "choices": [
-      { "label": "Cho Tuấn trốn ở phòng trọ", "hint": "Mất trọn hôm nay, bằng chứng +1",
-        "effects": { "skip_day": true, "evidence": 1, "rep.tuan": 20, "log": "Tuấn khai ra đường dây. Đó cũng chính là đường dây của Hưng Sẹo." } },
-      { "label": "Từ chối", "hint": "Tinh thần −30", "effects": { "mood": -30 } }
-    ]
-  },
-  {
-    "id": "ong_tu", "day": 27, "when": { "flag.returnedWallet": true },
-    "title": "Ông Tư gõ cửa", "who": "Ông Tư",
-    "text": "\"Ông không có nhiều. Năm trăm nghìn, coi như tiền nước. Đừng từ chối, ông giận.\"",
-    "choices": [ { "label": "Nhận", "effects": { "money": 500000, "money_label": "Ông Tư gửi", "rep.ongTu": 10 } } ]
+    "choices": [ { "label": "Bắt đầu ngày 18" } ]
   },
 
   {
-    "id": "moc_10_ok", "system": true, "eyebrow": "Tối ngày 10 · Mốc 1",
-    "title": "Khoa đến thu lãi", "who": "Khoa",
-    "text": "Minh đưa {amount}. Khoa đếm từng tờ, liếc quanh căn phòng trọ.",
-    "quote": "\"Mày gan đấy.\"",
+    "id": "ngay18_bc", "day": 18, "when": { "route": ["B", "C"] },
+    "title": "Một chút của năm quán", "who": "Anh Phúc",
+    "text": "Mỗi chủ quán ở Bến Cạn xin thêm \"một việc nhỏ\": thay cái công tắc, kéo thêm ổ cắm, coi lại bóng đèn. Cộng lại thành cả ngày.\n\"Anh tưởng thêm có chút.\"",
+    "quote": "An: \"Dạ. Nhưng mỗi quán thêm chút là hết buổi chiều của cả nhóm.\"",
+    "choices": [
+      { "label": "Báo phần phát sinh kèm giá và lịch riêng, để khách tự quyết",
+        "hint": "Có quán đồng ý, có quán bỏ bớt. +600.000đ phải thu ngày 32",
+        "effects": { "receivable": { "id": "phat_sinh", "from": "Bến Cạn", "label": "Phần phát sinh đã báo giá", "amount": 600000, "due": 32 },
+          "rep.PHUC": 2, "rep.TRAM": 3, "flag.baoGia": true } },
+      { "label": "Làm miễn phí một việc nhỏ, ghi rõ chỉ lần này",
+        "hint": "Mất 3 giờ, Mệt +8. Anh Phúc giúp chặn các yêu cầu khác",
+        "require": { "hours_left": 3 },
+        "effects": { "hours": 3, "fatigue": 8, "rep.PHUC": 6, "flag.tangMotLan": true } },
+      { "label": "Nhận tất cả miễn phí để giữ tiếng dễ thương",
+        "hint": "Cần thêm 1 buổi làm trước nghiệm thu. Trâm và Minh phải làm thêm không công",
+        "effects": { "progress_need": 1, "rep.PHUC": 8, "rep.TRAM": -10, "rep.MINH": -5,
+          "promise": { "id": "lam_them_mien_phi", "text": "Làm thêm việc nhỏ miễn phí cho năm quán", "to": "PHUC", "due": 20, "doneIf": "progress_ready" },
+          "family": { "who": "BA_TU", "kind": "time_lost", "text": "Bớt giờ ở nhà để làm thêm không công" } } }
+    ]
+  },
+  {
+    "id": "ngay18_a", "day": 18, "when": { "route": "A" },
+    "title": "Một chút ngoài phiếu", "who": "Khách sửa nồi cơm",
+    "text": "Khách mang nồi cơm tới bàn chú Sáu, xong lại lấy thêm cái quạt, cái ấm siêu tốc: \"Tiện tay coi giùm luôn em.\" Mấy món đó không có trong phiếu đã ghi.",
+    "quote": "Chú Sáu: \"Tiện tay của khách là nguyên buổi của mình đó con.\"",
+    "choices": [
+      { "label": "Báo giá phần thêm, để khách tự quyết",
+        "hint": "Khách đồng ý một món. +150.000đ phải thu ngày 21",
+        "effects": { "receivable": { "id": "phat_sinh_le", "from": "Khách lẻ", "label": "Phần sửa thêm đã báo giá", "amount": 150000, "due": 21 },
+          "rep.SAU": 2, "flag.baoGia": true } },
+      { "label": "Coi giùm miễn phí một món, nói rõ chỉ lần này",
+        "hint": "Mất 2 giờ, Mệt +5",
+        "require": { "hours_left": 2 },
+        "effects": { "hours": 2, "fatigue": 5, "rep.SAU": 3, "flag.tangMotLan": true } },
+      { "label": "Nhận sửa hết, không lấy thêm tiền",
+        "hint": "Mất 5 giờ, Mệt +12. Bàn của chú Sáu bị chiếm cả buổi",
+        "require": { "hours_left": 5 },
+        "effects": { "hours": 5, "fatigue": 12, "rep.SAU": -3,
+          "family": { "who": "BA_TU", "kind": "time_lost", "text": "Về trễ vì sửa không công" } } }
+    ]
+  },
+
+  {
+    "id": "ngay19", "day": 19,
+    "title": "Cái tên trên phiếu thực tập", "who": "Linh",
+    "text": "Linh nhờ An xem hồ sơ và xin nửa buổi tới cơ sở thực tập làm thử. Em muốn được đánh giá bằng việc mình làm, không phải mang danh \"em của anh An\".",
+    "quote": "Linh: \"Em muốn người ta biết em làm được gì trước khi biết anh quen ai.\"",
+    "choices": [
+      { "label": "Đọc hồ sơ theo đề nghị, hỏi Linh muốn góp ý phần nào, đi cùng em",
+        "hint": "Mất 3 giờ. Linh tự trao đổi với cơ sở",
+        "require": { "hours_left": 3 },
+        "effects": { "hours": 3, "fatigue": 3, "respect": 2, "rep.LINH": 5, "flag.diCungLinh": true,
+          "family": { "who": "LINH", "kind": "support", "text": "Đọc hồ sơ theo đề nghị của Linh, đi cùng em" } } },
+      { "label": "Báo trước là không đi được, giúp em tra tuyến xe và chi phí",
+        "hint": "Mất 1 giờ. Giữ được ca làm, Linh đi với bạn",
+        "effects": { "hours": 1, "respect": 1, "rep.LINH": 2,
+          "family": { "who": "LINH", "kind": "support", "text": "Giúp Linh tra tuyến xe và chi phí" } } },
+      { "label": "Gọi trước nhờ người quen \"lo giùm\", dù Linh chưa đồng ý",
+        "hint": "Linh khó chịu vì bị nói thay",
+        "effects": { "respect": -2, "rep.LINH": -8, "flag.noiThayLinh": true,
+          "family": { "who": "LINH", "kind": "pressure", "text": "Nhờ người quen lo hồ sơ thay khi Linh chưa đồng ý" } } }
+    ]
+  },
+
+  {
+    "id": "ngay20_bc", "day": 20, "when": { "route": ["B", "C"] },
+    "title": "Lãi trên giấy", "who": "Trâm",
+    "text": "Đến mốc giữa kỳ. Trên bảng, hợp đồng vẫn có lời, nhưng khoản cuối chỉ về ngày 32. Một chủ quán xin lùi phần đóng tiền. Hạn chốt chỗ ở là ngày 26.\nTiến độ: {progress}/{need} buổi. Tiền mặt dự kiến ngày 26: {proj26}.",
+    "quote": "Trâm: \"Việc có lời, nhưng tiền chưa về kịp. Em định lấy tiền nào trả phần còn lại, và người có tiền đó đã đồng ý chưa?\"",
+    "choices": [
+      { "label": "Nhận tiền phần đã nghiệm thu, thu hẹp phần chưa chắc được trả",
+        "hint": "Nhận ngay phần đợt giữa tương ứng tiến độ. Đợt cuối còn 1.000.000đ, công đội giảm 400.000đ",
+        "effects": { "special": "narrow_contract", "rep.PHUC": -3, "rep.TRAM": 3 } },
+      { "label": "Tiếp tục theo mốc đã xác nhận, chuẩn bị phương án ở tạm nếu thiếu",
+        "hint": "Khoản phải thu không đổi. Ghi kế hoạch dự phòng nhà dì Năm",
+        "effects": { "flag.duPhongNhaTam": true, "rep.TRAM": 2 } },
+      { "label": "Tính cả tiền chưa nhận để hứa đặt cọc Hẻm Dừa ngay",
+        "hint": "Cảnh báo: tiền thật chưa đủ. Sinh ra một lời hứa có rủi ro, ngày 25 phải nói lại",
+        "effects": { "flag.huaBangTienChuaVe": true, "rep.TRAM": -5,
+          "promise": { "id": "dat_coc_hem_dua", "text": "Đặt cọc Hẻm Dừa bằng tiền chưa về", "to": "LINH", "due": 26 },
+          "family": { "who": "LINH", "kind": "conceal", "text": "Hứa đặt phòng bằng tiền hợp đồng chưa về" } } }
+    ]
+  },
+  {
+    "id": "ngay20_a", "day": 20, "when": { "route": "A" },
+    "title": "Lãi trên giấy", "who": "Quản lý kho",
+    "text": "Quản lý kho mời An làm một việc trả theo nửa tháng, tổng 1.600.000đ, tiền về ngày 31. Hạn chốt chỗ ở là ngày 26.\nTiền mặt dự kiến ngày 26: {proj26}.",
+    "quote": "Linh: \"Anh đang lời. Nhưng hôm nay mình còn bao nhiêu để cầm đi đặt phòng?\"",
+    "choices": [
+      { "label": "Từ chối, giữ các ca trả tiền ngay",
+        "hint": "Không có khoản phải thu mới. Tiền mặt chắc hơn",
+        "effects": { "flag.giuCaTraNgay": true } },
+      { "label": "Nhận việc trả chậm, sau khi đã để riêng đủ tiền chuyển nhà",
+        "hint": "Chỉ chọn được khi tiền mặt từ 4.200.000đ. +1.600.000đ phải thu ngày 31",
+        "require": { "cash_min": 4200000 },
+        "effects": { "receivable": { "id": "kho_nua_thang", "from": "Kho khu công nghiệp", "label": "Việc kho trả theo nửa tháng", "amount": 1600000, "due": 31 } } },
+      { "label": "Nhận việc, tính luôn tiền chưa về để hứa đặt cọc ngay",
+        "hint": "Cảnh báo: tiền thật chưa đủ. Sinh ra một lời hứa có rủi ro",
+        "effects": { "receivable": { "id": "kho_nua_thang", "from": "Kho khu công nghiệp", "label": "Việc kho trả theo nửa tháng", "amount": 1600000, "due": 31 },
+          "flag.huaBangTienChuaVe": true,
+          "promise": { "id": "dat_coc_hem_dua", "text": "Đặt cọc Hẻm Dừa bằng tiền chưa về", "to": "LINH", "due": 26 },
+          "family": { "who": "LINH", "kind": "conceal", "text": "Hứa đặt phòng bằng tiền chưa về" } } }
+    ]
+  },
+
+  {
+    "id": "ngay21", "day": 21,
+    "title": "Bậc cửa của bà", "who": "Bà Tư",
+    "text": "Cả nhà quay lại chỗ định thuê. Bà Tư khen mọi thứ, nhưng đứng khá lâu trước bậc cửa. Tối về, bà lén lấy chậu húng ra khỏi thùng đồ.",
+    "quote": "Bà Tư: \"Bà không tiếc cái phòng. Bà tiếc sáng ra mở cửa là có người gọi tên mình.\"",
+    "choices": [
+      { "label": "Dành một buổi cùng bà đi thử đường ra chợ và sinh hoạt",
+        "hint": "Mất 3 giờ. Biết rõ bà đi lại được tới đâu",
+        "require": { "hours_left": 3 },
+        "effects": { "hours": 3, "fatigue": 4, "rep.BA_TU": 8, "flag.baTuThuDuong": true,
+          "family": { "who": "BA_TU", "kind": "support", "text": "Cùng bà đi thử đường ra chợ" } } },
+      { "label": "Nhờ bà chọn hai ưu tiên cần giữ trong số tiền đang có",
+        "hint": "Mất 1 giờ. Không hứa đáp ứng tất cả",
+        "effects": { "hours": 1, "rep.BA_TU": 6, "flag.baTuChonUuTien": true,
+          "family": { "who": "BA_TU", "kind": "support", "text": "Để bà chọn hai ưu tiên về chỗ ở" } } },
+      { "label": "Giữ phương án tiện cho công việc, hứa một lịch hỗ trợ cụ thể",
+        "hint": "Bà có thể chưa vui. Sinh ra lời hứa đưa bà đi chợ sáng thứ Bảy",
+        "effects": { "rep.BA_TU": -2,
+          "promise": { "id": "dua_ba_di_cho", "text": "Đưa bà đi chợ sáng thứ Bảy ở chỗ mới", "to": "BA_TU", "due": 27 } } }
+    ]
+  },
+
+  {
+    "id": "ngay22", "day": 22,
+    "title": "Linh được nhận", "who": "Linh", "eyebrow": "Ngày 22 · tốn nhiều giờ",
+    "text": "Một cơ sở ở thị xã bên cạnh mời Linh thực tập: có người hướng dẫn riêng, hỗ trợ chỗ ở và phụ cấp, nhưng em chỉ về được cuối tuần. Một cơ sở gần nhà cũng nhận, việc quen hơn nhưng ít cơ hội học sâu.\nLinh: \"Em muốn bàn lịch với anh và bà. Chớ em chưa nói em mặc kệ.\"",
+    "quote": "Quyết định cuối cùng là của Linh.",
+    "choices": [
+      { "label": "Ủng hộ điều Linh muốn, cùng lập kế hoạch ăn ở và đi lại",
+        "hint": "Mất 6 giờ. Hỏi rõ khoản nào là góp, khoản nào là mượn",
+        "require": { "hours_left": 6 },
+        "effects": { "hours": 6, "fatigue": 5, "respect": 2, "rep.LINH": 6,
+          "family": { "who": "LINH", "kind": "support", "text": "Ủng hộ và cùng Linh lập kế hoạch thực tập" },
+          "special": "linh_decides" } },
+      { "label": "Nói rõ nỗi lo về bà và chi phí, cùng so sánh với chỗ gần",
+        "hint": "Mất 6 giờ. Cuộc nói chuyện khó, không bị phạt nếu lắng nghe",
+        "require": { "hours_left": 6 },
+        "effects": { "hours": 6, "fatigue": 6, "respect": 1, "rep.LINH": 2, "special": "linh_decides" } },
+      { "label": "Muốn em ở lại, nhắc chuyện mình đã hy sinh cho cả nhà",
+        "hint": "Linh vẫn giữ quyền chọn chỗ xa",
+        "effects": { "hours": 2, "respect": -3, "rep.LINH": -12,
+          "family": { "who": "LINH", "kind": "pressure", "text": "Lấy chuyện hy sinh ra ép Linh ở lại" },
+          "special": "linh_decides" } }
+    ]
+  },
+
+  {
+    "id": "linh_quyet", "system": true, "eyebrow": "Ngày 22", "title": "Linh chọn chỗ xa", "who": "Linh",
+    "text": "Linh nhận chỗ thực tập ở thị xã. Em hẹn cuối tuần về, đã hỏi kỹ tiền phòng và tuyến xe.",
+    "quote": "Linh: \"Em đi để sau này có nghề đàng hoàng. Không phải em đi vì không thương bà.\"",
+    "variants": [
+      { "when": { "pressure_min": 2 },
+        "title": "Linh tự thu xếp",
+        "text": "Tối đó Linh nhắn một dòng: em đã nhận chỗ xa, tự hỏi chỗ ở, cuối tuần sẽ báo lịch về. Em không hỏi ý An nữa.",
+        "quote": "Linh: \"Vì nhà mình đâu có nghĩa em không được có kế hoạch.\"" },
+      { "when": { "linh_wish": "gan" },
+        "title": "Linh chọn chỗ gần",
+        "text": "Linh chọn cơ sở gần nhà. Em đặt mốc ba tháng để xem lại cơ hội, và nói rõ đây là lựa chọn của em.",
+        "quote": "Linh: \"Em chọn gần vì em muốn học chỗ đó trước. Không phải vì anh bảo.\"" }
+    ],
+    "choices": [ { "label": "Tiếp tục" } ]
+  },
+
+  {
+    "id": "hd_giua_ok", "system": true, "eyebrow": "Tối ngày 20",
+    "title": "Nghiệm thu giai đoạn giữa",
+    "text": "Trâm ký xác nhận phần đã đạt. Anh Phúc chuyển đợt giữa {amount}.",
     "choices": [ { "label": "Tiếp tục" } ]
   },
   {
-    "id": "moc_10_fail", "system": true, "eyebrow": "Tối ngày 10 · Mốc 1",
-    "title": "Khoa đến thu lãi", "who": "Khoa",
-    "text": "Minh không có đủ {amount}. Khoa và hai thanh niên ra tay.\nSức khỏe {fail_health}, nợ ngày 30 tăng thêm {fail_debt}.",
-    "quote": "\"Lần sau thì không nhẹ vậy đâu.\"",
+    "id": "hd_giua_tre", "system": true, "eyebrow": "Tối ngày 20",
+    "title": "Chưa nghiệm thu được",
+    "text": "Mới xong {progress}/{need} buổi. Trâm không ký phần chưa làm. Đợt giữa dời sang ngày 23, anh Phúc phải báo lại các quán.",
+    "quote": "Trâm: \"Chưa xong thì ghi chưa xong. Mình còn làm tiếp được.\"",
     "choices": [ { "label": "Tiếp tục" } ]
   },
   {
-    "id": "moc_20_ok", "system": true, "eyebrow": "Tối ngày 20 · Mốc 2",
-    "title": "Học phí của Lan",
-    "text": "Cuộc gọi video: Lan mặc áo dài trắng trong ngày nhập học. Má khóc phía sau.",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "moc_20_fail", "system": true, "eyebrow": "Tối ngày 20 · Mốc 2",
-    "title": "Học phí của Lan",
-    "text": "Không đủ tiền học phí. Lan phải bảo lưu một năm.",
+    "id": "khong_du_tra", "system": true, "eyebrow": "Sáng nay",
+    "title": "Một khoản chưa trả được",
+    "text": "Tối qua đến hạn trả {amount} cho {label}, nhưng tiền mặt không đủ. Khoản này chuyển sang trạng thái chưa trả, người nhận đã biết.",
     "choices": [ { "label": "Tiếp tục" } ]
   },
   {
     "id": "ngu_gat", "system": true,
     "title": "Ngủ gục ngoài đường",
-    "text": "22 giờ, Minh không kịp về phòng trọ. Cả đêm co ro trên ghế đá, muỗi đốt, sáng ra người ê ẩm.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Đã trừ Sức khỏe {sleep_out_health}, Tinh thần {sleep_out_mood}" } ]
-  },
-  {
-    "id": "skip_ngat", "system": true,
-    "title": "Minh ngất vì kiệt sức",
-    "text": "Hàng xóm đưa Minh về phòng. Cả ngày hôm nay mất trắng.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true } } ]
-  },
-  {
-    "id": "skip_chan_nan", "system": true,
-    "title": "Minh không muốn dậy",
-    "text": "Minh nằm nhìn trần nhà. Cả ngày không bước ra khỏi phòng.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true } } ]
-  },
-
-  {
-    "id": "mua", "random": true,
-    "title": "Mưa ngập đường",
-    "text": "Nước lên tới bánh xe. Công trình và việc ngoài trời nghỉ hôm nay.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe −5", "effects": { "special": "rain", "health": -5 } } ]
-  },
-  {
-    "id": "moc_tui", "random": true, "when": { "money_min": 500001 },
-    "title": "Bị móc túi",
-    "text": "Trên xe buýt chật cứng, Minh mất {amt}.",
-    "choices": [ { "label": "Tiếp tục", "effects": { "special": "pickpocket" } } ]
-  },
-  {
-    "id": "ca_kho", "random": true,
-    "title": "Má gửi cá khô lên",
-    "text": "Gói cá khô bọc ba lớp ni lông, kèm mảnh giấy: \"Ăn cho có sức nghe con.\"",
-    "choices": [ { "label": "Tiếp tục", "hint": "Tinh thần +20", "effects": { "mood": 20, "flag.hasCaKho": true } } ]
-  },
-  {
-    "id": "nhau", "random": true,
-    "title": "Đồng hương rủ đi nhậu", "who": "Tuấn",
-    "text": "\"Tối nay anh em Hà Tĩnh tụ tập. Đi cho vui mày.\"",
-    "choices": [
-      { "label": "Đi", "hint": "Mất 3 giờ và 150k, Tinh thần +15", "require": { "money_min": 150000 },
-        "effects": { "hours": 3, "money": -150000, "money_label": "Đi nhậu với đồng hương", "mood": 15, "rep.tuan": 5 } },
-      { "label": "Từ chối", "hint": "Tuấn −5", "effects": { "rep.tuan": -5 } }
-    ]
-  },
-  {
-    "id": "dien_thoai", "random": true, "when": { "flag.phoneBroken": false },
-    "title": "Điện thoại hỏng",
-    "text": "Màn hình tối đen. Không nhận được việc online cho tới khi sửa.",
-    "choices": [ { "label": "Tiếp tục", "effects": { "flag.phoneBroken": true } } ]
-  },
-  {
-    "id": "kiem_tra_tam_tru", "random": true, "when": { "flag.tamTru": false },
-    "title": "Kiểm tra tạm trú",
-    "text": "Công an phường kiểm tra. Minh chưa đăng ký tạm trú, bị phạt 500.000đ.",
-    "variants": [
-      { "when": { "room": "rieng", "rep.coSau": 40 },
-        "text": "Công an phường kiểm tra. Cô Sáu ra nói vài câu rồi đăng ký luôn cho Minh.",
-        "choices": [ { "label": "Tiếp tục", "effects": { "flag.tamTru": true } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục", "effects": { "money": -500000, "money_label": "Phạt chưa đăng ký tạm trú" } } ]
-  },
-  {
-    "id": "tai_nan", "random": true, "when": { "did_yesterday_any": ["phu_ho", "boc_vac"] },
-    "title": "Tai nạn lao động nhỏ",
-    "text": "Hôm qua làm nặng, sáng nay Minh trượt chân ngã. Phải nghỉ cả ngày.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe −20, mất trọn hôm nay", "effects": { "health": -20, "skip_day": true } } ]
+    "text": "22 giờ, An không kịp về xóm trọ. Cả đêm ngồi ngủ gục trên ghế đá cạnh rạch, muỗi đốt, sáng ra người ê ẩm.",
+    "choices": [ { "label": "Tiếp tục", "hint": "Đã cộng Mệt +{sleep_out}" } ]
   }
 ]

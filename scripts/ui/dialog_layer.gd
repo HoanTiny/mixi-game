@@ -1,5 +1,5 @@
 extends Control
-## Lớp hộp thoại ở giữa màn hình: mở đầu, sự kiện, buổi tối và kết thúc.
+## Lớp hộp thoại ở giữa màn hình: chọn tuyến, sự kiện, buổi tối và tổng kết lát cắt.
 ## Tự hiện khi trạng thái game cần người chơi chọn, tự ẩn khi không.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
@@ -18,11 +18,16 @@ func _ready() -> void:
 	scrim.color = Color(0.05, 0.06, 0.12, 0.6)
 	add_child(scrim)
 	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var scroll := ScrollContainer.new()
+	add_child(scroll)
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var center := CenterContainer.new()
-	add_child(center)
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(620, 0)
+	panel.custom_minimum_size = Vector2(640, 0)
 	panel.add_theme_stylebox_override("panel", UI.box(UI.CARD, UI.LINE, 12, 26))
 	center.add_child(panel)
 	_box = VBoxContainer.new()
@@ -37,11 +42,6 @@ func open_night() -> void:
 	refresh()
 
 
-## Đúng khi đang có hộp thoại che màn hình (cảnh 3D nên ngừng nhận chuột).
-func is_blocking() -> bool:
-	return visible
-
-
 func refresh() -> void:
 	for child in _box.get_children():
 		child.queue_free()
@@ -49,7 +49,7 @@ func refresh() -> void:
 	if not game.is_started():
 		_start()
 	elif game.is_over():
-		_ending()
+		_report()
 	elif not game.s.queue.is_empty():
 		_event()
 	elif night_open:
@@ -62,16 +62,12 @@ func refresh() -> void:
 
 
 func _start() -> void:
-	var p: Dictionary = game.story.prologue
+	var p: Dictionary = game.story.slice
 	_head(p.eyebrow, p.title, "", p.text, "")
-	if not game.notes.is_empty():
-		_box.add_child(UI.label("SỔ TAY TỪ LẦN TRƯỚC", 11, UI.INK_SOFT))
-		for n in game.notes:
-			_box.add_child(UI.wrap("• " + str(game.story.notes.get(n, n)), 14, UI.TIM))
-	_box.add_child(UI.label("CHỌN MỘT MÓN MANG THEO", 11, UI.INK_SOFT))
-	for k in game.story.items:
-		var item: Dictionary = game.story.items[k]
-		_box.add_child(UI.choice(item.name, item.desc, "", game.new_game.bind(k)))
+	_box.add_child(UI.label(p.pick, 11, UI.INK_SOFT))
+	for k in GameLogic.ROUTES:
+		var pre: Dictionary = game.cfg.presets[k]
+		_box.add_child(UI.choice(pre.name, pre.desc, "", game.new_game.bind(k)))
 
 
 func _event() -> void:
@@ -87,42 +83,56 @@ func _event() -> void:
 
 func _night() -> void:
 	var n: Dictionary = game.night_preview()
-	var shift: Dictionary = game.cfg.nightShift
 	var lines := [
-		"Ăn uống: %s  −%s" % [n.food_name, GameLogic.fmt_money(n.food_cost)],
-		"Giờ còn trống (%s giờ): Sức khỏe +%s" % [GameLogic.num(n.free_hours), GameLogic.num(n.free_health)],
-		"Ngủ: Sức khỏe +%d" % int(n.sleep_health),
-		"Tinh thần cuối ngày: −%d" % int(n.mood_decay),
+		"Sinh hoạt cả nhà: −%s" % GameLogic.fmt_money(n.living),
+		"Ngủ và %s giờ còn trống: Mệt −%d" % [GameLogic.num(n.free_hours), int(n.recover)],
 	]
-	if n.milestone_tonight:
-		lines.append("Tối nay xét mốc tiền %s. Tiền ăn được trừ trước, tiền bốc vác được cộng trước khi xét." % GameLogic.fmt_money(game.next_milestone().amount))
-	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Tối nay làm gì?", "", "\n".join(lines), "")
-	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1), "", _end_day.bind(false)))
-	_box.add_child(UI.choice(shift.name, "+%s · Sức khỏe %d · Tinh thần %d" % [GameLogic.fmt_money(int(shift.pay)), int(shift.health), int(shift.mood)], "", _end_day.bind(true)))
+	if int(n.due_pay) > 0:
+		lines.append("Đến hạn trả tối nay: %s" % GameLogic.fmt_money(n.due_pay))
+	for label in n.due_recv:
+		lines.append("Đến hạn nhận: %s" % label)
+	if game.fatigue_warn() and not game.s.today.get("rested", false):
+		lines.append("Mệt đang ở mức cảnh báo mà hôm nay chưa nghỉ.")
+	if n.slice_end:
+		lines.append("Đây là đêm cuối của lát cắt. Sau đêm nay sẽ có bảng tổng kết.")
+	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Đi ngủ?", "", "\n".join(lines), "")
+	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1) if not n.slice_end else "Xem tổng kết", "", _end_day))
 	_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
 
 
-func _ending() -> void:
-	var over: Dictionary = game.s.over
-	var e: Dictionary = game.story.endings[over.key]
-	_box.add_child(UI.label(str(e.tag).to_upper(), 12, UI.GOOD if e.good else UI.STAMP))
-	_head("", e.title, "", e.text, e.get("quote", ""))
-	var s: Dictionary = game.s
-	var lines := []
-	if over.key == "game_over":
-		lines.append("Còn thiếu: " + GameLogic.fmt_money(int(over.short)))
-	lines.append("Tiền còn lại: " + GameLogic.fmt_money(int(s.money)))
-	lines.append("Tổng đã kiếm: %s · Tổng đã chi: %s" % [GameLogic.fmt_money(int(s.stats.earned)), GameLogic.fmt_money(int(s.stats.spent))])
-	var skills := []
-	for k in GameLogic.SKILLS:
-		skills.append("%s %d" % [GameLogic.SKILLS[k], game.level(k)])
-	lines.append(" · ".join(skills))
-	_box.add_child(UI.wrap("\n".join(lines), 14, UI.INK_SOFT))
-	if not over.new_notes.is_empty():
-		_box.add_child(UI.label("SỔ TAY GHI THÊM", 11, UI.INK_SOFT))
-		for n in over.new_notes:
-			_box.add_child(UI.wrap("• " + str(game.story.notes.get(n, n)), 14, UI.TIM))
-	_box.add_child(UI.choice("Chơi lại từ ngày 0", "", "", GameState.restart))
+func _report() -> void:
+	var r: Dictionary = game.slice_report()
+	var deadline := int(game.cfg.housingDeadline)
+	_box.add_child(UI.label("TỔNG KẾT LÁT CẮT NGÀY 18–22 · TUYẾN %s" % r.route, 12, UI.TIM))
+	var housing_name := "Chưa đủ cả chỗ ở tạm" if r.housing == "" else str(game.cfg.housing[r.housing].name)
+	_box.add_child(UI.wrap("Dự kiến sáng ngày %d: %s" % [deadline, GameLogic.fmt_money(r.proj_deadline)], 24, UI.INK))
+	_box.add_child(UI.wrap("Đủ cho: " + housing_name, 16, UI.GOOD if r.housing == "hem_dua" else (UI.WARN if r.housing != "" else UI.STAMP)))
+	var money := [
+		"Tiền mặt bây giờ: %s" % GameLogic.fmt_money(r.cash),
+		"Phải thu trước ngày 30: %s · sau ngày 30: %s" % [GameLogic.fmt_money(r.recv_before_30), GameLogic.fmt_money(r.recv_after_30)],
+		"Phải trả còn treo: %s" % GameLogic.fmt_money(r.pay_pending),
+	]
+	if r.route != "A":
+		money.append("Tiến độ hợp đồng: %d/%d buổi" % [r.progress, r.need])
+	money.append("Mệt: %d · ngày ở mức cảnh báo: %d · lần bỏ qua nghỉ: %d" % [int(r.fatigue), r.warn_days, r.rest_skips])
+	_box.add_child(UI.wrap("\n".join(money), 14, UI.INK_SOFT))
+
+	var linh: Dictionary = game.story.linhCards[r.linh_card]
+	_box.add_child(UI.label("LINH", 11, UI.INK_SOFT))
+	_box.add_child(UI.wrap("%s\n%s" % [linh.title, linh.text], 14, UI.INK))
+	var ba: Dictionary = game.story.baTuCards[r.ba_tu_card]
+	_box.add_child(UI.label("BÀ TƯ", 11, UI.INK_SOFT))
+	_box.add_child(UI.wrap("%s\n%s" % [ba.title, ba.text], 14, UI.INK))
+
+	var promises := []
+	for p in r.promises:
+		promises.append("• %s · hạn ngày %d · %s" % [p.text, p.due, GameLogic.PROMISE_STATUS.get(p.status, p.status)])
+	_box.add_child(UI.label("SỔ LỜI HỨA", 11, UI.INK_SOFT))
+	_box.add_child(UI.wrap("\n".join(promises), 13, UI.INK))
+	var f: Dictionary = r.family
+	_box.add_child(UI.wrap("Sổ gia đình: hỗ trợ %d · ép quyết định %d · che giấu %d · bớt giờ ở nhà %d" % [f.support, f.pressure, f.conceal, f.time_lost], 13, UI.INK_SOFT))
+
+	_box.add_child(UI.choice("Chơi lại lát cắt", "Chọn lại tuyến A, B hoặc C", "", GameState.restart))
 	_box.add_child(UI.choice("Sao chép kết quả lượt chơi", "Dán vào chat để phân tích cân bằng", "", func() -> void: DisplayServer.clipboard_set(game.summary())))
 
 
@@ -135,12 +145,12 @@ func _head(eyebrow: String, title: String, who: String, text: String, quote: Str
 	if text != "":
 		_box.add_child(UI.wrap(text, 15, UI.INK))
 	if quote != "":
-		_box.add_child(UI.wrap(quote, 18, UI.TIM))
+		_box.add_child(UI.wrap(quote, 17, UI.TIM))
 
 
-func _end_day(shift: bool) -> void:
+func _end_day() -> void:
 	night_open = false
-	game.finish_day(shift)
+	game.finish_day()
 
 
 func _cancel_night() -> void:

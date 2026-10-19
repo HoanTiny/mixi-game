@@ -1,27 +1,29 @@
 extends Node3D
-## Màn phố 3D kiểu Nobody: con phố ở Bình Thạnh nhìn chéo từ trên xuống. Bấm chuột để đi,
-## bấm vào cửa tiệm hoặc người đứng trước cửa để mở việc làm, lớp học ở đó (phím E khi đứng gần).
+## Màn phố 3D kiểu Nobody: phường An Hòa, thành phố Bình Giang, nhìn chéo từ trên xuống.
+## Bấm chuột để đi, bấm vào cửa tiệm hoặc người đứng trước cửa để mở việc ở đó (phím E khi đứng gần).
 ## Nhà cửa, người, xe đều là khối tạm; sau này thay bằng mô hình thật mà không đổi logic.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 const Hud := preload("res://scripts/world/hud.gd")
 
+## Xóm trọ của An: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối.
+const HOME := "xom_bo_me"
+## Để HUD đọc được id nhà mà không cần truy cập hằng số qua instance.
+var home: String = HOME
 ## Mỗi địa điểm nằm phía bắc con phố, mặt tiền nhìn ra đường (z = -5).
-## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm).
+## x: tâm dọc phố · size: rộng, sâu, cao · npcs: người đứng trước cửa (bấm vào cũng mở địa điểm)
+## · shops: số mặt tiền nhỏ liền nhau · stalls: có sạp và ghế trà đá trên vỉa hè.
 const LOCATIONS := {
-	"nga_tu": {"name": "Ngã tư Hàng Xanh", "desc": "Phát tờ rơi cho người qua đường.", "x": -64.0, "size": Vector3(0, 0, 0), "color": "8d8a83"},
-	"tram_xe_buyt": {"name": "Trạm xe buýt đi Quận 1", "desc": "Đón khách nước ngoài, việc cuối tuần.", "x": -55.0, "size": Vector3(5, 3, 2.8), "color": "3c7d6b"},
-	"phuong": {"name": "UBND phường", "desc": "Nhà văn hóa có lớp tiếng Anh tối. Công an phường đăng ký tạm trú.", "x": -45.0, "size": Vector3(12, 8, 7), "color": "e2c55c"},
-	"thu_vien": {"name": "Thư viện quận", "desc": "Tự học miễn phí.", "x": -32.0, "size": Vector3(10, 8, 6), "color": "a98467"},
-	"trung_tam": {"name": "Trung tâm dạy nghề", "desc": "Khóa điện lạnh và tin học văn phòng.", "x": -19.5, "size": Vector3(11, 8, 8.5), "color": "b9b2dc"},
-	"cua_hang": {"name": "Cửa hàng 24 giờ", "desc": "Tuyển thu ngân. Quầy sửa điện thoại bên cạnh.", "x": -8.5, "size": Vector3(8, 7, 4.5), "color": "8cc3df"},
-	"quan_ca_phe": {"name": "Cà phê Góc Phố", "desc": "Quán Vy làm thêm.", "x": 1.0, "size": Vector3(9, 7, 4.5), "color": "6f9474", "npc": "Vy", "npc_color": "d9776b"},
-	"quan_com": {"name": "Quán cơm tấm", "desc": "Cần người rửa bát.", "x": 10.5, "size": Vector3(8, 7, 4.2), "color": "e39a66"},
-	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "color": "c8503f", "npc": "Ông Tư", "npc_color": "8a8a7a"},
-	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "color": "6f8fa8", "npc": "Chú Bảy", "npc_color": "3f5f7a"},
-	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "color": "eadcae", "npc": "Cô Sáu", "npc_color": "b5577a"},
-	"cong_trinh": {"name": "Công trình", "desc": "Phụ hồ, công nhật.", "x": 51.0, "size": Vector3(14, 9, 10), "color": "9c9a93", "npc": "Tuấn", "npc_color": "c9853a"},
+	"ben_xe_6": {"name": "Bến xe số 6", "desc": "Xe đi kho khu công nghiệp và trung tâm nghề của Linh.", "x": -52.0, "size": Vector3(6, 3, 2.8), "color": "3c7d6b"},
+	"cho_cau_nho": {"name": "Chợ Cầu Nhỏ", "desc": "Sạp vật tư, hàng đồ cũ, quán trà đá có bảng tin cho thuê phòng.", "x": -38.0, "size": Vector3(12, 6, 3.4), "color": "c8503f", "stalls": true},
+	"com_hanh": {"name": "Cơm Hạnh", "desc": "Quán cơm phần cho người làm ca. Nhận ca phụ và giao cơm.", "x": -22.0, "size": Vector3(9, 7, 4.2), "color": "e39a66", "npcs": [{"name": "Chị Hạnh", "color": "c0603a"}]},
+	"tiem_sau": {"name": "Tiệm Sáu Sửa", "desc": "Tiệm sửa xe có thêm một bàn sửa đồ gia dụng.", "x": -9.0, "size": Vector3(8, 7, 4.5), "color": "6f8fa8", "npcs": [{"name": "Chú Sáu", "color": "3f5f7a"}]},
+	"xom_bo_me": {"name": "Xóm trọ Bờ Me", "desc": "Tám phòng quanh khoảng sân, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.", "x": 8.0, "size": Vector3(16, 9, 7), "color": "eadcae",
+		"npcs": [{"name": "Bà Tư", "color": "8a6f9a"}, {"name": "Linh", "color": "d9776b"}, {"name": "Cô Duyên", "color": "b5577a"}]},
+	"ben_can": {"name": "Dãy quán Bến Cạn", "desc": "Năm quán chung lối đi và hạ tầng cũ bên rạch. Hợp đồng của anh Phúc.", "x": 34.0, "size": Vector3(22, 7, 4.0), "color": "9c9a93", "shops": 5,
+		"npcs": [{"name": "Anh Phúc", "color": "c9853a"}, {"name": "Trâm", "color": "2f6f6a"}]},
 }
+const SHOP_COLORS := ["d9a35b", "7fa37a", "c46a5a", "6f8fb5", "b59a6f"]
 const FRONT_Z := -5.0
 const DOOR_Z := -4.1
 const STREET_X := Vector2(-68.0, 60.0)
@@ -67,7 +69,7 @@ func _ready() -> void:
 	player = _person(Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
 	add_child(player)
-	# Vòng vàng dưới chân để luôn nhận ra Minh giữa đám đông.
+	# Vòng vàng dưới chân để luôn nhận ra An giữa đám đông.
 	var marker := MeshInstance3D.new()
 	var disc := CylinderMesh.new()
 	disc.top_radius = 0.55
@@ -82,8 +84,8 @@ func _ready() -> void:
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	marker.position = Vector3(0, 0.1, 0)
 	player.add_child(marker)
-	player.add_child(_label3d("Minh", Vector3(0, 2.3, 0), 34))
-	player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
+	player.add_child(_label3d("An", Vector3(0, 2.3, 0), 34))
+	player.position = door_of(HOME) + Vector3(-1.5, 0, 0.8)
 	camera = Camera3D.new()
 	camera.fov = 34
 	add_child(camera)
@@ -157,9 +159,19 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	var holder := Node3D.new()
 	holder.name = id
 	add_child(holder)
-	var sign_height := 3.4
-	if size.x > 0.0:
-		var center := Vector3(x, 0, FRONT_Z - size.z / 2.0)
+	var sign_height := size.y + 0.8
+	var center := Vector3(x, 0, FRONT_Z - size.z / 2.0)
+	var shops := int(loc.get("shops", 0))
+	if shops > 0:
+		# Dãy quán: nhiều mặt tiền nhỏ liền nhau, mỗi quán một màu, một mái bạt.
+		var w := size.x / shops
+		for i in shops:
+			var sx := x - size.x / 2.0 + w * (i + 0.5)
+			var c := Color(SHOP_COLORS[i % SHOP_COLORS.size()])
+			_block(Vector3(w - 0.2, size.y - (i % 2) * 1.2, size.z), Vector3(sx, 0, center.z), c, holder)
+			_block(Vector3(w * 0.85, 0.12, 1.6), Vector3(sx, 2.6, FRONT_Z + 0.8), c.darkened(0.3), holder)
+			_block(Vector3(1.2, 2.2, 0.1), Vector3(sx, 0, FRONT_Z + 0.02), Color("2a2a2e"), holder)
+	else:
 		_block(size, center, color, holder)
 		# Cửa, mái hiên và bảng hiệu ở mặt tiền.
 		_block(Vector3(1.6, 2.3, 0.1), Vector3(x, 0, FRONT_Z + 0.02), Color("2a2a2e"), holder)
@@ -171,35 +183,30 @@ func _build_location(id: String, loc: Dictionary) -> void:
 			for floor_y in range(4, int(size.y) - 1, 3):
 				for wx in [-size.x * 0.3, size.x * 0.3]:
 					_block(Vector3(1.4, 1.2, 0.08), Vector3(x + wx, floor_y, FRONT_Z + 0.03), Color("5c6f80"), holder)
-			sign_height = size.y + 0.8
-		if id == "cong_trinh":
-			_scaffold(x, size, holder)
-		if id == "tra_da":
-			for sx in [-1.2, 0.0, 1.2]:
-				_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0, -3.4), Color("2f6fb0"), holder)
-		var body := StaticBody3D.new()
-		body.set_meta("loc", id)
-		var cs := CollisionShape3D.new()
-		var bs := BoxShape3D.new()
-		bs.size = size
-		cs.shape = bs
-		cs.position = center + Vector3(0, size.y / 2.0, 0)
-		body.add_child(cs)
-		holder.add_child(body)
-	else:
-		# Ngã tư: không có nhà, chỉ có cột đèn giao thông và một vùng bấm.
-		_block(Vector3(0.18, 4.2, 0.18), Vector3(x + 3.2, 0, -4.6), Color("2b2b2b"), holder)
-		_block(Vector3(0.45, 1.1, 0.4), Vector3(x + 3.2, 3.4, -4.6), Color("1f1f1f"), holder)
-		_glow(Vector3(x + 3.2, 4.25, -4.38), Color("e8483b"), holder)
-		var area := StaticBody3D.new()
-		area.set_meta("loc", id)
-		var cs := CollisionShape3D.new()
-		var bs := BoxShape3D.new()
-		bs.size = Vector3(5, 2, 4)
-		cs.shape = bs
-		cs.position = Vector3(x, 1, -6)
-		area.add_child(cs)
-		holder.add_child(area)
+	if loc.get("stalls", false):
+		# Sạp chợ có bạt và ghế nhựa xanh của quán trà đá trên vỉa hè.
+		for sx in [-4.0, 0.0, 4.0]:
+			_block(Vector3(3.2, 0.9, 1.4), Vector3(x + sx, 0, -3.7), Color("8a6a4a"), holder)
+			_block(Vector3(3.6, 0.08, 2.0), Vector3(x + sx, 2.3, -3.7), Color("2f6fb0"), holder)
+		for sx in [5.5, 6.3, 7.1]:
+			_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0, -3.4), Color("2f6fb0"), holder)
+	if id == HOME:
+		# Dây phơi dưới mái tôn trước xóm trọ.
+		for wx in [-5.0, 5.0]:
+			_block(Vector3(0.08, 2.4, 0.08), Vector3(x + wx, 0, -4.6), Color("6b6a66"), holder)
+		_block(Vector3(10.0, 0.03, 0.03), Vector3(x, 2.3, -4.6), Color("3a3a3a"), holder)
+		var shirt_colors := ["e6e2d3", "6f8fb5", "c46a5a", "d9a35b"]
+		for i in 4:
+			_block(Vector3(0.6, 0.7, 0.04), Vector3(x - 3.6 + i * 2.4, 1.55, -4.6), Color(shirt_colors[i]), holder)
+	var body := StaticBody3D.new()
+	body.set_meta("loc", id)
+	var cs := CollisionShape3D.new()
+	var bs := BoxShape3D.new()
+	bs.size = size
+	cs.shape = bs
+	cs.position = center + Vector3(0, size.y / 2.0, 0)
+	body.add_child(cs)
+	holder.add_child(body)
 	holder.add_child(_label3d(loc.name, Vector3(x, sign_height, FRONT_Z + 0.5), 46))
 
 	# Vòng sáng trước cửa: điểm tương tác.
@@ -219,12 +226,14 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	holder.add_child(ring)
 	door_rings[id] = ring
 
-	if loc.has("npc"):
-		var npc := _person(Color(loc.npc_color), Color("3a3a40"))
-		npc.position = door_of(id) + Vector3(1.6, 0, 0.2)
+	var slot := 0
+	for who in loc.get("npcs", []):
+		var npc := _person(Color(who.color), Color("3a3a40"))
+		npc.position = door_of(id) + Vector3(1.6 + slot * 1.2, 0, 0.2 + (slot % 2) * 0.5)
 		npc.rotation.y = PI
 		holder.add_child(npc)
-		npc.add_child(_label3d(loc.npc, Vector3(0, 2.25, 0), 34))
+		npc.add_child(_label3d(who.name, Vector3(0, 2.25 + (slot % 2) * 0.35, 0), 32))
+		slot += 1
 		var nb := StaticBody3D.new()
 		nb.set_meta("loc", id)
 		var ncs := CollisionShape3D.new()
@@ -237,18 +246,21 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		npc.add_child(nb)
 
 
-func _scaffold(x: float, size: Vector3, parent: Node3D) -> void:
-	var front := FRONT_Z + 0.6
-	var px := x - size.x / 2.0
-	while px <= x + size.x / 2.0 + 0.01:
-		_block(Vector3(0.1, size.y + 1.0, 0.1), Vector3(px, 0, front), Color("b0a48a"), parent)
-		px += 2.0
-	for y in range(2, int(size.y) + 1, 2):
-		_block(Vector3(size.x, 0.08, 0.9), Vector3(x, y, front - 0.3), Color("8a7a5a"), parent)
-	_block(Vector3(size.x, size.y * 0.6, 0.05), Vector3(x, size.y * 0.4, front + 0.05), Color(0.2, 0.45, 0.3, 0.55), parent, true)
+## Con rạch chạy dọc phía nam và cây cầu nhỏ trước chợ Cầu Nhỏ, chi tiết nhận diện của phường An Hòa.
+func _build_canal() -> void:
+	var water := _block(Vector3(140, 0.05, 5.0), Vector3(-4, -0.03, 10.5), Color("4f6f6a"))
+	var wm := water.material_override as StandardMaterial3D
+	wm.roughness = 0.15
+	wm.metallic = 0.2
+	_block(Vector3(140, 0.5, 0.6), Vector3(-4, -0.3, 7.7), Color("6e6a62"))
+	var bx := float(LOCATIONS.cho_cau_nho.x)
+	_block(Vector3(3.2, 0.25, 7.0), Vector3(bx, 0.15, 10.0), Color("8a7f72"))
+	for side in [-1.5, 1.5]:
+		_block(Vector3(0.1, 0.9, 7.0), Vector3(bx + side, 0.4, 10.0), Color("5e5a55"))
 
 
 func _build_props() -> void:
+	_build_canal()
 	# Cột điện và dây điện chằng chịt dọc vỉa hè phía bắc.
 	var poles := []
 	var px := -60.0
@@ -413,7 +425,7 @@ func _check_day_end() -> void:
 		return
 	_target = null
 	_target_loc = ""
-	if door_of("phong_tro").distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
+	if door_of(HOME).distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
 		if _night_prompt_day != game.day():
 			_night_prompt_day = game.day()
 			hud.close_location()
@@ -474,15 +486,15 @@ func _on_changed() -> void:
 	if not game.is_started():
 		_last_money = -1
 		return
-	var money := int(game.s.money)
+	var money := int(game.s.cash)
 	if _last_money >= 0 and money != _last_money:
 		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
 			Color("7fe0a0") if money > _last_money else Color("ff8a7a"))
 	_last_money = money
-	# Sang ngày mới: Minh thức dậy trước cửa phòng trọ.
+	# Sang ngày mới: An thức dậy trước cửa xóm trọ.
 	if game.day() != _last_day:
 		if _last_day != -1:
-			player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
+			player.position = door_of(HOME) + Vector3(-1.5, 0, 0.8)
 			camera.position = player.position + CAM_OFFSET
 			_target = null
 			_target_loc = ""
