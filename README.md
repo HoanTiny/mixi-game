@@ -23,6 +23,8 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Nói chuyện:** vào tiệm có người đứng trước cửa (Cô Sáu, Chú Bảy, Vy, Tuấn, Ông Tư) sẽ thấy nút **Nói chuyện**, tốn 30 phút, mỗi người một lần mỗi ngày. Mỗi người có vài đoạn mạch chuyện mở dần theo độ thân thiết và ngày; kể hết thì tán gẫu, được thêm chút thân thiết. Hội thoại viết trong `data/talks.json`.
 
+**Quận 1:** từ ngày 23, khi Ngoại ngữ đủ 3, trạm xe buýt có việc *Dẫn khách Úc đi chợ Bến Thành*. Nhận việc thì sang màn Quận 1 (`scenes/quan1.tscn`): dẫn ba vị khách qua cổng chợ, sạp lưu niệm, xe bánh xèo, mỗi chỗ một lựa chọn. Xong chuyến thì đón xe buýt về, tiền công và giờ tính lúc đó. Nội dung chuyến đi viết trong `data/tour_ben_thanh.json`.
+
 Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi lại** trong Bảng cân bằng xóa ván đang chơi.
 
 ## Cấu trúc thư mục
@@ -34,6 +36,7 @@ data/
   story.json      mở đầu, món mang theo, 5 kết thúc, Sổ tay của Minh
   talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
   models.json     file mô hình cho nhà, người, xe, cây và cách co giãn
+  tour_ben_thanh.json  điểm dừng và lựa chọn của chuyến dẫn khách ở Quận 1
   sounds.json     âm nền, tiếng rao, còi xe, tiếng hiệu ứng
 assets/           mô hình .glb (chưa có thì dùng khối hình), sounds/ âm thanh
 tools/
@@ -46,6 +49,8 @@ scripts/
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
   world/street_map.gd  bản đồ phố thu nhỏ, bấm để đi tới
+  world/landmarks.gd   địa danh dựng bằng khối (Chợ Bến Thành) có đèn neon
+  world/quan1.gd       màn Quận 1: dẫn khách Úc đi chợ Bến Thành
   world/hud.gd    HUD kiểu Nobody: mục tiêu, trạng thái, bảng địa điểm, thanh công cụ
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động dùng chung
   ui/dialog_layer.gd  hộp thoại mở đầu, sự kiện, buổi tối, kết thúc
@@ -53,6 +58,7 @@ scripts/
 scenes/
   world.tscn      màn chính
   board.tscn      Bảng cân bằng
+  quan1.tscn      màn Quận 1
 tests/
   sim.gd          tự chơi 200 ván để kiểm tra cân bằng
   playtest.gd     người chơi máy chơi trên màn phố thật, in nhật ký từng ngày

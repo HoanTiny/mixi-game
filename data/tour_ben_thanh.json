@@ -1,0 +1,37 @@
+{
+  "_ghi_chu": "Chuyến dẫn khách Úc đi chợ Bến Thành (màn Quận 1). Mỗi điểm dừng: pos là [x, z] so với cổng chợ, choices dùng cùng cú pháp require/effects với events.json, reply là câu kể sau khi chọn. Tiền công và giờ của chuyến tính theo việc khach_uc trong config.json khi về lại Bình Thạnh.",
+  "title": "Dẫn khách Úc đi chợ Bến Thành",
+  "intro": "Xe buýt thả cả nhóm xuống bùng binh Quách Thị Trang. Ba vị khách Úc ngước nhìn tháp đồng hồ, máy ảnh đã cầm sẵn trên tay.",
+  "stops": [
+    { "id": "cong_cho", "name": "Cổng chợ", "pos": [0, 3.2],
+      "title": "Trước cổng chính", "who": "Ông Mark",
+      "text": "\"Is that clock tower really that old? It looks brand new!\"",
+      "choices": [
+        { "label": "Kể chợ được xây từ năm 1912 đến 1914, người Pháp làm, sửa sang nhiều lần", "hint": "Ngoại ngữ tăng",
+          "effects": { "xp.ngoaiNgu": 0.5 }, "reply": "Ông Mark gật gù, bấm máy lia lịa. \"Over a hundred years! Amazing.\"" },
+        { "label": "\"Yes… very old.\"",
+          "effects": {}, "reply": "Khách cười xã giao, có vẻ hơi hụt hẫng." }
+      ] },
+    { "id": "quay_luu_niem", "name": "Sạp lưu niệm", "pos": [-13.0, 2.2],
+      "title": "Sạp nón lá và đồ lưu niệm", "who": "Bà Linda",
+      "text": "Người bán hét giá 800 nghìn một chiếc nón lá. Bà Linda quay sang nhìn Minh.",
+      "choices": [
+        { "label": "Mặc cả giúp khách", "hint": "Cần Giao tiếp 2 · khách có thể cảm ơn", "require": { "skill.giaoTiep": 2 },
+          "effects": { "money": 100000, "money_label": "Bà Linda cảm ơn vì mặc cả giúp" },
+          "reply": "Chiếc nón còn 150 nghìn. Bà Linda dúi vào tay Minh tờ 100 nghìn, nhất định không lấy lại." },
+        { "label": "Để khách tự mua", "hint": "Tinh thần −3",
+          "effects": { "mood": -3 }, "reply": "Bà Linda trả đủ 800 nghìn. Minh áy náy suốt quãng đường còn lại." }
+      ] },
+    { "id": "hang_an", "name": "Xe bánh xèo", "pos": [25.0, 4.0],
+      "title": "Xe bánh xèo bên hông chợ", "who": "Cậu Jack",
+      "text": "\"Can we try some street food? Something really Vietnamese!\"",
+      "choices": [
+        { "label": "Mời cả nhóm ăn bánh xèo, chỉ cách cuốn rau chấm nước mắm", "hint": "−60 nghìn · Tinh thần +6",
+          "effects": { "money": -60000, "money_label": "Bánh xèo với khách Úc", "mood": 6 },
+          "reply": "Cả nhóm ăn hết ba cái bánh. Cậu Jack giơ ngón cái: \"Best thing I've eaten in Vietnam!\"" },
+        { "label": "Chỉ chỗ rồi đứng chờ",
+          "effects": {}, "reply": "Khách ăn xong, Minh đứng chờ ngoài nắng, bụng réo." }
+      ] }
+  ],
+  "outro": "Xong chuyến, cả nhóm chia tay ở bùng binh. Ông Mark bắt tay thật chặt: \"Thank you, Minh. You're a great guide.\""
+}

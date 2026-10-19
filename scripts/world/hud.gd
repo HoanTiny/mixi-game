@@ -251,6 +251,11 @@ func _perform(id: String) -> void:
 	var st: Dictionary = game.action_status(a)
 	if not st.ok or _working:
 		return
+	# Việc làm ở màn riêng (dẫn khách Úc ở Quận 1): sang màn đó, tiền công tính khi về.
+	if a.has("scene"):
+		get_node("/root/GameState").tour = id
+		get_tree().change_scene_to_file(str(a.scene))
+		return
 	var start: float = st.start
 	var finish: float = start + float(a.hours)
 	_working = true

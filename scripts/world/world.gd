@@ -96,6 +96,11 @@ func _ready() -> void:
 	player.add_child(marker)
 	player.add_child(_label3d("Minh", Vector3(0, 2.3, 0), 34))
 	player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
+	# Về từ màn khác (xe buýt từ Quận 1) thì hiện ra ở chỗ đó.
+	var gs := get_node("/root/GameState")
+	if gs.spawn_at != "" and LOCATIONS.has(gs.spawn_at):
+		player.position = door_of(gs.spawn_at) + Vector3(1.5, 0, 0.8)
+		gs.spawn_at = ""
 	camera = Camera3D.new()
 	camera.fov = 34
 	add_child(camera)
