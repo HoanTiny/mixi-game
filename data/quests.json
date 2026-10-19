@@ -1,0 +1,180 @@
+{
+  "_ghi_chu": "Việc nhờ nhiều bước kiểu Nobody. giver: địa điểm có người nhờ (hiện dấu ! trên phố). days, offer_window, when: lúc nào được nhờ. deadline_days/deadline_hour: hạn tính từ ngày nhận. Mỗi bước (steps) có kind: visit (tới loc bấm thẻ, có thể kèm window giờ, need_items, scene hộp thoại có lựa chọn; auto: tới nơi là xong), action (làm việc action đủ count lần, min_ratio chỉ tiêu trò chơi nhỏ, manual: phải tự làm), find (lục thùng rác trong khoảng x, chance ra đồ). within: số giờ phải xong bước kể từ lúc bắt đầu bước. Lựa chọn trong scene có goto: next (mặc định), stay (làm lại sau), end (thôi, không thưởng), fail, hoặc id của bước khác.",
+  "items": {
+    "xe_dap": "Chiếc xe đạp xanh của Bin",
+    "do_nghe_bay": "Túi đồ nghề của chú Bảy",
+    "com_suat": "30 suất cơm tấm",
+    "phong_bi": "Phong bì dán kín của Tuấn",
+    "anh_giay_vay": "Ảnh chụp tờ giấy vay",
+    "meo": "Con mèo Mướp của ông Tư"
+  },
+  "quests": [
+    {
+      "id": "xe_dap_bin", "title": "Chiếc xe đạp của bé Bin", "who": "Cô Sáu", "giver": "phong_tro",
+      "days": [2, 9], "offer_window": [7, 20],
+      "intro": "Cô Sáu đứng ngoài cổng, mặt đỏ gay. \"Chiếc xe đạp xanh của thằng Bin mới dựng trước cổng hồi sáng, giờ mất tiêu rồi! Con đi ngoài đường nhiều, để ý giùm cô với.\"\nBé Bin ngồi thút thít ở bậc thềm, tay còn cầm cái chuông xe.",
+      "accept": "\"Để con đi hỏi thử, cô đừng lo.\"", "decline": "\"Con bận quá cô ơi…\"",
+      "deadline_days": 2, "reward_hint": "Cô Sáu +15, Tinh thần +8, được bớt tiền điện",
+      "reward": { "rep.coSau": 15, "mood": 8, "money": 100000, "money_label": "Cô Sáu bớt tiền điện" },
+      "reward_text": "Bé Bin ôm chầm lấy chiếc xe, bấm chuông leng keng khắp sân. Cô Sáu dúi vào tay Minh 100 nghìn: \"Cô bớt tiền điện tháng này cho con. Không có con chắc cô phải mua chiếc khác rồi.\"",
+      "fail": { "rep.coSau": -5, "mood": -3 },
+      "fail_text": "Cô Sáu đã mua cho Bin chiếc xe đạp cũ khác. \"Thôi, của đi thay người.\" Nhưng cô nhìn Minh có vẻ thất vọng.",
+      "steps": [
+        { "kind": "visit", "loc": "tra_da", "hours": 0.5,
+          "text": "Hỏi ông Tư ở quán trà đá có thấy chiếc xe không",
+          "scene": { "title": "Ông Tư ngồi trước quán", "who": "Ông Tư",
+            "text": "\"Xe đạp xanh, giỏ dán hình siêu nhân hả? Hồi sáng ông thấy hai thằng nhóc dắt một chiếc đi về cuối phố, phía vựa ve chai bà Tám đó con.\"",
+            "choices": [ { "label": "\"Cảm ơn ông, con ra đó liền.\"", "hint": "Ông Tư +2", "effects": { "rep.ongTu": 2 } } ] } },
+        { "kind": "visit", "loc": "vua_ve_chai", "hours": 0.5,
+          "text": "Tới vựa ve chai cô Tám ở cuối phố tìm chiếc xe",
+          "scene": { "title": "Chiếc xe xanh trong đống sắt vụn", "who": "Cô Tám",
+            "text": "Chiếc xe nằm chỏng chơ giữa đống sắt vụn, cái giỏ còn dán hình siêu nhân. Cô Tám khoanh tay: \"Hai thằng nhỏ bán cho cô 80 nghìn đó. Muốn lấy lại thì đưa đủ 80 nghìn.\"",
+            "choices": [
+              { "label": "Trả 80 nghìn chuộc lại", "require": { "money_min": 80000 },
+                "effects": { "money": -80000, "money_label": "Chuộc xe đạp cho bé Bin", "item.xe_dap": 1 } },
+              { "label": "\"Xe ăn trộm mà cô, bớt cho con một nửa.\"", "hint": "Còn 40 nghìn", "require": { "skill.giaoTiep": 1, "money_min": 40000 },
+                "effects": { "money": -40000, "money_label": "Chuộc xe đạp, sau khi mặc cả", "item.xe_dap": 1 } },
+              { "label": "\"Ông Tư thấy tụi nhỏ dắt xe đi, cô hỏi ông là biết.\"", "hint": "Không mất tiền, cần thân với ông Tư", "require": { "rep.ongTu": 15 },
+                "effects": { "item.xe_dap": 1, "log": "Nghe tới ông Tư, cô Tám chép miệng rồi trả xe, không lấy đồng nào." } },
+              { "label": "Để tính sau", "hint": "Quay lại sau", "goto": "stay" }
+            ] } },
+        { "kind": "visit", "loc": "phong_tro", "hours": 0.25, "window": [16, 22], "need_items": { "xe_dap": 1 }, "consume": true, "carry": true,
+          "text": "Dắt xe về dãy trọ trả bé Bin (Bin đi học về sau 16:00)" }
+      ]
+    },
+    {
+      "id": "lon_co_tam", "title": "Mối hàng lon nhôm", "who": "Cô Tám", "giver": "vua_ve_chai",
+      "days": [2, 24],
+      "intro": "Cô Tám gõ gõ cái cân. \"Lò nấu nhôm bên Bình Dương đang cần hàng gấp. Trong ba ngày con gom cho cô đủ 15 lon nhôm, cô trả gấp đôi giá. Thùng rác dọc phố nhiều lắm, chịu khó lục là có.\"",
+      "accept": "\"Ba ngày 15 lon, con nhận.\"", "decline": "\"Để con coi đã cô.\"",
+      "deadline_days": 3, "reward_hint": "150 nghìn, sau này bán ve chai được giá hơn",
+      "reward": { "money": 150000, "money_label": "Cô Tám trả gấp đôi 15 lon nhôm", "flag.veChaiQuen": true },
+      "reward_text": "Cô Tám đếm đủ 15 lon, trả 150 nghìn. \"Được việc ghê. Từ giờ con đem gì tới cô cũng trả cao hơn người ta hai chục phần trăm.\"",
+      "fail": { "mood": -2 },
+      "fail_text": "Lò nhôm đã lấy hàng chỗ khác. Cô Tám: \"Thôi, lần sau cô kêu con.\"",
+      "steps": [
+        { "kind": "visit", "loc": "vua_ve_chai", "hours": 0.25, "need_items": { "lon": 15 }, "consume": true,
+          "text": "Gom 15 lon nhôm (lục thùng rác dọc phố, phím E) rồi đem tới vựa. Đừng bán lon cho vựa trước!" }
+      ]
+    },
+    {
+      "id": "may_lanh_ong_tu", "title": "Cái máy lạnh của ông Tư", "who": "Chú Bảy", "giver": "tiem_chu_bay",
+      "days": [4, 22], "offer_window": [6, 14], "when": { "rep.chuBay": 12 },
+      "intro": "Chú Bảy đang dở tay với ba cái máy. \"Máy lạnh nhà ông Tư kêu rè rè mà không lạnh. Chú kẹt quá, con xách đồ nghề qua coi giùm chú được không? Nhớ đem đồ nghề trả lại trước 18 giờ, chiều chú còn đi công trình.\"",
+      "accept": "Xách túi đồ nghề đi", "decline": "\"Con sợ làm hư máy của ông…\"",
+      "accept_effects": { "item.do_nghe_bay": 1 },
+      "deadline_days": 0, "deadline_hour": 18, "reward_hint": "150 nghìn, Tay nghề tăng, chú Bảy +10",
+      "reward": { "money": 150000, "money_label": "Chú Bảy trả công sửa máy lạnh", "rep.chuBay": 10, "xp.tayNghe": 1, "item.do_nghe_bay": -1 },
+      "reward_text": "Chú Bảy nghe kể, gật gù: \"Tụ hả? Đúng bệnh rồi đó. Đây, tiền công của con. Mai mốt có ca nào chú kêu.\"",
+      "fail": { "rep.chuBay": -6, "item.do_nghe_bay": -1 },
+      "fail_text": "Chú Bảy phải tự chạy đi lấy túi đồ nghề. \"Nhận rồi thì phải làm cho tới nơi nghen con.\"",
+      "steps": [
+        { "kind": "visit", "loc": "tra_da", "hours": 1,
+          "text": "Qua nhà ông Tư (cạnh quán trà đá) xem máy lạnh",
+          "scene": { "title": "Cái máy lạnh cũ của ông Tư", "who": "Ông Tư",
+            "text": "Quạt dàn lạnh vẫn quay, gió ra hâm hâm. Ngoài ban công, dàn nóng kêu rè rè, quạt không chịu quay, được một lát thì tắt, rồi lại rè rè. Lưới lọc bám một lớp bụi mỏng.\nMinh nhớ lời ba: \"Cục nóng kêu mà quạt không quay thì coi cái tụ trước.\"",
+            "choices": [
+              { "label": "Đo tụ bằng đồng hồ vạn năng rồi thay", "hint": "Cần Tay nghề 2, chắc ăn", "require": { "skill.tayNghe": 2 },
+                "effects": { "xp.tayNghe": 3, "rep.ongTu": 8, "log": "Kim đồng hồ không nhúc nhích: tụ chết. Thay tụ mới, dàn nóng chạy êm ru." } },
+              { "label": "Thay tụ khởi động cho dàn nóng", "hint": "Đoán theo lời ba dặn",
+                "effects": { "xp.tayNghe": 2, "rep.ongTu": 6, "log": "Dàn nóng chạy êm. Ông Tư: \"Mát rồi! Thằng này được việc.\"" } },
+              { "label": "Bơm thêm ga", "hint": "Tốn 150 nghìn tiền ga", "require": { "money_min": 150000 }, "goto": "stay",
+                "effects": { "money": -150000, "money_label": "Bơm ga máy lạnh (bơm oan)", "mood": -3, "log": "Bơm ga xong máy vẫn rè rè. Tốn tiền oan, phải coi lại." } },
+              { "label": "Vệ sinh lưới lọc", "hint": "Nhanh, nhưng có đúng bệnh không?", "goto": "stay",
+                "effects": { "rep.ongTu": 1, "log": "Lưới sạch, gió mạnh hơn chút, nhưng dàn nóng vẫn rè rè. Phải coi lại." } }
+            ] } },
+        { "kind": "visit", "loc": "tiem_chu_bay", "hours": 0.25, "need_items": { "do_nghe_bay": 1 },
+          "text": "Đem túi đồ nghề về trả chú Bảy trước 18:00" }
+      ]
+    },
+    {
+      "id": "com_doan", "title": "Ba mươi suất cơm trưa", "who": "Chị Hoa chủ quán", "giver": "quan_com",
+      "days": [3, 14], "offer_window": [6, 18],
+      "intro": "Chị Hoa chủ quán lau mồ hôi trán. \"Công trình đầu phố đặt 30 suất cơm trưa cho thợ. Em rửa giùm chị một ca bát cho thật sạch, rồi 10 đến 12 giờ trưa ghé lấy cơm, chở tới công trình. Cơm nguội là thợ chửi đó nghen. Xong chị tính tiền đàng hoàng.\"",
+      "accept": "\"Dạ, chị cứ giao em.\"", "decline": "\"Để bữa khác chị ơi.\"",
+      "deadline_days": 1, "deadline_hour": 13, "reward_hint": "200 nghìn, được ăn cơm giá khách quen",
+      "reward": { "money": 200000, "money_label": "Chị Hoa trả công giao 30 suất cơm", "flag.comQuen": true, "rep.tuan": 3 },
+      "reward_text": "Thợ công trình ùa ra lấy cơm. Tuấn vỗ vai: \"Ê Minh, cơm còn nóng hổi!\" Chị Hoa nhắn: \"Giỏi lắm. Từ giờ em ghé quán chị tính giá khách quen.\"",
+      "fail": { "mood": -4 },
+      "fail_text": "Chị Hoa thở dài: \"Thôi để chị tự lo. Lần sau nhận thì phải làm cho kịp nghen em.\"",
+      "steps": [
+        { "kind": "action", "action": "rua_bat", "count": 1, "min_ratio": 1.0, "manual": true,
+          "text": "Tự rửa một ca bát ở quán cơm, đủ chỉ tiêu",
+          "short_text": "Chưa đủ chỉ tiêu, chị Hoa chưa chịu" },
+        { "kind": "visit", "loc": "quan_com", "hours": 0.15, "window": [10, 12], "effects": { "item.com_suat": 1 },
+          "text": "Lấy 30 suất cơm ở quán (10:00–12:00)" },
+        { "kind": "visit", "loc": "cong_trinh", "auto": true, "within": 0.4, "need_items": { "com_suat": 1 }, "consume": true, "carry": true,
+          "text": "Chở cơm tới công trình trước khi nguội (24 phút)" }
+      ]
+    },
+    {
+      "id": "meo_ong_tu", "title": "Con mèo Mướp đi lạc", "who": "Ông Tư", "giver": "tra_da",
+      "days": [4, 24], "offer_window": [6, 19], "when": { "rep.ongTu": 4 },
+      "intro": "Ông Tư cầm cái chén cơm cá, gọi \"Mướp ơi\" khắp hẻm. \"Con mèo của ông đi từ hôm qua chưa về. Nó hay mò vô mấy thùng rác cuối phố, chỗ công trình với vựa ve chai, kiếm đồ ăn. Con đi ngang thì ngó giùm ông.\"",
+      "accept": "\"Để con tìm cho ông.\"", "decline": "\"Chắc nó đi chơi rồi về thôi ông.\"",
+      "deadline_days": 1, "reward_hint": "Ông Tư +12, Tinh thần +6",
+      "reward": { "rep.ongTu": 12, "mood": 6, "item.meo": -1 },
+      "reward_text": "Ông Tư ôm con Mướp vào lòng, tay run run. \"Cảm ơn con. Già rồi, còn mỗi nó với ông.\" Ông rót cho Minh ly trà, không chịu lấy tiền.",
+      "fail": { "rep.ongTu": -3 },
+      "fail_text": "Sáng nay con Mướp tự về, gầy nhom. Ông Tư nói không sao, nhưng Minh thấy áy náy.",
+      "steps": [
+        { "kind": "find", "x": [40, 76], "chance": 0.45, "item": "meo",
+          "text": "Lục mấy thùng rác cuối phố (gần công trình, vựa ve chai) tìm con Mướp",
+          "found_text": "Meo! Con Mướp chui ra từ sau thùng rác" },
+        { "kind": "visit", "loc": "tra_da", "hours": 0.25, "need_items": { "meo": 1 }, "carry": true,
+          "text": "Ôm con Mướp về trả ông Tư ở quán trà đá" }
+      ]
+    },
+    {
+      "id": "ho_so_vy", "title": "Một vụ án thật cho Vy", "who": "Vy", "giver": "quan_ca_phe",
+      "days": [7, 17], "offer_window": [12, 21], "when": { "rep.vy": 18, "flag.phapLyMo": false },
+      "intro": "Vy đặt ly cà phê xuống. \"Lớp mình có buổi phiên tòa giả định, cần một vụ thật để phân tích. Hôm trước Minh kể nhà đang vay lãi… Minh nhờ má chụp tờ giấy vay gửi lên được không? Mình hứa giữ kín.\"",
+      "accept": "\"Tối nay mình gọi má.\"", "decline": "\"Chuyện nhà mình… để sau nha.\"",
+      "deadline_days": 3, "reward_hint": "Mở lớp Đọc sách luật với Vy sớm, Pháp lý tăng, Vy +12",
+      "reward": { "flag.phapLyMo": true, "rep.vy": 12, "xp.phapLy": 2, "item.anh_giay_vay": -1 },
+      "reward_text": "Vy phóng to tấm ảnh, ngón tay dừng ở dòng lãi suất. \"Mười phần trăm một tháng… Minh ơi, cái này vượt mức luật cho phép gần mười lần. Tối nào rảnh ghé quán, mình chỉ Minh đọc luật.\"\nĐã mở: Đọc sách luật với Vy (20:00–22:00, quán cà phê).",
+      "fail": { "rep.vy": -3 },
+      "fail_text": "Buổi phiên tòa giả định đã qua. Vy cười: \"Không sao đâu, lần khác.\"",
+      "steps": [
+        { "kind": "visit", "loc": "phong_tro", "hours": 1, "window": [18, 22],
+          "text": "Tối về phòng trọ gọi má chụp tờ giấy vay (18:00–22:00)",
+          "scene": { "title": "Cuộc gọi về quê", "who": "Má",
+            "text": "Má nói nhỏ trong điện thoại, sợ hàng xóm nghe: \"Tờ giấy má cất dưới đáy rương. Con hỏi chi vậy? Tụi nó mà biết con đi thưa là khổ.\"",
+            "choices": [
+              { "label": "\"Má yên tâm, con chỉ hỏi bạn học luật thôi.\"", "hint": "Tinh thần +3", "effects": { "mood": 3, "item.anh_giay_vay": 1 } },
+              { "label": "Kể hết cho má nghe", "hint": "Tinh thần +6",
+                "effects": { "mood": 6, "item.anh_giay_vay": 1, "log": "Má khóc. Rồi má nói: \"Con làm gì má cũng tin con.\"" } }
+            ] } },
+        { "kind": "visit", "loc": "quan_ca_phe", "hours": 1, "window": [14, 22], "need_items": { "anh_giay_vay": 1 },
+          "text": "Đưa ảnh tờ giấy vay cho Vy ở quán cà phê (14:00–22:00)" }
+      ]
+    },
+    {
+      "id": "phong_bi_tuan", "title": "Phong bì dán kín", "who": "Tuấn", "giver": "cong_trinh",
+      "days": [9, 16], "offer_window": [7, 19], "when": { "rep.tuan": 38 },
+      "intro": "Tuấn kéo Minh ra góc khuất, nhét vào tay một phong bì dày cộm. \"Tối nay từ 20 giờ rưỡi tới 22 giờ, đưa cái này cho thằng đội nón đỏ đứng ở ngã tư Hàng Xanh. Đừng mở, đừng hỏi. Xong tao cho mày 300 nghìn.\"",
+      "accept": "Cất phong bì vào túi", "decline": "\"Tao không dính vô mấy chuyện này.\"",
+      "decline_effects": { "rep.tuan": -3 },
+      "accept_effects": { "item.phong_bi": 1 },
+      "deadline_days": 0, "deadline_hour": 22, "reward_hint": "300 nghìn",
+      "reward": { "money": 300000, "money_label": "Tuấn trả công đưa phong bì", "rep.tuan": 6 },
+      "reward_text": "Gã nón đỏ nhét phong bì vào áo rồi rồ ga đi mất. Điện thoại rung: \"Ok rồi. Tiền tao chuyển rồi đó. — Tuấn\"",
+      "fail": { "rep.tuan": -10, "item.phong_bi": -1 },
+      "fail_text": "Tuấn gọi, giọng gắt: \"Mày làm tao mất mặt với người ta rồi! Đưa phong bì đây.\"",
+      "steps": [
+        { "kind": "visit", "loc": "nga_tu", "hours": 0.5, "window": [20.5, 22], "need_items": { "phong_bi": 1 },
+          "text": "Đưa phong bì cho người đội nón đỏ ở ngã tư Hàng Xanh (20:30–22:00)",
+          "scene": { "title": "Ngã tư lúc tối", "who": "Người đội nón đỏ",
+            "text": "Một gã đội nón đỏ dựa vào xe máy, mắt láo liên. Phong bì trong túi áo Minh bong một góc keo. Qua khe hở thấy lấp ló một xấp giấy có chữ ký và con dấu đỏ.",
+            "choices": [
+              { "label": "Đưa phong bì, không hỏi gì", "effects": { "item.phong_bi": -1 } },
+              { "label": "Lén chụp xấp giấy rồi mới đưa", "hint": "Liều, nhưng có thể là bằng chứng",
+                "effects": { "item.phong_bi": -1, "evidence": 1, "mood": -3, "flag.anhSoNo": true,
+                  "log": "Xấp giấy là sổ ghi nợ của đường dây Hưng Sẹo, có chữ ký của Khoa. Tên má Minh nằm ở trang thứ ba. Bằng chứng +1." } },
+              { "label": "Không đưa nữa, đem trả Tuấn", "hint": "Không lấy tiền, Tuấn giận", "goto": "end",
+                "effects": { "item.phong_bi": -1, "rep.tuan": -5, "log": "Minh trả phong bì cho Tuấn. Tuấn không nói gì, chỉ nhìn Minh rất lâu." } }
+            ] } }
+      ]
+    }
+  ]
+}

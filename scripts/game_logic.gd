@@ -22,6 +22,9 @@ var events: Array = []
 var story: Dictionary = {}
 ## Hội thoại với nhân vật, theo khóa trong REPS (data/talks.json).
 var talks: Dictionary = {}
+## Việc nhờ nhiều bước (data/quests.json): danh sách quest và tên các món đồ của quest.
+var quests: Array = []
+var quest_items: Dictionary = {}
 ## Trạng thái ván chơi. Rỗng nghĩa là chưa bắt đầu (đang ở màn mở đầu).
 var s: Dictionary = {}
 ## Sổ tay của Minh: giữ lại qua các lần thua.
@@ -37,6 +40,10 @@ func load_data(dir := "res://data") -> void:
 	story = _read_json(dir + "/story.json")
 	talks = _read_json(dir + "/talks.json")
 	talks.erase("_ghi_chu")
+	if FileAccess.file_exists(dir + "/quests.json"):
+		var q: Dictionary = _read_json(dir + "/quests.json")
+		quests = q.get("quests", [])
+		quest_items = q.get("items", {})
 
 
 static func _read_json(path: String) -> Variant:
@@ -60,6 +67,7 @@ func new_game(item: String) -> void:
 		"counts": {}, "today": {"list": []}, "yesterday": {"list": []}, "last_random": {},
 		"queue": [], "log": [], "history": [], "choices": [], "skip_reason": "", "over": {},
 		"stats": {"earned": 0, "spent": 0, "faints": 0}, "talks_done": [],
+		"quests": {}, "qitems": {},
 	}
 	# Nhu cầu cơ thể (đói, vệ sinh, quần áo) kiểu Nobody: ăn uống tự mua ở quán thay vì gói ăn theo ngày.
 	if cfg.has("needs"):
@@ -207,6 +215,8 @@ func apply_effects(eff: Dictionary) -> void:
 					add_xp(key.substr(3), float(v))
 				elif key.begins_with("rep."):
 					add_rep(key.substr(4), float(v))
+				elif key.begins_with("item."):
+					_add_item(key.substr(5), int(v))
 				elif key.begins_with("need."):
 					need_adj(key.substr(5), float(v))
 				elif key.begins_with("flag."):
@@ -442,6 +452,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	s.counts[id] = count(id) + 1
 	s.today[id] = today_count(id) + 1
 	s.today.list.append(id)
+	_quest_on_action(id, result)
 	_commit()
 
 
@@ -488,6 +499,10 @@ func set_focus(k: String) -> void:
 # ---------------------------------------------------------------- sự kiện
 
 func find_event(id: String) -> Dictionary:
+	if id.begins_with("q"):
+		var qe := _quest_event(id)
+		if not qe.is_empty():
+			return qe
 	for e in events:
 		if e.id == id:
 			return e
@@ -677,6 +692,7 @@ func resolve_choice(i: int) -> void:
 	for b in c.get("bonus", []):
 		if check(b.get("when", {})) == "":
 			apply_effects(b.get("effects", {}))
+	_quest_choice(str(e.id), c)
 	_event_data = {}
 	_commit()
 
@@ -905,6 +921,7 @@ func _resolve_ending() -> void:
 
 func _commit() -> void:
 	_tick_needs()
+	_check_quests()
 	clamp_all()
 	changed.emit()
 
@@ -959,6 +976,347 @@ func pay_mult() -> float:
 	return 0.5
 
 
+# ---------------------------------------------------------------- việc nhờ
+
+## Giờ tuyệt đối (ngày × 24 + giờ) để so hạn chót kéo qua nhiều ngày.
+func now_abs() -> float:
+	return float(day()) * 24.0 + clock()
+
+
+func quest_def(id: String) -> Dictionary:
+	for q in quests:
+		if q.id == id:
+			return q
+	return {}
+
+
+func _qs() -> Dictionary:
+	if not s.has("quests"):
+		s["quests"] = {}
+	return s.quests
+
+
+func quest_state(id: String) -> String:
+	return str(_qs().get(id, {}).get("state", ""))
+
+
+func _is_scrap(k: String) -> bool:
+	return cfg.scrap.has(k) and cfg.scrap[k] is Dictionary
+
+
+## Số món đang mang: ve chai nằm trong s.inv, đồ của việc nhờ nằm trong s.qitems.
+func item_count(k: String) -> int:
+	if _is_scrap(k):
+		return int(s.get("inv", {}).get(k, 0))
+	return int(s.get("qitems", {}).get(k, 0))
+
+
+func item_name(k: String) -> String:
+	if _is_scrap(k):
+		return str(cfg.scrap[k].name)
+	return str(quest_items.get(k, k))
+
+
+func _add_item(k: String, n: int) -> void:
+	var key := "inv" if _is_scrap(k) else "qitems"
+	if not s.has(key):
+		s[key] = {}
+	var bag: Dictionary = s[key]
+	bag[k] = maxi(0, int(bag.get(k, 0)) + n)
+	if int(bag[k]) == 0:
+		bag.erase(k)
+
+
+func quest_offerable(q: Dictionary) -> bool:
+	if not is_started() or is_over():
+		return false
+	var st: Dictionary = _qs().get(q.id, {})
+	if not st.is_empty() and not (st.state == "declined" and day() > int(st.day)):
+		return false
+	if q.has("days") and (day() < int(q.days[0]) or day() > int(q.days[1])):
+		return false
+	if q.has("offer_window") and (clock() < float(q.offer_window[0]) or clock() > float(q.offer_window[1])):
+		return false
+	return check(q.get("when", {})) == ""
+
+
+## Các việc nhờ đang chờ người nhận, tất cả hoặc chỉ ở một địa điểm.
+func quest_offers(loc := "") -> Array:
+	var out := []
+	for q in quests:
+		if (loc == "" or q.giver == loc) and quest_offerable(q):
+			out.append(q)
+	return out
+
+
+func quests_active() -> Array:
+	var out := []
+	for q in quests:
+		if quest_state(q.id) == "active":
+			out.append(str(q.id))
+	return out
+
+
+func quest_step(id: String) -> Dictionary:
+	if quest_state(id) != "active":
+		return {}
+	return quest_def(id).steps[int(s.quests[id].step)]
+
+
+## Chỗ cần tới của bước hiện tại: {"loc": id địa điểm} hoặc {"x": [từ, tới]} với bước lục thùng rác.
+func quest_target(id: String) -> Dictionary:
+	var step := quest_step(id)
+	match str(step.get("kind", "")):
+		"visit":
+			return {"loc": str(step.loc)}
+		"action":
+			return {"loc": str(get_action(str(step.action)).get("location", ""))}
+		"find":
+			return {"x": step.x}
+	return {}
+
+
+## Việc nhờ có bước phải bấm thẻ ở địa điểm loc (không tính bước tự xong khi tới nơi).
+func quest_cards_at(loc: String) -> Array:
+	var out := []
+	for id in quests_active():
+		var step := quest_step(id)
+		if step.get("kind", "") == "visit" and step.loc == loc and not step.get("auto", false):
+			out.append(id)
+	return out
+
+
+## "" nếu làm được bước tới-nơi hiện tại của việc nhờ id, ngược lại là lý do.
+func quest_step_lock(id: String) -> String:
+	if not is_started() or is_over() or not s.queue.is_empty():
+		return "-"
+	var step := quest_step(id)
+	if step.get("kind", "") != "visit":
+		return "-"
+	if step.has("window") and (clock() < float(step.window[0]) or clock() > float(step.window[1])):
+		return "Chỉ trong khung %s–%s" % [hh(float(step.window[0])), hh(float(step.window[1]))]
+	for k in step.get("need_items", {}):
+		var need := int(step.need_items[k])
+		if item_count(k) < need:
+			if need == 1:
+				return "Chưa có: " + item_name(k).to_lower()
+			return "Cần %d %s (đang có %d)" % [need, item_name(k), item_count(k)]
+	if hours_left() < float(step.get("hours", 0.0)):
+		return "Không đủ giờ"
+	return ""
+
+
+## Bấm vào người nhờ: hiện lời nhờ để nhận hay từ chối.
+func quest_offer(id: String) -> void:
+	var q := quest_def(id)
+	if q.is_empty() or not quest_offerable(q) or not s.queue.is_empty():
+		return
+	s.queue.append({"id": "qo:" + id, "data": {}})
+	_commit()
+
+
+## Làm bước tới-nơi: tốn giờ, trao đồ nếu cần, mở hộp thoại của bước (nếu có) rồi sang bước sau.
+func quest_visit(id: String) -> void:
+	if quest_step_lock(id) != "":
+		return
+	var step := quest_step(id)
+	s["used"] = float(s.used) + float(step.get("hours", 0.0))
+	if step.get("consume", false):
+		for k in step.need_items:
+			_add_item(k, -int(step.need_items[k]))
+	apply_effects(step.get("effects", {}))
+	if step.has("scene"):
+		s.queue.append({"id": "q:" + id, "data": {}})
+	else:
+		_quest_advance(id)
+	_commit()
+
+
+func _quest_deadline(q: Dictionary, from_day: int) -> float:
+	return float(from_day + int(q.get("deadline_days", 0))) * 24.0 + float(q.get("deadline_hour", 22.0))
+
+
+func _abs_text(t: float) -> String:
+	var d := int(floor(t / 24.0))
+	var h := t - float(d) * 24.0
+	if d == day():
+		return "%s hôm nay" % hh(h)
+	if d == day() + 1:
+		return "%s ngày mai" % hh(h)
+	return "%s ngày %d" % [hh(h), d]
+
+
+## Hạn của bước hoặc của cả việc nhờ, viết cho người chơi đọc.
+func quest_deadline_text(id: String) -> String:
+	var st: Dictionary = _qs().get(id, {})
+	if st.has("step_deadline"):
+		return "còn %d phút" % maxi(0, roundi((float(st.step_deadline) - now_abs()) * 60.0))
+	return "hạn " + _abs_text(float(st.get("deadline", 0.0)))
+
+
+func quest_progress_text(id: String) -> String:
+	var step := quest_step(id)
+	var t := str(step.get("text", ""))
+	if step.get("kind", "") == "visit":
+		for k in step.get("need_items", {}):
+			if int(step.need_items[k]) > 1:
+				t += " · %d/%d" % [mini(item_count(k), int(step.need_items[k])), int(step.need_items[k])]
+	elif step.get("kind", "") == "action" and int(step.get("count", 1)) > 1:
+		t += " · %d/%d" % [int(s.quests[id].progress), int(step.count)]
+	return t
+
+
+func _quest_event(id: String) -> Dictionary:
+	var parts := id.split(":")
+	if parts.size() != 2:
+		return {}
+	var q := quest_def(parts[1])
+	if q.is_empty():
+		return {}
+	match parts[0]:
+		"qo":
+			return {"id": id, "eyebrow": "Việc nhờ · Ngày %d" % day(), "title": q.title, "who": q.get("who", ""), "text": q.intro,
+				"choices": [
+					{"label": q.get("accept", "Nhận lời"), "hint": "Hạn %s · %s" % [_abs_text(_quest_deadline(q, day())), q.get("reward_hint", "")], "q_accept": true},
+					{"label": q.get("decline", "Để khi khác"), "effects": q.get("decline_effects", {})},
+				]}
+		"q":
+			var step := quest_step(parts[1])
+			if not step.has("scene"):
+				return {"id": id, "title": q.title, "text": "", "choices": [{"label": "Tiếp tục", "goto": "stay"}]}
+			var e: Dictionary = step.scene.duplicate()
+			e["id"] = id
+			e["eyebrow"] = "Việc nhờ · " + str(q.title)
+			return e
+		"qd":
+			return {"id": id, "eyebrow": "Xong việc nhờ", "title": q.title, "who": q.get("who", ""), "text": q.get("reward_text", ""),
+				"choices": [{"label": "Tiếp tục", "hint": q.get("reward_hint", "")}]}
+		"qf":
+			return {"id": id, "eyebrow": "Hỏng việc nhờ", "title": q.title, "who": q.get("who", ""), "text": q.get("fail_text", ""),
+				"choices": [{"label": "Tiếp tục"}]}
+	return {}
+
+
+func quest_accept(id: String) -> void:
+	var q := quest_def(id)
+	_qs()[id] = {"state": "active", "step": 0, "day": day(), "deadline": _quest_deadline(q, day()), "progress": 0, "misses": 0}
+	add_log("Nhận việc nhờ: " + str(q.title), "event")
+	apply_effects(q.get("accept_effects", {}))
+	_quest_start_step(id)
+
+
+func _quest_start_step(id: String) -> void:
+	var st: Dictionary = s.quests[id]
+	st["progress"] = 0
+	st["misses"] = 0
+	var step := quest_step(id)
+	if step.has("within"):
+		st["step_deadline"] = now_abs() + float(step.within)
+	else:
+		st.erase("step_deadline")
+
+
+## Sang bước sau (hoặc tới bước có id goto); hết bước thì xong việc.
+func _quest_advance(id: String, goto := "next") -> void:
+	var q := quest_def(id)
+	var st: Dictionary = s.quests[id]
+	var next := int(st.step) + 1
+	if goto != "next":
+		for i in q.steps.size():
+			if str(q.steps[i].get("id", "")) == goto:
+				next = i
+	if next >= q.steps.size():
+		_quest_finish(id, true)
+		return
+	st["step"] = next
+	add_log("Việc nhờ «%s»: %s" % [q.title, q.steps[next].text], "event")
+	_quest_start_step(id)
+
+
+func _quest_finish(id: String, ok: bool) -> void:
+	var q := quest_def(id)
+	var st: Dictionary = s.quests[id]
+	st["state"] = "done" if ok else "failed"
+	st.erase("step_deadline")
+	apply_effects(q.get("reward" if ok else "fail", {}))
+	s.queue.append({"id": ("qd:" if ok else "qf:") + id, "data": {}})
+	add_log(("Xong việc nhờ: " if ok else "Hỏng việc nhờ: ") + str(q.title), "plus" if ok else "warn")
+
+
+func _quest_choice(eid: String, c: Dictionary) -> void:
+	if eid.begins_with("qo:"):
+		var id := eid.substr(3)
+		if c.get("q_accept", false):
+			quest_accept(id)
+		else:
+			_qs()[id] = {"state": "declined", "day": day()}
+	elif eid.begins_with("q:"):
+		var id := eid.substr(2)
+		if quest_state(id) != "active":
+			return
+		var goto := str(c.get("goto", "next"))
+		match goto:
+			"stay":
+				pass
+			"end":
+				s.quests[id]["state"] = "ended"
+				add_log("Thôi việc nhờ: " + str(quest_def(id).title), "warn")
+			"fail":
+				_quest_finish(id, false)
+			_:
+				_quest_advance(id, goto)
+
+
+func _quest_on_action(action_id: String, result: Dictionary) -> void:
+	for id in quests_active():
+		var step := quest_step(id)
+		if step.get("kind", "") != "action" or step.get("action", "") != action_id:
+			continue
+		if step.get("manual", false) and (result.is_empty() or result.get("auto", false)):
+			add_log("Việc nhờ «%s» cần tự tay làm, làm tự động không tính" % quest_def(id).title, "warn")
+			continue
+		if float(result.get("ratio", 1.0)) < float(step.get("min_ratio", 0.0)) - 0.001:
+			add_log(str(step.get("short_text", "Chưa đạt yêu cầu của việc nhờ")), "warn")
+			continue
+		s.quests[id]["progress"] = int(s.quests[id].progress) + 1
+		if int(s.quests[id].progress) >= int(step.get("count", 1)):
+			_quest_advance(id)
+
+
+## Lục thùng rác đúng khúc phố của bước "find": có xác suất ra đồ, xui ba lần liền thì lần sau chắc chắn ra.
+func _quest_on_scavenge(x: float) -> String:
+	for id in quests_active():
+		var step := quest_step(id)
+		if step.get("kind", "") != "find" or x < float(step.x[0]) or x > float(step.x[1]):
+			continue
+		var st: Dictionary = s.quests[id]
+		if randf() < float(step.get("chance", 1.0)) or int(st.get("misses", 0)) >= 3:
+			_add_item(str(step.item), 1)
+			var t := str(step.get("found_text", "Tìm thấy rồi!"))
+			add_log(t, "event")
+			_quest_advance(id)
+			return t
+		st["misses"] = int(st.get("misses", 0)) + 1
+	return ""
+
+
+## Quá hạn thì hỏng việc (trừ khi đang mở hộp thoại của chính việc đó).
+func _check_quests() -> void:
+	if not is_started() or is_over() or not s.has("quests"):
+		return
+	var t := now_abs()
+	for id in quests_active():
+		var busy := false
+		for e in s.queue:
+			if str(e.id) == "q:" + id:
+				busy = true
+		if busy:
+			continue
+		var st: Dictionary = s.quests[id]
+		if t > float(st.deadline) + 0.001 or (st.has("step_deadline") and t > float(st.step_deadline) + 0.001):
+			_quest_finish(id, false)
+
+
 # ---------------------------------------------------------------- ve chai
 
 func scrap_lock(bin_id: String) -> String:
@@ -972,7 +1330,8 @@ func scrap_lock(bin_id: String) -> String:
 
 
 ## Lục một thùng rác: mất ít phút, bẩn người, được vài chai, lon, bìa giấy. Trả về số món nhặt được.
-func scavenge(bin_id: String) -> Dictionary:
+## x: vị trí thùng dọc phố, để việc nhờ kiểu "tìm trong thùng rác cuối phố" biết thùng nào đúng chỗ.
+func scavenge(bin_id: String, x := INF) -> Dictionary:
 	if scrap_lock(bin_id) != "":
 		return {}
 	var c: Dictionary = cfg.scrap
@@ -990,6 +1349,9 @@ func scavenge(bin_id: String) -> Dictionary:
 		need_adj(k, float(c.dirty[k]))
 	adj("mood", float(c.mood))
 	add_log("Lục thùng rác: " + (", ".join(parts) if not parts.is_empty() else "không có gì"))
+	var found := _quest_on_scavenge(x)
+	if found != "":
+		got["_quest"] = found
 	_commit()
 	return got
 
@@ -998,6 +1360,8 @@ func scrap_value() -> int:
 	var total := 0
 	for k in s.get("inv", {}):
 		total += int(s.inv[k]) * int(cfg.scrap[k].price)
+	if s.flags.get("veChaiQuen", false):
+		total = int(round(total * float(cfg.scrap.get("friendMult", 1.0)) / 1000.0)) * 1000
 	return total
 
 

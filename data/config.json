@@ -56,7 +56,7 @@
     "chai": {"name": "chai nhựa", "price": 3000},
     "lon": {"name": "lon nhôm", "price": 5000},
     "giay": {"name": "bìa giấy", "price": 2000},
-    "binHours": 0.25, "dirty": {"clean": -6, "neat": -8}, "mood": -1
+    "binHours": 0.25, "friendMult": 1.2, "dirty": {"clean": -6, "neat": -8}, "mood": -1
   },
   "food": {
     "tu_lo": {"name": "Tự lo, mua ở quán", "cost": 0, "hours": 0, "health": 0, "mood": 0},
@@ -135,6 +135,7 @@
     {"id": "tin_hoc", "group": "study", "location": "trung_tam", "name": "Tin học văn phòng", "place": "Trung tâm tin học", "hours": 2, "fee": 500000, "max_times": 6, "window": [8,10], "require": {"from_day": 11}, "effects": {"xp.tinHoc": 2}},
     {"id": "doc_luat", "group": "study", "location": "quan_ca_phe", "name": "Đọc sách luật với Vy", "place": "Quán cà phê", "hours": 1, "window": [20,22], "show_if_flag": "phapLyMo", "effects": {"xp.phapLy": 2, "rep.vy": 3}},
     {"id": "an_com_tam", "group": "life", "location": "quan_com", "name": "Ăn dĩa cơm tấm sườn", "place": "Quán cơm tấm", "hours": 0.33, "cost": 35000, "per_day": 3, "effects": {"need.fed": 60, "mood": 3}},
+    {"id": "an_com_quen", "group": "life", "location": "quan_com", "name": "Cơm tấm giá khách quen, thêm chén canh", "place": "Quán cơm tấm", "hours": 0.33, "cost": 25000, "per_day": 3, "show_if_flag": "comQuen", "effects": {"need.fed": 65, "mood": 4}},
     {"id": "an_mi_ly", "group": "life", "location": "cua_hang", "name": "Ăn ly mì, uống chai nước", "place": "Cửa hàng 24 giờ", "hours": 0.15, "cost": 15000, "per_day": 3, "effects": {"need.fed": 30}},
     {"id": "banh_mi", "group": "life", "location": "cua_hang", "name": "Mua ổ bánh mì thịt, vừa đi vừa ăn", "place": "Xe bánh mì trước cửa hàng", "hours": 0.1, "cost": 20000, "per_day": 3, "window": [6, 10], "effects": {"need.fed": 40, "mood": 1}},
     {"id": "tra_da_hat", "group": "life", "location": "tra_da", "name": "Uống trà đá, cắn hướng dương", "place": "Quán trà đá", "hours": 0.5, "cost": 5000, "per_day": 2, "effects": {"need.fed": 5, "mood": 4}},

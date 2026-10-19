@@ -623,6 +623,26 @@ func _refresh_objectives(s: Dictionary) -> void:
 			var when := "hạn là tối nay" if days_left == 0 else "còn %d ngày" % days_left
 			var sub := "Đã đủ tiền" if lack == 0 else "Còn thiếu %s · %s" % [GameLogic.fmt_money(lack), when]
 			_objective_box.add_child(UI.label("     " + sub, 12, UI.HUD_SOFT))
+	var active: Array = game.quests_active()
+	if not active.is_empty():
+		_objective_box.add_child(UI.label("Việc nhờ đang làm", 14, Color("9fc4ff")))
+	for id in active:
+		var st: Dictionary = game.s.quests[id]
+		var urgent: bool = st.has("step_deadline") or float(st.deadline) - game.now_abs() < 3.0
+		_objective_box.add_child(UI.label("★  %s · %s" % [game.quest_def(id).title, game.quest_deadline_text(id)], 14, Color("ffb27a") if urgent else Color("9fc4ff")))
+		var l := UI.label("     " + game.quest_progress_text(id), 12, UI.HUD_SOFT)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(360, 0)
+		_objective_box.add_child(l)
+	var offers: Array = game.quest_offers()
+	if not offers.is_empty():
+		var who := []
+		for q in offers:
+			who.append(str(q.who))
+		var l := UI.label("!  Có người cần giúp: " + ", ".join(who) + " (tìm dấu ! trên phố)", 12, UI.GOLD)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(360, 0)
+		_objective_box.add_child(l)
 
 
 func _refresh_skills(s: Dictionary) -> void:
@@ -668,6 +688,11 @@ func _refresh_skills(s: Dictionary) -> void:
 			inv.append("%d %s" % [int(s.inv[k]), game.cfg.scrap[k].name])
 	if not inv.is_empty():
 		lines.append("Ve chai: %s (≈ %s)" % [", ".join(inv), GameLogic.fmt_k(game.scrap_value())])
+	var carry := []
+	for k in s.get("qitems", {}):
+		carry.append(game.item_name(k))
+	if not carry.is_empty():
+		lines.append("Đang mang: " + ", ".join(carry))
 	_skills_box.add_child(UI.label("\n".join(lines), 12, UI.HUD_SOFT))
 
 
@@ -687,6 +712,17 @@ func _refresh_location() -> void:
 		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(loc.npc),
 			"%d phút · Thân thiết %d/100" % [roundi(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
 			game.talk_lock(npc), game.talk.bind(npc)))
+	for q in game.quest_offers(_loc_id):
+		_loc_cards.add_child(_quest_card("!  Việc nhờ: " + str(q.title), "%s đang cần người giúp. Bấm để nghe chuyện." % q.who, "", game.quest_offer.bind(q.id)))
+		found += 1
+	for id in game.quest_cards_at(_loc_id):
+		var step: Dictionary = game.quest_step(id)
+		var meta: String = game.quest_deadline_text(id)
+		if float(step.get("hours", 0.0)) > 0.0:
+			meta = "%d phút · %s" % [roundi(float(step.hours) * 60.0), meta]
+		_loc_cards.add_child(_quest_card("★  " + str(game.quest_def(id).title), game.quest_progress_text(id) + "\n" + meta,
+			game.quest_step_lock(id), game.quest_visit.bind(id)))
+		found += 1
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
 			if a.get("location", "") == _loc_id:
@@ -711,3 +747,28 @@ func _refresh_location() -> void:
 ## Bảng địa điểm cao vừa đủ số thẻ, nhiều quá thì cuộn (tránh khoảng trắng thừa khi chỉ có một việc).
 func _fit_location() -> void:
 	_loc_scroll.custom_minimum_size.y = minf(_loc_cards.get_combined_minimum_size().y, 420.0)
+
+
+## Thẻ việc nhờ: nền vàng nhạt để nổi giữa các việc làm, dòng phụ xuống hàng được (bước việc nhờ thường dài).
+func _quest_card(title: String, hint: String, lock: String, on_press: Callable) -> Button:
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(320, 92)
+	btn.disabled = lock != ""
+	btn.add_theme_stylebox_override("normal", UI.box(Color("fff6dc"), UI.GOLD, 8, 10))
+	btn.add_theme_stylebox_override("hover", UI.box(Color("ffeec0"), UI.GOLD, 8, 10))
+	btn.add_theme_stylebox_override("disabled", UI.box(Color("f6f1e4"), Color("e6d7a8"), 8, 10))
+	btn.pressed.connect(on_press)
+	var v := VBoxContainer.new()
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_theme_constant_override("separation", 2)
+	btn.add_child(v)
+	v.set_anchors_preset(Control.PRESET_FULL_RECT)
+	v.offset_left = 12
+	v.offset_top = 8
+	v.offset_right = -12
+	v.offset_bottom = -8
+	v.add_child(UI.label(title, 15, Color("6b4a00")))
+	v.add_child(UI.wrap(hint, 12, UI.INK_SOFT, 296))
+	if lock != "" and lock != "-":
+		v.add_child(UI.small(lock, UI.STAMP))
+	return btn

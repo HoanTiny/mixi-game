@@ -31,6 +31,8 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Nói chuyện:** vào tiệm có người đứng trước cửa (Cô Sáu, Chú Bảy, Vy, Tuấn, Ông Tư) sẽ thấy nút **Nói chuyện**, tốn 30 phút, mỗi người một lần mỗi ngày. Mỗi người có vài đoạn mạch chuyện mở dần theo độ thân thiết và ngày; kể hết thì tán gẫu, được thêm chút thân thiết. Hội thoại viết trong `data/talks.json`.
 
+**Việc nhờ (kiểu Nobody):** người trong phố nhờ những việc nhiều bước, có hạn giờ và có lựa chọn. Chỗ có người nhờ hiện dấu **!** vàng; nhận việc thì bảng mục tiêu hiện bước đang làm, dấu **◆** xanh chỉ chỗ cần tới. Ví dụ: tìm xe đạp bị trộm của bé Bin (hỏi ông Tư, chuộc ở vựa ve chai, mặc cả hoặc nhờ ông Tư làm chứng); sửa máy lạnh nhà ông Tư (đọc triệu chứng, chọn đúng bệnh, trả đồ nghề trước 18:00); rửa bát đủ chỉ tiêu rồi chở 30 suất cơm tới công trình trước khi nguội; gom 15 lon nhôm cho cô Tám; lục thùng rác cuối phố tìm mèo của ông Tư; nhờ má chụp giấy vay cho Vy; đưa phong bì của Tuấn (lén chụp lại được thêm bằng chứng). Quá hạn là hỏng việc và mất thân thiết; làm xong được tiền, thân thiết hoặc mở ưu đãi mới (cơm giá khách quen, ve chai được giá). Viết trong `data/quests.json`.
+
 **Quận 1:** từ ngày 23, khi Ngoại ngữ đủ 3, trạm xe buýt có việc *Dẫn khách Úc đi chợ Bến Thành*. Nhận việc thì sang màn Quận 1 (`scenes/quan1.tscn`): dẫn ba vị khách qua cổng chợ, sạp lưu niệm, xe bánh xèo, mỗi chỗ một lựa chọn. Xong chuyến thì đón xe buýt về, tiền công và giờ tính lúc đó. Nội dung chuyến đi viết trong `data/tour_ben_thanh.json`.
 
 Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi lại** trong Bảng cân bằng xóa ván đang chơi.
@@ -43,6 +45,7 @@ data/
   events.json     sự kiện cố định theo ngày, sự kiện ngẫu nhiên, mốc tiền
   story.json      mở đầu, món mang theo, 5 kết thúc, Sổ tay của Minh
   talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
+  quests.json     việc nhờ nhiều bước: người nhờ, hạn, các bước, lựa chọn, phần thưởng
   models.json     file mô hình cho nhà, người, xe, cây và cách co giãn
   tour_ben_thanh.json  điểm dừng và lựa chọn của chuyến dẫn khách ở Quận 1
   sounds.json     âm nền, tiếng rao, còi xe, tiếng hiệu ứng

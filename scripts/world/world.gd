@@ -580,6 +580,7 @@ func _physics_process(delta: float) -> void:
 
 	_update_traffic(delta)
 	_update_delivery()
+	_update_quests()
 	_check_day_end()
 
 
@@ -587,9 +588,20 @@ func _physics_process(delta: float) -> void:
 
 ## Phong độ thấp thì lê bước, đi chậm hẳn.
 func _speed() -> float:
+	var v := SPEED
 	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
-		return SPEED * 0.7
-	return SPEED
+		v *= 0.7
+	# Đang khiêng đồ của việc nhờ (xe đạp, cơm suất, con mèo) thì đi chậm hơn một chút.
+	for id in game.quests_active():
+		var step: Dictionary = game.quest_step(id)
+		if step.get("carry", false):
+			var holding := true
+			for k in step.get("need_items", {}):
+				holding = holding and game.item_count(k) > 0
+			if holding:
+				v *= 0.8
+				break
+	return v
 
 
 func nearest_bin() -> String:
@@ -604,7 +616,15 @@ func _scavenge(id: String) -> void:
 	if lock != "":
 		_float_text(lock, Color("ffd27a"))
 		return
-	var got: Dictionary = game.scavenge(id)
+	var x := INF
+	for b in bins:
+		if b.id == id:
+			x = float(b.pos.x)
+	var got: Dictionary = game.scavenge(id, x)
+	if got.has("_quest"):
+		_float_text(str(got._quest), Color("9fc4ff"))
+		audio.play("done")
+		got.erase("_quest")
 	var parts := []
 	for k in got:
 		if int(got[k]) > 0:
@@ -1126,3 +1146,86 @@ func _float_text(text: String, color: Color) -> void:
 	tw.tween_property(l, "position", l.position + Vector3(0, 1.4, 0), 1.6)
 	tw.tween_property(l, "modulate:a", 0.0, 1.6).set_delay(0.4)
 	tw.chain().tween_callback(l.queue_free)
+
+
+# ---------------------------------------------------------------- việc nhờ
+
+## Dấu ! vàng trên chỗ có người nhờ việc, dấu ◆ xanh trên chỗ cần tới của việc đang làm.
+var _quest_offer_marks := {}
+var _quest_marks: Array = []
+var _quest_tick := 0.0
+
+
+func _update_quests() -> void:
+	if not game.is_started():
+		return
+	var bob := 0.18 * sin(Time.get_ticks_msec() / 260.0)
+	_quest_tick -= get_physics_process_delta_time()
+	if _quest_tick <= 0.0:
+		_quest_tick = 0.3
+		_refresh_quest_marks()
+	for id in _quest_offer_marks:
+		var m: Label3D = _quest_offer_marks[id]
+		m.position.y = float(m.get_meta("y")) + bob
+	for m in _quest_marks:
+		m.position.y = float(m.get_meta("y")) + bob
+		m.rotation.y += 0.03
+	# Bước "auto": tới nơi là xong (giao cơm tới công trình).
+	if hud.blocking():
+		return
+	for id in game.quests_active():
+		var step: Dictionary = game.quest_step(id)
+		if step.get("kind", "") == "visit" and step.get("auto", false) and game.quest_step_lock(id) == "" \
+				and door_of(str(step.loc)).distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE:
+			game.quest_visit(id)
+			audio.play("done")
+
+
+func _refresh_quest_marks() -> void:
+	var offers := {}
+	for q in game.quest_offers():
+		offers[str(q.giver)] = true
+	for loc in offers:
+		if not _quest_offer_marks.has(loc):
+			var l := _label3d("!", Vector3.ZERO, 120)
+			l.modulate = Color("f2c14e")
+			l.outline_modulate = Color("3a2a00")
+			l.position = door_of(loc) + Vector3(1.6 if LOCATIONS[loc].has("npc") else 0.0, 0, 0.2)
+			l.set_meta("y", 3.0)
+			add_child(l)
+			_quest_offer_marks[loc] = l
+	for loc in _quest_offer_marks.keys():
+		if not offers.has(loc):
+			_quest_offer_marks[loc].queue_free()
+			_quest_offer_marks.erase(loc)
+	var spots := []
+	for id in game.quests_active():
+		var t: Dictionary = game.quest_target(id)
+		if t.has("loc") and LOCATIONS.has(t.loc):
+			spots.append(door_of(str(t.loc)))
+		elif t.has("x"):
+			for b in bins:
+				if float(b.pos.x) >= float(t.x[0]) and float(b.pos.x) <= float(t.x[1]) and game.scrap_lock(b.id) == "":
+					spots.append(Vector3(b.pos.x, 0, b.pos.z))
+	while _quest_marks.size() < spots.size():
+		var m := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.38
+		cm.bottom_radius = 0.0
+		cm.height = 0.75
+		cm.radial_segments = 4
+		m.mesh = cm
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = Color("5aa9ff")
+		m.material_override = mat
+		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(m)
+		_quest_marks.append(m)
+	for i in _quest_marks.size():
+		var m: MeshInstance3D = _quest_marks[i]
+		m.visible = i < spots.size()
+		if m.visible:
+			var p: Vector3 = spots[i]
+			m.position = Vector3(p.x, m.position.y, p.z)
+			m.set_meta("y", 2.2 if absf(p.z - DOOR_Z) > 0.5 else 4.2)
