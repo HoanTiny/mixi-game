@@ -279,15 +279,6 @@
     },
     "plant": [
       {
-        "path": "res://assets/models/potted_plant_01/potted_plant_01.gltf",
-        "fit": "height",
-        "size": [
-          0,
-          0.9,
-          0
-        ]
-      },
-      {
         "path": "res://assets/models/potted_plant_02/potted_plant_02.gltf",
         "fit": "height",
         "size": [
