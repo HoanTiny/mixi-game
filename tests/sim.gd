@@ -6,6 +6,10 @@ extends SceneTree
 const GameLogic := preload("res://scripts/game_logic.gd")
 
 ## Lựa chọn theo ngày cho từng cách chơi. Bị khóa thì lấy lựa chọn đầu tiên còn mở.
+## Bản 30 ngày có thêm hai cách chơi: "giấu" (làm việc đàng hoàng nhưng giấu chuyện và ép người nhà ở các cảnh gia đình)
+## và "ít việc" (chọn như lắng nghe nhưng mỗi ngày chỉ làm một việc ngắn), để thử kết E5 và E7.
+const HIDE_PICKS := {"ngay1": 1, "ngay9": 2, "ngay12_bc": 2, "ngay12_a": 2, "ngay19": 2, "ngay22": 2, "ngay25": 2}
+const FULL_POLICIES := ["lắng nghe", "giữ tiếp", "áp đặt", "gồng", "giấu", "ít việc"]
 const POLICIES := {
 	"lắng nghe": {"ngay18_bc": 0, "ngay18_a": 0, "ngay19": 0, "ngay20_bc": 0, "ngay20_a": 0, "ngay21": 0, "ngay22": 0},
 	"giữ tiếp": {"ngay18_bc": 1, "ngay18_a": 1, "ngay19": 1, "ngay20_bc": 1, "ngay20_a": 1, "ngay21": 1, "ngay22": 1},
@@ -33,7 +37,7 @@ func _init() -> void:
 	print("Tuyến  Cách chơi   Kết   Chỗ ở      Tiền cuối    Phải thu sau 30  Mệt  Cảnh báo/bỏ nghỉ  Che giấu  Linh   Bà Tư    Việc nhờ xong  Cảnh bỏ lỡ")
 	var tally := {}
 	for route in GameLogic.ROUTES:
-		for pi in POLICIES.size() + 1:
+		for pi in FULL_POLICIES.size():
 			var g := GameLogic.new()
 			g.load_data()
 			var missed := _full(g, route, pi)
@@ -44,7 +48,7 @@ func _init() -> void:
 					done += 1
 			tally[over.get("key", "?")] = int(tally.get(over.get("key", "?"), 0)) + 1
 			print("%-6s %-11s %-5s %-10s %-12s %-16s %-4d %-17s %-9d %-6s %-8s %-14d %d" % [
-				route + ("" if g.s.route == route else ">" + str(g.s.route)), (POLICIES.keys() + ["gồng"])[pi], over.get("key", "?"), str(g.housing().place),
+				route + ("" if g.s.route == route else ">" + str(g.s.route)), FULL_POLICIES[pi], over.get("key", "?"), str(g.housing().place),
 				GameLogic.fmt_money(int(g.s.cash)), GameLogic.fmt_money(g.receivable_sum(31, 999)), int(g.s.fatigue),
 				"%d/%d" % [int(g.s.warn_days), int(g.s.rest_skips)], g.hidden_marks(), over.get("linh", "?"), over.get("ba_tu", "?"), done, missed])
 	print("Phân bố kết thúc: ", tally)
@@ -118,7 +122,9 @@ func _answer_full(g, route: String, pick: int) -> void:
 	while not g.s.queue.is_empty() and safety < 20 and not g.is_over():
 		safety += 1
 		var e: Dictionary = g.current_event()
-		var want := 1 if pick == 3 else pick
+		var want := 1 if pick == 3 else (0 if pick >= 4 else pick)
+		if pick == 4:
+			want = int(HIDE_PICKS.get(str(e.id), 0))
 		if str(e.id) in ["ngay11", "missed:ngay11"]:
 			want = GameLogic.ROUTES.find(route)
 		elif str(e.id) in ["ngay26", "missed:ngay26", "ngay30"]:
@@ -153,10 +159,12 @@ func _quests(g) -> void:
 ## "gồng" (pick 3): chọn như giữ tiếp nhưng ngày nào cũng thêm ca phụ quán, không bao giờ nghỉ.
 func _plan_full(g, pick: int) -> Array:
 	var p := []
-	if pick < 3 and float(g.s.fatigue) >= (60.0 if pick == 0 else float(g.cfg.fatigue.warn)):
+	if pick != 3 and float(g.s.fatigue) >= (60.0 if pick in [0, 4, 5] else float(g.cfg.fatigue.warn)):
 		p.append("nghi")
 	if pick == 3:
 		p.append("ca_phu_quan")
+	if pick == 5:
+		return p + ["sua_do_le", "com_voi_ba"]
 	match str(g.s.route):
 		"B":
 			if not g.progress_ready():
@@ -168,7 +176,7 @@ func _plan_full(g, pick: int) -> Array:
 			p.append_array(["sua_do_le", "ca_phu_quan"])
 		_:
 			p.append_array(["ca_kho", "sua_do_le"])
-	if pick == 0:
+	if pick in [0, 4]:
 		p.append("com_voi_ba")
 	return p
 

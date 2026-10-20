@@ -147,5 +147,63 @@
    "good": "Anh Phúc giới thiệu An cho một dãy quán khác, kèm câu \"làm rõ từng phần như bên anh\".",
    "bad": "Anh Phúc chốt hợp đồng nhỏ hơn, bắt tay An rồi đi tìm đội khác cho phần còn lại."
   }
- }
+ },
+ "tips": [
+  {
+   "id": "di_lai",
+   "text": "Bấm chuột vào mặt đường để đi, hoặc dùng phím WASD. Bấm vào cửa tiệm hay người đứng trước cửa để vào. Đi bộ cũng tốn giờ."
+  },
+  {
+   "id": "canh_chinh",
+   "text": "Hôm nay có cảnh chính. Tìm dấu ◆ vàng trên phố (hoặc chấm trên bản đồ phố phía trên), tới nơi bấm thẻ ◆. Có cảnh chỉ diễn ra trong một khung giờ; bỏ lỡ thì việc không tự xong."
+  },
+  {
+   "id": "tien",
+   "text": "Góc phải: số lớn là tiền mặt tiêu được. Dòng dưới là tiền phải thu và phải trả; tiền chưa về thì chưa tiêu được. Mỗi tối trừ tiền sinh hoạt của cả nhà."
+  },
+  {
+   "id": "an_uong",
+   "text": "Bụng đói làm Phong độ giảm. Ăn ở Cơm Hạnh, hoặc mua bánh mì ở chợ Cầu Nhỏ buổi sáng."
+  },
+  {
+   "id": "tam_giat",
+   "text": "Người bẩn, đồ dơ cũng kéo Phong độ xuống. Tắm và giặt đồ ở xóm trọ Bờ Me."
+  },
+  {
+   "id": "phong_do",
+   "text": "Phong độ dưới 55 thì chỉ được 70% tiền công, dưới 30 còn 50%. Ăn, tắm, giặt và nghỉ cho bớt Mệt."
+  },
+  {
+   "id": "so",
+   "text": "Có lời hứa mới. Mở nút Sổ ở dưới để xem hạn. Quá hạn mà không báo thì người nhận mất lòng tin."
+  },
+  {
+   "id": "noi_chuyen",
+   "text": "Người đứng trước cửa có nút Nói chuyện. Mỗi người một lần mỗi ngày; mạch chuyện mở dần theo ngày và độ thân thiết."
+  },
+  {
+   "id": "met",
+   "text": "Mệt đang lên. Từ 70 là mức cảnh báo; nhiều ngày liền không nghỉ sẽ có hậu quả. Nghỉ ở phòng, ăn cơm với bà, ngồi trà đá giúp hồi."
+  },
+  {
+   "id": "viec_nho",
+   "text": "Dấu ! vàng là có người nhờ việc. Bấm vào để nghe chuyện; nhận hay không là ở bạn. Việc đang làm hiện ở bảng mục tiêu, dấu ◆ xanh chỉ chỗ cần tới."
+  },
+  {
+   "id": "ve_chai",
+   "text": "Thùng rác dọc vỉa hè: đứng gần bấm E để lục ve chai, đem bán ở sạp cô Út trong chợ. Lục rác thì bẩn người."
+  },
+  {
+   "id": "dien_thoai",
+   "text": "Rảnh thì mở Điện thoại, bật app giao đồ để nhận đơn kiếm thêm. Giao sớm có tip, trễ bị trừ tiền."
+  },
+  {
+   "id": "toi",
+   "text": "Sau 20 giờ mà còn làm việc thì Mệt tăng thêm. 22 giờ chưa về xóm trọ là ngủ gục ngoài đường. Nút Về xóm trọ dẫn đường về."
+  },
+  {
+   "id": "cho_o",
+   "text": "Ngày 26 phải chốt chỗ ở. Bảng mục tiêu tính sẵn: không kiếm thêm thì sáng ngày 26 còn bao nhiêu. Hẻm Dừa ở cạnh chợ, Cầu Tre ở cuối phố, nhà dì Năm ở đầu phố."
+  }
+ ]
 }

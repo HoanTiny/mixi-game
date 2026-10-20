@@ -35,6 +35,16 @@ const LOCATIONS := {
 	"xom_bo_me": {"name": "Xóm trọ Bờ Me", "desc": "Tám phòng quanh khoảng sân, vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.", "x": 10.0, "size": Vector3(15, 8, 9),
 		"tube": {"floors": 3, "sign": "XÓM TRỌ BỜ ME", "units": 3}, "color": "eadcae", "line": true,
 		"npcs": [{"name": "Bà Tư", "id": "BA_TU", "color": "8a6f9a"}, {"name": "Linh", "id": "LINH", "color": "d9776b"}, {"name": "Cô Duyên", "id": "DUYEN", "color": "b5577a"}]},
+	# Ba chỗ ở mới: Hẻm Dừa gần chợ và gần việc, Cầu Tre ở cuối phố (đi xa hơn), nhà dì Năm ở đầu phố.
+	"hem_dua": {"name": "Phòng Hẻm Dừa", "desc": "Hẻm nhỏ rẽ ra từ phố chính, gần chợ. Phòng nhỏ, cửa sát mặt hẻm, ít chỗ phơi.", "x": -30.5, "size": Vector3(5, 7, 5),
+		"tube": {"floors": 3, "sign": "HẺM DỪA · CHO THUÊ PHÒNG", "shop": false}, "color": "d8c39a", "home": "hem_dua",
+		"npcs": [{"name": "Cô chủ phòng", "id": "", "color": "9a6a8a"}]},
+	"cau_tre": {"name": "Phòng Cầu Tre", "desc": "Cuối phố, qua khỏi Bến Cạn. Phòng thoáng, có hiên rộng; đi làm xa hơn.", "x": 63.0, "size": Vector3(8, 6, 6),
+		"tube": {"floors": 2, "sign": "PHÒNG TRỌ CẦU TRE", "shop": false}, "color": "a9c4a0", "home": "cau_tre",
+		"npcs": [{"name": "Chú chủ nhà", "id": "", "color": "5a6a7a"}]},
+	"nha_di_nam": {"name": "Nhà dì Năm", "desc": "Nhà dì Năm ở đầu phố. Ở tạm được bảy ngày, phải gửi bớt đồ.", "x": -80.0, "size": Vector3(7, 6, 5),
+		"tube": {"floors": 2, "sign": "", "shop": false}, "color": "e0b08a", "home": "di_nam",
+		"npcs": [{"name": "Dì Năm", "id": "", "color": "7a5a4a"}]},
 	"ben_can": {"name": "Dãy quán Bến Cạn", "desc": "Năm quán chung lối đi và hạ tầng cũ bên rạch. Hợp đồng của anh Phúc.", "x": 40.0, "size": Vector3(22, 6, 4.0),
 		"tube": {"floors": 2, "sign": "DÃY QUÁN BẾN CẠN", "units": 5}, "color": "9c9a93",
 		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
@@ -956,7 +966,12 @@ func _update_traffic(delta: float) -> void:
 func _on_changed() -> void:
 	if not game.is_started():
 		_last_money = -1
+		if _ending_home != null:
+			_ending_home.queue_free()
+			_ending_home = null
 		return
+	if game.is_over() and str(game.s.over.get("kind", "")) == "full" and _ending_home == null:
+		_show_ending_home()
 	var money := int(game.s.cash)
 	if _last_money >= 0 and money != _last_money:
 		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
@@ -1226,6 +1241,43 @@ func _float_text(text: String, color: Color) -> void:
 	tw.tween_property(l, "position", l.position + Vector3(0, 1.4, 0), 1.6)
 	tw.tween_property(l, "modulate:a", 0.0, 1.6).set_delay(0.4)
 	tw.chain().tween_callback(l.queue_free)
+
+
+# ---------------------------------------------------------------- ngày 30
+
+## Hình ảnh khép lại: An đứng trước chỗ ở mới, bà Tư bên cạnh (Linh có mặt nếu không đi thực tập xa),
+## chậu húng đặt dưới mái hiên. Hộp thoại kết thúc hiện đè lên cảnh này.
+var _ending_home: Node3D
+
+
+func _show_ending_home() -> void:
+	var place := str(game.housing().place)
+	var loc := str(game.cfg.housing.get(place, {}).get("loc", HOME))
+	if not LOCATIONS.has(loc):
+		loc = HOME
+	var door := door_of(loc)
+	_ending_home = Node3D.new()
+	add_child(_ending_home)
+	var family := ["BA_TU"]
+	if str(game.s.linh.decision) != "xa":
+		family.append("LINH")
+	var i := 0
+	for id in family:
+		var who := _character("npc." + id, Color("8a6f9a"), Color("3a3a40"))
+		who.position = door + Vector3(0.9 + i * 1.0, 0, 0.7)
+		who.rotation.y = PI * 0.15
+		_ending_home.add_child(who)
+		who.add_child(_label3d(game.rep_name(id), Vector3(0, 1.9, 0), 20))
+		i += 1
+	if not _prop("plant", door + Vector3(-1.8, 0.16, -0.3), 0.0, _ending_home):
+		_block(Vector3(0.35, 0.35, 0.35), door + Vector3(-1.8, 0.16, -0.3), Color("5f7a3f"), _ending_home)
+	_ending_home.add_child(_label3d("Chậu húng của bà", door + Vector3(-1.8, 0.95, -0.3), 18))
+	player.position = door + Vector3(-0.2, 0, 1.0)
+	player.rotation.y = 0.0
+	zoom = 0.15
+	camera.position = player.position + cam_offset()
+	_target = null
+	_target_loc = ""
 
 
 # ---------------------------------------------------------------- việc nhờ

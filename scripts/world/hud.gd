@@ -92,6 +92,7 @@ func _ready() -> void:
 	var middle := _pass(HBoxContainer.new(), rows)
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var left := _pass(VBoxContainer.new(), middle)
+	_build_tip(left)
 	_build_skills(left)
 	_build_log(left)
 	_build_phone(left)
@@ -395,6 +396,7 @@ func _process(delta: float) -> void:
 	if _phone_tick <= 0.0:
 		_phone_tick = 0.25
 		_warn_needs()
+		_update_tip(0.25)
 		_update_order_strip(active)
 		if _phone.visible:
 			_refresh_phone()
@@ -540,6 +542,8 @@ func _refresh() -> void:
 	if not started:
 		_loc_id = ""
 		_location.visible = false
+		_tip.visible = false
+		_tip_id = ""
 		_update_prompt()
 		return
 	var s: Dictionary = game.s
@@ -778,3 +782,101 @@ func _quest_card(title: String, hint: String, lock: String, on_press: Callable) 
 	if lock != "" and lock != "-":
 		v.add_child(UI.small(lock, UI.STAMP))
 	return btn
+
+
+# ---------------------------------------------------------------- gợi ý cách chơi
+
+## Gợi ý hiện đúng lúc lần đầu gặp (đói, có cảnh chính, Mệt lên…), mỗi cái một lần, lưu trong s.tips_seen.
+var _tip: PanelContainer
+var _tip_label: Label
+var _tip_id := ""
+var _tip_time := 0.0
+
+
+func _build_tip(parent: Control) -> void:
+	_tip = PanelContainer.new()
+	_tip.add_theme_stylebox_override("panel", UI.box(UI.HUD_BG, UI.GOLD, 8, 12))
+	_tip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	_tip.custom_minimum_size = Vector2(360, 0)
+	parent.add_child(_tip)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	_tip.add_child(v)
+	v.add_child(UI.label("GỢI Ý", 11, UI.GOLD))
+	_tip_label = UI.wrap("", 14, UI.HUD_TEXT, 336)
+	v.add_child(_tip_label)
+	var ok := Button.new()
+	ok.text = "Hiểu rồi"
+	ok.size_flags_horizontal = Control.SIZE_SHRINK_END
+	ok.pressed.connect(_close_tip)
+	v.add_child(ok)
+	_tip.visible = false
+
+
+func _close_tip() -> void:
+	if _tip_id != "" and game.is_started():
+		if not game.s.has("tips_seen"):
+			game.s["tips_seen"] = []
+		game.s.tips_seen.append(_tip_id)
+	_tip_id = ""
+	_tip.visible = false
+
+
+func _tip_due(id: String) -> bool:
+	var s: Dictionary = game.s
+	match id:
+		"di_lai":
+			return true
+		"canh_chinh":
+			return not game.scenes_today().is_empty()
+		"tien":
+			return int(s.stats.get("earned", 0)) > 0
+		"an_uong":
+			return game.has_needs() and game.need("fed") < 45.0
+		"tam_giat":
+			return game.has_needs() and (game.need("clean") < 45.0 or game.need("neat") < 45.0)
+		"phong_do":
+			return game.pay_mult() < 1.0
+		"so":
+			for p in s.promises:
+				if p.status == "open":
+					return true
+		"noi_chuyen":
+			if _loc_id != "":
+				for who in world.location_info(_loc_id).get("npcs", []):
+					if str(who.id) != "":
+						return true
+		"met":
+			return float(s.fatigue) >= 55.0
+		"viec_nho":
+			return not game.quest_offers().is_empty()
+		"ve_chai":
+			return _prompt_id.begins_with("bin:")
+		"dien_thoai":
+			return game.day() >= 2
+		"toi":
+			return game.clock() >= 19.5
+		"cho_o":
+			return game.day() >= 3
+	return false
+
+
+func _update_tip(dt: float) -> void:
+	if game.is_over():
+		_tip.visible = false
+	if not game.is_started() or game.is_over() or dialogs.visible:
+		return
+	if _tip.visible:
+		# Tự tắt sau một lúc nếu người chơi không bấm, coi như đã đọc.
+		_tip_time += dt
+		if _tip_time > 40.0:
+			_close_tip()
+		return
+	var seen: Array = game.s.get("tips_seen", [])
+	for tip in game.story.get("tips", []):
+		if not seen.has(tip.id) and _tip_due(str(tip.id)):
+			_tip_id = str(tip.id)
+			_tip_label.text = str(tip.text)
+			_tip_time = 0.0
+			_tip.visible = true
+			return

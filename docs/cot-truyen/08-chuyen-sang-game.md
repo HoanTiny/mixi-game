@@ -24,7 +24,9 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - **8 kết thúc E1–E8** xét theo thứ tự E8 → E6 → E7 → E5 → E4 → E2 → E3 → E1 (`ending_key()` trong `game_logic.gd`, ngưỡng ở `endings` của `config.json`), màn kết có thẻ Linh, thẻ bà Tư, một thẻ quan hệ nghề và các khoản còn phải xử lý.
   - Việc tùy chọn theo ngày và việc giữ lời hứa (`showIfPromise`) ở các địa điểm; việc nhờ mở từ lựa chọn trong cảnh (sửa quạt ngày 2, giao 12 suất ngày 6, đón Bắp ngày 9).
   - `tests/sim.gd` chạy thêm 30 ngày cho 3 tuyến × 4 cách chơi; `tests/playtest.gd -- --demo --full` cho người chơi máy đi hết 30 ngày trên màn phố thật.
-- **Nhận xét từ mô phỏng 30 ngày:** lắng nghe ra E1/E2/E3 theo tuyến, giữ tiếp ra E4 hoặc E6, áp đặt ra E8, làm quá sức ra E6 hoặc E4. Tiền cuối tháng sau khi trả Hẻm Dừa từ 0,4 đến 6 triệu. Chưa có lượt mô phỏng nào ra E5 (bị E8 chặn trước) và E7 (ai cũng đủ tiền phòng); cần chơi thử người thật để chỉnh.
+  - Ba chỗ ở dựng trên phố (Hẻm Dừa cạnh chợ, Cầu Tre cuối phố, nhà dì Năm đầu phố) để xem phòng và dắt bà đi thử tận nơi; ngày 30 cảnh khép lại diễn ra trước chỗ ở đã chọn, có chậu húng dưới mái hiên.
+  - Gợi ý cách chơi hiện một lần khi lần đầu gặp từng tình huống (`tips` trong `story.json`).
+- **Nhận xét từ mô phỏng 30 ngày:** lắng nghe ra E1/E2/E3 theo tuyến, giữ tiếp ra E4 hoặc E6, áp đặt ra E8, làm quá sức ra E6 hoặc E4. Tiền cuối tháng sau khi trả Hẻm Dừa từ 0,4 đến 6 triệu. Cách chơi "giấu" (làm việc đàng hoàng nhưng giấu chuyện, ép người nhà) ra E5 ở cả ba tuyến. E7 chỉ ra khi thiếu tiền phòng ngày 26 (đã thử riêng); mô phỏng "ít việc" (mỗi ngày một việc ngắn) vẫn vừa đủ Hẻm Dừa, nên cần người thật chơi thử để biết áp lực tiền có đủ không.
 - **Còn lại:** chỉnh cân bằng sau khi chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
 
 ## Câu hỏi đã chốt

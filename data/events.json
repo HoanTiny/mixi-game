@@ -130,25 +130,25 @@
   "loc": "cho_cau_nho",
   "title": "Phòng ở cuối hẻm",
   "who": "Linh",
-  "text": "Linh gỡ ba mẩu tin cho thuê ở bảng tin chợ. Bà Tư không hỏi giá, chỉ hỏi nơi nào buổi sáng có người ngồi trước cửa.\n• Phòng Hẻm Dừa: gần chợ, gần việc, phòng nhỏ. Vào ở 5.000.000đ (cọc, tháng đầu, chuyển đồ).\n• Phòng Cầu Tre: xa hơn, thoáng, có hiên. Vào ở 4.200.000đ, tốn thêm xăng.\n• Nhà dì Năm: ở tạm 7 ngày, góp 500.000đ, phải gửi bớt đồ.",
+  "text": "Linh gỡ ba mẩu tin cho thuê ở bảng tin chợ. Bà Tư không hỏi giá, chỉ hỏi nơi nào buổi sáng có người ngồi trước cửa.\n• Phòng Hẻm Dừa: hẻm nhỏ ngay cạnh chợ, gần việc, phòng nhỏ. Vào ở 5.000.000đ (cọc, tháng đầu, chuyển đồ).\n• Phòng Cầu Tre: cuối phố, qua khỏi Bến Cạn. Thoáng, có hiên. Vào ở 4.200.000đ, đi làm xa hơn.\n• Nhà dì Năm: đầu phố. Ở tạm 7 ngày, góp 500.000đ, phải gửi bớt đồ.",
   "quote": "Linh: \"Rẻ hơn tám trăm, nhưng mỗi ngày anh chạy xa hơn. Mình tính cả cái đó nữa.\"",
-  "missed": "Mấy mẩu tin vẫn dán trên bảng tin ở chợ Cầu Nhỏ. Muốn đi xem phòng thì ghé chợ, việc \"Đi xem phòng\" còn mở tới ngày 25.",
+  "missed": "Mấy mẩu tin vẫn dán trên bảng tin ở chợ Cầu Nhỏ. Muốn xem phòng thì tự tới Hẻm Dừa (cạnh chợ) hay Cầu Tre (cuối phố).",
   "choices": [
    {
-    "label": "Đi xem Hẻm Dừa",
-    "hint": "Mất 2 giờ. Thấy tận mắt bậc cửa, chỗ phơi, tiếng ồn",
+    "label": "Hẹn đi xem Hẻm Dừa ngay sáng nay",
+    "hint": "Mất 1,5 giờ. Thấy tận mắt bậc cửa, chỗ phơi, tiếng ồn",
     "effects": {
-     "hours": 2,
+     "hours": 1.5,
      "fatigue": 3,
      "housing_seen": "hem_dua",
      "log": "Hẻm Dừa: phòng nhỏ, cửa sát mặt hẻm, bước ra là có người bán rau. Chỗ phơi chỉ đủ hai sào."
     }
    },
    {
-    "label": "Đi xem Cầu Tre",
-    "hint": "Mất 3 giờ. Xa hơn nhưng có hiên",
+    "label": "Hẹn đi xem Cầu Tre",
+    "hint": "Mất 2,5 giờ vì ở cuối phố. Xa hơn nhưng có hiên",
     "effects": {
-     "hours": 3,
+     "hours": 2.5,
      "fatigue": 4,
      "housing_seen": "cau_tre",
      "log": "Cầu Tre: hiên rộng, gió mát. Đường ra chợ phải qua cầu, bà đi bộ sẽ mệt."

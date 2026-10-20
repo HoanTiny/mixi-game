@@ -6,6 +6,10 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29, chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
 
+**Chỗ ở trên phố:** Phòng Hẻm Dừa ở hẻm cạnh chợ, Phòng Cầu Tre ở cuối phố qua khỏi Bến Cạn, nhà dì Năm ở đầu phố. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
+
+**Gợi ý cách chơi:** lần đầu gặp chuyện gì (có cảnh chính, đói, bẩn, Mệt lên, có người nhờ việc, đứng cạnh thùng rác, sau 20 giờ…) thì ô Gợi ý ở góc trái hiện một lần. Nội dung ở mục `tips` của `data/story.json`.
+
 **Cảnh chính mỗi ngày:** bảng mục tiêu ghi "Hôm nay: …" kèm nơi và khung giờ, trên phố có dấu ◆ vàng. Tới nơi bấm thẻ ◆ để vào cảnh, chọn một trong ba cách. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong. Tin nhắn, mưa và ngày 30 tự bật buổi sáng.
 
 ## Mở project
