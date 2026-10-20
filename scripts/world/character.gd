@@ -6,24 +6,33 @@ extends Node3D
 ##       hat (none | non_la | cap | helmet), bag (true/false), height (mét), build (độ đậm người, 0.9–1.15)
 
 const LOOKS := {
-	# Minh: áo thun xanh bạc màu, quần jean, dép tổ ong, ba lô cũ, tóc đen ngắn.
-	"minh": {"skin": "d9a77c", "hair": "1b1714", "hair_style": "short", "shirt": "4f7fb3", "sleeve": "short",
-		"pants": "35455e", "shoes": "e8efe9", "hat": "none", "bag": true, "height": 1.72, "build": 1.0},
-	# Cô Sáu: áo bà ba hoa cà, quần đen, tóc búi.
-	"coSau": {"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "b57aa6", "sleeve": "long",
-		"pants": "1f1f24", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.56, "build": 1.08},
-	# Chú Bảy: sơ mi xanh dài tay, quần kaki, nón kết.
-	"chuBay": {"skin": "b97d55", "hair": "3a3a3a", "hair_style": "short", "shirt": "3f6f8f", "sleeve": "long",
-		"pants": "6d5d4b", "shoes": "3b3b3b", "hat": "cap", "bag": false, "height": 1.66, "build": 1.1},
-	# Vy: áo thun trắng, quần jean, tóc dài.
-	"vy": {"skin": "e2b48f", "hair": "1b1714", "hair_style": "long", "shirt": "f2f0ea", "sleeve": "short",
-		"pants": "3b5b82", "shoes": "f2f0ea", "hat": "none", "bag": false, "height": 1.6, "build": 0.94},
-	# Tuấn: áo thun đen, quần jean rách, giày thể thao trắng.
-	"tuan": {"skin": "c98f63", "hair": "1b1714", "hair_style": "short", "shirt": "1f1f24", "sleeve": "short",
-		"pants": "2c3e50", "shoes": "f5f5f5", "hat": "none", "bag": false, "height": 1.75, "build": 1.04},
-	# Ông Tư: sơ mi trắng dài tay, quần tây xám, tóc bạc.
-	"ongTu": {"skin": "c99a76", "hair": "d8d8d8", "hair_style": "short", "shirt": "efeee8", "sleeve": "long",
-		"pants": "6f7277", "shoes": "3b3b3b", "hat": "none", "bag": false, "height": 1.62, "build": 0.95},
+	# An, 27 tuổi, thợ sửa điện máy: áo thun xám xanh, quần kaki, dép quai hậu, ba lô đồ nghề.
+	"AN": {"skin": "d1a07a", "hair": "1b1714", "hair_style": "short", "shirt": "5b7f8f", "sleeve": "short",
+		"pants": "5e5446", "shoes": "3b3b3b", "hat": "none", "bag": true, "height": 1.72, "build": 1.02},
+	# Linh, 20 tuổi: áo đồng phục trường nghề xanh, quần jean, tóc cột.
+	"LINH": {"skin": "e2b48f", "hair": "1b1714", "hair_style": "long", "shirt": "4f8fb5", "sleeve": "short",
+		"pants": "3b5b82", "shoes": "f2f0ea", "hat": "none", "bag": true, "height": 1.58, "build": 0.94},
+	# Bà Tư, 70 tuổi: áo bà ba tím, quần đen, tóc bạc búi.
+	"BA_TU": {"skin": "c99a76", "hair": "d8d8d8", "hair_style": "bun", "shirt": "8a6f9a", "sleeve": "long",
+		"pants": "1f1f24", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.5, "build": 0.95},
+	# Chị Hạnh: áo thun cam, tạp dề, tóc búi.
+	"HANH": {"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "c0603a", "sleeve": "short",
+		"pants": "2c2f3a", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.58, "build": 1.04},
+	# Chú Sáu: sơ mi xanh bạc màu dài tay, quần kaki, nón kết.
+	"SAU": {"skin": "b97d55", "hair": "9a9a9a", "hair_style": "short", "shirt": "3f6f8f", "sleeve": "long",
+		"pants": "6d5d4b", "shoes": "3b3b3b", "hat": "cap", "bag": false, "height": 1.64, "build": 1.08},
+	# Minh, tài xế giao hàng: áo khoác xanh, mũ bảo hiểm.
+	"MINH": {"skin": "c98f63", "hair": "1b1714", "hair_style": "short", "shirt": "2f8a5a", "sleeve": "long",
+		"pants": "2c3e50", "shoes": "f5f5f5", "hat": "helmet", "bag": false, "height": 1.74, "build": 1.04},
+	# Cô Duyên: áo sơ mi hoa, quần tây.
+	"DUYEN": {"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "b5577a", "sleeve": "long",
+		"pants": "4a4a52", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.56, "build": 1.06},
+	# Trâm, thợ điện: áo bảo hộ xanh rêu, nón kết.
+	"TRAM": {"skin": "d9a77c", "hair": "1b1714", "hair_style": "long", "shirt": "2f6f6a", "sleeve": "long",
+		"pants": "35455e", "shoes": "3b3b3b", "hat": "cap", "bag": false, "height": 1.62, "build": 0.98},
+	# Anh Phúc: áo sơ mi trắng, quần tây.
+	"PHUC": {"skin": "c99a76", "hair": "1b1714", "hair_style": "short", "shirt": "efeee8", "sleeve": "short",
+		"pants": "6f7277", "shoes": "3b3b3b", "hat": "none", "bag": false, "height": 1.7, "build": 1.12},
 }
 
 var look: Dictionary = {}

@@ -6,23 +6,35 @@ const SAVE_PATH := "user://save.json"
 const NOTES_PATH := "user://notes.json"
 
 var game: GameLogic
-## Chạy với "-- --demo" để vào thẳng ngày 1 (bỏ qua mở đầu) mà không ghi đè bản lưu thật.
+## Chạy với "-- --demo" để vào thẳng ngày 18 tuyến B mà không ghi đè bản lưu thật;
+## thêm "--demo-route=A" hoặc "=C" để đổi tuyến.
 var _persist := true
-## Việc đang làm ở màn khác (ví dụ khach_uc ở màn Quận 1) và chỗ Minh hiện ra khi về lại phố.
-var tour := ""
+## Chỗ An hiện ra khi về lại phố từ màn khác (để dành cho các màn ngoài phố sau này).
 var spawn_at := ""
 
 
 func _ready() -> void:
 	game = GameLogic.new()
 	game.load_data()
-	if OS.get_cmdline_user_args().has("--demo"):
+	var args := OS.get_cmdline_user_args()
+	if args.has("--demo"):
 		_persist = false
-		game.new_game("do_nghe")
+		var route := "B"
+		for arg in args:
+			if arg.begins_with("--demo-route="):
+				route = arg.substr(13)
+		game.new_game(route)
 		var guard := 0
 		while not game.s.queue.is_empty() and guard < 10:
 			guard += 1
 			game.resolve_first_available()
+		# "--demo-end": tự chơi tới hết ngày 22 để xem bảng tổng kết.
+		while args.has("--demo-end") and not game.is_over() and guard < 60:
+			guard += 1
+			if game.s.queue.is_empty():
+				game.finish_day()
+			else:
+				game.resolve_first_available()
 		return
 	var saved_notes = _read(NOTES_PATH)
 	if saved_notes is Array:

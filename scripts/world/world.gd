@@ -12,24 +12,32 @@ const Surfaces := preload("res://scripts/world/surfaces.gd")
 const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 
+## Xóm trọ của An: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối.
+const HOME := "xom_bo_me"
+## Để HUD đọc được id nhà mà không cần truy cập hằng số qua instance.
+var home: String = HOME
 ## Mỗi địa điểm nằm phía bắc con phố, mặt tiền nhìn ra đường (z = -5).
-## x: tâm dọc phố · size: rộng, sâu, cao · npc: người đứng trước cửa (bấm vào cũng mở địa điểm),
-## npc_id: khóa của người đó trong REPS và data/talks.json.
+## x: tâm dọc phố · size: rộng, sâu, cao · npcs: người đứng trước cửa (bấm vào cũng mở địa điểm),
+## id của người đó là khóa trong story.reps và data/talks.json (trống thì không nói chuyện được).
 ## tube: dựng thành nhà ống (floors tầng, sign chữ biển hiệu, units số căn liền nhau, shop tầng trệt buôn bán).
+## stalls: sạp chợ và ghế trà đá trên vỉa hè · line: dây phơi đồ trước cửa · scrap: chỗ bán ve chai.
 const LOCATIONS := {
-	"nga_tu": {"name": "Ngã tư Hàng Xanh", "desc": "Phát tờ rơi cho người qua đường.", "x": -64.0, "size": Vector3(0, 0, 0), "color": "8d8a83"},
-	"tram_xe_buyt": {"name": "Trạm xe buýt đi Quận 1", "desc": "Đón khách nước ngoài, việc cuối tuần.", "x": -55.0, "size": Vector3(5, 3, 2.8), "color": "3c7d6b"},
-	"phuong": {"name": "UBND phường", "desc": "Nhà văn hóa có lớp tiếng Anh tối. Công an phường đăng ký tạm trú.", "x": -45.0, "size": Vector3(12, 8, 7), "color": "e2c55c"},
-	"thu_vien": {"name": "Thư viện quận", "desc": "Tự học miễn phí.", "x": -32.0, "size": Vector3(10, 8, 6), "color": "a98467"},
-	"trung_tam": {"name": "Trung tâm dạy nghề", "desc": "Khóa điện lạnh và tin học văn phòng.", "x": -19.5, "size": Vector3(11, 8, 8.5), "color": "b9b2dc"},
-	"cua_hang": {"name": "Cửa hàng 24 giờ", "desc": "Tuyển thu ngân. Quầy sửa điện thoại bên cạnh.", "x": -8.5, "size": Vector3(8, 7, 4.5), "tube": {"floors": 3, "sign": "CỬA HÀNG 24H"}, "color": "8cc3df"},
-	"quan_ca_phe": {"name": "Cà phê Góc Phố", "desc": "Quán Vy làm thêm.", "x": 1.0, "size": Vector3(9, 7, 4.5), "tube": {"floors": 3, "sign": "CÀ PHÊ GÓC PHỐ"}, "color": "6f9474", "npc": "Vy", "npc_id": "vy", "npc_color": "d9776b"},
-	"quan_com": {"name": "Quán cơm tấm", "desc": "Cần người rửa bát.", "x": 10.5, "size": Vector3(8, 7, 4.2), "tube": {"floors": 3, "sign": "CƠM TẤM"}, "color": "e39a66"},
-	"tra_da": {"name": "Quán trà đá đầu hẻm", "desc": "Hàng xóm ngồi tán chuyện.", "x": 18.0, "size": Vector3(4, 3, 2.6), "tube": {"floors": 2, "shop": false}, "color": "c8503f", "npc": "Ông Tư", "npc_id": "ongTu", "npc_color": "8a8a7a"},
-	"tiem_chu_bay": {"name": "Điện lạnh chú Bảy", "desc": "Sửa máy lạnh, học việc, làm thợ.", "x": 25.0, "size": Vector3(7, 7, 4.5), "tube": {"floors": 3, "sign": "ĐIỆN LẠNH BẢY"}, "color": "6f8fa8", "npc": "Chú Bảy", "npc_id": "chuBay", "npc_color": "3f5f7a"},
-	"phong_tro": {"name": "Dãy trọ cô Sáu", "desc": "Phòng trọ của Minh.", "x": 36.5, "size": Vector3(12, 8, 9), "tube": {"floors": 3, "sign": "NHÀ TRỌ CÔ SÁU", "units": 3}, "color": "eadcae", "npc": "Cô Sáu", "npc_id": "coSau", "npc_color": "b5577a"},
-	"vua_ve_chai": {"name": "Vựa ve chai cô Tám", "desc": "Thu mua chai nhựa, lon nhôm, bìa giấy.", "x": 66.0, "size": Vector3(7, 3.2, 5), "color": "8b7d5b", "npc": "Cô Tám", "npc_color": "6b4f3a"},
-	"cong_trinh": {"name": "Công trình", "desc": "Phụ hồ, công nhật.", "x": 51.0, "size": Vector3(14, 9, 10), "color": "9c9a93", "npc": "Tuấn", "npc_id": "tuan", "npc_color": "c9853a"},
+	"ben_xe_6": {"name": "Bến xe số 6", "desc": "Xe đưa đón công nhân đi kho khu công nghiệp. Trung tâm nghề của Linh cũng đi xe ở đây.", "x": -66.0, "size": Vector3(6, 3, 2.8), "color": "3c7d6b"},
+	"cho_cau_nho": {"name": "Chợ Cầu Nhỏ", "desc": "Sạp vật tư, hàng đồ cũ, tiệm photo, sạp ve chai của cô Út và quán trà đá có bảng tin cho thuê phòng.", "x": -42.0, "size": Vector3(13, 7, 4.5),
+		"tube": {"floors": 2, "sign": "CHỢ CẦU NHỎ", "units": 2}, "color": "c8503f", "stalls": true, "scrap": true,
+		"npcs": [{"name": "Cô Út ve chai", "id": "", "color": "6b4f3a"}]},
+	"com_hanh": {"name": "Cơm Hạnh", "desc": "Quán cơm phần cho người làm ca. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.", "x": -22.0, "size": Vector3(8, 7, 4.2),
+		"tube": {"floors": 3, "sign": "CƠM HẠNH"}, "color": "e39a66",
+		"npcs": [{"name": "Chị Hạnh", "id": "HANH", "color": "c0603a"}, {"name": "Minh", "id": "MINH", "color": "2f5f8a"}]},
+	"tiem_sau": {"name": "Tiệm Sáu Sửa", "desc": "Tiệm sửa xe có thêm một bàn sửa đồ gia dụng.", "x": -9.0, "size": Vector3(8, 7, 4.5),
+		"tube": {"floors": 3, "sign": "SÁU SỬA XE · ĐỒ ĐIỆN"}, "color": "6f8fa8",
+		"npcs": [{"name": "Chú Sáu", "id": "SAU", "color": "3f5f7a"}]},
+	"xom_bo_me": {"name": "Xóm trọ Bờ Me", "desc": "Tám phòng quanh khoảng sân, vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.", "x": 10.0, "size": Vector3(15, 8, 9),
+		"tube": {"floors": 3, "sign": "XÓM TRỌ BỜ ME", "units": 3}, "color": "eadcae", "line": true,
+		"npcs": [{"name": "Bà Tư", "id": "BA_TU", "color": "8a6f9a"}, {"name": "Linh", "id": "LINH", "color": "d9776b"}, {"name": "Cô Duyên", "id": "DUYEN", "color": "b5577a"}]},
+	"ben_can": {"name": "Dãy quán Bến Cạn", "desc": "Năm quán chung lối đi và hạ tầng cũ bên rạch. Hợp đồng của anh Phúc.", "x": 40.0, "size": Vector3(22, 6, 4.0),
+		"tube": {"floors": 2, "sign": "DÃY QUÁN BẾN CẠN", "units": 5}, "color": "9c9a93",
+		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
 }
 const FRONT_Z := -5.0
 const DOOR_Z := -4.1
@@ -91,6 +99,7 @@ func _ready() -> void:
 		_build_location(id, LOCATIONS[id])
 	_build_fillers()
 	_build_props()
+	_build_canal()
 	_build_bins()
 	_build_grime()
 	_build_clutter()
@@ -98,7 +107,7 @@ func _ready() -> void:
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
 	add_child(player)
-	# Vòng vàng dưới chân để luôn nhận ra Minh giữa đám đông.
+	# Vòng vàng dưới chân để luôn nhận ra An giữa đám đông.
 	var marker := MeshInstance3D.new()
 	var disc := CylinderMesh.new()
 	disc.top_radius = 0.55
@@ -113,8 +122,8 @@ func _ready() -> void:
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	marker.position = Vector3(0, 0.1, 0)
 	player.add_child(marker)
-	player.add_child(_label3d("Minh", Vector3(0, 2.15, 0), 22))
-	player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
+	player.add_child(_label3d("An", Vector3(0, 2.15, 0), 22))
+	player.position = door_of(HOME) + Vector3(-1.5, 0, 0.8)
 	# Về từ màn khác (xe buýt từ Quận 1) thì hiện ra ở chỗ đó.
 	var gs := get_node("/root/GameState")
 	if gs.spawn_at != "" and LOCATIONS.has(gs.spawn_at):
@@ -236,12 +245,10 @@ func _build_location(id: String, loc: Dictionary) -> void:
 					for wx in [-size.x * 0.3, size.x * 0.3]:
 						_block(Vector3(1.4, 1.2, 0.08), Vector3(x + wx, floor_y, FRONT_Z + 0.03), Color("5c6f80"), holder)
 				sign_height = minf(size.y + 0.8, SIGN_MAX)
-			if id == "cong_trinh":
-				_scaffold(x, size, holder)
-		if id == "tra_da":
-			for sx in [-1.2, 0.0, 1.2]:
-				if not _prop("stool", Vector3(x + sx, 0.16, -3.4), randf() * TAU, holder):
-					_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0, -3.4), Color("2f6fb0"), holder)
+		if loc.get("stalls", false):
+			_build_stalls(x, holder)
+		if loc.get("line", false):
+			_build_clothesline(x, holder)
 		var body := StaticBody3D.new()
 		body.set_meta("loc", id)
 		var cs := CollisionShape3D.new()
@@ -284,12 +291,14 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	holder.add_child(ring)
 	door_rings[id] = ring
 
-	if loc.has("npc"):
-		var npc := _character("npc." + str(loc.get("npc_id", "")), Color(loc.npc_color), Color("3a3a40"))
-		npc.position = door_of(id) + Vector3(1.6, 0, 0.2)
+	var slot := 0
+	for who in loc.get("npcs", []):
+		var npc := _character("npc." + str(who.id), Color(who.color), Color("3a3a40"))
+		npc.position = door_of(id) + Vector3(1.6 + slot * 1.7, 0, 0.2 + (slot % 2) * 0.45)
 		npc.rotation.y = PI
 		holder.add_child(npc)
-		npc.add_child(_label3d(loc.npc, Vector3(0, 2.0, 0), 22))
+		npc.add_child(_label3d(who.name, Vector3(0, 2.0 + (slot % 2) * 0.3, 0), 22))
+		slot += 1
 		var nb := StaticBody3D.new()
 		nb.set_meta("loc", id)
 		var ncs := CollisionShape3D.new()
@@ -366,17 +375,6 @@ func _build_fillers() -> void:
 		board.material_override = _mat(Color("1e5aa8"))
 		board.position = Vector3(hx + 1.2, 2.25, FRONT_Z + 0.16)
 		holder.add_child(board)
-
-
-func _scaffold(x: float, size: Vector3, parent: Node3D) -> void:
-	var front := FRONT_Z + 0.6
-	var px := x - size.x / 2.0
-	while px <= x + size.x / 2.0 + 0.01:
-		_block(Vector3(0.1, size.y + 1.0, 0.1), Vector3(px, 0, front), Color("b0a48a"), parent)
-		px += 2.0
-	for y in range(2, int(size.y) + 1, 2):
-		_block(Vector3(size.x, 0.08, 0.9), Vector3(x, y, front - 0.3), Color("8a7a5a"), parent)
-	_block(Vector3(size.x, size.y * 0.6, 0.05), Vector3(x, size.y * 0.4, front + 0.05), Color(0.2, 0.45, 0.3, 0.55), parent, true)
 
 
 func _build_props() -> void:
@@ -459,6 +457,50 @@ func _build_props() -> void:
 		add_child(lamp)
 		lamps.append(lamp)
 		lx += 12.0
+
+
+## Sạp chợ trên vỉa hè: bàn gỗ, bạt xanh, thùng nhựa và giỏ hàng; ghế đẩu của quán trà đá ở góc.
+func _build_stalls(x: float, holder: Node3D) -> void:
+	var wood := Surfaces.get_mat("tuong_cu", 1.5, Color("9a7a58"))
+	for sx in [-4.2, 3.6]:
+		_block(Vector3(2.6, 0.8, 1.2), Vector3(x + sx, 0.16, -3.75), Color("8a6a4a"), holder).material_override = wood
+		var tarp := _block(Vector3(3.0, 0.05, 1.9), Vector3(x + sx, 2.35, -3.75), Color("2f6fb0"), holder)
+		tarp.rotation.x = -0.12
+		for px in [-1.3, 1.3]:
+			_block(Vector3(0.06, 2.2, 0.06), Vector3(x + sx + px, 0.16, -2.95), Color("6b6a66"), holder)
+		_prop("basket", Vector3(x + sx - 0.6, 0.96, -3.75), randf() * TAU, holder)
+		_prop("crate", Vector3(x + sx + 0.7, 0.96, -3.7), randf() * TAU, holder)
+	for sx in [5.4, 6.2]:
+		if not _prop("stool", Vector3(x + sx, 0.16, -3.3), randf() * TAU, holder):
+			_block(Vector3(0.35, 0.4, 0.35), Vector3(x + sx, 0.16, -3.3), Color("2f6fb0"), holder)
+
+
+## Dây phơi đồ trước xóm trọ, áo quần nhiều màu.
+func _build_clothesline(x: float, holder: Node3D) -> void:
+	for wx in [-5.5, -2.5]:
+		_block(Vector3(0.07, 2.3, 0.07), Vector3(x + wx, 0.16, -3.2), Color("6b6a66"), holder)
+	_block(Vector3(3.0, 0.02, 0.02), Vector3(x - 4.0, 2.35, -3.2), Color("3a3a3a"), holder)
+	var shirt_colors := ["e6e2d3", "6f8fb5", "c46a5a", "d9a35b"]
+	for i in 4:
+		var c := _block(Vector3(0.5, 0.62, 0.03), Vector3(x - 5.1 + i * 0.72, 1.7, -3.2), Color(shirt_colors[i]), holder)
+		c.rotation.z = randf_range(-0.05, 0.05)
+
+
+## Con rạch chạy dọc phía nam sau hàng cây và cây cầu nhỏ trước chợ Cầu Nhỏ: chi tiết nhận diện phường An Hòa.
+func _build_canal() -> void:
+	var water := _block(Vector3(180, 0.04, 6.0), Vector3(-7, 0.005, 11.6), Color("3f5a52"))
+	var wm := StandardMaterial3D.new()
+	wm.albedo_color = Color(0.22, 0.32, 0.28)
+	wm.roughness = 0.08
+	wm.metallic = 0.35
+	water.material_override = wm
+	var stone := Surfaces.get_mat("tuong_cu", 2.0, Color("8a8478"))
+	_block(Vector3(180, 0.3, 0.6), Vector3(-7, 0.0, 8.3), Color("6e6a62")).material_override = stone
+	_block(Vector3(180, 0.3, 0.6), Vector3(-7, 0.0, 14.9), Color("6e6a62")).material_override = stone
+	var bx := float(LOCATIONS.cho_cau_nho.x) + 3.0
+	_block(Vector3(3.0, 0.22, 8.0), Vector3(bx, 0.3, 11.6), Color("8a7f72")).material_override = stone
+	for side in [-1.45, 1.45]:
+		_block(Vector3(0.12, 0.8, 8.0), Vector3(bx + side, 0.52, 11.6), Color("5e5a55"))
 
 
 func _build_traffic() -> void:
@@ -668,10 +710,11 @@ func _build_clutter() -> void:
 			_prop(key, pos, rng.randf_range(-0.4, 0.4) + (PI if rng.randf() < 0.5 else 0.0))
 			if key == "crate" and rng.randf() < 0.5:
 				_prop("crate", pos + Vector3(0, 0.3, 0), rng.randf_range(-0.2, 0.2))
-	var cx: float = LOCATIONS.cong_trinh.x
-	for layer in 3:
-		for j in 4 - layer:
-			_prop("cement_bag", Vector3(cx - 4.0 + j * 0.8 + layer * 0.4, 0.16 + layer * 0.22, -4.4), rng.randf_range(-0.1, 0.1))
+	# Vật tư chất trước dãy Bến Cạn: bao xi măng, thùng các-tông đựng dây điện.
+	var cx: float = LOCATIONS.ben_can.x
+	for layer in 2:
+		for j in 3 - layer:
+			_prop("cement_bag", Vector3(cx + 7.0 + j * 0.8 + layer * 0.4, 0.16 + layer * 0.22, -4.4), rng.randf_range(-0.1, 0.1))
 
 
 ## Không bày đồ chắn ngay trước cửa tiệm (vòng sáng tương tác).
@@ -780,7 +823,7 @@ func make_offer() -> Dictionary:
 	for h in homes:
 		dests.append({"name": h.name, "x": h.x})
 	for id in LOCATIONS:
-		if id != shop and id != "nga_tu":
+		if id != shop:
 			dests.append({"name": str(LOCATIONS[id].name), "x": door_of(id).x})
 	dests = dests.filter(func(d) -> bool: return absf(float(d.x) - sx) >= 15.0 and absf(float(d.x) - sx) <= 110.0)
 	if dests.is_empty():
@@ -845,7 +888,7 @@ func _check_day_end() -> void:
 		return
 	_target = null
 	_target_loc = ""
-	if door_of("phong_tro").distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
+	if door_of(HOME).distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
 		if _night_prompt_day != game.day():
 			_night_prompt_day = game.day()
 			hud.close_location()
@@ -912,16 +955,16 @@ func _on_changed() -> void:
 	if not game.is_started():
 		_last_money = -1
 		return
-	var money := int(game.s.money)
+	var money := int(game.s.cash)
 	if _last_money >= 0 and money != _last_money:
 		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
 			Color("7fe0a0") if money > _last_money else Color("ff8a7a"))
 		audio.play("earn" if money > _last_money else "spend")
 	_last_money = money
-	# Sang ngày mới: Minh thức dậy trước cửa phòng trọ.
+	# Sang ngày mới: An thức dậy trước cửa xóm trọ.
 	if game.day() != _last_day:
 		if _last_day != -1:
-			player.position = door_of("phong_tro") + Vector3(-1.5, 0, 0.8)
+			player.position = door_of(HOME) + Vector3(-1.5, 0, 0.8)
 			camera.position = player.position + cam_offset()
 			_target = null
 			_target_loc = ""
@@ -1055,12 +1098,12 @@ func _label3d(text: String, pos: Vector3, size: int) -> Label3D:
 ## Người khối tạm: chân, thân, đầu. Con đầu tiên là phần thân để nhún khi đi.
 ## Người theo mô hình trong models.json (key như "player", "npc.vy", "people"), thiếu thì dựng khối.
 ## Con đầu tiên luôn là phần thân (mô hình hoặc khối) để nhún nhảy hay phát hoạt cảnh.
-## Không có file mô hình thì dựng nhân vật có khớp (character.gd): Minh và nhân vật phụ có ngoại hình riêng,
+## Không có file mô hình thì dựng nhân vật có khớp (character.gd): An và nhân vật phụ có ngoại hình riêng,
 ## người đi đường ngẫu nhiên.
 func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenerator = null, hat := "") -> Node3D:
 	var m := models.spawn(key, rng)
 	if m == null:
-		var id := "minh" if key == "player" else key.trim_prefix("npc.")
+		var id := "AN" if key == "player" else key.trim_prefix("npc.")
 		var look: Dictionary = Character.LOOKS.get(id, {})
 		if look.is_empty():
 			var r := rng if rng != null else RandomNumberGenerator.new()
@@ -1190,7 +1233,7 @@ func _refresh_quest_marks() -> void:
 			var l := _label3d("!", Vector3.ZERO, 120)
 			l.modulate = Color("f2c14e")
 			l.outline_modulate = Color("3a2a00")
-			l.position = door_of(loc) + Vector3(1.6 if LOCATIONS[loc].has("npc") else 0.0, 0, 0.2)
+			l.position = door_of(loc) + Vector3(1.6 if LOCATIONS[loc].has("npcs") else 0.0, 0, 0.2)
 			l.set_meta("y", 3.0)
 			add_child(l)
 			_quest_offer_marks[loc] = l

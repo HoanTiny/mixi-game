@@ -56,7 +56,7 @@ func _clear() -> void:
 func _show_start() -> void:
 	_state = "start"
 	_clear()
-	_box.add_child(UI.label(title.to_upper() + " · QUÁN CƠM TẤM", 12, UI.INK_SOFT))
+	_box.add_child(UI.label(title.to_upper() + " · " + str(cfg.get("kicker", "QUÁN CƠM")), 12, UI.INK_SOFT))
 	_box.add_child(UI.wrap("Rửa sạch chồng bát", 26, UI.INK, 660))
 	_box.add_child(UI.wrap("Bấm từng vết bẩn để kỳ cọ, vết to phải chà hai lần. Sạch thì bấm Xếp lên giá (hoặc phím cách). Xếp bát còn bẩn là bị trả lại. Đủ %d cái trong %d giây thì đủ công; rửa vượt chỉ tiêu và không bị trả lại lần nào thì được thưởng." % [int(cfg.target), int(cfg.seconds)], 15, UI.INK, 660))
 	_box.add_child(UI.choice("Tự làm", "Làm nhanh, sạch thì được thưởng", "", _start_play))

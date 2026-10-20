@@ -1,23 +1,22 @@
 extends SceneTree
-## Người chơi máy chơi trên màn phố thật: đi bộ tới tiệm, làm việc qua thanh thời gian, nói chuyện,
-## về phòng trọ ngủ, chọn sự kiện. In nhật ký từng ngày để xem nhịp chơi.
-## Chạy: Godot --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo [--talk] [--seed=1]
-##   --talk: nói chuyện với nhân vật (kể mạch chuyện, tán gẫu Vy và Tuấn để mở tuyến)
+## Người chơi máy chơi lát cắt ngày 18–22 trên màn phố thật: đi bộ tới từng nơi, làm việc qua thanh thời gian
+## (trò chơi nhỏ coi như đủ chỉ tiêu), ăn, tắm, giặt, lục ve chai, nói chuyện, về xóm trọ ngủ, chọn sự kiện.
+## In nhật ký từng ngày và bảng tổng kết để xem nhịp chơi.
+## Chạy: Godot --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo [--route=B] [--talk] [--seed=1]
+##   --talk: nói chuyện với nhân vật khi có mạch chuyện mới
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 
-## Thứ tự lựa chọn ưu tiên cho từng sự kiện, như một người chơi thận trọng.
-const PICKS := {
-	"xe_om": [1, 2, 0], "phong_tro": [1, 0], "chu_bay": [0, 1], "be_bin": [0], "lan_goi": [0],
-	"vi_ong_tu": [1], "tuan_ru": [2, 1], "tuan_ru_tiep": [1], "tang_lai": [0], "tuan_nan": [0],
-	"vy_bai_tap": [1, 0], "cs_mot_minh": [1, 0],
-}
-const NPC_LOC := {"coSau": "phong_tro", "chuBay": "tiem_chu_bay", "vy": "quan_ca_phe", "tuan": "cong_trinh", "ongTu": "tra_da"}
+## Thứ tự lựa chọn ưu tiên cho từng sự kiện: người chơi biết lắng nghe (lựa chọn đầu tiên là cách nói rõ, hỏi ý).
+const PICKS := {}
+const NPC_LOC := {"BA_TU": "xom_bo_me", "LINH": "xom_bo_me", "DUYEN": "xom_bo_me", "HANH": "com_hanh", "MINH": "com_hanh",
+	"SAU": "tiem_sau", "TRAM": "ben_can", "PHUC": "ben_can"}
 
 var w
 var game
 var hud
 var talk := false
+var route := "B"
 var stats := {"walk": 0.0, "work": 0.0, "talk": 0.0, "sleep_out": 0, "talks": 0, "chats": 0, "stuck": 0}
 var _day_log := []
 
@@ -27,6 +26,8 @@ func _initialize() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a == "--talk":
 			talk = true
+		elif a.begins_with("--route="):
+			route = a.substr(8)
 		elif a.begins_with("--seed="):
 			seed_v = int(a.substr(7))
 	seed(seed_v)
@@ -39,10 +40,10 @@ func _run() -> void:
 	await process_frame
 	game = root.get_node("GameState").game
 	hud = w.hud
-	# --demo đã tự chọn sự kiện ngày 1 theo lựa chọn đầu tiên; chơi lại từ đầu để tự chọn như người chơi.
-	game.new_game("do_nghe")
+	# --demo đã tự chọn sự kiện mở đầu; chơi lại từ đầu để tự chọn như người chơi.
+	game.new_game(route)
 	await process_frame
-	print("== Người chơi máy · %s · seed %s" % ["có nói chuyện" if talk else "không nói chuyện", str(OS.get_cmdline_user_args())])
+	print("== Người chơi máy · tuyến %s · %s · %s" % [route, "có nói chuyện" if talk else "không nói chuyện", str(OS.get_cmdline_user_args())])
 	var guard := 0
 	while not game.is_over() and guard < 40:
 		guard += 1
@@ -53,7 +54,7 @@ func _run() -> void:
 
 func _play_day() -> void:
 	var d: int = game.day()
-	var m0: int = int(game.s.money)
+	var m0: int = int(game.s.cash)
 	_day_log = []
 	await _events()
 	if game.is_over():
@@ -69,35 +70,30 @@ func _play_day() -> void:
 	await _scrap(d)
 	if game.day() == d and not game.is_over():
 		var t0: float = game.clock()
-		await _walk("phong_tro")
+		await _walk(w.home)
 		stats.walk += game.clock() - t0
 		if game.day() == d and game.s.queue.is_empty():
 			hud.dialogs.open_night()
-			hud.dialogs._end_day(float(game.s.health) > 75.0)
-	var out := "" if game.day() != d else " (chưa sang ngày!)"
-	print("Ngày %2d | %s → %s | SK %3d TT %3d | %s%s" % [d, GameLogic.fmt_k(m0), GameLogic.fmt_k(int(game.s.money)),
-		int(game.s.health), int(game.s.mood), ", ".join(_day_log), out])
+			hud.dialogs._end_day()
+	var out := "" if game.day() != d or game.is_over() else " (chưa sang ngày!)"
+	print("Ngày %2d | %s → %s | Mệt %3d PĐ %3d | %s%s" % [d, GameLogic.fmt_k(m0), GameLogic.fmt_k(int(game.s.cash)),
+		int(game.s.fatigue), int(game.phong_do()), ", ".join(_day_log), out])
 
 
-## Mạch chuyện đang mở thì kể; tán gẫu thêm với Vy, Tuấn để kịp mở tuyến pháp lý và cứu Tuấn.
+## Chỉ nói chuyện khi có mạch chuyện mới mở.
 func _talk_plan() -> Array:
 	var out := []
-	for npc in ["vy", "tuan", "chuBay", "coSau", "ongTu"]:
-		var beat := false
+	for npc in NPC_LOC:
 		for b in game.talks[npc].story:
 			if not game.s.get("talks_done", []).has(b.id) and game.check(b.get("when", {})) == "":
-				beat = true
+				out.append(npc)
 				break
-		var grind: bool = (npc == "vy" and game.day() <= 18 and int(game.s.rep.vy) < 40) \
-			or (npc == "tuan" and game.day() < 15 and int(game.s.rep.tuan) < 50)
-		if beat or grind:
-			out.append(npc)
 	return out
 
 
 ## Cuối ngày còn giờ thì lục vài thùng rác gần đó; đủ hàng thì mang ra vựa bán.
 func _scrap(d: int) -> void:
-	if not game.has_needs() or float(game.s.health) < 60.0:
+	if not game.has_needs() or game.fatigue_warn():
 		return
 	var near: Array = w.bins.duplicate()
 	near.sort_custom(func(a, b) -> bool: return absf(a.pos.x - w.player.position.x) < absf(b.pos.x - w.player.position.x))
@@ -118,7 +114,7 @@ func _scrap(d: int) -> void:
 	if done > 0:
 		_day_log.append("lục %d thùng rác" % done)
 	if game.scrap_value() >= 60000 and game.hours_left() > 1.2 and game.day() == d:
-		await _walk("vua_ve_chai")
+		await _walk("cho_cau_nho")
 		var v: int = game.sell_scrap()
 		_day_log.append("bán ve chai %s" % GameLogic.fmt_k(v))
 
@@ -128,27 +124,30 @@ func _care() -> void:
 	if not game.has_needs():
 		return
 	if game.need("fed") < 45.0:
-		await _do("an_mi_ly" if game.need("fed") > 30.0 else ("banh_mi" if game.clock() < 10.0 else "an_com_tam"))
+		await _do("banh_mi" if game.clock() < 10.0 else "an_com")
 	if game.need("clean") < 30.0:
 		await _do("tam_rua")
 	if game.need("neat") < 30.0:
 		await _do("giat_do")
 
 
+## Giống tests/sim.gd: lo tiến độ hợp đồng trước, rồi kiếm tiền trả ngay, mệt thì nghỉ.
 func _plan() -> Array:
 	var p := []
-	if float(game.s.health) < 45.0:
+	if game.fatigue_warn():
 		p.append("nghi")
-	if game.day() <= 10:
-		p.append_array(["phu_ho", "phu_chu_bay", "rua_bat", "phat_to_roi"])
-	elif game.level("tayNghe") < 4:
-		p.append_array(["hop_dong_12", "khoa_dien_lanh", "hoc_viec", "tho_phu", "rua_bat", "phat_to_roi"])
-	else:
-		p.append_array(["hop_dong_12", "tho_chinh", "tho_phu", "gia_su", "rua_bat", "phat_to_roi"])
-	if game.s.flags.get("phapLyMo", false):
-		p.append("doc_luat")
-	if float(game.s.mood) < 40.0:
-		p.append("goi_ve")
+	match str(game.s.route):
+		"A":
+			p.append_array(["ca_kho", "ca_phu_quan", "sua_do_le"])
+		"B":
+			if not game.progress_ready():
+				p.append("ben_can_b")
+			p.append_array(["giao_com", "ca_phu_quan", "sua_do_le"])
+		"C":
+			if not game.progress_ready():
+				p.append("ben_can_c")
+			p.append_array(["sua_do_le", "ca_phu_quan"])
+	p.append("com_voi_ba")
 	return p
 
 
@@ -168,7 +167,7 @@ func _do(id: String) -> void:
 		return
 	var t1: float = game.clock()
 	hud._perform(id)
-	# Trò chơi nhỏ (phụ hồ bưng gạch): coi như làm đủ chỉ tiêu, không thưởng, bằng tiền công cũ.
+	# Trò chơi nhỏ (xếp hàng ở kho, rửa bát): coi như làm đủ chỉ tiêu, không thưởng.
 	if hud.minigame != null:
 		hud.minigame.finished.emit({"ratio": 1.0, "bonus": 0})
 		await process_frame
@@ -240,13 +239,13 @@ func _events() -> void:
 
 
 func _report() -> void:
-	var over: Dictionary = game.s.over
-	print("\nKết thúc: %s · tiền còn %s · nợ %s" % [over.get("key", "?"), GameLogic.fmt_money(int(game.s.money)), GameLogic.fmt_money(int(game.s.debt))])
-	var days: float = maxf(1.0, float(game.day()))
-	print("Giờ đi bộ %.1f (TB %.2f giờ/ngày) · giờ làm/học %.1f · giờ nói chuyện %.1f · mạch chuyện %d · tán gẫu %d · ngủ ngoài đường %d · tới nơi không làm được %d" % [
+	var r: Dictionary = game.slice_report()
+	print("\nTổng kết tuyến %s · tiền mặt %s · dự kiến ngày %d: %s · đủ cho %s" % [r.route, GameLogic.fmt_money(r.cash),
+		int(game.cfg.housingDeadline), GameLogic.fmt_money(r.proj_deadline), r.housing if r.housing != "" else "-"])
+	print("Phải thu trước 30: %s · sau 30: %s · phải trả còn treo: %s · tiến độ %d/%d" % [GameLogic.fmt_money(r.recv_before_30),
+		GameLogic.fmt_money(r.recv_after_30), GameLogic.fmt_money(r.pay_pending), r.progress, r.need])
+	print("Mệt %d · ngày cảnh báo %d · bỏ nghỉ %d · Linh: %s · Bà Tư: %s" % [int(r.fatigue), r.warn_days, r.rest_skips, r.linh_card, r.ba_tu_card])
+	var days: float = maxf(1.0, float(game.day() - int(game.cfg.sliceStartDay) + 1))
+	print("Giờ đi bộ %.1f (TB %.2f giờ/ngày) · giờ làm %.1f · giờ nói chuyện %.1f · mạch chuyện %d · tán gẫu %d · ngủ ngoài đường %d · tới nơi không làm được %d" % [
 		stats.walk, stats.walk / days, stats.work, stats.talk, stats.talks, stats.chats, stats.sleep_out, stats.stuck])
-	var skills := []
-	for k in GameLogic.SKILLS:
-		skills.append("%s %d" % [GameLogic.SKILLS[k], game.level(k)])
-	print("Kỹ năng: ", ", ".join(skills), " · Thân thiết: ", game.s.rep)
-	print("Cờ: ", game.s.flags.keys(), " · bằng chứng ", game.s.evidence)
+	print("Thân thiết: ", game.s.rep, " · Cờ: ", game.s.flags.keys())

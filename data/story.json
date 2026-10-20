@@ -1,38 +1,24 @@
 {
-  "prologue": {
-    "eyebrow": "Mở đầu · Ngày 0",
-    "title": "Đêm cuối ở quê",
-    "text": "Tiếng sóng biển. Ngọn đèn dầu leo lét. Má ngồi đếm từng tờ tiền nhàu nát.\nMá: \"Có hai triệu ba thôi con. Má gom hết rồi đó.\"\nTiếng đập cửa. Khoa bước vào, sau lưng là hai thanh niên.\nKhoa: \"Anh Hưng nhắn: 30 ngày. Ngày 10 đóng lãi 3 triệu. Ngày 30 trả đủ 15. Không thì cái nhà này với mấy sào đất là của anh Hưng.\"\nLan đứng sau cánh cửa buồng, ôm chặt tờ giấy báo trúng tuyển."
+  "title": "Trước mùa mưa",
+  "slice": {
+    "eyebrow": "Lát cắt ngày 18–22",
+    "title": "Trước mùa mưa",
+    "text": "An, 27 tuổi, mất việc ở tiệm điện máy và về lại xóm trọ Bờ Me. Cuối tháng cả xóm phải dọn đi. Bà Tư cần một chỗ có người quen, Linh sắp có tin thực tập.\n\nLát cắt này bắt đầu ở ngày 18, giữa lúc tiền chưa tới tay. Mục tiêu là thử dòng tiền của ba tuyến nghề và quyền tự quyết của Linh.",
+    "pick": "CHỌN TUYẾN NGHỀ AN ĐÃ CHỌN Ở NGÀY 11"
   },
-  "items": {
-    "do_nghe": { "name": "Bộ đồ nghề của ba", "desc": "Tay nghề +1, chú Bảy chú ý ngay từ đầu",
-      "effects": { "xp.tayNghe": 6 } },
-    "sach": { "name": "Chồng sách cũ thời cao đẳng", "desc": "Tin học +1, kèm Toán cho bé Bin dễ được tin hơn",
-      "effects": { "xp.tinHoc": 6, "flag.sach": true } },
-    "ao_khoac": { "name": "Chiếc áo khoác má đan", "desc": "Tinh thần tối đa +20, gọi về nhà hồi thêm Tinh thần",
-      "effects": { "mood_max": 20, "mood": 20, "flag.aoKhoac": true } }
+  "reps": {
+    "LINH": "Linh", "BA_TU": "Bà Tư", "HANH": "Chị Hạnh", "SAU": "Chú Sáu",
+    "MINH": "Minh", "DUYEN": "Cô Duyên", "TRAM": "Trâm", "PHUC": "Anh Phúc"
   },
-  "letter": "Thư tay của Lan: \"Anh Hai nhớ ăn uống đầy đủ nghen.\"",
-  "endings": {
-    "duong_tat": { "tag": "Kết xấu", "good": false, "title": "Đường tắt",
-      "text": "Minh có đủ tiền. Nhưng sáng ngày 30, công an ập vào phòng trọ. Lô hàng chở cho Tuấn là hàng cấm. Lan đứng ngoài cổng trại giam, tay vẫn cầm tờ giấy báo nhập học." },
-    "cong_ly": { "tag": "Kết ẩn", "good": true, "title": "Công lý",
-      "text": "Khi Hưng Sẹo tới, Vy đi cùng một cán bộ công an phường. Hợp đồng vay bị xác định vi phạm pháp luật. Minh chỉ phải trả phần gốc hợp pháp.",
-      "quote": "\"Hóa ra thứ đáng sợ nhất ở thành phố không phải là nợ, mà là không biết.\"" },
-    "dat_lanh": { "tag": "Kết đẹp", "good": true, "title": "Đất lành",
-      "text": "Minh trả xong nợ. Chú Bảy mời Minh làm thợ chính, chia đôi lợi nhuận. Tháng sau má lên thăm, cả nhà ăn cơm trong căn phòng trọ chật mà ấm." },
-    "trang_tay": { "tag": "Buồn vui lẫn lộn", "good": false, "title": "Trắng tay",
-      "text": "Nợ đã trả xong, nhưng Minh nằm viện vì kiệt sức. Má hỏi: \"Tháng sau con tính sao?\" Minh không trả lời được.",
-      "quote": "\"Có lẽ mình nên học một cái nghề.\"" },
-    "game_over": { "tag": "Game over", "good": false, "title": "Trở lại vạch xuất phát",
-      "text": "Má gọi điện, giọng lạc đi: \"Người ta tới đo đất rồi con ơi…\"",
-      "quote": "Sổ tay của Minh giữ lại vài điều cho lần sau." }
+  "linhCards": {
+    "xa": { "title": "Đi xa, vẫn có đường về", "text": "Linh tự chọn chỗ xa, An tôn trọng và hỗ trợ đúng phần em đề nghị. Đi xa là trưởng thành, không phải mất gia đình." },
+    "gan": { "title": "Ở gần theo ý mình", "text": "Linh tự chọn chỗ gần sau khi cân nhắc. Em ở gần không có nghĩa phải chăm hết việc nhà." },
+    "lanh": { "title": "Tin nhắn chỉ đủ việc", "text": "Linh vẫn báo mình an toàn nhưng không kể chuyện ở xưởng. Gửi tiền không tự sửa được khoảng cách." },
+    "chua": { "title": "Chưa có quyết định", "text": "Lát cắt kết thúc trước khi Linh trả lời cơ sở thực tập." }
   },
-  "notes": {
-    "quyt_luong": "Chủ thầu công trình sẽ trốn vào ngày 8, mang theo lương phụ hồ các ngày 5 đến 7.",
-    "tang_lai": "Ngày 21, Hưng Sẹo sẽ đòi 18 triệu thay vì 15.",
-    "vy_luat": "Vy học Luật. Thân với Vy trước ngày 18 có thể mở ra một lối thoát khác.",
-    "hoc_nghe": "Chỉ làm việc chân tay thì không đủ. Từ ngày 11 nên đi học một nghề.",
-    "chu_bay": "Chú Bảy chỉ dạy nghề cho người chú đã quen. Ghé phụ chú dọn tiệm từ sớm."
+  "baTuCards": {
+    "tot": { "title": "Một người quen ở cửa bên", "text": "Bà được cùng chọn. Ở chỗ mới, bà hỏi tên người bán rau và mang qua một nhánh húng." },
+    "hua": { "title": "Chờ một lời hứa", "text": "Phương án tiện cho công việc, kèm lời hứa đưa bà đi chợ ngày 27. Giữ lời thì bà quen dần." },
+    "lo": { "title": "Cái ghế chưa có chỗ", "text": "Nhu cầu của bà chưa được hỏi tới. Chiếc ghế kê sát thùng đồ, bà ít ra ngoài." }
   }
 }
