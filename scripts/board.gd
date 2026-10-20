@@ -20,6 +20,8 @@ var progress_label: Label
 var people_label: Label
 var end_day_btn: Button
 var flows := {}
+## Cảnh chính hôm nay và bước việc nhờ: bấm là mở luôn (bảng cân bằng bỏ qua đi bộ).
+var scene_row: HFlowContainer
 var ledger: RichTextLabel
 var log_label: RichTextLabel
 
@@ -56,7 +58,7 @@ func _build() -> void:
 	brand.add_theme_constant_override("separation", 0)
 	header.add_child(brand)
 	brand.add_child(UI.label("Trước mùa mưa", 28, UI.TIM))
-	brand.add_child(UI.label("BẢNG CÂN BẰNG · LÁT CẮT NGÀY 18–22", 11, UI.INK_SOFT))
+	brand.add_child(UI.label("BẢNG CÂN BẰNG", 11, UI.INK_SOFT))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(spacer)
@@ -135,6 +137,10 @@ func _build_actions() -> Control:
 	end_day_btn.pressed.connect(func() -> void: dialogs.open_night())
 	toolbar.add_child(end_day_btn)
 
+	scene_row = HFlowContainer.new()
+	scene_row.add_theme_constant_override("h_separation", 10)
+	scene_row.add_theme_constant_override("v_separation", 10)
+	col.add_child(scene_row)
 	var tabs := TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(tabs)
@@ -198,8 +204,8 @@ func _refresh() -> void:
 	var warn := float(game.cfg.fatigue.warn)
 	fatigue_label.text = "Mệt  %d/100%s" % [int(s.fatigue), "  · cảnh báo" if game.fatigue_warn() else ""]
 	UI.set_bar(fatigue_bar, float(s.fatigue), 100.0, UI.STAMP if float(s.fatigue) >= warn else (UI.WARN if float(s.fatigue) >= warn - 20 else UI.GOOD))
-	var info := ["Tuyến " + str(s.route)]
-	if s.route != "A":
+	var info := ["Tuyến " + (str(s.route) if s.route != "" else "chưa chọn (ngày 11)")]
+	if s.route in ["B", "C"]:
 		info.append("Tiến độ hợp đồng %d/%d buổi trước nghiệm thu" % [int(s.progress), int(s.progress_need)])
 	info.append("Ngày ở mức cảnh báo: %d · bỏ qua nghỉ: %d" % [int(s.warn_days), int(s.rest_skips)])
 	info.append("Linh tin An: %d · Linh muốn: %s" % [int(s.respect), "chỗ xa" if s.linh.wish == "xa" else "chỗ gần"])
@@ -209,6 +215,18 @@ func _refresh() -> void:
 		reps.append("%s %d" % [game.rep_name(k), int(s.rep.get(k, 0))])
 	people_label.text = "  ·  ".join(reps)
 
+	for c in scene_row.get_children():
+		c.queue_free()
+	for id in game.scenes_today():
+		var e: Dictionary = game.scene_info(id)
+		var b := UI.choice("◆ " + game.fill(str(e.title)), "Cảnh chính · " + str(e.loc), game.scene_lock(id), game.open_scene.bind(id))
+		b.custom_minimum_size.x = 300
+		scene_row.add_child(b)
+	for id in game.quests_active():
+		if game.quest_step(id).get("kind", "") == "visit":
+			var b := UI.choice("★ " + str(game.quest_def(id).title), game.quest_progress_text(id), game.quest_step_lock(id), game.quest_visit.bind(id))
+			b.custom_minimum_size.x = 300
+			scene_row.add_child(b)
 	end_day_btn.text = "Kết thúc ngày %d" % game.day()
 	end_day_btn.disabled = game.is_over() or not s.queue.is_empty()
 	for g in flows:

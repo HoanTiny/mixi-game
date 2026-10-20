@@ -12,8 +12,20 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - Màn phố đổi sang 6 địa điểm mới, có rạch và cầu. HUD mới có hai cột tiền, Mệt và Sổ.
   - Bảng tổng kết lát cắt.
   - `tests/sim.gd` chạy 3 tuyến × 3 cách chơi.
-- **Chưa làm:** ngày 1–17 và 23–30, cảnh "nếu bỏ lỡ" (lát cắt vẫn đưa cảnh chính lên bằng hộp thoại buổi sáng), 8 kết thúc E1–E8, mưa ngày 15 và 29, chỗ ở thật (đặt cọc, ký, chuyển vào).
-- **Nhận xét từ mô phỏng:** tuyến A dư dả (đủ Hẻm Dừa) nhưng ngày nào Mệt cũng ở mức cảnh báo. Tuyến C sát nút, chỉ đủ Cầu Tre. Nếu không làm thêm việc trả ngay, tuyến C rơi xuống ở tạm nhà dì Năm. Chưa có cách chơi nào làm khoản phải trả bị nợ.
+- **Đã gộp vào nhánh `feature/noi-chuyen`** cùng các cơ chế kiểu Nobody: nhu cầu cơ thể (ăn, tắm, giặt) và Phong độ tính theo Mệt, trò chơi nhỏ (xếp hàng ở ca kho, rửa bát ở Cơm Hạnh), app giao đồ, lục ve chai, nói chuyện với 8 nhân vật, việc nhờ nhiều bước.
+- **Đã làm đủ 30 ngày** (chọn "Bắt đầu ngày 1" ở màn đầu; lát cắt 18–22 vẫn giữ để thử nhanh):
+  - Nội dung ngày 1–30 trong `events.json`, mỗi ngày một cảnh chính với 3 lựa chọn lấy từ `narrative_design.json`, có biến thể theo tuyến (ngày 12, 15, 18, 20, 27) và theo việc đã làm (ngày 13, 16, 17, 24, 26, 29).
+  - **Cảnh chính gắn địa điểm** (`loc`, `window`): không bật lên buổi sáng mà chờ An tới nơi (dấu ◆ vàng trên phố, thẻ ◆ ở địa điểm, dòng "Hôm nay" ở bảng mục tiêu). Cảnh không gắn địa điểm (tin nhắn, mưa, ngày 30) vẫn bật buổi sáng.
+  - **Nếu bỏ lỡ** (`missed`, `missed_effects`, `missed_choices`): sáng hôm sau có tin "Hôm qua An không tới". Ngày 11 và 26 được chọn lại ở tin này; quá ngày 12 chưa chọn tuyến thì đi đường làm công.
+  - **Lương cũ** ngày 4 → 17 → 24 (hai mốc, khép sớm 2,8 triệu, hoặc chưa chốt).
+  - **Tuyến nghề ngày 11** tạo các khoản thu chi của hợp đồng theo `contracts` trong `config.json`; nghiệm thu giữa kỳ ngày 20 mở giai đoạn cuối, bàn giao trước ngày 27. Ngày 12 khách tự mua vật tư thì tính lại giá dịch vụ 4,4 triệu và hoàn phần ứng dư.
+  - **Chỗ ở thật:** xem phòng (ngày 3 hoặc việc tùy chọn ở chợ), đặt cọc giữ chỗ (ngày 12 lựa chọn dùng tiền ứng), chốt ngày 26, chưa chốt thì hết ngày 30 sang ở nhờ dì Năm.
+  - **Mưa ngày 15 và 29:** trời xám, mưa rơi trên phố, đèn đường bật sớm. Thiệt hại tùy việc chuẩn bị ngày 14, 23, 28, không tung xúc xắc.
+  - **8 kết thúc E1–E8** xét theo thứ tự E8 → E6 → E7 → E5 → E4 → E2 → E3 → E1 (`ending_key()` trong `game_logic.gd`, ngưỡng ở `endings` của `config.json`), màn kết có thẻ Linh, thẻ bà Tư, một thẻ quan hệ nghề và các khoản còn phải xử lý.
+  - Việc tùy chọn theo ngày và việc giữ lời hứa (`showIfPromise`) ở các địa điểm; việc nhờ mở từ lựa chọn trong cảnh (sửa quạt ngày 2, giao 12 suất ngày 6, đón Bắp ngày 9).
+  - `tests/sim.gd` chạy thêm 30 ngày cho 3 tuyến × 4 cách chơi; `tests/playtest.gd -- --demo --full` cho người chơi máy đi hết 30 ngày trên màn phố thật.
+- **Nhận xét từ mô phỏng 30 ngày:** lắng nghe ra E1/E2/E3 theo tuyến, giữ tiếp ra E4 hoặc E6, áp đặt ra E8, làm quá sức ra E6 hoặc E4. Tiền cuối tháng sau khi trả Hẻm Dừa từ 0,4 đến 6 triệu. Chưa có lượt mô phỏng nào ra E5 (bị E8 chặn trước) và E7 (ai cũng đủ tiền phòng); cần chơi thử người thật để chỉnh.
+- **Còn lại:** chỉnh cân bằng sau khi chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
 
 ## Câu hỏi đã chốt
 

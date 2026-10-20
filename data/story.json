@@ -1,24 +1,151 @@
 {
+ "title": "Trước mùa mưa",
+ "slice": {
+  "eyebrow": "Lát cắt ngày 18–22",
   "title": "Trước mùa mưa",
-  "slice": {
-    "eyebrow": "Lát cắt ngày 18–22",
-    "title": "Trước mùa mưa",
-    "text": "An, 27 tuổi, mất việc ở tiệm điện máy và về lại xóm trọ Bờ Me. Cuối tháng cả xóm phải dọn đi. Bà Tư cần một chỗ có người quen, Linh sắp có tin thực tập.\n\nLát cắt này bắt đầu ở ngày 18, giữa lúc tiền chưa tới tay. Mục tiêu là thử dòng tiền của ba tuyến nghề và quyền tự quyết của Linh.",
-    "pick": "CHỌN TUYẾN NGHỀ AN ĐÃ CHỌN Ở NGÀY 11"
+  "text": "An, 27 tuổi, mất việc ở tiệm điện máy và về lại xóm trọ Bờ Me. Cuối tháng cả xóm phải dọn đi. Bà Tư cần một chỗ có người quen, Linh sắp có tin thực tập.\n\nLát cắt này bắt đầu ở ngày 18, giữa lúc tiền chưa tới tay. Mục tiêu là thử dòng tiền của ba tuyến nghề và quyền tự quyết của Linh.",
+  "pick": "CHỌN TUYẾN NGHỀ AN ĐÃ CHỌN Ở NGÀY 11"
+ },
+ "reps": {
+  "LINH": "Linh",
+  "BA_TU": "Bà Tư",
+  "HANH": "Chị Hạnh",
+  "SAU": "Chú Sáu",
+  "MINH": "Minh",
+  "DUYEN": "Cô Duyên",
+  "TRAM": "Trâm",
+  "PHUC": "Anh Phúc"
+ },
+ "linhCards": {
+  "xa": {
+   "title": "Đi xa, vẫn có đường về",
+   "text": "Ảnh cuối tuần là chiếc bàn thực hành và hộp cơm em tự nấu. Em gọi về hỏi bà đặt cây ở đâu. Đi xa là bước trưởng thành, không phải mất gia đình."
   },
-  "reps": {
-    "LINH": "Linh", "BA_TU": "Bà Tư", "HANH": "Chị Hạnh", "SAU": "Chú Sáu",
-    "MINH": "Minh", "DUYEN": "Cô Duyên", "TRAM": "Trâm", "PHUC": "Anh Phúc"
+  "gan": {
+   "title": "Ở gần theo ý mình",
+   "text": "Em đặt mốc ba tháng để xem lại cơ hội. Buổi tối có hôm em ăn ở nhà, có hôm học thêm. Việc nhà chia theo lịch, không mặc định em ở gần thì phải chăm tất cả."
   },
-  "linhCards": {
-    "xa": { "title": "Đi xa, vẫn có đường về", "text": "Linh tự chọn chỗ xa, An tôn trọng và hỗ trợ đúng phần em đề nghị. Đi xa là trưởng thành, không phải mất gia đình." },
-    "gan": { "title": "Ở gần theo ý mình", "text": "Linh tự chọn chỗ gần sau khi cân nhắc. Em ở gần không có nghĩa phải chăm hết việc nhà." },
-    "lanh": { "title": "Tin nhắn chỉ đủ việc", "text": "Linh vẫn báo mình an toàn nhưng không kể chuyện ở xưởng. Gửi tiền không tự sửa được khoảng cách." },
-    "chua": { "title": "Chưa có quyết định", "text": "Lát cắt kết thúc trước khi Linh trả lời cơ sở thực tập." }
+  "lanh": {
+   "title": "Tin nhắn chỉ đủ việc",
+   "text": "Em vẫn báo mình an toàn, nhưng không kể chuyện ở xưởng. Gửi tiền không tự sửa được khoảng cách; phải bắt đầu bằng việc tôn trọng điều em đã chọn."
   },
-  "baTuCards": {
-    "tot": { "title": "Một người quen ở cửa bên", "text": "Bà được cùng chọn. Ở chỗ mới, bà hỏi tên người bán rau và mang qua một nhánh húng." },
-    "hua": { "title": "Chờ một lời hứa", "text": "Phương án tiện cho công việc, kèm lời hứa đưa bà đi chợ ngày 27. Giữ lời thì bà quen dần." },
-    "lo": { "title": "Cái ghế chưa có chỗ", "text": "Nhu cầu của bà chưa được hỏi tới. Chiếc ghế kê sát thùng đồ, bà ít ra ngoài." }
+  "chua": {
+   "title": "Chưa có quyết định",
+   "text": "Lát cắt kết thúc trước khi Linh trả lời cơ sở thực tập."
+  },
+  "hoan": {
+   "title": "Một ngày bắt đầu khác",
+   "text": "Lịch mới do chính em viết, có ngày nộp lại hồ sơ. Em chậm một bước, chưa phải bỏ nghề để ở nhà."
   }
+ },
+ "baTuCards": {
+  "tot": {
+   "title": "Một người quen ở cửa bên",
+   "text": "Bà hỏi tên người bán rau gần nhà và mang qua một nhánh húng. Quan hệ mới bắt đầu bằng một chuyện rất nhỏ."
+  },
+  "hua": {
+   "title": "Chờ một lời hứa",
+   "text": "Phương án tiện cho công việc, kèm lời hứa đưa bà đi chợ ngày 27. Giữ lời thì bà quen dần."
+  },
+  "lo": {
+   "title": "Cái ghế chưa có chỗ",
+   "text": "Chiếc ghế kê sát thùng đồ, bà ít ra ngoài. An hỏi bà muốn kê lại cái ghế ở đâu. Bà chưa trả lời."
+  },
+  "ro_nhua": {
+   "title": "Cây húng trong rổ nhựa",
+   "text": "Chưa có hiên riêng, bà đặt chậu trong chiếc rổ dễ mang. Bà hẹn cô Duyên buổi chợ tuần sau; sự gắn bó không đợi có một căn nhà đủ đẹp."
+  }
+ },
+ "prologue": {
+  "eyebrow": "Ba mươi ngày · từ ngày 1",
+  "title": "Trước mùa mưa",
+  "text": "An, 27 tuổi, thợ sửa điện máy, vừa bị tiệm cho nghỉ. Anh về lại xóm trọ Bờ Me, định ở vài hôm rồi tìm việc mới trước khi người nhà biết. Trên cửa phòng bà ngoại đã dán thông báo: cuối tháng cả xóm phải dọn đi.\n\nAn có 1,2 triệu đồng tiền mặt, một túi đồ nghề, và 3,6 triệu tiền công tiệm cũ còn nợ. Trong 30 ngày, anh phải tìm chỗ ở mới cho cả nhà, dựng lại một cách kiếm sống, và học cách giúp người thân mà không quyết định thay họ.",
+  "quote": "Linh đang đo cái kệ bếp bằng sợi dây: \"Nếu kiếm phòng khác thì mình phải biết cái nào mang theo được chứ.\"",
+  "start": "Bắt đầu ngày 1",
+  "slicePick": "HOẶC THỬ NHANH LÁT CẮT NGÀY 18–22 (TUYẾN ĐÃ CHỌN Ở NGÀY 11)"
+ },
+ "endings": {
+  "E1": {
+   "tag": "Ổn định",
+   "title": "Căn phòng có ánh đèn",
+   "text": "An kê chiếc bàn gấp cạnh cửa. Anh chưa có tiệm riêng. Sáng mai anh nhận ca ở kho, chiều trả chiếc nồi cơm đã sửa cho khách. Bà Tư tìm được chỗ ngồi nhặt rau; Linh dán lịch của mình lên tủ. Trong bảng chi tiêu, dòng tiền dư không lớn nhưng không có khoản nào phải giấu.",
+   "quote": "Bà Tư: “Mai mấy giờ con đi?” An: “Bảy giờ. Chiều con về nấu. Bữa nào tăng ca con báo trước.”",
+   "epilogue": "Sau ba tháng, An có một công việc đều và vài khách quen. Căn phòng vẫn chật; lịch sinh hoạt đã bớt chồng chéo. Thành công là một nhịp sống có thể tiếp tục."
+  },
+  "E2": {
+   "tag": "Tổ đội",
+   "title": "Chung một bảng hiệu",
+   "text": "Sáu treo tấm bảng nhỏ “Sáu Sửa — nhận lịch điện gia dụng”. Trâm sửa lại dòng mô tả để khách không hiểu là ai cũng làm được mọi việc. Minh ghi giờ cuối nhận chuyến trước giờ đón Bắp. An định nhận thêm một khách rồi nhìn lịch, hẹn sang hôm sau.",
+   "quote": "Sáu: “Bảng có tên tao, chớ đừng để việc gì cũng tới tao.” An: “Dạ. Ai nhận việc nào, ghi tên người đó.”",
+   "epilogue": "Ba tháng sau, nhóm vẫn có hôm cãi nhau về lịch và phí. Họ giữ một buổi đối soát mỗi tuần; Sáu có một chiều nghỉ. Không ai phải góp vốn ngoài phần đã tự nguyện nhận."
+  },
+  "E3": {
+   "tag": "Bàn nghề riêng",
+   "title": "Một chiếc bàn riêng",
+   "text": "An thuê được một góc phía trước tiệm Sáu theo giờ, đặt hộp đồ nghề lên bàn. Tấm biển chỉ ghi tên, số điện thoại và những việc anh thật sự nhận. Anh trả lời cuộc gọi đầu tiên bằng một câu hỏi về tình trạng món đồ, không bằng lời hứa sửa được hết.",
+   "quote": "Khách: “Hôm nay xong hông?” An: “Để tôi xem rồi báo giờ chắc cho anh. Anh cần gấp thì tôi giới thiệu chỗ khác.”",
+   "epilogue": "Ba tháng sau, An có khách quay lại và vẫn nhận ca phụ khi vắng việc. Bàn riêng là quyền chọn nhịp làm, chưa phải cảnh giàu lên sau một tháng."
+  },
+  "E4": {
+   "tag": "Làm lại",
+   "title": "Làm lại từ đơn nhỏ",
+   "text": "Trong sổ còn một trang gạch đỏ. An ghi ngày trả từng khoản, bên cạnh lịch nhận ca và ba đơn sửa nhỏ. Anh mang trả chiếc dụng cụ đã mượn, nhận lại một cái gật đầu dè dặt. Bữa cơm tối không biến thành lễ ăn mừng, nhưng anh ngồi xuống kể đúng chuyện đã xảy ra.",
+   "quote": "An: “Con tính hụt. Phần còn thiếu con đã hẹn lại, đây là lịch.” Bà Tư: “Ừ. Ăn đi rồi mình coi tháng tới.”",
+   "epilogue": "Sau ba tháng, vài khoản đã được gạch đi. Một khách chưa quay lại. An biết giới hạn của mình hơn và có thể tạo lại uy tín bằng việc nhỏ."
+  },
+  "E5": {
+   "tag": "Gia đình xa cách",
+   "title": "Có tiền nhưng vắng tiếng",
+   "text": "Phòng mới có chiếc quạt chạy êm và cái kệ vừa kích thước. Linh gửi tiền phần mình bằng chuyển khoản rồi đi thực tập; tin nhắn chỉ có một dòng. Bà Tư trả lời mọi câu bằng “sao cũng được”. An đặt chậu húng xuống đúng nơi anh đã chọn, rồi nhận ra mình chưa hỏi bà có muốn đặt ở đó không.",
+   "quote": "An: “Phòng này được hơn phòng cũ mà bà.” Bà Tư: “Ừ, phòng được.”",
+   "epilogue": "Một tháng sau, An gửi Linh lời xin lỗi, không kèm yêu cầu em quay về. Linh trả lời một chữ \"Dạ\". Nối lại sẽ cần nhiều hơn một tin nhắn."
+  },
+  "E6": {
+   "tag": "Kiệt sức",
+   "title": "Tiếng mưa ngoài phòng nghỉ",
+   "text": "An ngồi trong phòng, ngoài hiên là đồ vừa chuyển. Anh không nhận thêm ca. Trâm báo đã sắp lại một phần công việc; phần còn lại phải gọi từng khách xin hẹn. An đưa cuốn lịch cho người nhà, nói mình cần nghỉ.",
+   "quote": "An: “Hôm nay con không làm nổi.” Linh: “Vậy nói khách hôm nay. Đừng hẹn đại tới chiều.”",
+   "epilogue": "Hai tuần sau, An trở lại bằng lịch ngắn hơn. Thu nhập hụt, một vài khách đã chuyển chỗ. Những việc còn dở vẫn nằm trong sổ, phải giải quyết dần."
+  },
+  "E7": {
+   "tag": "Ở tạm có kế hoạch",
+   "title": "Chìa khóa mượn",
+   "text": "Dì Năm chỉ chỗ để dép và ngăn tủ trống. An nói rõ ở nhờ một tuần, đưa lịch đi xem phòng và lịch nhận tiền. Bà Tư chia rau vào rổ nhà dì. Linh nhắn giờ mình về, hoặc địa chỉ chỗ thực tập. Cả nhà chưa có chìa khóa riêng, nhưng không phải đứng ngoài mưa chờ một phép màu.",
+   "quote": "Dì Năm: “Ở thì ở. Có đổi ngày đi, nói dì sớm.” An: “Dạ. Tối thứ tư con báo lại, kể cả chưa tìm được phòng.”",
+   "epilogue": "Tối thứ tư, An báo dì Năm kế hoạch như đã hẹn. Nếu tiền phải thu về đúng ngày, cả nhà chuyển tiếp; nếu chưa, họ xin dì thêm ít bữa hoặc tìm chỗ khác, có hỏi trước."
+  },
+  "E8": {
+   "tag": "Mất tin cậy nghề",
+   "title": "Dòng tên trên biên bản",
+   "text": "An gặp Phúc và Trâm tại quán đã dọn bàn. Họ ghi rõ phần đã làm, phần chưa làm, số tiền cần đối soát và bước tiếp theo. Trâm không ký thay anh. Điện thoại hiện một cuộc gọi hỏi việc mới; An để máy nằm yên rồi tiếp tục đọc bản ghi.",
+   "quote": "Phúc: “Tôi cần biết phần nào dùng được, phần nào chưa.” An: “Tôi sẽ ghi đúng từng phần. Chỗ tôi đã báo sai, tôi nhận.”",
+   "epilogue": "Ba tháng sau, An vẫn đang làm theo phương án khắc phục đã thống nhất sau buổi gặp. Nhóm không giới thiệu việc mới khi vấn đề chưa rõ. Gia đình vẫn ở bên, tùy cách anh đối xử với họ."
+  }
+ },
+ "npcCards": {
+  "HANH": {
+   "good": "Chị Hạnh thêm một dòng đặt cơm cố định cho An mỗi tuần, ghi rõ giờ giao.",
+   "bad": "Chị Hạnh thuê người khác giao cơm, nhưng vẫn bán cho An một suất cơm bình thường, không nhắc chuyện cũ."
+  },
+  "MINH": {
+   "good": "Minh nhận chuyến chở đồ đúng giờ đã hẹn, xong còn kịp đón bé Bắp.",
+   "bad": "Minh từ chối chuyến chở đồ, nhưng báo trước để An kịp tìm xe khác."
+  },
+  "SAU": {
+   "good": "Chú Sáu giữ cho An một chỗ cộng tác ở bàn sửa, mỗi tuần đối soát một lần.",
+   "bad": "Chú Sáu muốn An trả hết đồ đã mượn trước khi nói chuyện việc mới."
+  },
+  "TRAM": {
+   "good": "Trâm tiếp tục nhận việc chung khi phạm vi, kiểm tra và tiền công đều rõ.",
+   "bad": "Trâm giữ khoảng cách nghề nghiệp. Cô không đứng tên những việc An chưa sửa xong."
+  },
+  "DUYEN": {
+   "good": "Cô Duyên gửi ảnh cây trước dãy trọ đã dỡ, hỏi bà Tư ở chỗ mới có quen ai chưa.",
+   "bad": "Cô Duyên nhắn hẹn lại một khoản đối soát còn treo, số tiền ghi rõ trong tin nhắn."
+  },
+  "PHUC": {
+   "good": "Anh Phúc giới thiệu An cho một dãy quán khác, kèm câu \"làm rõ từng phần như bên anh\".",
+   "bad": "Anh Phúc chốt hợp đồng nhỏ hơn, bắt tay An rồi đi tìm đội khác cho phần còn lại."
+  }
+ }
 }

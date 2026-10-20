@@ -577,12 +577,30 @@ func _update_prompt() -> void:
 func _refresh_objectives(s: Dictionary) -> void:
 	for c in _objective_box.get_children():
 		c.queue_free()
+	# Cảnh chính hôm nay: đi tới đúng nơi, đúng khung giờ (dấu ◆ vàng trên phố).
+	for id in game.scenes_today():
+		var e: Dictionary = game.scene_info(id)
+		var where := str(world.location_info(str(e.loc)).name)
+		if e.has("window"):
+			where += " · %s–%s" % [GameLogic.hh(float(e.window[0])), GameLogic.hh(float(e.window[1]))]
+		_objective("Hôm nay: " + game.fill(str(e.title)), "Tới " + where, "current")
 	var deadline := int(game.cfg.housingDeadline)
-	var proj: int = game.projected_cash(deadline)
-	var best: String = game.best_housing(proj)
-	var best_name := "chưa đủ cả chỗ ở tạm" if best == "" else str(game.cfg.housing[best].name)
-	_objective("Chốt chỗ ở trước ngày %d" % deadline, "Dự kiến sáng ngày %d: %s · đủ cho %s" % [deadline, GameLogic.fmt_money(proj), best_name], "current")
-	if s.route != "A":
+	var h: Dictionary = game.housing()
+	if h.state == "signed":
+		_objective("Chỗ ở: " + str(game.cfg.housing[h.place].name), "Đã chốt" + (" · ở tạm, hẹn tìm tiếp" if game.cfg.housing[h.place].get("temp", false) else ""), "done")
+	else:
+		var proj: int = game.projected_cash(deadline)
+		var best: String = game.best_housing(proj)
+		var best_name := "chưa đủ cả chỗ ở tạm" if best == "" else str(game.cfg.housing[best].name)
+		var sub := "Không kiếm thêm thì sáng ngày %d còn %s · đủ cho %s" % [deadline, GameLogic.fmt_money(proj), best_name]
+		if h.state == "reserved":
+			sub = "Đã cọc giữ %s, còn thiếu %s · " % [game.cfg.housing[h.place].name, GameLogic.fmt_money(game.housing_cost(h.place))] + sub
+		_objective("Chốt chỗ ở trước ngày %d" % deadline, sub, "current" if game.day() >= 20 else "normal")
+	if game.is_full():
+		for r in s.receivables:
+			if str(r.id).begins_with("luong_cu") and r.status == "pending":
+				_objective("Lương cũ: %s" % GameLogic.fmt_money(int(r.amount)), "chưa hẹn ngày trả" if int(r.due) > 90 else "hẹn ngày %d" % int(r.due), "normal")
+	if s.route in ["B", "C"]:
 		var mid = null
 		for r in s.receivables:
 			if r.id == "hd_giua":
@@ -594,9 +612,17 @@ func _refresh_objectives(s: Dictionary) -> void:
 			state = "failed"
 		else:
 			state = "current"
-		_objective("Nghiệm thu đợt giữa Bến Cạn tối ngày 20", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], state)
-	var linh_state := "done" if s.linh.decision != "" else ("current" if game.day() >= 19 else "normal")
-	_objective("Nghe Linh nói về chỗ thực tập (ngày 22)", "Quyết định là của Linh", linh_state)
+		var final_open := false
+		for p in s.promises:
+			if p.id == "ban_giao_cuoi" and p.status == "open":
+				final_open = true
+		if final_open:
+			_objective("Bàn giao giai đoạn cuối Bến Cạn trước tối ngày 27", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], "current")
+		elif game.day() <= 22:
+			_objective("Nghiệm thu đợt giữa Bến Cạn tối ngày 20", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], state)
+	if game.day() <= 22:
+		var linh_state := "done" if s.linh.decision != "" else ("current" if game.day() >= 19 else "normal")
+		_objective("Nghe Linh nói về chỗ thực tập (ngày 22)", "Quyết định là của Linh", linh_state)
 	var due_today := 0
 	for p in s.promises:
 		if p.status == "open" and int(p.due) == game.day():
@@ -681,6 +707,14 @@ func _refresh_location() -> void:
 			"" if game.s.queue.is_empty() else "Còn việc phải chọn", func() -> void:
 				close_location()
 				dialogs.open_night()))
+	for id in game.scene_cards_at(_loc_id):
+		var e: Dictionary = game.scene_info(id)
+		var meta := "Cảnh chính hôm nay · %d phút" % roundi(float(e.get("hours", 0.5)) * 60.0)
+		if e.has("window"):
+			meta += " · %s–%s" % [GameLogic.hh(float(e.window[0])), GameLogic.hh(float(e.window[1]))]
+		_loc_cards.add_child(_quest_card("◆  " + game.fill(str(e.title)), meta + "\n" + str(e.get("who", "")),
+			game.scene_lock(id), game.open_scene.bind(id)))
+		found += 1
 	for who in loc.get("npcs", []):
 		var npc := str(who.id)
 		if npc == "":

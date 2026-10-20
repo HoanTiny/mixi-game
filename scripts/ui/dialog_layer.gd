@@ -1,5 +1,5 @@
 extends Control
-## Lớp hộp thoại ở giữa màn hình: chọn tuyến, sự kiện, buổi tối và tổng kết lát cắt.
+## Lớp hộp thoại ở giữa màn hình: mở đầu, sự kiện, buổi tối, màn kết 30 ngày và tổng kết lát cắt.
 ## Tự hiện khi trạng thái game cần người chơi chọn, tự ẩn khi không.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
@@ -49,7 +49,10 @@ func refresh() -> void:
 	if not game.is_started():
 		_start()
 	elif game.is_over():
-		_report()
+		if str(game.s.over.get("kind", "")) == "full":
+			_ending()
+		else:
+			_report()
 	elif not game.s.queue.is_empty():
 		_event()
 	elif night_open:
@@ -62,9 +65,10 @@ func refresh() -> void:
 
 
 func _start() -> void:
-	var p: Dictionary = game.story.slice
-	_head(p.eyebrow, p.title, "", p.text, "")
-	_box.add_child(UI.label(p.pick, 11, UI.INK_SOFT))
+	var p: Dictionary = game.story.prologue
+	_head(p.eyebrow, p.title, "", p.text, p.quote)
+	_box.add_child(UI.choice(p.start, "30 ngày · 1.200.000đ tiền mặt · 3.600.000đ lương cũ còn phải thu", "", game.new_game.bind("full")))
+	_box.add_child(UI.label(p.slicePick, 11, UI.INK_SOFT))
 	for k in GameLogic.ROUTES:
 		var pre: Dictionary = game.cfg.presets[k]
 		_box.add_child(UI.choice(pre.name, pre.desc, "", game.new_game.bind(k)))
@@ -135,6 +139,51 @@ func _report() -> void:
 	_box.add_child(UI.wrap("Sổ gia đình: hỗ trợ %d · ép quyết định %d · che giấu %d · bớt giờ ở nhà %d" % [f.support, f.pressure, f.conceal, f.time_lost], 13, UI.INK_SOFT))
 
 	_box.add_child(UI.choice("Chơi lại lát cắt", "Chọn lại tuyến A, B hoặc C", "", GameState.restart))
+	_box.add_child(UI.choice("Sao chép kết quả lượt chơi", "Dán vào chat để phân tích cân bằng", "", func() -> void: DisplayServer.clipboard_set(game.summary())))
+
+
+## Màn kết 30 ngày: một cảnh chính, thẻ của Linh, thẻ của bà Tư, một thẻ quan hệ nghề, các khoản còn phải xử lý.
+## Không có huy chương tốt hay xấu.
+func _ending() -> void:
+	var over: Dictionary = game.s.over
+	var e: Dictionary = game.story.endings[over.key]
+	_box.add_child(UI.label("%s · %s" % [str(over.key), str(e.tag).to_upper()], 12, UI.TIM))
+	_head("", e.title, "", e.text, e.quote)
+	_box.add_child(UI.wrap(e.epilogue, 14, UI.INK_SOFT))
+	var h: Dictionary = game.housing()
+	var place := str(game.cfg.housing.get(h.place, {}).get("name", "chưa rõ"))
+	var lines := [
+		"Chỗ ở: %s · Tuyến %s" % [place, str(game.s.route)],
+		"Tiền mặt: %s · phải thu sau ngày 30: %s" % [GameLogic.fmt_money(int(game.s.cash)), GameLogic.fmt_money(game.receivable_sum(31, 999))],
+	]
+	_box.add_child(UI.wrap("\n".join(lines), 14, UI.INK))
+	var linh: Dictionary = game.story.linhCards.get(over.linh, {})
+	if not linh.is_empty():
+		_box.add_child(UI.label("LINH", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("%s\n%s" % [linh.title, linh.text], 14, UI.INK))
+	var ba: Dictionary = game.story.baTuCards.get(over.ba_tu, {})
+	if not ba.is_empty():
+		_box.add_child(UI.label("BÀ TƯ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("%s\n%s" % [ba.title, ba.text], 14, UI.INK))
+	var npc: Dictionary = over.get("npc", {})
+	if not npc.is_empty():
+		var card: Dictionary = game.story.npcCards[npc.who]
+		_box.add_child(UI.label(game.rep_name(npc.who).to_upper(), 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap(str(card.good if npc.good else card.bad), 14, UI.INK))
+	var left := []
+	for x in game.s.payables:
+		if x.status in ["unpaid", "renegotiated"] or (x.status == "pending" and int(x.due) > 30):
+			left.append("• %s: %s" % [x.label, GameLogic.fmt_money(int(x.amount))])
+	for pr in game.s.promises:
+		if pr.status in ["overdue", "renegotiated"]:
+			left.append("• %s (%s)" % [pr.text, GameLogic.PROMISE_STATUS.get(pr.status, pr.status)])
+	for r in game.s.receivables:
+		if r.status == "pending":
+			left.append("• Còn chờ nhận: %s %s" % [r.label, GameLogic.fmt_money(int(r.amount))])
+	if not left.is_empty():
+		_box.add_child(UI.label("CÒN PHẢI XỬ LÝ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n".join(left), 13, UI.INK_SOFT))
+	_box.add_child(UI.choice("Chơi lại từ ngày 1", "", "", GameState.restart))
 	_box.add_child(UI.choice("Sao chép kết quả lượt chơi", "Dán vào chat để phân tích cân bằng", "", func() -> void: DisplayServer.clipboard_set(game.summary())))
 
 

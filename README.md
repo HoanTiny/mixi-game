@@ -4,12 +4,14 @@ Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*,
 
 Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
 
-**Trạng thái:** đã chơi được **lát cắt ngày 18–22**. Lát cắt có ba tuyến nghề, tiền mặt tách khỏi tiền phải thu và phải trả, chỉ số Mệt, sổ lời hứa, sổ gia đình, và quyền tự quyết của Linh. Ngày 1–17, ngày 23–30 và 8 kết thúc chính chưa làm.
+**Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29, chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
+
+**Cảnh chính mỗi ngày:** bảng mục tiêu ghi "Hôm nay: …" kèm nơi và khung giờ, trên phố có dấu ◆ vàng. Tới nơi bấm thẻ ◆ để vào cảnh, chọn một trong ba cách. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong. Tin nhắn, mưa và ngày 30 tự bật buổi sáng.
 
 ## Mở project
 
 1. Mở Godot, chọn **Import**, trỏ tới file `project.godot` trong thư mục này.
-2. Bấm **Run** (F5). Màn chính là phố 3D (`scenes/world.tscn`). Màn đầu cho chọn tuyến nghề A, B hoặc C mà An đã chọn từ ngày 11.
+2. Bấm **Run** (F5). Màn chính là phố 3D (`scenes/world.tscn`). Màn đầu có **Bắt đầu ngày 1** (đủ 30 ngày) hoặc thử nhanh lát cắt ngày 18–22 với tuyến A, B, C.
 
 **Điều khiển ở màn phố:**
 
@@ -45,8 +47,8 @@ Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi l
 ```
 data/
   config.json     số liệu: tiền sinh hoạt, Mệt, nhu cầu cơ thể, chỗ ở, điểm xuất phát của 3 tuyến, việc làm, trò chơi nhỏ, giao đồ, ve chai
-  events.json     sự kiện ngày 18–22, biến thể theo tuyến, sự kiện hệ thống (nghiệm thu, nợ chưa trả, ngủ gục)
-  story.json      lời mở lát cắt, tên nhân vật, thẻ hậu truyện của Linh và bà Tư
+  events.json     cảnh chính ngày 1–30 (địa điểm, khung giờ, lựa chọn, nếu bỏ lỡ), biến thể theo tuyến, sự kiện hệ thống
+  story.json      lời mở đầu, tên nhân vật, 8 kết thúc, thẻ hậu truyện của Linh, bà Tư và quan hệ nghề
   talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
   quests.json     việc nhờ nhiều bước: người nhờ, hạn, các bước, lựa chọn, phần thưởng
   models.json     file mô hình cho nhà, người, xe, cây, đồ vật và cách co giãn
@@ -118,24 +120,23 @@ Các file `.wav` trong `assets/sounds/` là **tiếng tạm** do `tools/gen_soun
 "C:/Users/Admin/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe" --headless --path . -s res://tests/sim.gd
 ```
 
-Kết quả gần nhất (tiền dự kiến sáng ngày 26, hạn chốt chỗ ở; máy chơi có ăn, tắm, giặt):
+Kết quả gần nhất của bản 30 ngày (bỏ qua đường đi bộ; kết thúc và tiền mặt cuối tháng sau khi đã trả chỗ ở):
 
-| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt |
-|---|---|---|---|
-| A · Làm công | 6,16 tr · đủ Hẻm Dừa | 6,14 tr · đủ Hẻm Dừa | 6,34 tr · đủ Hẻm Dừa |
-| B · Tổ đội | 6,17 tr · đủ Hẻm Dừa | 5,64 tr · đủ Hẻm Dừa | 5,72 tr · đủ Hẻm Dừa |
-| C · Dịch vụ riêng | 4,81 tr · đủ Cầu Tre | 4,43 tr · đủ Cầu Tre | 4,33 tr · đủ Cầu Tre |
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng (làm 3 việc, không nghỉ) |
+|---|---|---|---|---|
+| A · Làm công | E1 · 5,96 tr | E6 · 3,65 tr | E8 · 3,27 tr | E4 · 2,69 tr |
+| B · Tổ đội | E2 · 4,09 tr | E4 · 0,38 tr | (khóa B, sang A) | E4 · 1,99 tr |
+| C · Dịch vụ riêng | E3 · 4,96 tr | E4 · 1,58 tr | E8 · 1,23 tr | E6 · 1,71 tr |
 
-Cách chơi "áp đặt" luôn dẫn tới thẻ "Tin nhắn chỉ đủ việc" của Linh. Hai cách còn lại cho thẻ "Đi xa, vẫn có đường về".
-
-- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày:
+- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, cảnh chính, việc nhờ, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Bỏ `--full` để chơi lát cắt:
 
 ```bash
-Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --route=B --talk
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --full --route=B --talk
 ```
 
 **Chạy thử nhanh** (thêm vào sau lệnh chạy game, không ghi đè bản lưu thật):
 
+- `-- --demo --demo-full`: vào thẳng ngày 1 của bản 30 ngày.
 - `-- --demo --demo-route=C`: vào thẳng ngày 18 của tuyến C.
 - Thêm `--demo-open=ben_can`: mở sẵn một địa điểm.
 - Thêm `--demo-end`: tự chơi tới hết ngày 22 để xem bảng tổng kết.

@@ -623,6 +623,8 @@ func _physics_process(delta: float) -> void:
 	_update_traffic(delta)
 	_update_delivery()
 	_update_quests()
+	if _rain != null and _rain.visible:
+		_rain.position = player.position + Vector3(0, 11, 2)
 	_check_day_end()
 
 
@@ -992,12 +994,47 @@ func _update_lighting(hour: float) -> void:
 		c = noon.lerp(dusk, (hour - 16.0) / 3.0)
 	else:
 		c = dusk.lerp(night, clampf((hour - 19.0) / 2.0, 0.0, 1.0))
+	# Ngày mưa (15, 29): trời xám, nắng yếu, đèn đường bật sớm, có mưa rơi quanh An.
+	var rain: bool = game.is_started() and bool(game.s.today.get("rain", false))
+	if rain:
+		c = c.lerp(Color("8a96a8"), 0.7)
 	sun.light_color = c
-	sun.light_energy = 0.35 if hour >= 20.0 else 1.1
-	env.ambient_light_color = c.lerp(Color("b49a7c"), 0.6)
-	env.ambient_light_energy = 0.45 if hour >= 20.0 else 0.95
+	sun.light_energy = (0.35 if hour >= 20.0 else 1.1) * (0.35 if rain else 1.0)
+	env.ambient_light_color = c.lerp(Color("b49a7c"), 0.2 if rain else 0.6)
+	env.ambient_light_energy = 0.45 if hour >= 20.0 else (0.75 if rain else 0.95)
 	for lamp in lamps:
-		lamp.light_energy = 2.2 if hour >= 18.0 else 0.0
+		lamp.light_energy = 2.2 if hour >= (16.0 if rain else 18.0) else 0.0
+	_set_rain(rain)
+
+
+var _rain: CPUParticles3D
+
+
+func _set_rain(on: bool) -> void:
+	if on and _rain == null:
+		_rain = CPUParticles3D.new()
+		_rain.amount = 1400
+		_rain.lifetime = 0.9
+		_rain.local_coords = false
+		_rain.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		_rain.emission_box_extents = Vector3(18, 0.5, 13)
+		_rain.direction = Vector3(0.08, -1, 0)
+		_rain.spread = 3.0
+		_rain.initial_velocity_min = 16.0
+		_rain.initial_velocity_max = 20.0
+		_rain.gravity = Vector3(0, -9.8, 0)
+		var drop := BoxMesh.new()
+		drop.size = Vector3(0.018, 0.55, 0.018)
+		var dm := StandardMaterial3D.new()
+		dm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		dm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		dm.albedo_color = Color(0.82, 0.88, 0.95, 0.45)
+		drop.material = dm
+		_rain.mesh = drop
+		add_child(_rain)
+	if _rain != null:
+		_rain.emitting = on
+		_rain.visible = on
 
 
 # ---------------------------------------------------------------- truy vấn cho HUD
@@ -1193,7 +1230,8 @@ func _float_text(text: String, color: Color) -> void:
 
 # ---------------------------------------------------------------- việc nhờ
 
-## Dấu ! vàng trên chỗ có người nhờ việc, dấu ◆ xanh trên chỗ cần tới của việc đang làm.
+## Dấu ! vàng trên chỗ có người nhờ việc, dấu ◆ xanh trên chỗ cần tới của việc đang làm,
+## dấu ◆ vàng trên chỗ có cảnh chính hôm nay.
 var _quest_offer_marks := {}
 var _quest_marks: Array = []
 var _quest_tick := 0.0
@@ -1242,14 +1280,22 @@ func _refresh_quest_marks() -> void:
 			_quest_offer_marks[loc].queue_free()
 			_quest_offer_marks.erase(loc)
 	var spots := []
+	var colors := []
+	for id in game.scenes_today():
+		var loc := str(game.scene_info(id).loc)
+		if LOCATIONS.has(loc):
+			spots.append(door_of(loc))
+			colors.append(Color("f2c14e"))
 	for id in game.quests_active():
 		var t: Dictionary = game.quest_target(id)
 		if t.has("loc") and LOCATIONS.has(t.loc):
 			spots.append(door_of(str(t.loc)))
+			colors.append(Color("5aa9ff"))
 		elif t.has("x"):
 			for b in bins:
 				if float(b.pos.x) >= float(t.x[0]) and float(b.pos.x) <= float(t.x[1]) and game.scrap_lock(b.id) == "":
 					spots.append(Vector3(b.pos.x, 0, b.pos.z))
+					colors.append(Color("5aa9ff"))
 	while _quest_marks.size() < spots.size():
 		var m := MeshInstance3D.new()
 		var cm := CylinderMesh.new()
@@ -1270,5 +1316,11 @@ func _refresh_quest_marks() -> void:
 		m.visible = i < spots.size()
 		if m.visible:
 			var p: Vector3 = spots[i]
-			m.position = Vector3(p.x, m.position.y, p.z)
+			(m.material_override as StandardMaterial3D).albedo_color = colors[i]
+			# Hai dấu cùng một cửa thì đặt lệch nhau cho khỏi chồng.
+			var dup := 0
+			for j in i:
+				if spots[j] == p:
+					dup += 1
+			m.position = Vector3(p.x + dup * 0.9, m.position.y, p.z)
 			m.set_meta("y", 2.2 if absf(p.z - DOOR_Z) > 0.5 else 4.2)

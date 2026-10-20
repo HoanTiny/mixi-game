@@ -2,7 +2,8 @@ extends SceneTree
 ## Người chơi máy chơi lát cắt ngày 18–22 trên màn phố thật: đi bộ tới từng nơi, làm việc qua thanh thời gian
 ## (trò chơi nhỏ coi như đủ chỉ tiêu), ăn, tắm, giặt, lục ve chai, nói chuyện, về xóm trọ ngủ, chọn sự kiện.
 ## In nhật ký từng ngày và bảng tổng kết để xem nhịp chơi.
-## Chạy: Godot --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo [--route=B] [--talk] [--seed=1]
+## Chạy: Godot --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo [--full] [--route=B] [--talk] [--seed=1]
+##   --full: chơi đủ 30 ngày từ ngày 1 (tới cảnh chính, làm việc nhờ, ngày 11 chọn tuyến theo --route)
 ##   --talk: nói chuyện với nhân vật khi có mạch chuyện mới
 
 const GameLogic := preload("res://scripts/game_logic.gd")
@@ -17,6 +18,7 @@ var game
 var hud
 var talk := false
 var route := "B"
+var full := false
 var stats := {"walk": 0.0, "work": 0.0, "talk": 0.0, "sleep_out": 0, "talks": 0, "chats": 0, "stuck": 0}
 var _day_log := []
 
@@ -26,6 +28,8 @@ func _initialize() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a == "--talk":
 			talk = true
+		elif a == "--full":
+			full = true
 		elif a.begins_with("--route="):
 			route = a.substr(8)
 		elif a.begins_with("--seed="):
@@ -41,9 +45,9 @@ func _run() -> void:
 	game = root.get_node("GameState").game
 	hud = w.hud
 	# --demo đã tự chọn sự kiện mở đầu; chơi lại từ đầu để tự chọn như người chơi.
-	game.new_game(route)
+	game.new_game("full" if full else route)
 	await process_frame
-	print("== Người chơi máy · tuyến %s · %s · %s" % [route, "có nói chuyện" if talk else "không nói chuyện", str(OS.get_cmdline_user_args())])
+	print("== Người chơi máy · %s · tuyến %s · %s · %s" % ["30 ngày" if full else "lát cắt", route, "có nói chuyện" if talk else "không nói chuyện", str(OS.get_cmdline_user_args())])
 	var guard := 0
 	while not game.is_over() and guard < 40:
 		guard += 1
@@ -62,11 +66,25 @@ func _play_day() -> void:
 	if talk:
 		for npc in _talk_plan():
 			await _talk(npc)
+	var late := []
+	for id in _sorted_scenes():
+		if _start_of(id) >= 15.0:
+			late.append(id)
+		else:
+			await _scene(id)
+	await _quests()
 	for id in _plan():
 		if game.day() != d or game.is_over():
 			break
+		if not late.is_empty() and game.clock() + float(game.get_action(id).get("hours", 0)) > _start_of(late[0]) + 1.0:
+			continue
 		await _care()
 		await _do(id)
+		await _quests()
+	for id in late:
+		if game.day() == d and not game.is_over():
+			await _scene(id)
+	await _quests()
 	await _scrap(d)
 	if game.day() == d and not game.is_over():
 		var t0: float = game.clock()
@@ -78,6 +96,68 @@ func _play_day() -> void:
 	var out := "" if game.day() != d or game.is_over() else " (chưa sang ngày!)"
 	print("Ngày %2d | %s → %s | Mệt %3d PĐ %3d | %s%s" % [d, GameLogic.fmt_k(m0), GameLogic.fmt_k(int(game.s.cash)),
 		int(game.s.fatigue), int(game.phong_do()), ", ".join(_day_log), out])
+
+
+func _sorted_scenes() -> Array:
+	var out: Array = game.scenes_today()
+	out.sort_custom(func(a, b) -> bool: return _start_of(a) < _start_of(b))
+	return out
+
+
+func _start_of(id: String) -> float:
+	var e: Dictionary = game.scene_info(id)
+	return float(e.window[0]) if e.has("window") else float(game.cfg.dayStart)
+
+
+## Đi tới nơi có cảnh chính; tới sớm thì ngồi chờ (thời gian trôi), quá khung giờ thì bỏ lỡ.
+func _scene(id: String) -> void:
+	var e: Dictionary = game.scene_info(id)
+	var d: int = game.day()
+	await _walk(str(e.loc))
+	if game.day() != d:
+		return
+	if e.has("window") and game.clock() < float(e.window[0]):
+		game.walk(float(e.window[0]) - game.clock())
+	if game.scene_lock(id) != "":
+		_day_log.append("lỡ cảnh %s (%s)" % [id, game.scene_lock(id)])
+		return
+	_day_log.append("%s cảnh %s" % [GameLogic.hh(game.clock()), id])
+	game.open_scene(id)
+	await _events()
+
+
+## Việc nhờ đang làm: đi tới chỗ cần tới, lục thùng rác đúng khúc phố, làm việc được yêu cầu.
+func _quests() -> void:
+	for n in 3:
+		for id in game.quests_active():
+			var step: Dictionary = game.quest_step(id)
+			var d: int = game.day()
+			match str(step.get("kind", "")):
+				"visit":
+					if step.has("window") and game.clock() < float(step.window[0]) - 1.5:
+						continue
+					await _walk(str(step.loc))
+					if game.day() != d:
+						return
+					if step.has("window") and game.clock() < float(step.window[0]):
+						game.walk(float(step.window[0]) - game.clock())
+					if not step.get("auto", false) and game.quest_step_lock(id) == "":
+						game.quest_visit(id)
+						_day_log.append("việc nhờ %s" % id)
+						await _events()
+				"find":
+					for b in w.bins:
+						if float(b.pos.x) >= float(step.x[0]) and float(b.pos.x) <= float(step.x[1]) and game.scrap_lock(b.id) == "" and game.quest_state(id) == "active" and game.quest_step(id) == step:
+							hud.close_location()
+							w._target = b.pos
+							var f := 0
+							while w._target != null and f < 3000 and game.day() == d:
+								f += 1
+								await physics_frame
+							w._scavenge(b.id)
+				"action":
+					await _do(str(step.action))
+		await process_frame
 
 
 ## Chỉ nói chuyện khi có mạch chuyện mới mở.
@@ -137,8 +217,8 @@ func _plan() -> Array:
 	if game.fatigue_warn():
 		p.append("nghi")
 	match str(game.s.route):
-		"A":
-			p.append_array(["ca_kho", "ca_phu_quan", "sua_do_le"])
+		"A", "":
+			p.append_array(["ca_kho", "sua_do_le"])
 		"B":
 			if not game.progress_ready():
 				p.append("ben_can_b")
@@ -225,6 +305,8 @@ func _events() -> void:
 		var e: Dictionary = game.current_event()
 		var before: int = game.s.queue.size()
 		var order: Array = PICKS.get(e.id, [])
+		if str(e.id) in ["ngay11", "missed:ngay11"]:
+			order = [GameLogic.ROUTES.find(route)]
 		for i in order + range(e.choices.size()):
 			if i < e.choices.size() and game.choice_lock(e.choices[i]) == "":
 				if not str(e.id).begins_with("talk") and not game.talks.has(e.get("who", "")):
@@ -239,6 +321,10 @@ func _events() -> void:
 
 
 func _report() -> void:
+	var over: Dictionary = game.s.over
+	if str(over.get("kind", "")) == "full":
+		var e: Dictionary = game.story.endings[over.key]
+		print("\nKẾT %s · %s · chỗ ở %s · Linh: %s · Bà Tư: %s · thẻ nghề: %s" % [over.key, e.title, game.housing().place, over.linh, over.ba_tu, str(over.npc)])
 	var r: Dictionary = game.slice_report()
 	print("\nTổng kết tuyến %s · tiền mặt %s · dự kiến ngày %d: %s · đủ cho %s" % [r.route, GameLogic.fmt_money(r.cash),
 		int(game.cfg.housingDeadline), GameLogic.fmt_money(r.proj_deadline), r.housing if r.housing != "" else "-"])

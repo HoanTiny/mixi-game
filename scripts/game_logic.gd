@@ -53,12 +53,15 @@ static func _read_json(path: String) -> Variant:
 
 # ---------------------------------------------------------------- bắt đầu
 
-## Bắt đầu lát cắt ở ngày 18 với trạng thái dựng sẵn của tuyến A, B hoặc C.
-func new_game(route: String) -> void:
-	var p: Dictionary = cfg.presets[route]
+## mode "full": chơi đủ 30 ngày từ ngày 1 (cfg.full). "A", "B", "C": lát cắt ngày 18–22
+## với trạng thái dựng sẵn của tuyến đó (cfg.presets).
+func new_game(mode: String) -> void:
+	var full := mode == "full"
+	var p: Dictionary = cfg.full if full else cfg.presets[mode]
 	_event_data = {}
 	s = {
-		"day": int(cfg.sliceStartDay), "used": 0.0, "route": route,
+		"mode": "full" if full else "slice",
+		"day": 1 if full else int(cfg.sliceStartDay), "used": 0.0, "route": "" if full else mode,
 		"cash": int(p.cash), "fatigue": float(p.fatigue), "warn_days": 0, "rest_skips": 0,
 		"progress": int(p.progress), "progress_need": int(p.progressNeed),
 		"receivables": [], "payables": [], "promises": [], "family": [],
@@ -68,6 +71,8 @@ func new_game(route: String) -> void:
 		"queue": [], "log": [], "history": [], "choices": [], "over": {},
 		"stats": {"earned": 0, "spent": 0, "start_cash": int(p.cash)},
 		"talks_done": [], "quests": {}, "qitems": {}, "inv": {}, "job_last": {},
+		"housing": {"state": "none", "place": "", "paid": 0, "seen": []},
+		"scenes": [], "scenes_done": [], "missed": [],
 	}
 	# Nhu cầu cơ thể kiểu Nobody: tự ăn ở quán, tắm, giặt đồ ở xóm trọ.
 	if cfg.has("needs"):
@@ -79,7 +84,9 @@ func new_game(route: String) -> void:
 		_add_payable(x)
 	for pr in p.promises:
 		_add_promise(pr)
-	add_log("Bắt đầu lát cắt: " + str(p.name), "event")
+	add_log(("Bắt đầu: " if full else "Bắt đầu lát cắt: ") + str(p.name), "event")
+	if full:
+		s.queue.append({"id": "mo_dau", "data": {}})
 	_morning()
 	_commit()
 
@@ -98,6 +105,58 @@ func is_started() -> bool:
 
 func is_over() -> bool:
 	return is_started() and not s.over.is_empty()
+
+
+## Đang chơi đủ 30 ngày (không phải lát cắt ngày 18–22).
+func is_full() -> bool:
+	return is_started() and s.get("mode", "slice") == "full"
+
+
+func last_day() -> int:
+	return 30 if is_full() else int(cfg.sliceEndDay)
+
+
+func housing() -> Dictionary:
+	if not s.has("housing"):
+		s["housing"] = {"state": "none", "place": "", "paid": 0, "seen": []}
+	return s.housing
+
+
+## Số tiền còn phải chi để vào ở chỗ k (trừ phần cọc đã đặt ở chính chỗ đó).
+func housing_cost(k: String) -> int:
+	var h := housing()
+	var cost := int(cfg.housing[k].cost)
+	if h.place == k:
+		cost -= int(h.get("paid", 0))
+	return maxi(0, cost)
+
+
+## Đã có chỗ thuê dài hạn (đã ký, không phải ở tạm).
+func has_long_home() -> bool:
+	var h := housing()
+	return h.state == "signed" and not bool(cfg.housing.get(h.place, {}).get("temp", false))
+
+
+## Số lần che giấu hoặc ép quyết định với gia đình, mỗi ngày tính một lần.
+func hidden_marks() -> int:
+	var days := {}
+	for f in s.family:
+		if f.kind == "conceal" or f.kind == "pressure":
+			days[int(f.day)] = true
+	return days.size()
+
+
+## Có lời hứa quá hạn, khoản phải trả chưa trả hoặc báo xong sai: những việc cần sửa ở ngày 30.
+func has_broken() -> bool:
+	if s.flags.get("falseCompletion", false) and not s.flags.get("suaSai", false):
+		return true
+	for p in s.promises:
+		if p.status == "overdue":
+			return true
+	for x in s.payables:
+		if x.status == "unpaid":
+			return true
+	return hidden_marks() >= 2
 
 
 func day() -> int:
@@ -303,9 +362,54 @@ func apply_effects(eff: Dictionary) -> void:
 				f["day"] = day()
 				s.family.append(f)
 			"special":
-				_special(str(v))
+				if v is Array:
+					for sp in v:
+						_special(str(sp))
+				else:
+					_special(str(v))
 			"log":
 				add_log(fill(str(v)), "event")
+			"route":
+				_set_route(str(v))
+			"receivables":
+				for x in v:
+					_add_receivable(x)
+					add_log("Thêm khoản phải thu: %s %s, hạn ngày %d" % [x.label, fmt_money(int(x.amount)), int(x.due)], "event")
+			"rested":
+				if v:
+					s.today["rested"] = true
+			"receivable_remove":
+				var r = _find(s.receivables, str(v))
+				if r != null:
+					s.receivables.erase(r)
+			"receivable_due":
+				var r = _find(s.receivables, str(v.id))
+				if r != null:
+					r["due"] = int(v.due)
+					add_log("Dời hạn %s sang ngày %d" % [r.label, int(v.due)], "warn")
+			"collect":
+				collect(str(v))
+			"payable_status":
+				var x = _find(s.payables, str(v.id))
+				if x != null:
+					x["status"] = str(v.status)
+			"housing":
+				_take_housing(str(v), false)
+			"housing_owed":
+				_take_housing(str(v), true)
+			"housing_reserve":
+				_reserve_housing(str(v))
+			"housing_seen":
+				if not housing().seen.has(str(v)):
+					housing().seen.append(str(v))
+			"quest_start":
+				var qa: Dictionary = v if v is Dictionary else {"id": str(v)}
+				if quest_state(str(qa.id)) == "":
+					quest_accept(str(qa.id), qa)
+			"linh_wish":
+				s.linh["wish"] = str(v)
+			"queue":
+				s.queue.append({"id": str(v), "data": {}})
 			_:
 				if key.begins_with("rep."):
 					add_rep(key.substr(4), float(v))
@@ -324,6 +428,53 @@ func apply_effects(eff: Dictionary) -> void:
 
 func _special(name: String) -> void:
 	match name:
+		"end_game":
+			s["end_now"] = true
+		"fix_broken":
+			# Ngày 30 sửa lời hứa đổ vỡ: khoản chưa trả được hẹn lại lịch, báo sai được nhận lại. Vẫn để dấu vết (kết E4).
+			for x in s.payables:
+				if x.status == "unpaid":
+					x["status"] = "renegotiated"
+			for p in s.promises:
+				if p.status == "overdue":
+					p["status"] = "renegotiated"
+			s.flags["suaSai"] = true
+			s.flags["suaSaiGiaDinh"] = true
+			if s.flags.get("falseCompletion", false):
+				s.flags["thuHepCuoi"] = true
+		"rain":
+			s.today["rain"] = true
+		"client_buys_materials":
+			# Khách tự mua vật tư: bỏ các khoản vật tư phải trả, tính lại giá dịch vụ (8,4tr − 4tr vật tư = 4,4tr)
+			# theo cùng tỉ lệ 40/30/30. Phần ứng khi ký đã nhận dư thì hoàn lại cho anh Phúc.
+			var removed := 0
+			for x in s.payables.duplicate():
+				if str(x.id).begins_with("vat_tu") and x.status == "pending":
+					removed += int(x.amount)
+					s.payables.erase(x)
+			var service := int(cfg.contract.total) - int(cfg.contract.materials)
+			var sign = _find(s.receivables, "hd_ky")
+			var new_sign := round_k(service * 0.4)
+			if sign != null and sign.status == "collected" and int(sign.amount) > new_sign:
+				_add_payable({"id": "hoan_ung", "to": "PHUC", "label": "Hoàn phần ứng vật tư cho anh Phúc", "amount": int(sign.amount) - new_sign, "due": day() + 1})
+			for id in ["hd_giua", "hd_cuoi"]:
+				var r = _find(s.receivables, id)
+				if r != null and r.status == "pending":
+					r["amount"] = round_k(service * 0.3)
+			s.flags["khachMuaVatTu"] = true
+			add_log("Khách tự mua vật tư: bỏ %s vật tư phải trả, giá dịch vụ còn %s" % [fmt_money(removed), fmt_money(service)], "event")
+		"narrow_final":
+			# Bàn giao phần đã đạt, thu hẹp phần chưa làm: đợt cuối tính theo tiến độ thật, phần dở hẹn trả dần sau ngày 30.
+			var last = _find(s.receivables, "hd_cuoi")
+			if last != null and last.status == "pending":
+				var ratio := minf(1.0, float(s.progress) / maxf(1.0, float(s.progress_need)))
+				last["amount"] = round_k(float(last.amount) * ratio * 0.8)
+			s["progress_need"] = int(s.progress)
+			s.flags["thuHepCuoi"] = true
+			for p in s.promises:
+				if p.get("doneIf", "") == "progress_ready" and p.status == "open":
+					p["status"] = "renegotiated"
+			add_log("Thu hẹp phần cuối: bàn giao phần đạt, phần dở ghi lịch trả lại", "event")
 		"narrow_contract":
 			# Nhận phần đã nghiệm thu theo tiến độ thật, thu hẹp phần còn lại.
 			var mid = _find(s.receivables, "hd_giua")
@@ -345,11 +496,54 @@ func _special(name: String) -> void:
 			add_log("Thu hẹp hợp đồng: đợt cuối còn 1.000.000đ, công đội giảm 400.000đ", "event")
 		"linh_decides":
 			# Linh tự quyết theo mong muốn của em. Thái độ của An chỉ đổi cách em báo tin.
+			if s.flags.get("linhLoHoSo", false) and not s.flags.get("diCungLinh", false):
+				s.linh["wish"] = "hoan"
 			s.linh["decision"] = s.linh.wish
 			s.linh["contact"] = "lanh" if count_family("LINH", "pressure") >= 2 else "binh_thuong"
 			s.queue.push_front({"id": "linh_quyet", "data": {}})
 		_:
 			push_warning("Hiệu ứng đặc biệt không rõ: " + name)
+
+
+## Chọn tuyến nghề ở ngày 11. Tuyến B, C nhận hợp đồng Bến Cạn: các khoản thu, chi, lời hứa trong cfg.contracts.
+func _set_route(r: String) -> void:
+	s["route"] = r
+	add_log("Chọn tuyến " + {"A": "A · làm công", "B": "B · tổ đội", "C": "C · dịch vụ riêng"}.get(r, r), "event")
+	var c: Dictionary = cfg.get("contracts", {}).get(r, {})
+	if c.is_empty():
+		return
+	for x in c.get("receivables", []):
+		_add_receivable(x)
+	for x in c.get("payables", []):
+		_add_payable(x)
+	for x in c.get("promises", []):
+		_add_promise(x)
+	s["progress_need"] = int(s.progress) + int(c.progressNeed)
+
+
+## Vào ở chỗ k: trả phần còn thiếu. owed: ở tạm nhà dì Năm chưa đủ tiền thì ghi khoản góp sau.
+func _take_housing(k: String, owed: bool) -> void:
+	var h := housing()
+	var cost := housing_cost(k)
+	var name := str(cfg.housing[k].name)
+	if owed and int(s.cash) < cost:
+		_add_payable({"id": "gop_di_nam", "to": "", "label": "Góp tiền ở nhờ nhà dì Năm", "amount": cost, "due": 33})
+	else:
+		spend(cost, "Vào ở: " + name)
+	h["state"] = "signed"
+	h["place"] = k
+	h["paid"] = int(cfg.housing[k].cost)
+	add_log("Chốt chỗ ở: " + name, "event")
+
+
+## Đặt cọc giữ chỗ k: tiền cọc không còn là tiền tiêu được, chưa phải đã vào ở được.
+func _reserve_housing(k: String) -> void:
+	var h := housing()
+	var dep := int(cfg.housing[k].get("deposit", 0))
+	spend(dep, "Đặt cọc giữ chỗ: " + str(cfg.housing[k].name))
+	h["state"] = "reserved"
+	h["place"] = k
+	h["paid"] = dep
 
 
 # ---------------------------------------------------------------- điều kiện
@@ -389,6 +583,54 @@ func check(req: Dictionary) -> String:
 		elif key == "progress_ready":
 			if progress_ready() != bool(v):
 				fail = "-"
+		elif key == "mode":
+			if s.get("mode", "slice") != v:
+				fail = "-"
+		elif key == "afford_housing":
+			if int(s.cash) < housing_cost(v):
+				fail = "Cần %s tiền mặt (đang có %s)" % [fmt_money(housing_cost(v)), fmt_money(int(s.cash))]
+		elif key == "housing_state":
+			var hs: String = housing().state
+			if not (hs in v if v is Array else hs == v):
+				fail = "-"
+		elif key == "long_home":
+			if has_long_home() != bool(v):
+				fail = "-"
+		elif key == "housing_seen":
+			if not housing().seen.has(v):
+				fail = "Chưa đi xem chỗ này"
+		elif key == "receivable_pending":
+			var r = _find(s.receivables, str(v))
+			if r == null or r.status != "pending":
+				fail = "-"
+		elif key == "fatigue_min":
+			if float(s.fatigue) < float(v):
+				fail = "-"
+		elif key == "fatigue_max":
+			if float(s.fatigue) > float(v):
+				fail = "Đang quá mệt"
+		elif key == "quest_done":
+			if quest_state(str(v)) != "done":
+				fail = "-"
+		elif key == "quest_failed":
+			if quest_state(str(v)) != "failed":
+				fail = "-"
+		elif key == "broken":
+			if has_broken() != bool(v):
+				fail = "Không có lời hứa nào cần sửa" if bool(v) else "-"
+		elif key == "hidden_min":
+			if hidden_marks() < int(v):
+				fail = "-"
+		elif key == "flag_any":
+			var any := false
+			for f in v:
+				if s.flags.get(f, false):
+					any = true
+			if not any:
+				fail = "-"
+		elif key == "support_min":
+			if count_family(str(v.who), "support") < int(v.n):
+				fail = "-"
 		else:
 			push_warning("Điều kiện không rõ: " + str(key))
 		if fail != "":
@@ -426,6 +668,10 @@ func is_hidden(a: Dictionary) -> bool:
 		return true
 	if a.has("showIfFlag") and not s.flags.get(a.showIfFlag, false):
 		return true
+	if a.has("showIfPromise"):
+		var p = _find(s.promises, str(a.showIfPromise))
+		if p == null or p.status != "open":
+			return true
 	return false
 
 
@@ -548,6 +794,13 @@ func find_event(id: String) -> Dictionary:
 			return e
 	if id == "talk_chat":
 		return {"id": id, "title": "{npc}", "text": "{line}", "choices": [{"label": "Chào rồi đi", "hint": "{npc} +{chat_rep}"}]}
+	if id.begins_with("missed:"):
+		var base := _merge_variants(find_event(id.substr(7)))
+		if base.is_empty():
+			return {}
+		return {"id": id, "eyebrow": "Hôm qua An không tới", "title": base.title, "who": base.get("who", ""),
+			"text": base.get("missed", "Việc hôm qua đã có người khác lo."),
+			"choices": base.get("missed_choices", [{"label": "Tiếp tục", "effects": base.get("missed_effects", {})}])}
 	for npc in talks:
 		for b in talks[npc].get("story", []):
 			if b.id == id:
@@ -567,6 +820,16 @@ func current_event() -> Dictionary:
 	if base.is_empty():
 		push_error("Không tìm thấy sự kiện: " + str(q.id))
 		return {}
+	var e := _merge_variants(base)
+	if not e.has("choices"):
+		e["choices"] = [{"label": "Tiếp tục"}]
+	if not e.has("eyebrow"):
+		e["eyebrow"] = "Ngày %d · %s" % [day(), weekday_name()]
+	return e
+
+
+## Sự kiện đã gộp biến thể đầu tiên thỏa điều kiện.
+func _merge_variants(base: Dictionary) -> Dictionary:
 	var e := base.duplicate()
 	for variant in base.get("variants", []):
 		if check(variant.get("when", {})) == "":
@@ -574,10 +837,6 @@ func current_event() -> Dictionary:
 				if k != "when":
 					e[k] = variant[k]
 			break
-	if not e.has("choices"):
-		e["choices"] = [{"label": "Tiếp tục"}]
-	if not e.has("eyebrow"):
-		e["eyebrow"] = "Ngày %d · %s" % [day(), weekday_name()]
 	return e
 
 
@@ -598,8 +857,16 @@ func resolve_choice(i: int) -> void:
 	s.queue.pop_front()
 	s.choices.append({"day": day(), "event": e.id, "choice": fill(c.label)})
 	apply_effects(c.get("effects", {}))
+	for b in c.get("bonus", []):
+		if check(b.get("when", {})) == "":
+			apply_effects(b.get("effects", {}))
 	_quest_choice(str(e.id), c)
 	_event_data = {}
+	if s.get("end_now", false):
+		s.erase("end_now")
+		s["queue"] = []
+		finish_day()
+		return
 	_commit()
 
 
@@ -630,25 +897,92 @@ func fill(text: String) -> String:
 		"npc": str(_event_data.get("npc", "")),
 		"line": str(_event_data.get("line", "")),
 		"chat_rep": str(int(cfg.get("chatRep", 2))),
+		"cash": fmt_money(int(s.get("cash", 0))),
+		"cost_hem_dua": fmt_money(housing_cost("hem_dua")) if is_started() else "",
+		"cost_cau_tre": fmt_money(housing_cost("cau_tre")) if is_started() else "",
 	}
 	for k in vals:
 		text = text.replace("{" + k + "}", vals[k])
 	return text
 
 
+## Sự kiện cố định của ngày d. Sự kiện có "loc" là cảnh chính ở một địa điểm: không bật lên buổi sáng
+## mà chờ An tới nơi (thẻ ★ ở địa điểm, dấu trên phố); bỏ lỡ thì sáng hôm sau có tin "Hôm qua An không tới".
 func _events_for_day(d: int) -> Array:
 	var out := []
 	for e in events:
 		if e.get("system", false):
 			continue
 		var on: bool = e.has("day") and int(e.day) == d
-		if on and check(e.get("when", {})) == "":
+		if not on or (e.has("mode") and e.mode != s.get("mode", "slice")):
+			continue
+		if e.has("loc"):
+			s.scenes.append(str(e.id))
+		elif check(e.get("when", {})) == "":
 			out.append({"id": e.id, "data": {}})
 	return out
 
 
 func _morning() -> void:
+	if not s.has("scenes"):
+		s["scenes"] = []
+		s["scenes_done"] = []
+		s["missed"] = []
+	s["scenes"] = []
+	for id in s.missed:
+		s.queue.append({"id": "missed:" + str(id), "data": {}})
+	s["missed"] = []
+	if is_full():
+		for d in cfg.get("rainDays", []):
+			if int(d) == day():
+				s.today["rain"] = true
+		# Hợp đồng Bến Cạn chỉ giữ tới hết ngày 12: chưa chọn tuyến thì đi theo đường làm công.
+		if s.route == "" and day() >= 13:
+			_set_route("A")
 	s.queue.append_array(_events_for_day(day()))
+
+
+## Cảnh chính hôm nay còn chờ (đã thỏa điều kiện, chưa xem).
+func scenes_today() -> Array:
+	var out := []
+	for id in s.get("scenes", []):
+		if not s.scenes_done.has(id) and check(find_event(id).get("when", {})) == "":
+			out.append(id)
+	return out
+
+
+## Cảnh chính đã gộp biến thể (tên, địa điểm, khung giờ có thể đổi theo tuyến).
+func scene_info(id: String) -> Dictionary:
+	return _merge_variants(find_event(id))
+
+
+func scene_cards_at(loc: String) -> Array:
+	var out := []
+	for id in scenes_today():
+		if str(scene_info(id).loc) == loc:
+			out.append(id)
+	return out
+
+
+func scene_lock(id: String) -> String:
+	if not is_started() or is_over() or not s.queue.is_empty():
+		return "-"
+	var e := scene_info(id)
+	if e.has("window") and (clock() < float(e.window[0]) or clock() > float(e.window[1])):
+		return "Chỉ trong khung %s–%s" % [hh(float(e.window[0])), hh(float(e.window[1]))]
+	if hours_left() < float(e.get("hours", 0.5)):
+		return "Không đủ giờ hôm nay"
+	return ""
+
+
+## Tới nơi và mở cảnh chính: tốn một chút thời gian, rồi hiện hộp thoại lựa chọn.
+func open_scene(id: String) -> void:
+	if scene_lock(id) != "":
+		return
+	s.scenes_done.append(id)
+	s["used"] = float(s.used) + float(scene_info(id).get("hours", 0.5))
+	s.queue.append({"id": id, "data": {}})
+	_commit()
 
 
 # ---------------------------------------------------------------- cuối ngày
@@ -666,7 +1000,7 @@ func night_preview() -> Dictionary:
 		"living": int(cfg.livingCostPerDay), "free_hours": hours_left(),
 		"recover": -(float(cfg.fatigue.sleep) + hours_left() * float(cfg.fatigue.freeHour)),
 		"due_pay": due_pay, "due_recv": due_recv,
-		"slice_end": day() >= int(cfg.sliceEndDay),
+		"slice_end": day() >= last_day(),
 	}
 
 
@@ -685,6 +1019,9 @@ func finish_day() -> void:
 	spend(int(cfg.livingCostPerDay), "Sinh hoạt cả nhà")
 
 	# Mệt: đếm ngày ở mức cảnh báo và những lần bỏ qua cơ hội nghỉ, rồi hồi qua đêm.
+	# Mệt cuối ngày dùng cho kết E6; sáng ngày 30 kết thúc ngay nên giữ số của tối ngày 29.
+	if not (is_full() and day() >= last_day()):
+		s["fatigue_end"] = float(s.fatigue)
 	if fatigue_warn():
 		s["warn_days"] = int(s.warn_days) + 1
 		if not s.today.get("rested", false):
@@ -704,6 +1041,7 @@ func finish_day() -> void:
 			collect(r.id)
 			if r.get("needsProgress", false):
 				tonight.append({"id": "hd_giua_ok", "data": {"amount": int(r.amount)}})
+				_contract_phase2()
 
 	# Khoản phải trả đến hạn.
 	for x in s.payables:
@@ -729,15 +1067,24 @@ func finish_day() -> void:
 			p["status"] = "overdue"
 			add_rep(p.to, -8)
 			add_log("Lời hứa quá hạn: " + str(p.text), "warn")
+			apply_effects(p.get("onOverdue", {}))
 
 	s.history.append({
 		"day": day(), "cash": int(s.cash), "fatigue": float(s.fatigue),
 		"proj26": projected_cash(int(cfg.housingDeadline)), "actions": s.today.list.duplicate(),
 	})
 
-	if day() >= int(cfg.sliceEndDay):
+	# Cảnh chính chưa tới thì sáng mai có tin kể lại (không tự hoàn thành thay người chơi).
+	for id in s.get("scenes", []):
+		if not s.scenes_done.has(id) and check(find_event(id).get("when", {})) == "" and find_event(id).has("missed"):
+			s.missed.append(id)
+
+	if day() >= last_day():
 		s["queue"] = tonight
-		s["over"] = {"kind": "slice"}
+		if is_full():
+			_end_full()
+		else:
+			s["over"] = {"kind": "slice"}
 		_commit()
 		return
 
@@ -748,6 +1095,99 @@ func finish_day() -> void:
 	s["queue"] = tonight
 	_morning()
 	_commit()
+
+
+## Sau nghiệm thu giữa kỳ (chơi đủ 30 ngày): giai đoạn cuối cần thêm buổi làm, bàn giao trước ngày 27.
+func _contract_phase2() -> void:
+	if not is_full():
+		return
+	var c: Dictionary = cfg.get("contracts", {}).get(s.route, {})
+	if c.is_empty() or s.flags.get("thuHep", false):
+		return
+	s["progress_need"] = int(s.progress_need) + int(c.phase2Need)
+	_add_promise({"id": "ban_giao_cuoi", "text": "Bàn giao giai đoạn cuối cho dãy Bến Cạn", "to": "PHUC", "due": 27, "doneIf": "progress_ready"})
+	add_log("Giai đoạn cuối: cần thêm %d buổi làm, bàn giao trước tối ngày 27" % int(c.phase2Need), "event")
+
+
+## Hết ngày 30: chưa có chỗ nào thì cả nhà sang chỗ tạm đã gieo từ ngày 3, rồi chọn kết thúc.
+func _end_full() -> void:
+	var h := housing()
+	if h.state != "signed":
+		var where := "di_nam"
+		add_log("Chưa chốt được phòng: cả nhà sang ở nhờ nhà dì Năm như đã hỏi từ trước", "warn")
+		_take_housing(where, true)
+		s.flags["tamTuDong"] = true
+	var key := ending_key()
+	s["over"] = {"kind": "full", "key": key, "linh": linh_card(), "ba_tu": ba_tu_card(), "npc": npc_card()}
+	add_log("Kết thúc: " + str(story.endings[key].title), "event")
+
+
+## Thứ tự xét E8 → E6 → E7 → E5 → E4 → E2 → E3 → E1, dừng ở điều kiện đầu tiên đúng.
+func ending_key() -> String:
+	var f: Dictionary = s.flags
+	var e: Dictionary = cfg.endings
+	if f.get("falseCompletion", false) and not f.get("suaSai", false):
+		return "E8"
+	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
+			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+		return "E6"
+	if not has_long_home():
+		return "E7"
+	if hidden_marks() >= int(e.distantMarks) and (f.get("giauNgay25", false) or count_family("LINH", "pressure") >= 2) \
+			and not f.get("suaSaiGiaDinh", false):
+		return "E5"
+	var unpaid := 0
+	for x in s.payables:
+		if x.status == "unpaid" or x.status == "renegotiated":
+			unpaid += 1
+	# Thu hẹp gọn ở ngày 20 không tính; E4 là khi còn phần dở hay khoản trả lại phải hẹn lịch.
+	if f.get("thuHepCuoi", false) or unpaid > 0:
+		return "E4"
+	if s.route == "B":
+		return "E2"
+	if s.route == "C" and int(s.cash) >= int(e.ownTableCash):
+		return "E3"
+	return "E1"
+
+
+func linh_card() -> String:
+	if s.linh.contact == "lanh":
+		return "lanh"
+	if s.linh.decision != "":
+		return str(s.linh.decision)
+	return "chua"
+
+
+func ba_tu_card() -> String:
+	var joined: bool = s.flags.get("baTuThuDuong", false) or s.flags.get("baTuChonUuTien", false) \
+		or count_family("BA_TU", "support") >= 2
+	var promise = _find(s.promises, "dua_ba_di_cho")
+	if not has_long_home():
+		return "ro_nhua" if joined else "lo"
+	if promise != null and promise.status == "overdue":
+		return "lo"
+	if joined:
+		return "tot"
+	if promise != null:
+		return "hua"
+	return "lo"
+
+
+## Thẻ quan hệ nghề nổi bật nhất: người có độ thân thiết lệch xa mức 50 nhất.
+func npc_card() -> Dictionary:
+	var best := ""
+	var gap := -1
+	for k in story.get("npcCards", {}):
+		var d := absi(int(s.rep.get(k, 50)) - 50)
+		if d > gap:
+			gap = d
+			best = k
+	if best == "":
+		return {}
+	var good: bool = int(s.rep.get(best, 50)) >= 50
+	if best == "TRAM" and s.flags.get("falseCompletion", false):
+		good = false
+	return {"who": best, "good": good}
 
 
 ## Bảng tổng kết lát cắt: dòng tiền, chỗ ở dự kiến, Linh, bà Tư, lời hứa, sổ gia đình.
@@ -1024,6 +1464,8 @@ func _add_item(k: String, n: int) -> void:
 func quest_offerable(q: Dictionary) -> bool:
 	if not is_started() or is_over():
 		return false
+	if not q.get("offer", true):
+		return false
 	var st: Dictionary = _qs().get(q.id, {})
 	if not st.is_empty() and not (st.state == "declined" and day() > int(st.day)):
 		return false
@@ -1191,8 +1633,12 @@ func _quest_event(id: String) -> Dictionary:
 	return {}
 
 
-func quest_accept(id: String) -> void:
-	var q := quest_def(id)
+## over: ghi đè hạn khi việc nhờ được mở từ một lựa chọn trong cảnh chính, ví dụ {"deadline_hour": 12}.
+func quest_accept(id: String, over: Dictionary = {}) -> void:
+	var q := quest_def(id).duplicate()
+	for k in ["deadline_days", "deadline_hour"]:
+		if over.has(k):
+			q[k] = over[k]
 	_qs()[id] = {"state": "active", "step": 0, "day": day(), "deadline": _quest_deadline(q, day()), "progress": 0, "misses": 0}
 	add_log("Nhận việc nhờ: " + str(q.title), "event")
 	apply_effects(q.get("accept_effects", {}))

@@ -7,7 +7,7 @@ const NOTES_PATH := "user://notes.json"
 
 var game: GameLogic
 ## Chạy với "-- --demo" để vào thẳng ngày 18 tuyến B mà không ghi đè bản lưu thật;
-## thêm "--demo-route=A" hoặc "=C" để đổi tuyến.
+## thêm "--demo-route=A" hoặc "=C" để đổi tuyến, "--demo-full" để chơi từ ngày 1.
 var _persist := true
 ## Chỗ An hiện ra khi về lại phố từ màn khác (để dành cho các màn ngoài phố sau này).
 var spawn_at := ""
@@ -23,7 +23,8 @@ func _ready() -> void:
 		for arg in args:
 			if arg.begins_with("--demo-route="):
 				route = arg.substr(13)
-		game.new_game(route)
+		# "--demo-full": chơi đủ 30 ngày từ ngày 1 thay vì lát cắt.
+		game.new_game("full" if args.has("--demo-full") else route)
 		var guard := 0
 		while not game.s.queue.is_empty() and guard < 10:
 			guard += 1

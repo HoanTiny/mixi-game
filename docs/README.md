@@ -2,7 +2,7 @@
 
 "Trước mùa mưa" là cốt truyện chính mới của game, thay cho cốt truyện "Lên Phố" cũ (Minh trả nợ nặng lãi, lo học phí cho Lan). Bộ tài liệu này viết lại hồ sơ cốt truyện bản 1.0 thành từng phần để đội làm game tra cứu và chuyển dần vào code.
 
-Trạng thái: **đã chơi được lát cắt ngày 18–22**. Các ngày còn lại và 8 kết thúc chưa làm. Tiến độ chi tiết và việc còn lại nằm ở [08-chuyen-sang-game.md](cot-truyen/08-chuyen-sang-game.md).
+Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát cắt ngày 18–22 để thử nhanh. Tiến độ chi tiết và việc còn lại nằm ở [08-chuyen-sang-game.md](cot-truyen/08-chuyen-sang-game.md).
 
 ## Đọc theo thứ tự
 
