@@ -4,7 +4,7 @@ Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*,
 
 Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
 
-**Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29, chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
+**Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29 (rạch dâng, chỗ trũng ngập, lội nước tốn giờ), chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
 
 **Chỗ ở trên phố:** Phòng Hẻm Dừa trong hẻm cụt rẽ ra từ đường Chợ, Phòng Cầu Tre bên kia rạch (qua cây cầu tre sau Bến Cạn), nhà dì Năm ở đầu đường An Hòa gần trạm xe. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
 
@@ -80,6 +80,7 @@ scripts/
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/character.gd   nhân vật có khớp dựng bằng khối: An, 8 nhân vật, người đi đường; hoạt cảnh đi, đứng, ngồi xe
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
+  world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
   world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
   world/street_map.gd  bản đồ nhỏ và bản đồ lớn (phím M), bấm để đi tới
   world/hud.gd    HUD kiểu Nobody: mục tiêu, tiền và Mệt, bảng địa điểm, điện thoại, Sổ, Nhật ký, việc nhờ

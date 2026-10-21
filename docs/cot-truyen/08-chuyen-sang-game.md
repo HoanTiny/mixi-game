@@ -20,7 +20,9 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - **Lương cũ** ngày 4 → 17 → 24 (hai mốc, khép sớm 2,8 triệu, hoặc chưa chốt).
   - **Tuyến nghề ngày 11** tạo các khoản thu chi của hợp đồng theo `contracts` trong `config.json`; nghiệm thu giữa kỳ ngày 20 mở giai đoạn cuối, bàn giao trước ngày 27. Ngày 12 khách tự mua vật tư thì tính lại giá dịch vụ 4,4 triệu và hoàn phần ứng dư.
   - **Chỗ ở thật:** xem phòng (ngày 3 hoặc việc tùy chọn ở chợ), đặt cọc giữ chỗ (ngày 12 lựa chọn dùng tiền ứng), chốt ngày 26, chưa chốt thì hết ngày 30 sang ở nhờ dì Năm.
-  - **Mưa ngày 15 và 29:** trời xám, mưa rơi trên phố, đèn đường bật sớm. Thiệt hại tùy việc chuẩn bị ngày 14, 23, 28, không tung xúc xắc.
+  - **Mưa ngày 15 và 29:** trời xám, sương mờ, mưa rơi trên phố, đèn đường bật sớm. Thiệt hại tùy việc chuẩn bị ngày 14, 23, 28, không tung xúc xắc.
+  - **Mưa trên bản đồ** (`scripts/world/rain_layer.gd`, mức ngập ở `rainFlood` của `config.json`): rạch dâng tràn hai bờ, vũng nước trên đường, gợn nước chỗ mưa rơi, nước bắn quanh chân, An che dù, phố vắng bớt người và xe. Ngày 15 ngập Hẻm Bờ Nam; ngày 29 ngập thêm đường Bờ Me và khúc cuối các hẻm đổ ra rạch (nước đục màu phù sa). Lội chỗ ngập đi chậm hơn và tốn giờ gấp 1,6 lần; bản đồ tô xanh chỗ ngập.
+  - Trước xóm trọ thấy ngay kết quả chuẩn bị: đã chuẩn bị thì thùng đồ kê gạch, trùm bạt xanh, đồ phơi đã cất; Linh che giùm thì chỉ phần của em và bà được che; bỏ chuẩn bị thì thùng ướt sẫm màu, thau hứng nước dột, đồ phơi ướt sũng trên dây. Ngày 14 chia việc cho cả xóm thì nhà hàng xóm dọc Bờ Me cũng phủ bạt.
   - **8 kết thúc E1–E8** xét theo thứ tự E8 → E6 → E7 → E5 → E4 → E2 → E3 → E1 (`ending_key()` trong `game_logic.gd`, ngưỡng ở `endings` của `config.json`), màn kết có thẻ Linh, thẻ bà Tư, một thẻ quan hệ nghề và các khoản còn phải xử lý.
   - Việc tùy chọn theo ngày và việc giữ lời hứa (`showIfPromise`) ở các địa điểm; việc nhờ mở từ lựa chọn trong cảnh (sửa quạt ngày 2, giao 12 suất ngày 6, đón Bắp ngày 9).
   - `tests/sim.gd` chạy thêm 30 ngày cho 3 tuyến × 4 cách chơi; `tests/playtest.gd -- --demo --full` cho người chơi máy đi hết 30 ngày trên màn phố thật.
@@ -49,7 +51,7 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - `city_map.gd` chia lô nhà theo mặt tiền từng đường, đánh số nhà kiểu thật (lẻ, chẵn, gạch chéo trong hẻm), dựng lưới đi bộ 1 m và tìm đường A*. Thời gian đi bộ tính theo quãng đường thật (`walkHoursPerMeter` 0,0022), tiền giao hàng theo mét đi thật.
   - Việc nhờ "tìm" dùng vùng chữ nhật trên bản đồ (`area`) thay vì khúc phố theo trục x.
   - Bản đồ lớn (phím M) có tên đường, tên rạch; bấm chỗ nào đi tới chỗ đó.
-- **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
+- **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử, cho nhân vật đi lại theo giờ trên bản đồ (bà Tư ra chợ, Linh ra bến xe), người bán rong rao vào từng hẻm.
 
 ## Câu hỏi đã chốt
 

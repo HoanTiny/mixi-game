@@ -14,6 +14,7 @@ const Surfaces := preload("res://scripts/world/surfaces.gd")
 const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
+const RainLayer := preload("res://scripts/world/rain_layer.gd")
 
 ## Xóm trọ của An: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối.
 const HOME := "xom_bo_me"
@@ -880,6 +881,7 @@ func _build_clothesline(holder: Node3D) -> void:
 	for i in 4:
 		var c := _block(Vector3(0.5, 0.62, 0.03), Vector3(-5.1 + i * 0.72, 1.7, 1.8), Color(shirt_colors[i]), holder)
 		c.rotation.z = randf_range(-0.05, 0.05)
+		c.add_to_group("do_phoi")
 
 
 ## Đồ đạc bày trước nhà: thùng nhựa chồng nhau, thùng các-tông, chậu cây, giỏ mây.
@@ -1108,7 +1110,7 @@ func _physics_process(delta: float) -> void:
 		step = _follow_path(_speed() * delta)
 	if step != Vector3.ZERO:
 		player.position += step
-		_add_walk(step.length())
+		_add_walk(step.length() * (RainLayer.WADE_COST if _wading() else 1.0))
 		audio.step(delta)
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
 		if player_body.has_method("animate"):
@@ -1213,6 +1215,8 @@ func _update_cutaway() -> void:
 ## Phong độ thấp thì lê bước, đi chậm hẳn.
 func _speed() -> float:
 	var v := SPEED
+	if _wading():
+		v *= RainLayer.WADE_SPEED
 	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
 		v *= 0.7
 	# Đang khiêng đồ của việc nhờ (xe đạp, cơm suất, con mèo) thì đi chậm hơn một chút.
@@ -1226,6 +1230,16 @@ func _speed() -> float:
 				v *= 0.8
 				break
 	return v
+
+
+## An đang lội qua chỗ ngập ngày mưa.
+func _wading() -> bool:
+	return _rain_layer != null and _rain_layer.wading(Vector2(player.position.x, player.position.z))
+
+
+## Vùng ngập hôm nay (rỗng nếu tạnh), cho bản đồ tô màu.
+func flood_rects() -> Array:
+	return [] if _rain_layer == null else _rain_layer.flood_rects()
 
 
 func nearest_bin() -> String:
@@ -1479,9 +1493,24 @@ func _update_lighting(hour: float) -> void:
 		lamp.visible = on
 		lamp.light_energy = 2.2 if on else 0.0
 	_set_rain(rain)
+	# Mưa: sương xám dày hơn, nhìn xa mờ hẳn.
+	env.fog_light_color = Color("8f98a3") if rain else Color("8f8c86")
+	env.fog_density = 0.0065 if rain else 0.004
+	# Mức ngập: theo rainFlood trong config (ngày 15 mức 1, ngày 29 mức 2).
+	var lvl := 0
+	if rain:
+		lvl = int(game.cfg.get("rainFlood", {}).get(str(game.day()), 1))
+	if lvl > 0 and _rain_layer == null:
+		_rain_layer = RainLayer.new()
+		_rain_layer.world = self
+		add_child(_rain_layer)
+		_rain_layer.build()
+	if _rain_layer != null:
+		_rain_layer.apply(lvl, game.s.flags)
 
 
 var _rain: CPUParticles3D
+var _rain_layer: Node3D
 
 
 func _set_rain(on: bool) -> void:

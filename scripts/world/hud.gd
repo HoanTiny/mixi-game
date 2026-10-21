@@ -889,6 +889,8 @@ func _tip_due(id: String) -> bool:
 			return not game.quest_offers().is_empty()
 		"ve_chai":
 			return _prompt_id.begins_with("bin:")
+		"mua":
+			return bool(s.today.get("rain", false))
 		"dien_thoai":
 			return game.day() >= 2
 		"toi":

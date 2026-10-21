@@ -59,6 +59,7 @@
     "di_nam": { "name": "Ở tạm nhà dì Năm (7 ngày)", "cost": 500000, "temp": true, "loc": "nha_di_nam", "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được." }
   },
   "rainDays": [15, 29],
+  "rainFlood": {"15": 1, "29": 2},
   "endings": { "exhaustWarnDays": 4, "exhaustSkips": 3, "exhaustFatigue": 60, "distantMarks": 3, "ownTableCash": 600000 },
   "full": {
     "name": "Ba mươi ngày trước mùa mưa",

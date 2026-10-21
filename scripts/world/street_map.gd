@@ -152,6 +152,9 @@ func _draw() -> void:
 	for id in city.order:
 		var st: Dictionary = city.streets[id]
 		draw_rect(_rect(st.rect), STREET_COLORS.get(str(st.kind), Color("8b8780")))
+	# Ngày mưa: chỗ ngập tô xanh nước.
+	for r in world.flood_rects():
+		draw_rect(_rect(r), Color(0.3, 0.55, 0.68, 0.75))
 	for id in city.locs:
 		var p: Dictionary = city.locs[id]
 		var c := Color(world.LOCATIONS[id].color)
