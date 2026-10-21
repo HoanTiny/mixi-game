@@ -33,7 +33,8 @@
     "promise_status": {
      "id": "quat_truoc_trua",
      "status": "done"
-    }
+    },
+    "diary": "Cái quạt của cô bán trái cây chạy lại. Cô trả tiền, còn dúi thêm hai trái xoài: \"Cho bà.\""
    },
    "reward_text": "Cô bán trái cây bật quạt, gió thổi bay mấy tờ giấy gói. \"Chạy êm hơn hồi mới mua!\" Cô dúi thêm cho An hai trái xoài. Chú Sáu chỉ hỏi một câu: \"Tụ hả?\" rồi gật gù.",
    "fail": {
@@ -124,7 +125,8 @@
     "cash_label": "Chị Hạnh trả công chở 20 suất cơm",
     "flag.comQuen": true,
     "rep.HANH": 5,
-    "rep.PHUC": 2
+    "rep.PHUC": 2,
+    "diary": "Hai mươi suất cơm tới Bến Cạn còn bốc khói. Từ giờ ăn ở quán chị Hạnh có thêm chén canh."
    },
    "reward_text": "Cơm tới nơi còn bốc khói. Anh Phúc đếm đủ 20 hộp, gật gù. Chị Hạnh nhắn: \"Được việc. Từ giờ ăn ở quán chị tính giá quen, có thêm chén canh.\"",
    "fail": {
@@ -185,7 +187,8 @@
    "reward": {
     "cash": 120000,
     "cash_label": "Cô Út trả gấp đôi 12 lon nhôm",
-    "flag.veChaiQuen": true
+    "flag.veChaiQuen": true,
+    "diary": "Gom đủ mười hai lon cho cô Út ve chai. Giờ mình rành mấy cái thùng rác dọc phố hơn rành đường."
    },
    "reward_text": "Cô Út đếm đủ 12 lon. \"Được việc ghê. Từ giờ con đem gì tới cô cũng trả cao hơn người ta hai chục phần trăm.\"",
    "fail": {
@@ -230,7 +233,8 @@
    "reward": {
     "rep.MINH": 8,
     "fatigue": -4,
-    "flag.minhNoMotLan": true
+    "flag.minhNoMotLan": true,
+    "diary": "Tìm được con Mun sau thùng rác chợ. Minh chụp hình gửi vợ. Bắp hứa vẽ thêm mình vô cái xe chở cả xóm."
    },
    "reward_text": "Minh ôm con Mun, chụp hình gửi vợ. \"Thằng Bắp mà biết chắc nó vẽ thêm mày vô cái xe chở cả xóm.\" Rồi Minh nói nhỏ: \"Bữa nào rảnh tao bao mày ly cà phê.\"",
    "fail": {
@@ -286,7 +290,8 @@
    "reward_hint": "Bà Tư +6",
    "reward": {
     "rep.BA_TU": 6,
-    "flag.chauHungMoi": true
+    "flag.chauHungMoi": true,
+    "diary": "Bà sang cây húng qua chậu mới, ém đất bằng tay, không cho ai phụ."
    },
    "reward_text": "Bà Tư sang cây húng qua chậu mới, ém đất bằng tay. \"Qua bên đó bà để ngay cửa. Ai đi ngang cũng thấy.\"",
    "fail": {
@@ -384,7 +389,8 @@
    "deadline_hour": 21,
    "reward_hint": "Linh +5",
    "reward": {
-    "rep.LINH": 5
+    "rep.LINH": 5,
+    "diary": "Đem hai bộ hồ sơ về cho Linh trước giờ hẹn. Em lật từng trang, kẹp vô bìa."
    },
    "reward_text": "Linh lật từng trang, kẹp vô bìa. \"Cảm ơn anh. Thứ Ba em tự đi nộp.\"",
    "fail": {
@@ -548,7 +554,8 @@
     "cash": 150000,
     "cash_label": "Chị Hạnh trả công chở 12 suất cơm",
     "rep.HANH": 4,
-    "flag.comKhachDeu": true
+    "flag.comKhachDeu": true,
+    "diary": "Chở mười hai suất cơm ra bến xe kịp giờ. Chị Hạnh nói người ta sẽ đặt tiếp."
    },
    "reward_text": "Công nhân nhận cơm còn ấm, ký vô tờ giấy của chị Hạnh. Chị nhắn: \"Đúng giờ vậy là người ta đặt tiếp.\"",
    "fail": {
@@ -596,7 +603,8 @@
    "reward_hint": "Minh +10",
    "reward": {
     "rep.MINH": 10,
-    "flag.donBapDungGio": true
+    "flag.donBapDungGio": true,
+    "diary": "Đón Bắp đúng giờ. Nó khoe huy hiệu bé ngoan, bắt mình đeo thử."
    },
    "reward_text": "Bé Bắp chạy ào vô quán, khoe cái huy hiệu bé ngoan. Minh tới sau mười phút, mồ hôi đầm đìa. \"Cảm ơn mày. Bữa nào mày cần chở đồ thì hẹn tao một giờ, tao tới đúng giờ đó.\"",
    "fail": {

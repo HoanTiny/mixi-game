@@ -702,6 +702,19 @@ func _refresh_skills(s: Dictionary) -> void:
 		carry.append(game.item_name(k))
 	if not carry.is_empty():
 		lines.append("[b]Đang mang[/b]: " + ", ".join(carry))
+	var keep := []
+	for k in game.keepsakes():
+		keep.append(str(k.name))
+	if not keep.is_empty():
+		lines.append("")
+		lines.append("[b]Đồ muốn mang theo[/b]: " + ", ".join(keep))
+	# Sổ tay: vài dòng gần nhất, mới nhất ở trên.
+	var diary: Array = s.get("diary", [])
+	if not diary.is_empty():
+		lines.append("")
+		lines.append("[b]Sổ tay của An[/b]")
+		for i in range(diary.size() - 1, maxi(-1, diary.size() - 7), -1):
+			lines.append("[color=#6a3db8]Ngày %d[/color] · %s" % [int(diary[i].day), diary[i].text])
 	_skills_text.text = "\n".join(lines)
 
 

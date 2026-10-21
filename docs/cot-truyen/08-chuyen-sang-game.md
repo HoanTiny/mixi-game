@@ -36,6 +36,15 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - Ẩn thẻ khóa "Chưa mở" của việc tùy chọn còn chờ lựa chọn trước; ẩn "Xem phòng" khi đã xem ở cảnh ngày 3; ẩn "Đưa bà xem ảnh" khi chưa xem phòng nào; "Kể khoản lãi dự kiến" chỉ hiện sau khi nhận hợp đồng; có cơm giá quen thì ẩn dĩa cơm giá thường.
   - Câu đố sửa quạt không còn lộ đáp án trong gợi ý. Linh nộp hồ sơ chiều thứ Ba (ngày 9) cho khớp cảnh đón Bắp. Ngày 5 đổi thành "Hai cuộc hẹn trùng giờ".
   - Tiền sinh hoạt cả nhà 120.000đ/ngày (trước là 100.000đ): theo mô phỏng, người chơi chịu khó còn 1–6 triệu sau khi vào Hẻm Dừa, người làm ít còn dưới 0,2 triệu và có khi không trả kịp công người phụ (ra E4).
+- **Lớp gắn kết người chơi** (để người chơi muốn sang ngày mới và nhớ những gì mình đã chọn):
+  - **Sổ tay của An:** mỗi lựa chọn ở cảnh chính (115 dòng, kể cả biến thể theo tuyến) và các đoạn chuyện quan trọng ghi một dòng vào sổ tay bằng giọng của An (khóa `diary` trong `effects`). Tối nào màn "Đi ngủ?" cũng hiện các dòng của hôm nay, rồi một dòng **Ngày mai** hé lộ cảnh kế tiếp (`teasers` trong `story.json`, có biến thể theo tuyến và việc đã làm). Nút Sổ hiện 6 dòng gần nhất; màn kết có nút đọc lại cả tháng.
+  - **Mở đầu viết lại** thành một cảnh: chuyến xe đêm, cái quạt hỏng, tờ giấy trên cửa, và câu hỏi "lần này, anh có lo một mình được không?".
+  - **Mạch "Cánh tủ có hai cột vạch"** (bà Tư, Linh): Linh đo lại chiều cao của An (ngày 9–15), bà lau cánh tủ (ngày 13–21), ngày 28 chọn tháo cánh tủ mang theo, để bà quyết, hoặc chụp hình rồi bán (`canh_tu`). Tết sau bà đo tiếp, có thêm cột của bé Bắp.
+  - **Mạch "Cuộc gọi cho má"**: má An làm xa, An quen gửi tiền thay cho cuộc gọi, đúng điều An đang lặp lại với bà. Bà đưa điện thoại (ngày 2–8), mở hộp thiếc đựng biên lai chuyển tiền (ngày 22–28, cần thân với bà). Kết có ba cách khép tùy An đã nói thật với má tới đâu.
+  - **Chào xóm tuần cuối:** mỗi nhân vật một đoạn chia tay, gợi lại việc cũ và để lại một món đồ: túi giữ nhiệt của chị Hạnh, cái mỏ lết khắc tên (chú Sáu, cần thân), hình "nhà mới của chú An" của Bắp, tờ phiếu trắng có tên Trâm, tờ giấy năm chữ ký ở Bến Cạn, tấm bảng "Phòng 4" của cô Duyên, chìa khóa móc con cá của Linh, đêm cuối ngồi hiên với bà.
+  - **Món cầm trên tay ngày 30** (`cam_tren_tay`): chậu húng, túi đồ nghề, hoặc món đã giữ được (cánh tủ, tập hồ sơ của Linh, tấm bảng). Chỉ đổi hình ảnh kết, không cộng điểm.
+  - **Màn kết** thêm phần "Sau đó" (các mạch riêng khép lại), "Trong thùng đồ cuối cùng" (`keepsakes`), và một dòng cho từng người ở xóm và ở phố (`npcCards` có thêm `extra` theo việc đã làm), thay vì chỉ một người nổi bật nhất.
+  - Việc nhỏ cho những khoảng vui: đánh cầu lông với Linh ngoài sân (không có khi trời mưa).
 - **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
 
 ## Câu hỏi đã chốt

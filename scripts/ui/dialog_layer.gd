@@ -10,6 +10,7 @@ signal closed
 var game
 var night_open := false
 var _box: VBoxContainer
+var _diary_open := false
 
 
 func _ready() -> void:
@@ -100,6 +101,15 @@ func _night() -> void:
 	if n.slice_end:
 		lines.append("Đây là đêm cuối của lát cắt. Sau đêm nay sẽ có bảng tổng kết.")
 	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Đi ngủ?", "", "\n".join(lines), "")
+	# Sổ tay: điều An đã chọn hôm nay, rồi một dòng hé lộ ngày mai để người chơi muốn sang ngày.
+	var today: Array = game.diary_of(game.day())
+	if not today.is_empty():
+		_box.add_child(UI.label("SỔ TAY CỦA AN", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n".join(today), 15, UI.TIM))
+	var next: String = "" if n.slice_end else game.teaser(game.day() + 1)
+	if next != "":
+		_box.add_child(UI.label("NGÀY MAI", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap(next, 14, UI.INK))
 	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1) if not n.slice_end else "Xem tổng kết", "", _end_day))
 	# Hết giờ thì không quay lại được nữa, chỉ còn đi ngủ.
 	if not game.is_out_of_time():
@@ -150,6 +160,17 @@ func _ending() -> void:
 	_box.add_child(UI.label("%s · %s" % [str(over.key), str(e.tag).to_upper()], 12, UI.TIM))
 	_head("", e.title, "", e.text, e.quote)
 	_box.add_child(UI.wrap(e.epilogue, 14, UI.INK_SOFT))
+	var codas: Array = game.codas()
+	if not codas.is_empty():
+		_box.add_child(UI.label("SAU ĐÓ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n\n".join(codas), 14, UI.INK))
+	var keep: Array = game.keepsakes()
+	if not keep.is_empty():
+		_box.add_child(UI.label("TRONG THÙNG ĐỒ CUỐI CÙNG", 11, UI.INK_SOFT))
+		var items := []
+		for k in keep:
+			items.append("• %s: %s" % [k.name, k.text])
+		_box.add_child(UI.wrap("\n".join(items), 13, UI.INK))
 	var h: Dictionary = game.housing()
 	var place := str(game.cfg.housing.get(h.place, {}).get("name", "chưa rõ"))
 	var lines := [
@@ -165,11 +186,12 @@ func _ending() -> void:
 	if not ba.is_empty():
 		_box.add_child(UI.label("BÀ TƯ", 11, UI.INK_SOFT))
 		_box.add_child(UI.wrap("%s\n%s" % [ba.title, ba.text], 14, UI.INK))
-	var npc: Dictionary = over.get("npc", {})
-	if not npc.is_empty():
-		var card: Dictionary = game.story.npcCards[npc.who]
-		_box.add_child(UI.label(game.rep_name(npc.who).to_upper(), 11, UI.INK_SOFT))
-		_box.add_child(UI.wrap(str(card.good if npc.good else card.bad), 14, UI.INK))
+	var people := []
+	for x in game.npc_lines():
+		people.append("%s · %s" % [game.rep_name(x.who), x.text])
+	if not people.is_empty():
+		_box.add_child(UI.label("Ở XÓM VÀ Ở PHỐ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n\n".join(people), 13, UI.INK))
 	var left := []
 	for x in game.s.payables:
 		if x.status in ["unpaid", "renegotiated"] or (x.status == "pending" and int(x.due) > 30):
@@ -183,6 +205,15 @@ func _ending() -> void:
 	if not left.is_empty():
 		_box.add_child(UI.label("CÒN PHẢI XỬ LÝ", 11, UI.INK_SOFT))
 		_box.add_child(UI.wrap("\n".join(left), 13, UI.INK_SOFT))
+	var diary: Array = game.s.get("diary", [])
+	if not diary.is_empty():
+		if _diary_open:
+			_box.add_child(UI.label("SỔ TAY THÁNG NÀY", 11, UI.INK_SOFT))
+			var rows := []
+			for x in diary:
+				rows.append("Ngày %d · %s" % [int(x.day), x.text])
+			_box.add_child(UI.wrap("\n".join(rows), 13, UI.INK))
+		_box.add_child(UI.choice("Gấp sổ tay lại" if _diary_open else "Đọc lại sổ tay của An", "%d dòng, từ ngày 1 tới ngày 30" % diary.size(), "", _toggle_diary))
 	_box.add_child(UI.choice("Chơi lại từ ngày 1", "", "", GameState.restart))
 	_box.add_child(UI.choice("Sao chép kết quả lượt chơi", "Dán vào chat để phân tích cân bằng", "", func() -> void: DisplayServer.clipboard_set(game.summary())))
 
@@ -202,6 +233,11 @@ func _head(eyebrow: String, title: String, who: String, text: String, quote: Str
 func _end_day() -> void:
 	night_open = false
 	game.finish_day()
+
+
+func _toggle_diary() -> void:
+	_diary_open = not _diary_open
+	refresh()
 
 
 func _cancel_night() -> void:

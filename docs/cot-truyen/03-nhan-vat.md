@@ -122,3 +122,4 @@ Chín nhân vật, mỗi người có mong muốn, điểm yếu và hướng th
 - **Cô bán trái cây:** khách mang quạt tới sửa ở ngày 2, quay lại ở ngày 13.
 - **Chủ tiệm cũ và đồng nghiệp cũ:** liên quan khoản lương 3,6 triệu ở ngày 4, 17, 24.
 - **Mẹ Linh:** gọi điện ngày 22, hỏi con muốn học gì trước khi hỏi phụ cấp.
+- **Má An:** con gái bà Tư, làm xa từ hồi An còn nhỏ, gửi tiền về thay cho những lần về. Không xuất hiện trực tiếp, chỉ qua điện thoại. Bà Tư giữ biên lai chuyển tiền của cả má An lẫn An trong một hộp thiếc. Không có khoản tiền cứu viện nào từ má.

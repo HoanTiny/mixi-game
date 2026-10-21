@@ -72,7 +72,7 @@ func new_game(mode: String) -> void:
 		"stats": {"earned": 0, "spent": 0, "start_cash": int(p.cash)},
 		"talks_done": [], "quests": {}, "qitems": {}, "inv": {}, "job_last": {},
 		"housing": {"state": "none", "place": "", "paid": 0, "seen": []},
-		"scenes": [], "scenes_done": [], "missed": [],
+		"scenes": [], "scenes_done": [], "missed": [], "diary": [],
 	}
 	# Nhu cầu cơ thể kiểu Nobody: tự ăn ở quán, tắm, giặt đồ ở xóm trọ.
 	if cfg.has("needs"):
@@ -369,6 +369,8 @@ func apply_effects(eff: Dictionary) -> void:
 					_special(str(v))
 			"log":
 				add_log(fill(str(v)), "event")
+			"diary":
+				add_diary(fill(str(v)))
 			"route":
 				_set_route(str(v))
 			"receivables":
@@ -574,6 +576,14 @@ func check(req: Dictionary) -> String:
 		elif key == "linh_decided":
 			if (s.linh.decision != "") != bool(v):
 				fail = "-"
+		elif key == "linh_decision":
+			if not (s.linh.decision in v if v is Array else s.linh.decision == v):
+				fail = "-"
+		elif key == "rep_lt":
+			# Ngược với rep.X: chỉ thỏa khi độ thân thiết còn dưới mức (đoạn chuyện cho quan hệ chưa tốt).
+			for k in v:
+				if int(s.rep.get(k, 0)) >= int(v[k]):
+					fail = "-"
 		elif key == "cash_min":
 			if int(s.cash) < int(v):
 				fail = "Cần tiền mặt từ %s" % fmt_money(int(v))
@@ -675,6 +685,8 @@ func is_hidden(a: Dictionary) -> bool:
 	if a.has("showIfFlag") and not s.flags.get(a.showIfFlag, false):
 		return true
 	if a.has("hideIfFlag") and s.flags.get(a.hideIfFlag, false):
+		return true
+	if a.get("noRain", false) and s.today.get("rain", false):
 		return true
 	# Việc phụ còn chờ một lựa chọn trước đó thì giấu luôn, khỏi hiện thẻ khóa "Chưa mở".
 	if a.get("group", "") == "optional" and a.has("require"):
@@ -843,6 +855,12 @@ func current_event() -> Dictionary:
 	var e := _merge_variants(base)
 	if not e.has("choices"):
 		e["choices"] = [{"label": "Tiếp tục"}]
+	# Lựa chọn có showIf chỉ hiện khi thỏa (ví dụ món đồ An đã giữ được trong tháng).
+	var shown := []
+	for c in e.choices:
+		if check(c.get("showIf", {})) == "":
+			shown.append(c)
+	e["choices"] = shown
 	if not e.has("eyebrow"):
 		e["eyebrow"] = "Ngày %d · %s" % [day(), weekday_name()]
 	return e
@@ -1107,6 +1125,7 @@ func finish_day() -> void:
 	for id in s.get("scenes", []):
 		if not s.scenes_done.has(id) and check(find_event(id).get("when", {})) == "" and find_event(id).has("missed"):
 			s.missed.append(id)
+			add_diary("Không kịp tới cảnh «%s». Ngày trôi qua mà chuyện đó vẫn còn đó." % fill(str(scene_info(id).title)))
 
 	if day() >= last_day():
 		s["queue"] = tonight
@@ -1177,6 +1196,71 @@ func ending_key() -> String:
 	if s.route == "C" and int(s.cash) >= int(e.ownTableCash):
 		return "E3"
 	return "E1"
+
+
+# ---------------------------------------------------------------- sổ tay, đồ mang theo
+
+## Một dòng trong sổ tay của An: điều đã chọn hôm nay, kể lại bằng giọng của anh.
+func add_diary(text: String) -> void:
+	if text == "":
+		return
+	if not s.has("diary"):
+		s["diary"] = []
+	s.diary.append({"day": day(), "text": text})
+
+
+func diary_of(d: int) -> Array:
+	var out := []
+	for x in s.get("diary", []):
+		if int(x.day) == d:
+			out.append(str(x.text))
+	return out
+
+
+## Lời hé lộ cho ngày d: chuỗi, hoặc mảng {when, text} lấy dòng đầu tiên thỏa.
+func teaser(d: int) -> String:
+	var t = story.get("teasers", {}).get(str(d), "")
+	if t is Array:
+		for x in t:
+			if check(x.get("when", {})) == "":
+				return fill(str(x.text))
+		return ""
+	return fill(str(t))
+
+
+## Những món An giữ được trong tháng (mỗi món gắn với một việc đã làm).
+func keepsakes() -> Array:
+	var out := []
+	for k in story.get("keepsakes", []):
+		if check(k.get("when", {})) == "":
+			out.append(k)
+	return out
+
+
+## Đoạn kết cho từng người ở xóm và ở phố, không chỉ một người nổi bật nhất.
+func npc_lines() -> Array:
+	var out := []
+	for k in story.get("npcCards", {}):
+		var card: Dictionary = story.npcCards[k]
+		var good: bool = int(s.rep.get(k, 50)) >= 50
+		if k == "TRAM" and s.flags.get("falseCompletion", false):
+			good = false
+		var text := str(card.good if good else card.bad)
+		for x in card.get("extra", []):
+			if check(x.get("when", {})) == "":
+				text += " " + str(x.text)
+				break
+		out.append({"who": k, "good": good, "text": text})
+	return out
+
+
+## Những dòng "sau đó" của các mạch riêng (cánh tủ, cuộc gọi cho má…), dòng nào thỏa thì hiện.
+func codas() -> Array:
+	var out := []
+	for x in story.get("codas", []):
+		if check(x.get("when", {})) == "":
+			out.append(fill(str(x.text)))
+	return out
 
 
 func linh_card() -> String:
