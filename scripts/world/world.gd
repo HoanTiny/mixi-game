@@ -15,6 +15,7 @@ const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
 const RealCity := preload("res://scripts/world/real_city.gd")
+const Geo := preload("res://scripts/realmap/geo.gd")
 const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
@@ -526,7 +527,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		nb.add_child(ncs)
 		npc.add_child(nb)
 		if str(who.id) != "":
-			npc_nodes[str(who.id)] = {"node": npc, "body": nb, "name": str(who.name), "loc": id}
+			npc_nodes[str(who.id)] = {"node": npc, "body": nb, "name": str(who.name), "loc": id, "color": str(who.color)}
 
 
 ## Tiệm dựng thành một hoặc vài căn nhà ống liền nhau (toạ độ cục bộ của lô); biển hiệu đặt ở căn giữa.
@@ -1110,6 +1111,7 @@ func _build_real() -> void:
 	area.show_labels = false
 	# Mặt đường, mặt đất có vân nhựa đường như phường vẽ tay, sẫm hơn cho hợp ánh nắng của màn phố.
 	area.ground_material = Surfaces.get_mat("duong", 4.0, Color(0.78, 0.76, 0.72), true)
+	area.water_color = Color("2a4a4c")
 	add_child(area)
 	for id in city.locs:
 		area.keep_clear.append(city.loc_door(id))
@@ -1140,11 +1142,100 @@ func _build_real() -> void:
 					step["area"] = city.quest_areas[str(q.id)]
 	_build_real_lamps()
 	_build_real_traffic()
+	_build_real_canal()
 	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra.
 	if city.locs.has("hem_dua"):
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 5
 		_coconut(loc_point("hem_dua", float(city.locs.hem_dua.w) / 2.0 + 1.2, 0.6), rng)
+
+
+## Kênh rạch trên map thật: bờ kè đá dọc mép nước (bỏ các cạnh trùng mép khung), ghe xuồng neo sát bờ,
+## vài chiếc ghe chở hàng trôi chầm chậm qua lại giữa dòng.
+var boats: Array = []
+
+
+func _build_real_canal() -> void:
+	var stone := Surfaces.get_mat("tuong_cu", 2.0, Color("8a8478"))
+	var clip: PackedVector2Array = city.clip
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 91
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var moor: Array = []
+	for w in city.data.water:
+		var poly: PackedVector2Array = w.poly
+		var inward := 1.0 if Geometry2D.is_polygon_clockwise(poly) == Geometry2D.is_polygon_clockwise(clip) else -1.0
+		for i in poly.size():
+			var a := poly[i]
+			var b := poly[(i + 1) % poly.size()]
+			var mid := (a + b) / 2.0
+			# Cạnh nằm trên mép khung là chỗ mặt nước bị cắt, không có bờ.
+			var on_edge := false
+			for k in clip.size():
+				if Geo.seg_dist(mid, clip[k], clip[(k + 1) % clip.size()]) < 1.0:
+					on_edge = true
+					break
+			if on_edge or a.distance_to(b) < 0.5:
+				continue
+			AreaBuilder._wall_seg(st, a, b, -0.4, 0.75, 0.6, Color("8a8478"))
+			# Chỗ neo ghe: cách mép 3,5 m vào lòng kênh.
+			var d := (b - a).normalized()
+			var n := d.orthogonal() * inward
+			AreaBuilder._along(PackedVector2Array([a, b]), 26.0, func(p: Vector2, _dd: Vector2) -> void:
+				var q: Vector2 = p - n * 3.5 if Geometry2D.is_point_in_polygon(p - n * 3.5, poly) else p + n * 3.5
+				if Geometry2D.is_point_in_polygon(q, poly) and rng.randf() < 0.45:
+					moor.append([q, d]))
+	var mi := MeshInstance3D.new()
+	mi.mesh = st.commit()
+	mi.material_override = stone
+	add_child(mi)
+	for i in moor.size():
+		var m: Array = moor[i]
+		var boat := _boat(rng, i % 5 == 0)
+		boat.position = _v3(m[0], 0.02)
+		boat.rotation.y = atan2((m[1] as Vector2).x, (m[1] as Vector2).y) + rng.randf_range(-0.15, 0.15)
+		add_child(boat)
+		# Một phần ghe trôi qua lại giữa dòng, đổi chiều khi chạm bờ.
+		if i % 4 == 1:
+			boats.append({"node": boat, "dir": m[1], "speed": rng.randf_range(0.8, 1.6), "home": m[0], "range": rng.randf_range(25.0, 60.0), "s": 0.0, "sign": 1.0})
+
+
+## Ghe gỗ mũi nhọn, có mui che (ghe chở hàng) hay để trống (xuồng nhỏ).
+func _boat(rng: RandomNumberGenerator, cargo: bool) -> Node3D:
+	var boat := Node3D.new()
+	var len := rng.randf_range(5.5, 8.0) if cargo else rng.randf_range(3.5, 4.8)
+	var wood := Color("6b4a32").lerp(Color("8a5a3a"), rng.randf())
+	_block(Vector3(1.5 if cargo else 1.1, 0.5, len * 0.7), Vector3.ZERO, wood, boat)
+	for sgn in [-1.0, 1.0]:
+		var tip := _block(Vector3(0.9 if cargo else 0.7, 0.45, len * 0.2), Vector3(0, 0.05, sgn * len * 0.42), wood.darkened(0.1), boat)
+		tip.rotation.x = sgn * -0.25
+	if cargo:
+		var roof := _block(Vector3(1.6, 0.08, len * 0.35), Vector3(0, 1.3, -len * 0.05), Color("3f6f9a") if rng.randf() < 0.5 else Color("2f5f3a"), boat)
+		roof.rotation.z = 0.04
+		for px in [-0.65, 0.65]:
+			_block(Vector3(0.06, 0.8, 0.06), Vector3(px, 0.5, -len * 0.05), Color("4a3a2a"), boat)
+		_block(Vector3(1.1, 0.4, len * 0.25), Vector3(0, 0.5, len * 0.12), Color("c9a86a"), boat)
+	return boat
+
+
+func _update_boats(delta: float) -> void:
+	for b in boats:
+		var n: Node3D = b.node
+		b["s"] = float(b.s) + float(b.sign) * float(b.speed) * delta
+		var p: Vector2 = (b.home as Vector2) + (b.dir as Vector2) * float(b.s)
+		if absf(float(b.s)) > float(b.range) or not _on_water(p):
+			b["sign"] = -float(b.sign)
+			b["s"] = clampf(float(b.s), -float(b.range), float(b.range))
+			p = (b.home as Vector2) + (b.dir as Vector2) * float(b.s)
+		n.position = Vector3(p.x, 0.02 + sin(Time.get_ticks_msec() / 700.0 + float(b.range)) * 0.04, p.y)
+
+
+func _on_water(p: Vector2) -> bool:
+	for w in city.data.water:
+		if Geometry2D.is_point_in_polygon(p, w.poly):
+			return true
+	return false
 
 
 func _build_real_lamps() -> void:
@@ -1292,6 +1383,8 @@ func _physics_process(delta: float) -> void:
 		hud.close_location()
 
 	_update_traffic(delta)
+	if real:
+		_update_boats(delta)
 	_update_delivery()
 	_update_quests()
 	if _rain != null and _rain.visible:
@@ -1716,6 +1809,11 @@ func location_info(id: String) -> Dictionary:
 
 func door_of(id: String) -> Vector3:
 	return _v3(city.loc_door(id))
+
+
+## Màu áo của nhân vật, để chấm trên bản đồ.
+func npc_color(id: String) -> String:
+	return str(npc_nodes.get(id, {}).get("color", "ffffff"))
 
 
 ## Nhân vật đang ở địa điểm nào ("" nếu đang đi đường hay đi khỏi phường).

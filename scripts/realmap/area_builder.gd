@@ -82,6 +82,8 @@ var show_labels := true
 var ground_material: Material = null
 ## Chỗ không trồng cây ven đường (cửa các địa điểm của truyện), và các vật liệu có cắt khoét quanh An để màn phố cập nhật.
 var keep_clear: Array = []
+## Màu nước (màn phố của truyện dùng màu kênh đục, sẫm hơn).
+var water_color := Color("2b6a8f")
 var cut_materials: Array = []
 var _flat := {}
 var _rng := RandomNumberGenerator.new()
@@ -261,7 +263,7 @@ func _in_water(p: Vector2) -> bool:
 
 
 func _water() -> void:
-	var col := Color("2b6a8f")
+	var col := water_color
 	for w in data.water:
 		_fill(_st("water"), w.poly, 0.03, col)
 	for w in data.waterways:

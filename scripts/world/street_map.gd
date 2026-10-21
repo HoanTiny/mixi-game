@@ -204,6 +204,8 @@ func _draw() -> void:
 	if big:
 		for id in world.LOCATIONS:
 			_label(font, to_map(city.loc_door(id)), 6.0, str(world.LOCATIONS[id].name), placed)
+	if big:
+		_draw_people(self, font)
 	# An: mũi tên vàng chỉ theo hướng đang đi.
 	var pp := to_map(Vector2(world.player.position.x, world.player.position.z))
 	var a: float = world.player.rotation.y
@@ -375,6 +377,8 @@ func _draw_real_over() -> void:
 	if big:
 		for id in city.locs:
 			_label_on(c, font, to_map(city.loc_door(id)), 6.0, str(world.LOCATIONS[id].name), placed)
+	if big:
+		_draw_people(c, font)
 	var pp := to_map(Vector2(world.player.position.x, world.player.position.z))
 	var a: float = world.player.rotation.y
 	var fwd := Vector2(sin(a), cos(a))
@@ -429,4 +433,27 @@ func _label_on(c: Control, font: Font, dp: Vector2, r: float, s: String, placed:
 	placed.append(Rect2(pos - Vector2(0, asc), Vector2(w, h)))
 	c.draw_string_outline(font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color(0, 0, 0, 0.75))
 	c.draw_string(font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, UI.HUD_TEXT)
+
+
+## Bản lớn: chấm nhỏ cho từng người có tên đang ở đâu (kể cả đang đi đường), chữ cái đầu tên, tên khi rê chuột tới gần.
+func _draw_people(c: Control, font: Font) -> void:
+	if world.life == null:
+		return
+	var mouse := get_local_mouse_position()
+	for id in world.life.npcs:
+		var n: Dictionary = world.life.npcs[id]
+		var node: Node3D = n.node
+		if not node.visible:
+			continue
+		var p := to_map(Vector2(node.global_position.x, node.global_position.z))
+		var col := Color(world.npc_color(id))
+		c.draw_circle(p + Vector2(7, -7), 5.5, Color(0, 0, 0, 0.7))
+		c.draw_circle(p + Vector2(7, -7), 4.5, col)
+		var name := str(n.name)
+		var initial := name.get_slice(" ", name.get_slice_count(" ") - 1).left(1)
+		c.draw_string(font, p + Vector2(4.5, -3.5), initial, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color.WHITE)
+		if p.distance_to(mouse) < 14.0:
+			var wn := font.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
+			c.draw_string_outline(font, p + Vector2(14, -10), name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 4, Color(0, 0, 0, 0.8))
+			c.draw_string(font, p + Vector2(14, -10), name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
 
