@@ -15,15 +15,20 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 - Số nhà đánh như thật: số lẻ một bên, chẵn một bên; nhà trong hẻm mang số có gạch chéo theo căn ở đầu hẻm (42/3, 42/7/5…), app Giao Nhanh giao tới đúng các địa chỉ này.
 - An đi theo đường thật (tìm đường A* trên lưới 1 m, không xuyên nhà), nhà che khuất An thì tự ẩn. Bản đồ nhỏ góc trên; phím **M** hoặc bấm bản đồ nhỏ mở **bản đồ lớn** có tên đường, bấm chỗ nào thì An đi tới đó.
 
-**Dựng một khu thật ở Việt Nam** (chế độ riêng, ngoài truyện; nút ở màn đầu, hay thêm `?khu` vào địa chỉ bản web): gõ tên khu (ví dụ "Khương Thượng, Đống Đa"), chọn kết quả, kéo khung vàng trên bản đồ nét (150–600 m) rồi bấm **Dựng khu này**. Trình duyệt tự gọi thẳng ba nguồn miễn phí, không qua máy chủ nào khác:
+**Dựng một khu thật ở Việt Nam** (chế độ riêng, ngoài truyện; nút ở màn đầu, hay thêm `?khu` vào địa chỉ bản web). Giao diện kiểu Tiny Map:
+- Bên trái là bản đồ nền tối vẽ từ OSM (kéo để dời, con lăn hay +/− để phóng): ô tìm địa điểm (Nominatim), công cụ vẽ khung chữ nhật hay đa giác, nút xóa; vùng vẽ ghi diện tích, tối đa 1,2 km². Nút **Ví dụ Khương Thượng** dựng sẵn một khu.
+- Bấm **Dựng mô hình 3D**: thẻ tiến độ bốn bước (OpenStreetMap, Open Buildings, Ghép dữ liệu, Dựng mô hình), hai nguồn đầu tải cùng lúc.
+- Bên phải là mô hình thu nhỏ của đúng vùng đã vẽ trên tấm đế đất: kéo chuột trái để xoay, nghiêng; chuột phải (hay Shift) để dời; con lăn để phóng; la bàn ghi hướng và độ nghiêng; nút quay về hướng bắc, tải mô hình về (.glb), toàn màn hình; **Thả An vào đi dạo** để đi bộ trong khu. Vạch giữa hai nửa kéo được.
+
+Trình duyệt tự gọi thẳng ba nguồn miễn phí, không qua máy chủ nào khác:
 
 | Nguồn | Lấy gì |
 |---|---|
-| OpenStreetMap qua Overpass API | Nhà vẽ tay (số tầng, chiều cao, màu tường, kiểu và màu mái nếu có), đường, sông, hồ, kênh, công viên, đình chùa, di tích, tường rào, đường sắt. Hỏi `overpass-api.de` trước; sau 7 giây chưa trả lời (hay báo lỗi) thì hỏi thêm `overpass.private.coffee` và `maps.mail.ru`, máy nào trả trước thì dùng. |
-| Open Buildings (Google + Microsoft, bản gộp của VIDA) | Đường viền nhà dò từ ảnh vệ tinh, kèm độ tin cậy, trên `data.source.coop`. File FlatGeobuf mỗi nước vài GB, app chỉ đọc đúng phần byte của khung đã chọn (yêu cầu Range qua chỉ mục không gian). |
+| OpenStreetMap qua Overpass API | Nhà vẽ tay (số tầng, chiều cao, màu tường, kiểu và màu mái nếu có), đường, sông, hồ, kênh, công viên, cây, đình chùa, di tích, điểm tham quan, tường rào, đường sắt. Hỏi `overpass-api.de` trước; sau 7 giây chưa trả lời (hay báo lỗi) thì hỏi thêm `overpass.private.coffee` và `maps.mail.ru`, máy nào trả trước thì dùng. |
+| Open Buildings (Google + Microsoft, bản gộp của VIDA) | Đường viền nhà dò từ ảnh vệ tinh, kèm độ tin cậy: `data.source.coop/vida/google-microsoft-open-buildings/flatgeobuf/by_country/country_iso=VNM/VNM.fgb` (17,5 GB, 68,5 triệu nhà). App chỉ đọc đúng phần byte của vùng đã vẽ qua chỉ mục không gian (khoảng 0,5–1,5 MB cho một khu nửa km²). |
 | Nominatim | Tên khu ra tọa độ, khung và mã nước (để biết đọc file Open Buildings nào). |
 
-Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu độ tin cậy dưới 0,7, trùng chỗ nhà OSM, nằm trên lòng đường hoặc trên mặt nước. Nhà không ghi số tầng lấy 2–5 tầng như nhà ống; mặt tường có cửa sổ theo tầng, sân thượng có bồn nước inox; chùa, đình mái bốn dốc. Địa chỉ máy chủ, giờ chờ, ngưỡng tin cậy, bề rộng đường, màu nhà nằm trong `data/realmap.json`. Bảng khi đi dạo ghi số nhà mỗi nguồn, số nhà bị bỏ theo từng lý do, số byte đã đọc, và ghi công nguồn dữ liệu (© OpenStreetMap, ODbL; Open Buildings: Google CC BY 4.0, Microsoft ODbL).
+Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu độ tin cậy dưới 0,7, trùng chỗ nhà OSM, nằm trên lòng đường hoặc trên mặt nước. Nhà không ghi số tầng lấy 2–5 tầng như nhà ống, một phần nhà thấp lợp ngói đỏ; cao ốc kính; mặt tường có cửa sổ theo tầng (mờ dần khi nhìn xa); sân thượng có bồn nước inox; chùa, đình mái bốn dốc; cây ven đường, ô tô và xe máy đậu dọc đường; nhãn địa danh có chấm cam. Địa chỉ máy chủ, giờ chờ, ngưỡng tin cậy, bề rộng đường, màu nhà nằm trong `data/realmap.json`. Bản cài trên máy đi qua proxy được (đọc `HTTPS_PROXY`, chứng chỉ gốc ở `SSL_CERT_FILE`).
 
 **Gợi ý cách chơi:** lần đầu gặp chuyện gì (có cảnh chính, đói, bẩn, Mệt lên, có người nhờ việc, đứng cạnh thùng rác, sau 20 giờ…) thì ô Gợi ý ở góc trái hiện một lần. Nội dung ở mục `tips` của `data/story.json`.
 
@@ -92,12 +97,12 @@ scripts/
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/character.gd   nhân vật có khớp dựng bằng khối: An, 8 nhân vật, người đi đường; hoạt cảnh đi, đứng, ngồi xe
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
-  realmap/realmap.gd     chế độ Dựng khu thật: tìm tên, chọn khung, tải, dựng, đi dạo
+  realmap/realmap.gd     chế độ Dựng khu thật: giao diện hai nửa, tiến độ, camera xoay nghiêng, tải .glb, đi dạo
   realmap/fetcher.gd     gọi Nominatim, Overpass (nhiều máy, chờ 7 s), đọc file theo byte (Range)
   realmap/fgb_reader.gd  đọc FlatGeobuf từ xa theo chỉ mục không gian (Open Buildings)
   realmap/area_data.gd   đọc dữ liệu OSM, ghép và lọc nhà Open Buildings
   realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ
-  realmap/area_picker.gd bản đồ nét có khung kéo được
+  realmap/map_view.gd    bản đồ nền tối: kéo, phóng, tìm, vẽ khung hay đa giác
   world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)
   world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
   world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường

@@ -25,6 +25,8 @@ var _tree_size := 0
 var _levels: Array = []
 ## Số byte đã tải, để báo cho người chơi biết chỉ đọc một phần nhỏ của file.
 var bytes_read := 0
+## Tiến độ đọc 0..1 (header, từng tầng chỉ mục, rồi các đoạn dữ liệu nhà), để hiện phần trăm.
+var progress := 0.0
 
 
 func _init(file_url: String, f, merge_gap := 65536) -> void:
@@ -67,6 +69,7 @@ func open() -> bool:
 			var ct := p + hb.decode_u32(p)
 			columns.append({"name": _str(hb, ct, 0).to_lower(), "type": _u8(hb, ct, 1, 0)})
 	_tree_start = 12 + header_size
+	progress = 0.1
 	if node_size > 0 and count > 0:
 		_levels = level_bounds(count, node_size)
 		_tree_size = _num_nodes(count, node_size) * NODE_ITEM
@@ -138,6 +141,7 @@ func read_bbox(minx: float, miny: float, maxx: float, maxy: float, max_features 
 				elif hit:
 					next.append(off)
 		starts = next
+		progress = 0.1 + 0.6 * float(_levels.size() - li) / float(_levels.size())
 		if li > 0 and starts.is_empty():
 			return []
 	if leaves.size() > max_features:
@@ -174,7 +178,10 @@ func _read_features(leaves: Array) -> Array:
 		spans.append([a, b])
 	spans = _merge(spans, gap)
 	var out := []
+	var done := 0
 	for sp in spans:
+		done += 1
+		progress = 0.7 + 0.3 * float(done) / float(spans.size())
 		var a := int(sp[0])
 		var d: PackedByteArray = await _fetch(feat_start + a, feat_start + int(sp[1]) - 1)
 		var want := {}

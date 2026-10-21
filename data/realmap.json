@@ -25,25 +25,125 @@
     "maxFeatures": 12000,
     "mergeGapBytes": 65536
   },
-  "iso3": {"vn": "VNM", "la": "LAO", "kh": "KHM", "th": "THA", "cn": "CHN", "my": "MYS", "id": "IDN", "ph": "PHL", "mm": "MMR", "sg": "SGP"},
-  "area": {"defaultMeters": 400, "minMeters": 150, "maxMeters": 600, "previewMeters": 1600},
+  "iso3": {
+    "vn": "VNM",
+    "la": "LAO",
+    "kh": "KHM",
+    "th": "THA",
+    "cn": "CHN",
+    "my": "MYS",
+    "id": "IDN",
+    "ph": "PHL",
+    "mm": "MMR",
+    "sg": "SGP"
+  },
+  "area": {
+    "maxKm2": 1.2,
+    "_ghi_chu": "Vùng vẽ lớn hơn maxKm2 thì không cho dựng (dữ liệu nặng, Overpass dễ quá giờ).",
+    "example": {
+      "name": "Khương Thượng, Đống Đa",
+      "lat": 21.004,
+      "lon": 105.8262,
+      "rect": [
+        [
+          105.8228,
+          21.0072
+        ],
+        [
+          105.8296,
+          21.0072
+        ],
+        [
+          105.8296,
+          21.0008
+        ],
+        [
+          105.8228,
+          21.0008
+        ]
+      ]
+    }
+  },
   "roads": {
     "_ghi_chu": "Bề rộng mặt đường (mét) theo highway; có tag width hay lanes thì dùng tag. small: tô màu bê tông như hẻm.",
-    "width": {"motorway": 16, "trunk": 14, "primary": 12, "secondary": 10, "tertiary": 8, "unclassified": 6, "residential": 6,
-      "living_street": 4, "service": 4, "pedestrian": 5, "track": 3, "footway": 2, "path": 1.6, "cycleway": 2, "steps": 2,
-      "motorway_link": 7, "trunk_link": 7, "primary_link": 7, "secondary_link": 6, "tertiary_link": 6},
-    "small": ["service", "living_street", "footway", "path", "steps", "track", "pedestrian", "cycleway"],
+    "width": {
+      "motorway": 16,
+      "trunk": 14,
+      "primary": 12,
+      "secondary": 10,
+      "tertiary": 8,
+      "unclassified": 6,
+      "residential": 6,
+      "living_street": 4,
+      "service": 4,
+      "pedestrian": 5,
+      "track": 3,
+      "footway": 2,
+      "path": 1.6,
+      "cycleway": 2,
+      "steps": 2,
+      "motorway_link": 7,
+      "trunk_link": 7,
+      "primary_link": 7,
+      "secondary_link": 6,
+      "tertiary_link": 6
+    },
+    "small": [
+      "service",
+      "living_street",
+      "footway",
+      "path",
+      "steps",
+      "track",
+      "pedestrian",
+      "cycleway"
+    ],
     "default": 4
   },
-  "waterways": {"river": 14, "canal": 8, "stream": 3, "ditch": 1.5, "drain": 1.5},
+  "waterways": {
+    "river": 14,
+    "canal": 8,
+    "stream": 3,
+    "ditch": 1.5,
+    "drain": 1.5
+  },
   "buildings": {
     "levelHeight": 3.2,
     "_defaultLevels": "Nhà không ghi số tầng: lấy ngẫu nhiên (cố định theo vị trí) trong khoảng này, kiểu nhà ống phố Việt.",
-    "defaultLevels": [2, 5],
-    "walls": ["f1e3b8", "e9c9a3", "f4efe1", "d9e3d0", "c9dbe3", "f0c9b8", "e8d27a", "d8c3e0", "f6f3ea", "bfd1c4"],
+    "defaultLevels": [
+      2,
+      5
+    ],
+    "walls": [
+      "e2c98f",
+      "efd9b0",
+      "cdb894",
+      "b9ccd6",
+      "e3a98c",
+      "d8b84f",
+      "a8c493",
+      "e6e0d4",
+      "c29a78",
+      "98aec4",
+      "d47f5c",
+      "f0ede4",
+      "8fae95",
+      "e0b562",
+      "c86e5a",
+      "7fa0b8"
+    ],
     "flatRoof": "8e8a83",
     "pitchedRoof": "a5523a",
     "worshipWall": "d9b56b",
-    "worshipRoof": "6e2f22"
+    "worshipRoof": "6e2f22",
+    "tiledShare": 0.38,
+    "tileRoofs": [
+      "b5432f",
+      "c4552f",
+      "9a3a2a",
+      "a8482e",
+      "3f6f9a",
+      "4f7f4a"
+    ]
   }
 }

@@ -8,10 +8,37 @@ extends Node
 signal status(text: String)
 
 var cfg: Dictionary = {}
+var _tls: TLSOptions
 
 
 func _init(config: Dictionary = {}) -> void:
 	cfg = config
+	# Bản cài trên máy đi qua proxy công ty: đọc HTTPS_PROXY, và tin thêm chứng chỉ gốc ở SSL_CERT_FILE nếu có.
+	if not OS.has_feature("web"):
+		var ca := OS.get_environment("SSL_CERT_FILE")
+		if ca != "" and FileAccess.file_exists(ca):
+			var cert := X509Certificate.new()
+			if cert.load(ca) == OK:
+				_tls = TLSOptions.client(cert)
+
+
+## Gắn proxy (nếu máy có HTTPS_PROXY) và chứng chỉ cho một yêu cầu, bỏ qua trên trình duyệt.
+func _setup(req: HTTPRequest, url: String) -> void:
+	if OS.has_feature("web") or url.begins_with("http://127.") or url.begins_with("http://localhost"):
+		return
+	var proxy := OS.get_environment("HTTPS_PROXY" if url.begins_with("https") else "HTTP_PROXY")
+	if proxy == "":
+		proxy = OS.get_environment("https_proxy")
+	if proxy != "":
+		var hp := proxy.trim_prefix("http://").trim_prefix("https://").trim_suffix("/")
+		if hp.contains("@"):
+			hp = hp.get_slice("@", 1)
+		var host := hp.get_slice(":", 0)
+		var port := int(hp.get_slice(":", 1)) if hp.contains(":") else 80
+		req.set_https_proxy(host, port)
+		req.set_http_proxy(host, port)
+	if _tls != null:
+		req.set_tls_options(_tls)
 
 
 ## Một yêu cầu HTTP. limit: số byte tối đa nhận về (chặn trường hợp máy chủ bỏ qua Range mà gửi cả file vài GB).
@@ -20,6 +47,7 @@ func http(url: String, headers := PackedStringArray(), method := HTTPClient.METH
 	req.timeout = timeout
 	req.body_size_limit = limit
 	req.accept_gzip = method != HTTPClient.METHOD_GET or not _has_range(headers)
+	_setup(req, url)
 	add_child(req)
 	var err := req.request(url, headers, method, body)
 	if err != OK:
@@ -125,6 +153,7 @@ func _ask(server: String, query: String, state: Dictionary, timeout: float) -> v
 	var req := HTTPRequest.new()
 	req.timeout = timeout
 	req.body_size_limit = 200_000_000
+	_setup(req, server)
 	add_child(req)
 	state.reqs.append(req)
 	state["pending"] = int(state.pending) + 1

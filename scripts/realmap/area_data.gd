@@ -18,6 +18,8 @@ var parks: Array = []
 var walls: Array = []
 var rails: Array = []
 var pois: Array = []
+var trees: Array = []
+var tree_rows: Array = []
 ## Đếm để báo cho người chơi: nhà OSM, nhà Open Buildings giữ lại, bị bỏ vì từng lý do.
 var stats := {"osm": 0, "ob": 0, "ob_low": 0, "ob_dup": 0, "ob_road": 0, "ob_water": 0}
 
@@ -47,19 +49,31 @@ static func query(bb: Array) -> String:
   nwr["historic"];
   way["barrier"~"^(wall|fence|city_wall|retaining_wall)$"];
   way["railway"="rail"];
+  node["natural"="tree"];
+  way["natural"="tree_row"];
+  nwr["tourism"~"^(attraction|museum|viewpoint|artwork)$"]["name"];
+  nwr["amenity"~"^(theatre|townhall|post_office|marketplace|hospital|university|school)$"]["name"];
 );
 out geom;""" % [bb[0], bb[1], bb[2], bb[3]]
 
 
-## Câu hỏi nhẹ chỉ lấy đường chính để vẽ bản đồ nét lúc chọn khung.
-static func preview_query(bb: Array) -> String:
+## Câu hỏi nhẹ cho bản đồ nền: đường, sông hồ, công viên; phóng gần thì thêm nhà và tên địa danh.
+static func preview_query(bb: Array, with_buildings := false) -> String:
+	var extra := """
+  way["highway"~"^(service|living_street|pedestrian|footway)$"];
+  way["building"];
+  nwr["amenity"="place_of_worship"]["name"];
+  nwr["historic"]["name"];
+  nwr["tourism"~"^(attraction|museum)$"]["name"];""" if with_buildings else ""
 	return """[out:json][timeout:25][bbox:%f,%f,%f,%f];
 (
-  way["highway"~"^(motorway|trunk|primary|secondary|tertiary|residential|unclassified|living_street)$"];
+  way["highway"~"^(motorway|trunk|primary|secondary|tertiary|residential|unclassified|living_street|motorway_link|trunk_link|primary_link|secondary_link)$"];
   way["natural"="water"];
-  way["waterway"~"^(river|canal|riverbank)$"];
+  relation["natural"="water"];
+  way["waterway"~"^(river|canal|riverbank|stream)$"];
+  way["leisure"~"^(park|garden)$"];%s
 );
-out geom;""" % [bb[0], bb[1], bb[2], bb[3]]
+out geom;""" % [bb[0], bb[1], bb[2], bb[3], extra]
 
 
 func _line(geom: Array) -> PackedVector2Array:
@@ -93,8 +107,11 @@ func parse_osm(json: Dictionary) -> void:
 			for r in Geo.assemble_rings(outers):
 				rings.append(Geo.clean_ring(r))
 		elif kind == "node":
-			if tags.has("name") and (tags.has("amenity") or tags.has("historic")):
-				pois.append({"pos": geo.to_local(float(e.lon), float(e.lat)), "name": str(tags.name), "kind": _poi_kind(tags)})
+			var np := geo.to_local(float(e.lon), float(e.lat))
+			if str(tags.get("natural", "")) == "tree":
+				trees.append(np)
+			elif tags.has("name") and (tags.has("amenity") or tags.has("historic") or tags.has("tourism")):
+				pois.append({"pos": np, "name": str(tags.name), "kind": _poi_kind(tags), "rank": _poi_rank(tags)})
 			continue
 		if tags.has("building") or tags.has("building:part"):
 			for r in rings:
@@ -133,10 +150,13 @@ func parse_osm(json: Dictionary) -> void:
 		if str(tags.get("railway", "")) == "rail" and line.size() >= 2:
 			rails.append({"line": line})
 			continue
+		if str(tags.get("natural", "")) == "tree_row" and line.size() >= 2:
+			tree_rows.append({"line": line})
+			continue
 		# Chùa, đình, di tích vẽ thành vùng (không ghi building): chỉ đặt nhãn tên.
-		if (tags.has("amenity") or tags.has("historic")) and tags.has("name"):
+		if (tags.has("amenity") or tags.has("historic") or tags.has("tourism")) and tags.has("name"):
 			var c := Geo.centroid(rings[0]) if not rings.is_empty() else (line[0] if not line.is_empty() else Vector2.ZERO)
-			pois.append({"pos": c, "name": str(tags.name), "kind": _poi_kind(tags)})
+			pois.append({"pos": c, "name": str(tags.name), "kind": _poi_kind(tags), "rank": _poi_rank(tags)})
 	# Có building:part thì bỏ đường viền tổng chứa nó, tránh hai khối chồng nhau.
 	for o in outlines:
 		var keep := true
@@ -147,9 +167,11 @@ func parse_osm(json: Dictionary) -> void:
 		if keep:
 			buildings.append(o)
 	buildings.append_array(parts)
+	# Nhà có tên thành địa danh: đền chùa, di tích, và tòa nhà lớn (từ 800 m²).
 	for b in buildings:
-		if b.name != "" and (b.worship or b.historic):
-			pois.append({"pos": Geo.centroid(b.poly), "name": b.name, "kind": "worship" if b.worship else "historic"})
+		if b.name != "" and (b.worship or b.historic or absf(Geo.area(b.poly)) >= 800.0):
+			pois.append({"pos": Geo.centroid(b.poly), "name": b.name, "kind": "worship" if b.worship else "historic",
+				"rank": 3 if (b.worship or b.historic) else 2, "height": maxf(float(b.height), 8.0)})
 	stats["osm"] = buildings.size()
 
 
@@ -159,6 +181,13 @@ static func _poi_kind(tags: Dictionary) -> String:
 	if tags.has("historic"):
 		return "historic"
 	return "other"
+
+
+## Độ ưu tiên nhãn: đền chùa, di tích, điểm tham quan trước; trường, chợ, bệnh viện sau.
+static func _poi_rank(tags: Dictionary) -> int:
+	if str(tags.get("amenity", "")) == "place_of_worship" or tags.has("historic") or tags.has("tourism"):
+		return 3
+	return 1
 
 
 static func _is_water(tags: Dictionary) -> bool:

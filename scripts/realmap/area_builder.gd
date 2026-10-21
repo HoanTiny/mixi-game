@@ -7,6 +7,8 @@ extends Node3D
 ## - Đường có vỉa hè, vạch giữa; ngõ nhỏ lát bê tông; cầu có lan can. Sông, hồ, kênh, công viên, sân bóng,
 ##   tường rào, đường sắt, nhãn tên đường, hồ, chùa, di tích.
 ## - Lưới đi bộ 1 m: không đi xuyên nhà, tường, mặt nước (trừ trên cầu).
+## - Kiểu mô hình thu nhỏ: mọi thứ cắt theo vùng đã vẽ, đặt trên một tấm đế đất; cây (cây OSM, hàng cây, công viên,
+##   ven đường), ô tô và xe máy đậu dọc đường, nhãn địa danh có chấm cam.
 
 const Geo := preload("res://scripts/realmap/geo.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
@@ -19,6 +21,7 @@ uniform vec3 cam_pos;
 uniform float hole = 3.2;
 uniform float band_half = 9.0;
 uniform float band_depth = 26.0;
+uniform bool cut_on = false;
 varying vec3 wpos;
 void vertex() {
 	wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -30,13 +33,13 @@ void fragment() {
 	vec3 ab = b - a;
 	float t = clamp(dot(wpos - a, ab) / max(dot(ab, ab), 0.001), 0.0, 1.0);
 	float d = length(wpos - (a + ab * t));
-	if (t > 0.08 && t < 0.985 && d < hole * smoothstep(0.08, 0.7, t) + 0.6) {
+	if (cut_on && t > 0.08 && t < 0.985 && d < hole * smoothstep(0.08, 0.7, t) + 0.6) {
 		discard;
 	}
 	// Camera luôn nhìn về hướng bắc: nhà ở dải phía nam (trước mặt camera) gần An bị cắt còn chân tường thấp,
 	// như kiểu cắt nhà ở màn phố, để thấy An và mặt phố.
 	float dz = wpos.z - player_pos.z;
-	if (dz > 1.2 && dz < band_depth && abs(wpos.x - player_pos.x) < band_half + dz * 0.35 && wpos.y > 0.7) {
+	if (cut_on && dz > 1.2 && dz < band_depth && abs(wpos.x - player_pos.x) < band_half + dz * 0.35 && wpos.y > 0.7) {
 		discard;
 	}
 	vec3 col = COLOR.rgb;
@@ -47,9 +50,12 @@ void fragment() {
 		float floor_i = floor(UV.y / 3.2);
 		bool win = fy > 0.32 && fy < 0.8 && fx > 0.22 && fx < 0.78 && floor_i >= 1.0 && UV.y < UV2.y - 0.6;
 		bool door = floor_i < 1.0 && fy > 0.05 && fy < 0.72 && fx > 0.12 && fx < 0.88 && UV2.y > 4.0;
-		if (win) col = mix(col, vec3(0.13, 0.17, 0.21), 0.78);
-		if (door) col = mix(col, vec3(0.32, 0.31, 0.3), 0.6);
-		if (fy < 0.05) col *= 0.86;
+		// Nhìn xa (mỗi ô cửa chỉ còn vài điểm ảnh) thì mờ dần cửa sổ, tránh lấm tấm.
+		float fw = max(fwidth(UV.x) / 2.6, fwidth(UV.y) / 3.2);
+		float vis = 1.0 - smoothstep(0.12, 0.3, fw);
+		if (win) col = mix(col, vec3(0.13, 0.17, 0.21), 0.78 * vis);
+		if (door) col = mix(col, vec3(0.32, 0.31, 0.3), 0.6 * vis);
+		if (fy < 0.05) col *= mix(1.0, 0.86, vis);
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.88;
@@ -63,14 +69,20 @@ var building_mat: ShaderMaterial
 var grid: AStarGrid2D
 var bounds := Rect2()
 var labels: Array = []
+var clip := PackedVector2Array()
+## Đếm cho thẻ thông tin: nhà, cây, xe.
+var counts := {"buildings": 0, "trees": 0, "cars": 0}
 var _flat := {}
 var _rng := RandomNumberGenerator.new()
 
 
-func build(d, area_rect: Rect2) -> void:
+## clip: vùng đã vẽ (mét, cùng gốc với dữ liệu).
+func build(d, clip_poly: PackedVector2Array) -> void:
 	data = d
 	cfg = d.cfg
-	bounds = area_rect
+	clip = clip_poly
+	bounds = Geo.bounds(clip)
+	_clip_data()
 	font = UI.text_font()
 	building_mat = ShaderMaterial.new()
 	var sh := Shader.new()
@@ -86,6 +98,50 @@ func build(d, area_rect: Rect2) -> void:
 	_labels()
 	_commit_flat()
 	_walk_grid()
+	_street_trees()
+	_multimesh_trees()
+	_vehicles()
+
+
+# ---------------------------------------------------------------- cắt theo vùng
+
+func _clip_data() -> void:
+	data.roads = _clip_items(data.roads)
+	data.waterways = _clip_items(data.waterways)
+	data.walls = _clip_items(data.walls)
+	data.rails = _clip_items(data.rails)
+	data.tree_rows = _clip_items(data.tree_rows)
+	data.water = _clip_areas(data.water)
+	data.parks = _clip_areas(data.parks)
+	data.buildings = data.buildings.filter(func(b) -> bool: return Geometry2D.is_point_in_polygon(Geo.centroid(b.poly), clip))
+	data.pois = data.pois.filter(func(p) -> bool: return Geometry2D.is_point_in_polygon(p.pos, clip))
+	data.trees = data.trees.filter(func(t) -> bool: return Geometry2D.is_point_in_polygon(t, clip))
+	counts.buildings = data.buildings.size()
+
+
+## Đường, kênh, tường: giữ phần nằm trong vùng (một đường có thể bị cắt thành vài đoạn).
+func _clip_items(items: Array) -> Array:
+	var out := []
+	for it in items:
+		for seg in Geometry2D.intersect_polyline_with_polygon(it.line, clip):
+			if seg.size() >= 2:
+				var c: Dictionary = it.duplicate()
+				c["line"] = seg
+				out.append(c)
+	return out
+
+
+## Hồ, công viên: giao với vùng, bỏ phần lỗ.
+func _clip_areas(items: Array) -> Array:
+	var out := []
+	var cw := Geometry2D.is_polygon_clockwise(clip)
+	for it in items:
+		for poly in Geometry2D.intersect_polygons(it.poly, clip):
+			if poly.size() >= 3 and Geometry2D.is_polygon_clockwise(poly) == cw:
+				var c: Dictionary = it.duplicate()
+				c["poly"] = poly
+				out.append(c)
+	return out
 
 
 # ---------------------------------------------------------------- lưới gộp
@@ -109,8 +165,7 @@ func _commit_flat() -> void:
 		m.vertex_color_use_as_albedo = true
 		m.roughness = 0.92
 		if key == "water":
-			m.roughness = 0.12
-			m.metallic = 0.15
+			m.roughness = 0.5
 		mi.material_override = m
 		add_child(mi)
 	_flat.clear()
@@ -151,7 +206,7 @@ static func _strip(st: SurfaceTool, line: PackedVector2Array, w: float, y: float
 		var q := [a + n, b + n, b - n, a - n]
 		_tri(st, _v(q[0], y), _v(q[1], y), _v(q[2], y), Vector3.UP, col)
 		_tri(st, _v(q[0], y), _v(q[2], y), _v(q[3], y), Vector3.UP, col)
-	for i in line.size():
+	for i in range(1, line.size() - 1):
 		if hw < 0.6:
 			continue
 		var c := line[i]
@@ -167,14 +222,26 @@ static func _v(p: Vector2, y: float) -> Vector3:
 
 # ---------------------------------------------------------------- mặt đất, cỏ, nước
 
+## Tấm đế: mặt trên là vùng đã vẽ, bốn bề là lớp đất dày 4 m như mô hình sa bàn.
 func _ground() -> void:
-	var r := bounds.grow(60.0)
-	_fill(_st("ground"), PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), 0.0, Color("9c958a"))
+	_fill(_st("ground"), clip, 0.0, Color("a39c90"))
+	var st := _st("walls")
+	var c := Geo.centroid(clip)
+	for i in clip.size():
+		var a := clip[i]
+		var b := clip[(i + 1) % clip.size()]
+		var nn := Vector3(b.y - a.y, 0, -(b.x - a.x)).normalized()
+		if Vector2(nn.x, nn.z).dot((a + b) / 2.0 - c) < 0.0:
+			nn = -nn
+		_tri(st, _v(a, 0.0), _v(b, 0.0), _v(b, -4.0), nn, Color("7d6a55"))
+		_tri(st, _v(a, 0.0), _v(b, -4.0), _v(a, -4.0), nn, Color("7d6a55"))
+		_tri(st, _v(a, 0.02), _v(b, 0.02), _v(b, -0.35), nn, Color("5f8a45"))
+		_tri(st, _v(a, 0.02), _v(b, -0.35), _v(a, -0.35), nn, Color("5f8a45"))
 
 
 func _parks() -> void:
 	for p in data.parks:
-		var col := Color("6f9a4f")
+		var col := Color("5a8442")
 		match str(p.kind):
 			"pitch":
 				col = Color("5c9a58")
@@ -216,7 +283,7 @@ func _in_water(p: Vector2) -> bool:
 
 
 func _water() -> void:
-	var col := Color("2f5458")
+	var col := Color("2b6a8f")
 	for w in data.water:
 		_fill(_st("water"), w.poly, 0.03, col)
 	for w in data.waterways:
@@ -358,19 +425,34 @@ func _buildings() -> void:
 				h = lh * _rng.randi_range(int(lv[0]), int(lv[1])) + 0.4
 		var base := float(b.min_height)
 		var wall_col: Color = b.colour if b.colour != null else Color(str(palette[_rng.randi() % palette.size()]))
+		# Cao ốc từ 30 m: kính xanh xám.
+		if b.colour == null and h >= 30.0:
+			wall_col = Color(["5d7389", "4a5a6c", "7f8e9c", "d9dde2"][_rng.randi() % 4])
 		if b.worship and b.colour == null:
 			wall_col = Color(str(bc.get("worshipWall", "d9b56b")))
 		var shape := str(b.roof_shape)
 		if shape == "" and b.worship:
 			shape = "hipped"
+		# Nhà thấp nhỏ không ghi mái: một phần lợp ngói đỏ, như ảnh trên cao của phố Việt.
+		var tiled := false
+		if shape == "" and not b.known and a < 160.0 and h <= 13.5 and _rng.randf() < float(bc.get("tiledShare", 0.38)):
+			shape = "gabled"
+			tiled = true
 		var pitched := shape in ["gabled", "hipped", "pyramidal", "half-hipped", "gambrel", "mansard", "dome", "onion", "round", "skillion", "cone"]
 		var roof_col: Color
 		if b.roof_colour != null:
 			roof_col = b.roof_colour
 		elif b.worship:
 			roof_col = Color(str(bc.get("worshipRoof", "6e2f22")))
+		elif tiled:
+			var tiles: Array = bc.get("tileRoofs", ["b5432f"])
+			roof_col = Color(str(tiles[_rng.randi() % tiles.size()]))
+		elif pitched:
+			roof_col = Color(str(bc.get("pitchedRoof", "a5523a")))
 		else:
-			roof_col = Color(str(bc.get("pitchedRoof" if pitched else "flatRoof", "8e8a83")))
+			# Mái bằng: xám bê tông nhiều sắc, hay sẫm theo màu tường.
+			var flats := [Color("8a857d"), Color("77736c"), Color("9c9486"), Color("6c6a66"), wall_col.darkened(0.3)]
+			roof_col = flats[_rng.randi() % flats.size()]
 		var rh := 0.0
 		var rect := {}
 		if pitched:
@@ -397,7 +479,6 @@ func _buildings() -> void:
 	mi.material_override = building_mat
 	add_child(mi)
 	_multimesh_tanks(tanks)
-	_multimesh_trees()
 
 
 ## Tường quanh đường viền, từ y0 tới y1. UV.x là quãng đường dọc tường, UV.y là độ cao (để shader vẽ cửa sổ theo tầng).
@@ -560,47 +641,25 @@ static func _solid(c: Color) -> StandardMaterial3D:
 # ---------------------------------------------------------------- nhãn tên
 
 func _labels() -> void:
+	# Chỉ ghi tên địa danh (đền, chùa, di tích, điểm tham quan, tòa nhà lớn có tên), tối đa 14 cái, không chồng nhau.
 	var placed: Array[Vector2] = []
-	# Tên đường nằm sát mặt đường, xoay theo hướng đường, đặt ở đoạn dài nhất.
-	for r in data.roads:
-		if str(r.name) == "" or r.small and float(r.width) < 3.0:
+	var order: Array = data.pois.duplicate()
+	order.sort_custom(func(a, b) -> bool: return int(a.get("rank", 1)) > int(b.get("rank", 1)))
+	for p in order:
+		if placed.size() >= 9 or placed.any(func(q: Vector2) -> bool: return q.distance_to(p.pos) < 90.0):
 			continue
-		var best := -1
-		var best_l := 0.0
-		for i in r.line.size() - 1:
-			var l: float = r.line[i].distance_to(r.line[i + 1])
-			if l > best_l and bounds.has_point((r.line[i] + r.line[i + 1]) / 2.0):
-				best_l = l
-				best = i
-		if best < 0 or best_l < 18.0:
-			continue
-		var a: Vector2 = r.line[best]
-		var b: Vector2 = r.line[best + 1]
-		var mid := (a + b) / 2.0
-		if placed.any(func(q: Vector2) -> bool: return q.distance_to(mid) < 40.0):
-			continue
-		placed.append(mid)
-		var ang := atan2(b.y - a.y, b.x - a.x)
-		if absf(ang) > PI / 2.0:
-			ang += PI
-		var l := _label(str(r.name), Vector3(mid.x, (0.5 if r.bridge else 0.08) + 0.03, mid.y), 64 if float(r.width) >= 7.0 else 44, false)
-		l.rotation = Vector3(-PI / 2.0, -ang, 0)
+		placed.append(p.pos)
+		var h := float(p.get("height", 8.0))
+		var l := _label(str(p.name), _v(p.pos, h + 6.0), 26, true)
 		l.modulate = Color("fbf6e9")
-	for w in data.water:
-		if str(w.name) != "" and absf(Geo.area(w.poly)) > 300.0:
-			_label(str(w.name), _v(Geo.centroid(w.poly), 1.5), 40, true).modulate = Color("cfe6ee")
-	for w in data.waterways:
-		if str(w.name) != "" and w.line.size() >= 2:
-			var mid: Vector2 = w.line[w.line.size() / 2]
-			if bounds.grow(-20).has_point(mid):
-				_label(str(w.name), _v(mid, 1.5), 40, true).modulate = Color("cfe6ee")
-	for p in data.parks:
-		if str(p.name) != "":
-			_label(str(p.name), _v(Geo.centroid(p.poly), 1.5), 34, true).modulate = Color("d9efc4")
-	for p in data.pois:
-		var col := Color("ffd27a") if str(p.kind) == "worship" else Color("f4c7a1")
-		var icon := "卍 " if str(p.kind) == "worship" else "◆ "
-		_label(icon + str(p.name), _v(p.pos, 9.0), 40, true).modulate = col
+		var dot := MeshInstance3D.new()
+		var sm := SphereMesh.new()
+		sm.radius = 1.6
+		sm.height = 3.2
+		dot.mesh = sm
+		dot.material_override = _solid(Color("ff7a45"))
+		dot.position = _v(p.pos, h + 1.5)
+		add_child(dot)
 
 
 func _label(text: String, pos: Vector3, size: int, billboard: bool) -> Label3D:
@@ -615,9 +674,103 @@ func _label(text: String, pos: Vector3, size: int, billboard: bool) -> Label3D:
 	if billboard:
 		l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		l.no_depth_test = true
+		l.fixed_size = true
+		l.pixel_size = 0.00042
+		l.outline_size = 7
 	add_child(l)
 	labels.append(l)
 	return l
+
+
+# ---------------------------------------------------------------- cây, xe
+
+## Cây ven đường (mỗi 13 m, hai bên, chỗ không vướng nhà hay nước), cây OSM và hàng cây OSM.
+func _street_trees() -> void:
+	_rng.seed = 77
+	for t in data.trees:
+		_trees.append(t)
+	for r in data.tree_rows:
+		_along(r.line, 7.0, func(p: Vector2, _d: Vector2) -> void: _trees.append(p))
+	for r in data.roads:
+		if r.small or r.bridge or float(r.width) < 6.0:
+			continue
+		var off := float(r.width) / 2.0 + 1.3
+		_along(r.line, 13.0, func(p: Vector2, d: Vector2) -> void:
+			for side in [-1.0, 1.0]:
+				var q: Vector2 = p + d.orthogonal() * off * side
+				if _rng.randf() < 0.6 and walkable(q) and not _in_water(q) and Geometry2D.is_point_in_polygon(q, clip):
+					_trees.append(q))
+	counts.trees = _trees.size()
+
+
+## Gọi f(điểm, hướng) đều đặn mỗi step mét dọc đường gấp khúc.
+static func _along(line: PackedVector2Array, step: float, f: Callable) -> void:
+	var carry := step / 2.0
+	for i in line.size() - 1:
+		var a := line[i]
+		var b := line[i + 1]
+		var l := a.distance_to(b)
+		if l < 0.01:
+			continue
+		var d := (b - a) / l
+		var s := carry
+		while s < l:
+			f.call(a + d * s, d)
+			s += step
+		carry = s - l
+
+
+## Ô tô đậu dọc đường lớn, xe máy dựng sát vỉa hè đường nhỏ: khối thấp nhiều màu.
+func _vehicles() -> void:
+	_rng.seed = 531
+	var cars: Array = []
+	var bikes: Array = []
+	for r in data.roads:
+		if r.bridge or r.tunnel or str(r.kind) in ["footway", "path", "steps", "cycleway"]:
+			continue
+		var w := float(r.width)
+		_along(r.line, 9.0 if w >= 6.0 else 6.0, func(p: Vector2, d: Vector2) -> void:
+			var side := -1.0 if _rng.randf() < 0.5 else 1.0
+			if w >= 6.0 and _rng.randf() < 0.32:
+				var q: Vector2 = p + d.orthogonal() * (w / 2.0 - 1.4) * side
+				if Geometry2D.is_point_in_polygon(q, clip):
+					cars.append([q, d])
+			elif _rng.randf() < 0.25:
+				var q: Vector2 = p + d.orthogonal() * (w / 2.0 - 0.5) * side
+				if Geometry2D.is_point_in_polygon(q, clip):
+					bikes.append([q, d.orthogonal()]))
+	var palette := [Color("e8e6e1"), Color("2b2d33"), Color("b23a32"), Color("3a6ea5"), Color("c9ccd1"), Color("e0b23c"), Color("5a7d4f")]
+	_vehicle_mesh(cars, Vector3(1.8, 0.75, 4.2), Vector3(1.6, 0.6, 2.1), palette)
+	_vehicle_mesh(bikes, Vector3(0.5, 0.75, 1.8), Vector3(0.4, 0.35, 0.7), palette)
+	counts.cars = cars.size() + bikes.size()
+
+
+func _vehicle_mesh(items: Array, body: Vector3, cabin: Vector3, palette: Array) -> void:
+	if items.is_empty():
+		return
+	for part in [[body, 0.25], [cabin, 0.25 + body.y]]:
+		var bm := BoxMesh.new()
+		bm.size = part[0]
+		var m := StandardMaterial3D.new()
+		m.vertex_color_use_as_albedo = true
+		m.roughness = 0.5
+		bm.material = m
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.use_colors = true
+		mm.mesh = bm
+		mm.instance_count = items.size()
+		for i in items.size():
+			var p: Vector2 = items[i][0]
+			var d: Vector2 = items[i][1]
+			var basis := Basis(Vector3.UP, atan2(d.x, d.y))
+			var size: Vector3 = part[0]
+			mm.set_instance_transform(i, Transform3D(basis, Vector3(p.x, float(part[1]) + size.y / 2.0, p.y)))
+			var col: Color = palette[i % palette.size()]
+			mm.set_instance_color(i, col if part[0] == body else Color("2c3440"))
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		add_child(mmi)
 
 
 # ---------------------------------------------------------------- lưới đi bộ

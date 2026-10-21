@@ -14,7 +14,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var scene: Node3D = load("res://scenes/realmap.tscn").instantiate()
+	var scene: Control = load("res://scenes/realmap.tscn").instantiate()
 	# Cấu hình máy chủ giả và tên khu mẫu truyền qua đối số giả lập.
 	scene.set_meta("test_args", true)
 	root.add_child(scene)
