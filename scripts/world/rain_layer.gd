@@ -4,6 +4,8 @@ extends Node3D
 ## mức 2 (ngày 29, mưa dài từ sáng) ngập thêm đường Bờ Me và khúc cuối các hẻm đổ ra rạch.
 ## Trước xóm trọ là thùng đồ của nhà: có che hay không tùy việc chuẩn bị ngày 14, 23, 28.
 
+const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
+const Geo := preload("res://scripts/realmap/geo.gd")
 const FLOOD_Y := 0.2
 ## Lội nước: đi chậm hơn, và mỗi mét tính giờ nhiều hơn.
 const WADE_SPEED := 0.6
@@ -41,6 +43,9 @@ func build() -> void:
 		n.visible = false
 		add_child(n)
 		_nodes[l] = n
+	if world.real:
+		_build_real(water)
+		return
 	# Rạch tràn bờ: mặt nước phủ hết hai bãi cỏ, bùn ven rạch; chỉ còn lề đá kè nhô lên.
 	if city.streets.has("bo_me") and city.streets.has("bo_nam"):
 		var z0: float = city.streets.bo_me.rect.end.y
@@ -65,6 +70,60 @@ func build() -> void:
 	_build_splash()
 	for i in _ripple_rects[2].size():
 		_ripples.append(_ripple_emitter())
+	_build_umbrella()
+
+
+## Map thật: ngập theo các đoạn đường gần kênh (real_city.gd tính sẵn), vũng nước rải dọc đường, một bộ gợn đi theo An.
+func _build_real(water: Material) -> void:
+	for l in [1, 2]:
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for seg in world.city.floods[l]:
+			if l == 2 and world.city.floods[1].has(seg):
+				continue
+			AreaBuilder._strip(st, PackedVector2Array([seg.a, seg.b]), float(seg.w), FLOOD_Y, Color.WHITE)
+		var mi := MeshInstance3D.new()
+		mi.mesh = st.commit()
+		mi.material_override = water
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_nodes[l].add_child(mi)
+	# Vũng nước: mỗi 11 m một vũng trên mặt đường, gộp thành một MultiMesh.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1529
+	var spots: Array = []
+	for r in world.city.data.roads:
+		if r.bridge or r.tunnel:
+			continue
+		var hw := float(r.width) / 2.0
+		AreaBuilder._along(r.line, 11.0, func(p: Vector2, d: Vector2) -> void:
+			if rng.randf() < 0.6:
+				spots.append([p + d.orthogonal() * rng.randf_range(-hw + 0.5, hw - 0.5), rng.randf() * TAU, rng.randf_range(0.5, 1.5)]))
+	var cm := CylinderMesh.new()
+	cm.top_radius = 1.0
+	cm.bottom_radius = 1.0
+	cm.height = 0.01
+	cm.radial_segments = 12
+	cm.rings = 1
+	var pm := StandardMaterial3D.new()
+	pm.albedo_color = Color(0.22, 0.25, 0.26, 0.82)
+	pm.roughness = 0.03
+	pm.metallic = 0.3
+	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	cm.material = pm
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = cm
+	mm.instance_count = spots.size()
+	for i in spots.size():
+		var sp: Array = spots[i]
+		var p: Vector2 = sp[0]
+		mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, float(sp[1])).scaled(Vector3(float(sp[2]), 1.0, float(sp[2]) * 0.6)), Vector3(p.x, 0.07, p.y)))
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_nodes[1].add_child(mmi)
+	_build_splash()
+	_ripples.append(_ripple_emitter())
 	_build_umbrella()
 
 
@@ -247,6 +306,23 @@ func _process(_delta: float) -> void:
 	_splash.position = pp + Vector3(0, 0.12, 0)
 	# Mỗi vùng nước một bộ gợn, chỉ phát trong phần vùng nước nằm quanh An.
 	var view := Rect2(Vector2(pp.x, pp.z) - VIEW / 2.0, VIEW)
+	if world.real:
+		# Map thật: một bộ gợn phủ các đoạn ngập nằm quanh An.
+		var box := Rect2()
+		var any := false
+		for seg in world.city.floods[mini(level, 2)]:
+			var sb := Rect2(seg.a, Vector2.ZERO).expand(seg.b).grow(float(seg.w) / 2.0)
+			if sb.intersects(view):
+				box = sb if not any else box.merge(sb)
+				any = true
+		var e := _ripples[0]
+		if any:
+			var r := box.intersection(view)
+			e.position = Vector3(r.get_center().x, FLOOD_Y + 0.01, r.get_center().y)
+			e.emission_box_extents = Vector3(r.size.x / 2.0, 0.0, r.size.y / 2.0)
+		if e.emitting != any:
+			e.emitting = any
+		return
 	var rects: Array = _ripple_rects[mini(level, 2)]
 	for i in _ripples.size():
 		var e := _ripples[i]
@@ -264,6 +340,11 @@ func _process(_delta: float) -> void:
 func wading(p: Vector2) -> bool:
 	if level <= 0:
 		return false
+	if world.real:
+		for seg in world.city.floods[mini(level, 2)]:
+			if Geo.seg_dist(p, seg.a, seg.b) < float(seg.w) / 2.0:
+				return true
+		return false
 	for r in _floods[mini(level, 2)]:
 		if r.has_point(p):
 			return true
@@ -272,7 +353,7 @@ func wading(p: Vector2) -> bool:
 
 ## Vùng ngập hôm nay, để bản đồ tô màu.
 func flood_rects() -> Array:
-	return [] if level <= 0 else _floods[mini(level, 2)]
+	return [] if level <= 0 or world.real else _floods[mini(level, 2)]
 
 
 ## "tot": đồ đã kê cao, phủ bạt; "mot_phan": Linh che phần của em và bà; "uot": chưa che gì.

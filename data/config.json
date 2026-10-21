@@ -58,6 +58,8 @@
     "cau_tre": { "name": "Phòng Cầu Tre", "cost": 4200000, "deposit": 1800000, "loc": "cau_tre", "note": "Xa hơn nhưng thoáng, có hiên. Tốn thêm tiền xăng." },
     "di_nam": { "name": "Ở tạm nhà dì Năm (7 ngày)", "cost": 500000, "temp": true, "loc": "nha_di_nam", "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được." }
   },
+  "_map": "Map của màn phố: q8_tau_hu (khu thật Quận 8 ven kênh Tàu Hủ, data/maps/) hay an_hoa (phường vẽ tay, data/map.json).",
+  "map": "q8_tau_hu",
   "rainDays": [15, 29],
   "rainFlood": {"15": 1, "29": 2},
   "endings": { "exhaustWarnDays": 4, "exhaustSkips": 3, "exhaustFatigue": 60, "distantMarks": 3, "ownTableCash": 600000 },

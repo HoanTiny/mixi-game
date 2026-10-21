@@ -16,6 +16,9 @@ var big := false
 var other: Control
 var _hover := ""
 var _redraw_t := 0.0
+## Map thật: lớp tĩnh (kênh, nhà, đường) vẽ một lần, lớp động (An, dấu, tên) vẽ lại liên tục.
+var _base: Control
+var _over: Control
 
 
 func _ready() -> void:
@@ -25,6 +28,16 @@ func _ready() -> void:
 	mouse_exited.connect(func() -> void:
 		_hover = ""
 		queue_redraw())
+	if world.real:
+		_base = Control.new()
+		_over = Control.new()
+		for c in [_base, _over]:
+			c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			c.set_anchors_preset(Control.PRESET_FULL_RECT)
+			add_child(c)
+		_base.draw.connect(_draw_real_static)
+		_over.draw.connect(_draw_real_over)
+		resized.connect(func() -> void: _base.queue_redraw())
 	if big:
 		visible = false
 		set_anchors_preset(Control.PRESET_CENTER)
@@ -40,7 +53,10 @@ func _process(delta: float) -> void:
 	_redraw_t -= delta
 	if _redraw_t <= 0.0:
 		_redraw_t = 0.08
-		queue_redraw()
+		if _over != null:
+			_over.queue_redraw()
+		else:
+			queue_redraw()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -126,6 +142,8 @@ func _draw() -> void:
 	var city = world.city
 	var font := get_theme_default_font()
 	draw_style_box(UI.box(UI.HUD_BG if not big else Color(0.07, 0.08, 0.11, 0.94), Color(1, 1, 1, 0.12), 8, 0), Rect2(Vector2.ZERO, size))
+	if world.real:
+		return
 	var b: Rect2 = city.bounds
 	draw_rect(_rect(b), Color("3a3833"))
 	# Ruộng phía nam và rạch.
@@ -258,3 +276,157 @@ func _label(font: Font, dp: Vector2, r: float, s: String, placed: Array[Rect2]) 
 func _text(font: Font, pos: Vector2, s: String, fs: int, col: Color) -> void:
 	draw_string_outline(font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 4, Color(0, 0, 0, 0.75))
 	draw_string(font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+
+
+# ---------------------------------------------------------------- map thật
+
+func _pts(c: Control, poly: PackedVector2Array) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for p in poly:
+		out.append(to_map(p))
+	return out
+
+
+func _draw_real_static() -> void:
+	var city = world.city
+	var c := _base
+	var b: Rect2 = city.bounds
+	c.draw_rect(_rect(b), Color("3a3833"))
+	for p in city.data.parks:
+		var pts := _pts(c, p.poly)
+		if Geometry2D.triangulate_polygon(pts).size() > 0:
+			c.draw_colored_polygon(pts, Color("3f5a33"))
+	for w in city.data.water:
+		var pts := _pts(c, w.poly)
+		if Geometry2D.triangulate_polygon(pts).size() > 0:
+			c.draw_colored_polygon(pts, Color("4f7f8f"))
+	var s := _scale()
+	if big or s > 0.25:
+		for bd in city.data.buildings:
+			var pts := _pts(c, bd.poly)
+			if pts.size() >= 3 and Geometry2D.triangulate_polygon(pts).size() > 0:
+				c.draw_colored_polygon(pts, Color("5e5a52"))
+	var roads: Array = city.data.roads.duplicate()
+	roads.sort_custom(func(x, y) -> bool: return float(x.width) < float(y.width))
+	for r in roads:
+		var w := maxf(float(r.width) * s * (0.8 if big else 0.9), 1.0)
+		var col := Color("a5927a") if r.bridge else (Color("8b8780") if not r.small else Color("b9b2a3"))
+		if r.small and not big and s < 0.3:
+			continue
+		c.draw_polyline(_pts(c, r.line), col, w, w > 2.0)
+	for id in city.locs:
+		var p: Dictionary = city.locs[id]
+		var n: Vector2 = p.normal
+		var t := Vector2(n.y, -n.x)
+		var cc: Vector2 = p.center
+		var w := float(p.w)
+		var d := float(p.d)
+		var quad := PackedVector2Array([to_map(cc - t * w / 2.0), to_map(cc + t * w / 2.0), to_map(cc + t * w / 2.0 - n * d), to_map(cc - t * w / 2.0 - n * d)])
+		c.draw_colored_polygon(quad, Color(world.LOCATIONS[id].color).darkened(0.1))
+	if big:
+		var font := get_theme_default_font()
+		# Tên trong truyện: con kênh lớn nhất là rạch Bờ Me; vài đường chính có tên hư cấu.
+		var biggest = null
+		for w in city.data.water:
+			if biggest == null or Geo_area(w.poly) > Geo_area(biggest.poly):
+				biggest = w
+		if biggest != null:
+			_text_on(c, font, to_map(_centroid(biggest.poly)), "Rạch Bờ Me", 13, Color("cfe6ee"))
+		# Chỉ ghi tên đường lớn (không ghi tên hẻm), mỗi tên một lần, ở đoạn dài nhất.
+		var best := {}
+		for r in roads:
+			var name: String = city.street_name(str(r.name))
+			if name == "" or r.small or name.begins_with("Hẻm") or r.line.size() < 2:
+				continue
+			var l := 0.0
+			for k in r.line.size() - 1:
+				l += (r.line[k] as Vector2).distance_to(r.line[k + 1])
+			if l > float(best.get(name, [0.0])[0]):
+				best[name] = [l, r.line[r.line.size() / 2]]
+		for name in best:
+			if float(best[name][0]) > 60.0:
+				_text_on(c, font, to_map(best[name][1]), name, 12, Color("f4efe1"))
+
+
+func _draw_real_over() -> void:
+	var city = world.city
+	var c := _over
+	var font := get_theme_default_font()
+	for sp in world.objective_spots():
+		var mp := to_map(Vector2(sp[0].x, sp[0].z))
+		var r := 6.0 if big else 4.5
+		c.draw_colored_polygon(PackedVector2Array([mp + Vector2(0, -r), mp + Vector2(r, 0), mp + Vector2(0, r), mp + Vector2(-r, 0)]), sp[1])
+	var target = world.delivery_target()
+	if target != null:
+		var tp := to_map(Vector2(target.x, target.z))
+		c.draw_circle(tp, 6.0, Color("2ecc71") if world.game.delivery_active().picked else Color("ff9f1c"))
+		c.draw_arc(tp, 9.0, 0, TAU, 20, Color.WHITE, 1.5)
+	var open: String = world.hud.location_open()
+	var near: String = world.nearest_location()
+	var placed: Array[Rect2] = []
+	for id in city.locs:
+		var dp := to_map(city.loc_door(id))
+		var rr := (6.0 if big else 4.0) + (1.5 if id == _hover or id == open else 0.0)
+		c.draw_circle(dp, rr + 1.2, Color(0, 0, 0, 0.6))
+		c.draw_circle(dp, rr, Color(world.LOCATIONS[id].color).lightened(0.15))
+		if id == open or id == near:
+			c.draw_arc(dp, rr + 3.0, 0, TAU, 20, UI.GOLD, 1.5)
+		placed.append(Rect2(dp - Vector2(rr, rr), Vector2(rr, rr) * 2.0))
+	if big:
+		for id in city.locs:
+			_label_on(c, font, to_map(city.loc_door(id)), 6.0, str(world.LOCATIONS[id].name), placed)
+	var pp := to_map(Vector2(world.player.position.x, world.player.position.z))
+	var a: float = world.player.rotation.y
+	var fwd := Vector2(sin(a), cos(a))
+	var side := Vector2(-fwd.y, fwd.x)
+	var k := 1.5 if big else 1.0
+	var tri := PackedVector2Array([pp + fwd * 9.0 * k, pp - fwd * 5.0 * k + side * 6.0 * k, pp - fwd * 5.0 * k - side * 6.0 * k])
+	c.draw_colored_polygon(tri, UI.GOLD)
+	c.draw_polyline(tri + PackedVector2Array([tri[0]]), Color(0, 0, 0, 0.7), 1.2)
+	var title := "%s · bấm để mở bản đồ lớn (M)" % city.display if not big else "Bản đồ %s · bấm một chỗ để đi tới · M hoặc Esc để đóng" % city.display
+	var col := UI.HUD_SOFT
+	var show_id := _hover if _hover != "" else open
+	if show_id != "":
+		title = str(world.LOCATIONS[show_id].name)
+		col = UI.HUD_TEXT
+	var fs := 15 if big else 12
+	var tw := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	c.draw_string_outline(font, Vector2((size.x - tw) / 2.0, 16 if not big else 17), title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 4, Color(0, 0, 0, 0.7))
+	c.draw_string(font, Vector2((size.x - tw) / 2.0, 16 if not big else 17), title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+
+
+static func Geo_area(poly: PackedVector2Array) -> float:
+	var s := 0.0
+	for i in poly.size():
+		s += poly[i].x * poly[(i + 1) % poly.size()].y - poly[(i + 1) % poly.size()].x * poly[i].y
+	return absf(s) / 2.0
+
+
+static func _centroid(poly: PackedVector2Array) -> Vector2:
+	var c := Vector2.ZERO
+	for p in poly:
+		c += p
+	return c / maxf(poly.size(), 1)
+
+
+func _text_on(c: Control, font: Font, pos: Vector2, s: String, fs: int, col: Color) -> void:
+	var w := font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	c.draw_string_outline(font, pos - Vector2(w / 2.0, 0), s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 4, Color(0, 0, 0, 0.75))
+	c.draw_string(font, pos - Vector2(w / 2.0, 0), s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+
+
+func _label_on(c: Control, font: Font, dp: Vector2, r: float, s: String, placed: Array[Rect2]) -> void:
+	var w := font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
+	var asc := font.get_ascent(13)
+	var h := asc + font.get_descent(13)
+	var tries := [Vector2(r + 4.0, 4.0), Vector2(-r - 4.0 - w, 4.0), Vector2(-w / 2.0, -r - 8.0), Vector2(-w / 2.0, r + 22.0)]
+	var pos: Vector2 = dp + tries[0]
+	for t in tries:
+		var box := Rect2(dp + t - Vector2(0, asc), Vector2(w, h))
+		if placed.all(func(q: Rect2) -> bool: return not q.intersects(box)):
+			pos = dp + t
+			break
+	placed.append(Rect2(pos - Vector2(0, asc), Vector2(w, h)))
+	c.draw_string_outline(font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color(0, 0, 0, 0.75))
+	c.draw_string(font, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, UI.HUD_TEXT)
+

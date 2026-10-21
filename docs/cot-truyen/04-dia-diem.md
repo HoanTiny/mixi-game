@@ -14,7 +14,25 @@ Bảy nơi trong truyện, và cách đặt chúng lên bản đồ phường An
 
 **Bỏ đi:** `phuong`, `thu_vien`, `nga_tu`, `quan_ca_phe`. Truyện mới không dùng các nơi này. Nếu muốn giữ cho phố đông vui, có thể để làm cảnh nền không tương tác.
 
-## Bản đồ phường An Hòa
+## Map khu thật: Quận 8, ven kênh Tàu Hủ
+
+Từ khi có chế độ Dựng khu thật, map chơi là một khu có thật ở Quận 8 (TP.HCM), dọc kênh Tàu Hủ quanh cầu chữ Y, khung khoảng 980 × 860 m. Địa hình, đường, nhà là thật; tên trong truyện vẫn hư cấu để không gán chuyện bịa cho chỗ có thật.
+
+| Trong truyện | Chỗ trên map thật |
+|---|---|
+| Rạch Bờ Me | Kênh Tàu Hủ |
+| Cầu Nhỏ | Cầu chữ Y |
+| Đường Bờ Me | Đường dọc bờ nam kênh |
+| Xóm trọ Bờ Me | Dãy nhà ven kênh, phía tây cầu |
+| Cơm Hạnh, Dãy quán Bến Cạn | Trên đường Bờ Me, giữa xóm trọ và chân cầu |
+| Tiệm Sáu Sửa | Đầu hẻm sau xóm trọ |
+| Chợ Cầu Nhỏ, Hẻm Dừa | Phía đông chân cầu |
+| Phòng Cầu Tre | Bờ bắc kênh, phải đi vòng qua cầu |
+| Bến xe số 6, Nhà dì Năm | Phía tây nam, trên đường lớn |
+
+Đi bộ từ xóm trọ: Tiệm Sáu 76 m, Cơm Hạnh 110 m, Bến Cạn 145 m, bến xe 163 m, nhà dì Năm 198 m, chợ 240 m, Hẻm Dừa 280 m, Cầu Tre 354 m. Map chỉnh ở `data/maps/q8_tau_hu_story.json`.
+
+## Bản đồ phường An Hòa (vẽ tay, map cũ)
 
 Bố cục lấy theo kiểu một khu ven kênh ở TP.HCM: đường lớn phía bắc, các hẻm chạy xuống rạch, chợ ở đầu cầu, dãy nhà quay lưng ra rạch, bên kia rạch là xóm nhà sàn và ruộng rau. Tọa độ: x tăng về hướng đông, z tăng về hướng nam (camera nhìn về hướng bắc).
 

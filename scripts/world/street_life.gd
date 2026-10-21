@@ -208,6 +208,13 @@ func notes_at(loc: String) -> Array:
 func _add_vendor(v: Dictionary) -> void:
 	var pts := PackedVector2Array()
 	var route: Array = v.get("route", [])
+	# Map thật: tuyến của người bán rong đặt theo hẻm thật trong file đặt truyện.
+	if world.real:
+		route = []
+		for p in world.city.vendor_routes.get(str(v.id), PackedVector2Array()):
+			route.append([p.x, p.y])
+		if route.size() < 2:
+			return
 	for k in route.size() - 1:
 		var a := Vector2(float(route[k][0]), float(route[k][1]))
 		var b := Vector2(float(route[k + 1][0]), float(route[k + 1][1]))

@@ -352,3 +352,125 @@ static func _in_poly(p: Vector2, grid: Dictionary) -> bool:
 		if Geometry2D.is_point_in_polygon(p, poly):
 			return true
 	return false
+
+
+# ---------------------------------------------------------------- cắt theo vùng
+
+## Giữ phần nằm trong vùng clip (mét): đường, kênh, tường bị cắt thành đoạn; hồ, công viên giao với vùng;
+## nhà, cây, địa danh giữ nếu tâm nằm trong vùng.
+func clip_to(clip: PackedVector2Array) -> void:
+	roads = _clip_items(roads, clip)
+	waterways = _clip_items(waterways, clip)
+	walls = _clip_items(walls, clip)
+	rails = _clip_items(rails, clip)
+	tree_rows = _clip_items(tree_rows, clip)
+	water = _clip_areas(water, clip)
+	parks = _clip_areas(parks, clip)
+	buildings = buildings.filter(func(b) -> bool: return Geometry2D.is_point_in_polygon(Geo.centroid(b.poly), clip))
+	pois = pois.filter(func(p) -> bool: return Geometry2D.is_point_in_polygon(p.pos, clip))
+	trees = trees.filter(func(t) -> bool: return Geometry2D.is_point_in_polygon(t, clip))
+
+
+static func _clip_items(items: Array, clip: PackedVector2Array) -> Array:
+	var out := []
+	for it in items:
+		for seg in Geometry2D.intersect_polyline_with_polygon(it.line, clip):
+			if seg.size() >= 2:
+				var c: Dictionary = it.duplicate()
+				c["line"] = seg
+				out.append(c)
+	return out
+
+
+static func _clip_areas(items: Array, clip: PackedVector2Array) -> Array:
+	var out := []
+	var cw := Geometry2D.is_polygon_clockwise(clip)
+	for it in items:
+		for poly in Geometry2D.intersect_polygons(it.poly, clip):
+			if poly.size() >= 3 and Geometry2D.is_polygon_clockwise(poly) == cw:
+				var c: Dictionary = it.duplicate()
+				c["poly"] = poly
+				out.append(c)
+	return out
+
+
+# ---------------------------------------------------------------- lưu, đọc map nướng sẵn
+
+## Mảng điểm thành [x, z, x, z…] làm tròn 0,1 m cho file nhỏ.
+static func _flat(pts: PackedVector2Array) -> Array:
+	var out := []
+	for p in pts:
+		out.append(snappedf(p.x, 0.1))
+		out.append(snappedf(p.y, 0.1))
+	return out
+
+
+static func _pts(a: Array) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for i in range(0, a.size() - 1, 2):
+		out.append(Vector2(float(a[i]), float(a[i + 1])))
+	return out
+
+
+static func _hex(c) -> String:
+	return "" if c == null else (c as Color).to_html(false)
+
+
+static func _col(s):
+	return null if str(s) == "" else Color(str(s))
+
+
+## Dữ liệu đã cắt thành từ điển gọn để lưu JSON (map nướng sẵn cho truyện).
+func to_dict() -> Dictionary:
+	var d := {"buildings": [], "roads": [], "water": [], "waterways": [], "parks": [], "walls": [], "rails": [],
+		"trees": [], "tree_rows": [], "pois": [], "stats": stats}
+	for b in buildings:
+		d.buildings.append({"p": _flat(b.poly), "h": snappedf(float(b.height), 0.1), "k": b.known, "mh": snappedf(float(b.min_height), 0.1),
+			"c": _hex(b.colour), "rs": b.roof_shape, "rc": _hex(b.roof_colour), "rh": snappedf(float(b.roof_height), 0.1),
+			"n": b.name, "w": b.worship, "hi": b.historic, "s": b.src, "kind": b.kind})
+	for r in roads:
+		d.roads.append({"l": _flat(r.line), "k": r.kind, "w": r.width, "n": r.name, "b": r.bridge, "t": r.tunnel, "s": r.small})
+	for w in water:
+		d.water.append({"p": _flat(w.poly), "n": w.name})
+	for w in waterways:
+		d.waterways.append({"l": _flat(w.line), "w": w.width, "n": w.name, "k": w.kind})
+	for p in parks:
+		d.parks.append({"p": _flat(p.poly), "k": p.kind, "n": p.name})
+	for w in walls:
+		d.walls.append({"l": _flat(w.line), "k": w.kind, "h": w.height})
+	for r in rails:
+		d.rails.append({"l": _flat(r.line)})
+	for t in trees:
+		d.trees.append_array([snappedf(t.x, 0.1), snappedf(t.y, 0.1)])
+	for r in tree_rows:
+		d.tree_rows.append({"l": _flat(r.line)})
+	for p in pois:
+		d.pois.append({"x": snappedf(p.pos.x, 0.1), "z": snappedf(p.pos.y, 0.1), "n": p.name, "k": p.kind, "r": p.get("rank", 1)})
+	return d
+
+
+## Đọc lại từ to_dict().
+func from_dict(d: Dictionary) -> void:
+	for b in d.get("buildings", []):
+		buildings.append({"poly": _pts(b.p), "height": float(b.h), "known": bool(b.k), "min_height": float(b.mh), "src": str(b.s),
+			"colour": _col(b.c), "roof_shape": str(b.rs), "roof_colour": _col(b.rc), "roof_height": float(b.rh),
+			"name": str(b.n), "worship": bool(b.w), "historic": bool(b.hi), "kind": str(b.get("kind", "yes"))})
+	for r in d.get("roads", []):
+		roads.append({"line": _pts(r.l), "kind": str(r.k), "width": float(r.w), "name": str(r.n), "bridge": bool(r.b), "tunnel": bool(r.t), "small": bool(r.s)})
+	for w in d.get("water", []):
+		water.append({"poly": _pts(w.p), "name": str(w.n)})
+	for w in d.get("waterways", []):
+		waterways.append({"line": _pts(w.l), "width": float(w.w), "name": str(w.n), "kind": str(w.k)})
+	for p in d.get("parks", []):
+		parks.append({"poly": _pts(p.p), "kind": str(p.k), "name": str(p.n)})
+	for w in d.get("walls", []):
+		walls.append({"line": _pts(w.l), "kind": str(w.k), "height": float(w.h)})
+	for r in d.get("rails", []):
+		rails.append({"line": _pts(r.l)})
+	trees = Array(_pts(d.get("trees", [])))
+	for r in d.get("tree_rows", []):
+		tree_rows.append({"line": _pts(r.l)})
+	for p in d.get("pois", []):
+		pois.append({"pos": Vector2(float(p.x), float(p.z)), "name": str(p.n), "kind": str(p.k), "rank": int(p.r)})
+	stats = d.get("stats", stats)
+

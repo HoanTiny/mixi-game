@@ -12,6 +12,7 @@ extends Node3D
 
 const Geo := preload("res://scripts/realmap/geo.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
+const WalkGrid := preload("res://scripts/realmap/walk_grid.gd")
 
 const BUILDING_SHADER := """
 shader_type spatial;
@@ -22,6 +23,9 @@ uniform float hole = 3.2;
 uniform float band_half = 9.0;
 uniform float band_depth = 26.0;
 uniform bool cut_on = false;
+// Tán cây: dùng một màu thay cho màu đỉnh.
+uniform bool flat_color = false;
+uniform vec3 tint = vec3(1.0);
 varying vec3 wpos;
 void vertex() {
 	wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -42,8 +46,8 @@ void fragment() {
 	if (cut_on && dz > 1.2 && dz < band_depth && abs(wpos.x - player_pos.x) < band_half + dz * 0.35 && wpos.y > 0.7) {
 		discard;
 	}
-	vec3 col = COLOR.rgb;
-	if (UV2.x > 0.5) {
+	vec3 col = flat_color ? tint : COLOR.rgb;
+	if (!flat_color && UV2.x > 0.5) {
 		// Tường: vạch sàn mỗi tầng, ô cửa sổ kính tối, tầng trệt cửa cuốn rộng hơn.
 		float fy = fract(UV.y / 3.2);
 		float fx = fract(UV.x / 2.6);
@@ -66,28 +70,38 @@ var data
 var cfg: Dictionary
 var font: Font
 var building_mat: ShaderMaterial
-var grid: AStarGrid2D
+var grid
 var bounds := Rect2()
 var labels: Array = []
 var clip := PackedVector2Array()
 ## Đếm cho thẻ thông tin: nhà, cây, xe.
 var counts := {"buildings": 0, "trees": 0, "cars": 0}
+## Nhãn địa danh thật: tắt khi dùng làm map của truyện (truyện giữ tên hư cấu).
+var show_labels := true
+## Vật liệu riêng cho lớp mặt đất, đường (map của truyện dùng texture nhựa đường nhân với màu đỉnh); null là màu trơn.
+var ground_material: Material = null
+## Chỗ không trồng cây ven đường (cửa các địa điểm của truyện), và các vật liệu có cắt khoét quanh An để màn phố cập nhật.
+var keep_clear: Array = []
+var cut_materials: Array = []
 var _flat := {}
 var _rng := RandomNumberGenerator.new()
 
 
-## clip: vùng đã vẽ (mét, cùng gốc với dữ liệu).
-func build(d, clip_poly: PackedVector2Array) -> void:
+## clip: vùng đã vẽ (mét, cùng gốc với dữ liệu). walk: lưới đi bộ dựng sẵn (map của truyện), không có thì tự dựng.
+func build(d, clip_poly: PackedVector2Array, walk = null) -> void:
+	grid = walk
 	data = d
 	cfg = d.cfg
 	clip = clip_poly
 	bounds = Geo.bounds(clip)
-	_clip_data()
+	data.clip_to(clip)
+	counts.buildings = data.buildings.size()
 	font = UI.text_font()
 	building_mat = ShaderMaterial.new()
 	var sh := Shader.new()
 	sh.code = BUILDING_SHADER
 	building_mat.shader = sh
+	cut_materials.append(building_mat)
 	_ground()
 	_parks()
 	_water()
@@ -95,53 +109,13 @@ func build(d, clip_poly: PackedVector2Array) -> void:
 	_rails()
 	_walls()
 	_buildings()
-	_labels()
+	if show_labels:
+		_labels()
 	_commit_flat()
 	_walk_grid()
 	_street_trees()
 	_multimesh_trees()
 	_vehicles()
-
-
-# ---------------------------------------------------------------- cắt theo vùng
-
-func _clip_data() -> void:
-	data.roads = _clip_items(data.roads)
-	data.waterways = _clip_items(data.waterways)
-	data.walls = _clip_items(data.walls)
-	data.rails = _clip_items(data.rails)
-	data.tree_rows = _clip_items(data.tree_rows)
-	data.water = _clip_areas(data.water)
-	data.parks = _clip_areas(data.parks)
-	data.buildings = data.buildings.filter(func(b) -> bool: return Geometry2D.is_point_in_polygon(Geo.centroid(b.poly), clip))
-	data.pois = data.pois.filter(func(p) -> bool: return Geometry2D.is_point_in_polygon(p.pos, clip))
-	data.trees = data.trees.filter(func(t) -> bool: return Geometry2D.is_point_in_polygon(t, clip))
-	counts.buildings = data.buildings.size()
-
-
-## Đường, kênh, tường: giữ phần nằm trong vùng (một đường có thể bị cắt thành vài đoạn).
-func _clip_items(items: Array) -> Array:
-	var out := []
-	for it in items:
-		for seg in Geometry2D.intersect_polyline_with_polygon(it.line, clip):
-			if seg.size() >= 2:
-				var c: Dictionary = it.duplicate()
-				c["line"] = seg
-				out.append(c)
-	return out
-
-
-## Hồ, công viên: giao với vùng, bỏ phần lỗ.
-func _clip_areas(items: Array) -> Array:
-	var out := []
-	var cw := Geometry2D.is_polygon_clockwise(clip)
-	for it in items:
-		for poly in Geometry2D.intersect_polygons(it.poly, clip):
-			if poly.size() >= 3 and Geometry2D.is_polygon_clockwise(poly) == cw:
-				var c: Dictionary = it.duplicate()
-				c["poly"] = poly
-				out.append(c)
-	return out
 
 
 # ---------------------------------------------------------------- lưới gộp
@@ -164,6 +138,10 @@ func _commit_flat() -> void:
 		var m := StandardMaterial3D.new()
 		m.vertex_color_use_as_albedo = true
 		m.roughness = 0.92
+		if key == "ground" and ground_material != null:
+			mi.material_override = ground_material
+			add_child(mi)
+			continue
 		if key == "water":
 			m.roughness = 0.5
 		mi.material_override = m
@@ -616,7 +594,12 @@ func _multimesh_trees() -> void:
 	crown.height = 3.4
 	crown.radial_segments = 8
 	crown.rings = 5
-	crown.material = _solid(Color("4f7d3c"))
+	var leaf := ShaderMaterial.new()
+	leaf.shader = building_mat.shader
+	leaf.set_shader_parameter("flat_color", true)
+	leaf.set_shader_parameter("tint", Color("4f7d3c"))
+	cut_materials.append(leaf)
+	crown.material = leaf
 	for pair in [[trunk, 1.2], [crown, 3.6]]:
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
@@ -698,7 +681,8 @@ func _street_trees() -> void:
 		_along(r.line, 13.0, func(p: Vector2, d: Vector2) -> void:
 			for side in [-1.0, 1.0]:
 				var q: Vector2 = p + d.orthogonal() * off * side
-				if _rng.randf() < 0.6 and walkable(q) and not _in_water(q) and Geometry2D.is_point_in_polygon(q, clip):
+				if _rng.randf() < 0.6 and walkable(q) and not _in_water(q) and Geometry2D.is_point_in_polygon(q, clip) \
+						and not keep_clear.any(func(k: Vector2) -> bool: return k.distance_to(q) < 7.0):
 					_trees.append(q))
 	counts.trees = _trees.size()
 
@@ -776,107 +760,17 @@ func _vehicle_mesh(items: Array, body: Vector3, cabin: Vector3, palette: Array) 
 # ---------------------------------------------------------------- lưới đi bộ
 
 func _walk_grid() -> void:
-	var r := bounds.grow(40.0)
-	grid = AStarGrid2D.new()
-	grid.region = Rect2i(floori(r.position.x), floori(r.position.y), ceili(r.size.x), ceili(r.size.y))
-	grid.cell_size = Vector2.ONE
-	grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
-	grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_OCTILE
-	grid.update()
-	for w in data.water:
-		_block_poly(w.poly)
-	for w in data.waterways:
-		_block_line(w.line, float(w.width) / 2.0)
-	for b in data.buildings:
-		if float(b.min_height) < 2.0:
-			_block_poly(b.poly)
-	for w in data.walls:
-		_block_line(w.line, 0.35)
-	# Lòng đường luôn đi được, kể cả chỗ nhà vẽ lấn ra đường (lỗi vẽ hay gặp); cầu đi được dù bên dưới là nước.
-	for rd in data.roads:
-		if not rd.tunnel and not rd.bridge and str(rd.kind) not in ["footway", "path", "steps"]:
-			_block_line(rd.line, maxf(float(rd.width) / 2.0 - 0.8, 0.5), false)
-	for rd in data.roads:
-		if rd.bridge:
-			_block_line(rd.line, float(rd.width) / 2.0, false)
-
-
-## Tô kín đa giác lên lưới theo từng hàng (quét ngang ở ba độ cao trong ô), nới mỗi đoạn 0,35 m:
-## ô nào có phần đáng kể nằm trong nhà thì chặn, đường đi không cắt góc nhà. Nhanh hơn thử từng ô nhiều lần.
-func _block_poly(poly: PackedVector2Array) -> void:
-	var r := Geo.bounds(poly)
-	var n := poly.size()
-	for z in range(floori(r.position.y), ceili(r.end.y)):
-		for fy in [0.15, 0.5, 0.85]:
-			var y: float = z + fy
-			var xs := PackedFloat32Array()
-			for i in n:
-				var a := poly[i]
-				var b := poly[(i + 1) % n]
-				if (a.y <= y and b.y > y) or (b.y <= y and a.y > y):
-					xs.append(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x))
-			xs.sort()
-			for k in range(0, xs.size() - 1, 2):
-				for x in range(floori(xs[k] + 0.35), ceili(xs[k + 1] - 0.35)):
-					var cell := Vector2i(x, z)
-					if grid.is_in_boundsv(cell):
-						grid.set_point_solid(cell, true)
-
-
-func _block_line(line: PackedVector2Array, hw: float, solid := true) -> void:
-	for i in line.size() - 1:
-		var a := line[i]
-		var b := line[i + 1]
-		var r := Rect2(a, Vector2.ZERO).expand(b).grow(hw + 1.0)
-		for x in range(floori(r.position.x), ceili(r.end.x)):
-			for z in range(floori(r.position.y), ceili(r.end.y)):
-				var cell := Vector2i(x, z)
-				if grid.is_in_boundsv(cell) and Geo.seg_dist(Vector2(x + 0.5, z + 0.5), a, b) <= hw:
-					grid.set_point_solid(cell, solid)
+	if grid == null:
+		grid = WalkGrid.new(data, bounds)
 
 
 func walkable(p: Vector2) -> bool:
-	var cell := Vector2i(floori(p.x), floori(p.y))
-	return grid.is_in_boundsv(cell) and not grid.is_point_solid(cell)
+	return grid.walkable(p)
 
 
 func nearest_walkable(p: Vector2) -> Vector2:
-	if walkable(p):
-		return p
-	for rad in range(1, 40):
-		for k in rad * 8:
-			var a := TAU * k / float(rad * 8)
-			var q := p + Vector2(cos(a), sin(a)) * rad
-			if walkable(q):
-				return q
-	return p
+	return grid.nearest_walkable(p)
 
 
-## Đường đi bộ từ a tới b (mét), đã rút gọn các điểm thẳng hàng.
 func path(a: Vector2, b: Vector2) -> PackedVector2Array:
-	var s := nearest_walkable(a)
-	var g := nearest_walkable(b)
-	var ids := grid.get_id_path(Vector2i(floori(s.x), floori(s.y)), Vector2i(floori(g.x), floori(g.y)))
-	if ids.is_empty():
-		return PackedVector2Array()
-	var pts := PackedVector2Array([s])
-	for i in range(1, ids.size() - 1):
-		pts.append(Vector2(ids[i]) + Vector2(0.5, 0.5))
-	pts.append(g)
-	var out := PackedVector2Array([pts[0]])
-	var i := 0
-	while i < pts.size() - 1:
-		var j := pts.size() - 1
-		while j > i + 1 and not _clear(pts[i], pts[j]):
-			j -= 1
-		out.append(pts[j])
-		i = j
-	return out
-
-
-func _clear(a: Vector2, b: Vector2) -> bool:
-	var steps := int(ceil(a.distance_to(b) / 0.5))
-	for k in steps + 1:
-		if not walkable(a.lerp(b, float(k) / float(maxi(steps, 1)))):
-			return false
-	return true
+	return grid.path(a, b)

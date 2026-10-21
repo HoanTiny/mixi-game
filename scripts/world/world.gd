@@ -14,6 +14,8 @@ const Surfaces := preload("res://scripts/world/surfaces.gd")
 const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
+const RealCity := preload("res://scripts/world/real_city.gd")
+const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
 
@@ -67,7 +69,11 @@ const CUT_MARGIN := 3.0
 const FILLER_SIGNS := ["SỬA XE", "TẠP HÓA", "PHỞ", "CẮT TÓC", "BÁNH MÌ", "PHOTOCOPY", "NHÀ THUỐC", "SIM THẺ", "GỘI ĐẦU", "BÚN BÒ", "ĐIỆN THOẠI", "VẢI SỢI", "CƠM TẤM", "CÀ PHÊ", "HỦ TIẾU", "GẠO"]
 const HEM_SIGNS := ["TẠP HÓA", "CẮT TÓC", "CHÈ", "NƯỚC MÍA", "BÁNH CUỐN", "SỬA ĐIỆN THOẠI", "GIẶT ỦI", "BÁNH MÌ"]
 
-var city: CityMap
+## Map đang chơi: city_map.gd (phường An Hòa vẽ tay) hay real_city.gd (khu thật nướng sẵn, chọn ở "map" trong config).
+var city
+var real := false
+## Mô hình khu thật (nhà, đường, sông, cây) khi chơi trên map thật.
+var area: Node3D
 var game
 var hud
 var models := Models.new()
@@ -118,22 +124,27 @@ var _mat_cache := {}
 func _ready() -> void:
 	game = GameState.game
 	font = UI.text_font()
-	city = CityMap.new()
+	var map_id := _map_id()
+	real = map_id != "an_hoa" and FileAccess.file_exists("res://data/maps/%s.json" % map_id)
+	city = RealCity.new(map_id) if real else CityMap.new()
 	_build_environment()
 	tubes = TubeHouse.new(0.0, font)
-	_build_ground()
-	_build_streets()
-	_build_canal()
-	_build_fields()
-	for id in LOCATIONS:
-		_build_location(id, LOCATIONS[id])
-	_build_houses()
-	_build_fillers()
-	_build_props()
-	_build_gates()
-	_build_bins()
-	_build_grime()
-	_build_traffic()
+	if real:
+		_build_real()
+	else:
+		_build_ground()
+		_build_streets()
+		_build_canal()
+		_build_fields()
+		for id in LOCATIONS:
+			_build_location(id, LOCATIONS[id])
+		_build_houses()
+		_build_fillers()
+		_build_props()
+		_build_gates()
+		_build_bins()
+		_build_grime()
+		_build_traffic()
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
 	player_body = player.get_child(0)
 	add_child(player)
@@ -423,7 +434,7 @@ func _build_fields() -> void:
 	var z1: float = city.bounds.end.y + 20.0
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 64
-	var x := city.bounds.position.x - 20.0
+	var x: float = city.bounds.position.x - 20.0
 	while x < city.bounds.end.x + 20.0:
 		var w := rng.randf_range(12.0, 22.0)
 		var paddy := StandardMaterial3D.new()
@@ -1082,6 +1093,124 @@ func _build_traffic() -> void:
 
 # ---------------------------------------------------------------- vòng lặp
 
+## Map chơi: "--map=<id>" khi chạy, không thì "map" trong config.json; "an_hoa" là phường vẽ tay.
+func _map_id() -> String:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--map="):
+			return a.substr(6)
+	return str(game.cfg.get("map", "an_hoa"))
+
+
+# ---------------------------------------------------------------- map thật
+
+## Dựng màn phố trên khu thật: mô hình khu (nhà, đường, kênh, cây, xe đậu), các địa điểm của truyện dựng bằng nhà ống
+## có biển hiệu đặt lên lô đã dọn, nhà có số để giao hàng, thùng rác, đèn đường, xe máy và người đi bộ trên đường thật.
+func _build_real() -> void:
+	area = AreaBuilder.new()
+	area.show_labels = false
+	# Mặt đường, mặt đất có vân nhựa đường như phường vẽ tay, sẫm hơn cho hợp ánh nắng của màn phố.
+	area.ground_material = Surfaces.get_mat("duong", 4.0, Color(0.78, 0.76, 0.72), true)
+	add_child(area)
+	for id in city.locs:
+		area.keep_clear.append(city.loc_door(id))
+	area.build(city.data, city.clip, city.grid)
+	for m in area.cut_materials:
+		m.set_shader_parameter("cut_on", true)
+	var ground := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	shape.shape = WorldBoundaryShape3D.new()
+	ground.add_child(shape)
+	add_child(ground)
+	for id in LOCATIONS:
+		if city.locs.has(id):
+			_build_location(id, LOCATIONS[id])
+	for h in city.homes:
+		homes.append({"pos": _v3(h.pos), "no": str(h.no), "name": "Nhà " + str(h.address)})
+	var i := 0
+	for b in city.bins:
+		_bin(_v3(b), "b%d" % i, i)
+		i += 1
+	# Map thật rộng hơn: đi bộ tính giờ theo map; vùng tìm của việc nhờ đặt lại theo chỗ chợ thật.
+	if city.story.has("walkHoursPerMeter"):
+		game.cfg["walkHoursPerMeter"] = float(city.story.walkHoursPerMeter)
+	for q in game.quests:
+		if city.quest_areas.has(str(q.id)):
+			for step in q.get("steps", []):
+				if str(step.get("kind", "")) == "find":
+					step["area"] = city.quest_areas[str(q.id)]
+	_build_real_lamps()
+	_build_real_traffic()
+	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra.
+	if city.locs.has("hem_dua"):
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 5
+		_coconut(loc_point("hem_dua", float(city.locs.hem_dua.w) / 2.0 + 1.2, 0.6), rng)
+
+
+func _build_real_lamps() -> void:
+	var placed: Array[Vector2] = []
+	for r in city.data.roads:
+		if r.small or r.bridge or float(r.width) < 6.0:
+			continue
+		AreaBuilder._along(r.line, 34.0, func(p: Vector2, d: Vector2) -> void:
+			if placed.size() >= 36 or placed.any(func(q: Vector2) -> bool: return q.distance_to(p) < 30.0):
+				return
+			var q: Vector2 = p + d.orthogonal() * (float(r.width) / 2.0 + 0.6)
+			if city.walkable(q):
+				placed.append(p)
+				_lamp(_v3(q), atan2(d.x, d.y)))
+
+
+## Xe máy chạy hai chiều trên đường lớn, người đi bộ trên đường nhỏ và vỉa hè.
+func _build_real_traffic() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 808
+	var big := []
+	var small := []
+	for r in city.data.roads:
+		if r.bridge or r.tunnel or r.line.size() < 2:
+			continue
+		var l := 0.0
+		for k in r.line.size() - 1:
+			l += (r.line[k] as Vector2).distance_to(r.line[k + 1])
+		if l < 30.0:
+			continue
+		var lane := {"poly": r.line, "len": l, "off": float(r.width) / 4.0}
+		if not r.small and float(r.width) >= 6.0:
+			big.append(lane)
+		elif str(r.kind) not in ["steps"]:
+			small.append(lane)
+	big.sort_custom(func(a, b) -> bool: return float(a.len) > float(b.len))
+	for k in mini(big.size(), 12):
+		var lane: Dictionary = big[k]
+		for j in 3:
+			var bike := _bike(Color.from_hsv(rng.randf(), 0.5, 0.8), rng)
+			add_child(bike)
+			bikes.append({"node": bike, "dir": 1.0 if j % 2 == 0 else -1.0, "speed": rng.randf_range(5.0, 8.5), "lane": lane, "s": rng.randf() * float(lane.len)})
+	small.shuffle()
+	for k in mini(small.size(), 22):
+		var pth: Dictionary = small[k].duplicate()
+		pth["off"] = 0.0
+		var w := _character("people", Color.from_hsv(rng.randf(), 0.3, 0.65), Color.from_hsv(rng.randf(), 0.2, 0.35), rng)
+		var s0 := rng.randf() * float(pth.len)
+		var p0 := _poly_at(pth.poly, s0, 0.0)
+		w.position = Vector3(p0.x, 0, p0.y)
+		add_child(w)
+		walkers.append({"node": w, "goal": w.position, "speed": rng.randf_range(1.2, 2.0), "wait": rng.randf_range(0, 3), "path": pth, "s": s0})
+
+
+## Điểm cách đầu đường gấp khúc s mét, lệch sang phải off mét (làn xe).
+static func _poly_at(poly: PackedVector2Array, s: float, off: float) -> Vector2:
+	var acc := 0.0
+	for i in poly.size() - 1:
+		var d := poly[i].distance_to(poly[i + 1])
+		if acc + d >= s or i == poly.size() - 2:
+			var dir := (poly[i + 1] - poly[i]) / maxf(d, 0.001)
+			return poly[i].lerp(poly[i + 1], clampf((s - acc) / maxf(d, 0.001), 0.0, 1.0)) + dir.orthogonal() * off
+		acc += d
+	return poly[0]
+
+
 func cam_offset() -> Vector3:
 	return CAM_NEAR.lerp(CAM_OFFSET, zoom)
 
@@ -1147,6 +1276,10 @@ func _physics_process(delta: float) -> void:
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, zoom), 0), Vector3.UP)
 	_update_cutaway()
+	if area != null:
+		for m in area.cut_materials:
+			m.set_shader_parameter("player_pos", player.position)
+			m.set_shader_parameter("cam_pos", camera.global_position)
 
 	var near := nearest_location()
 	var bin := nearest_bin()
@@ -1415,7 +1548,15 @@ func _update_traffic(delta: float) -> void:
 	for b in bikes:
 		var n: Node3D = b.node
 		var lane: Dictionary = b.lane
-		if lane.axis == "x":
+		if lane.has("poly"):
+			# Map thật: chạy dọc đường gấp khúc, hết đường thì quay lại đầu.
+			b["s"] = fposmod(float(b.s) + float(b.dir) * float(b.speed) * delta, float(lane.len))
+			var at := _poly_at(lane.poly, float(b.s), float(lane.off) * float(b.dir))
+			var ahead := _poly_at(lane.poly, fposmod(float(b.s) + float(b.dir) * 0.8, float(lane.len)), float(lane.off) * float(b.dir))
+			n.position = Vector3(at.x, 0, at.y)
+			if ahead.distance_to(at) > 0.01:
+				n.rotation.y = atan2(ahead.x - at.x, ahead.y - at.y)
+		elif lane.axis == "x":
 			n.position.x += b.dir * b.speed * delta
 			if n.position.x > float(lane.hi):
 				n.position.x = float(lane.lo)
@@ -1441,7 +1582,11 @@ func _update_traffic(delta: float) -> void:
 		var to: Vector3 = w.goal - n.position
 		if to.length() < 0.2:
 			var pth: Dictionary = w.path
-			if pth.axis == "x":
+			if pth.has("poly"):
+				var g := _poly_at(pth.poly, clampf(float(w.get("s", 0.0)) + randf_range(-14, 14), 0.0, float(pth.len)), float(pth.off))
+				w["s"] = clampf(float(w.get("s", 0.0)) + randf_range(-14, 14), 0.0, float(pth.len))
+				w["goal"] = Vector3(g.x, 0, g.y)
+			elif pth.axis == "x":
 				w["goal"] = Vector3(clampf(n.position.x + randf_range(-14, 14), pth.lo, pth.hi), 0, pth.c)
 			else:
 				w["goal"] = Vector3(pth.c, 0, clampf(n.position.z + randf_range(-14, 14), pth.lo, pth.hi))
@@ -1560,7 +1705,12 @@ func _set_rain(on: bool) -> void:
 
 # ---------------------------------------------------------------- truy vấn cho HUD
 
+## Thông tin địa điểm; map thật thay lời tả theo địa hình của khu (file đặt truyện).
 func location_info(id: String) -> Dictionary:
+	if real and city.story.get("descriptions", {}).has(id):
+		var d: Dictionary = LOCATIONS[id].duplicate()
+		d["desc"] = str(city.story.descriptions[id])
+		return d
 	return LOCATIONS[id]
 
 

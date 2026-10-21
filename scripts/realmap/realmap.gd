@@ -744,7 +744,8 @@ func _download() -> void:
 func _toggle_walk() -> void:
 	walking = not walking
 	_walk_btn.text = "✕ Thôi đi dạo" if walking else "Thả An vào đi dạo"
-	builder.building_mat.set_shader_parameter("cut_on", walking)
+	for m in builder.cut_materials:
+		m.set_shader_parameter("cut_on", walking)
 	if walking:
 		if player == null:
 			player = Node3D.new()
@@ -821,8 +822,9 @@ func _physics_process(delta: float) -> void:
 		body.animate(delta, 1.0 if step != Vector2.ZERO else 0.0)
 	camera.position = camera.position.lerp(player.position + WALK_CAM, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - WALK_CAM + Vector3(0, 1.2, 0), Vector3.UP)
-	builder.building_mat.set_shader_parameter("player_pos", player.position)
-	builder.building_mat.set_shader_parameter("cam_pos", camera.global_position)
+	for m in builder.cut_materials:
+		m.set_shader_parameter("player_pos", player.position)
+		m.set_shader_parameter("cam_pos", camera.global_position)
 
 
 # ---------------------------------------------------------------- thử tự động

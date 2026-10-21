@@ -8,7 +8,11 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Chỗ ở trên phố:** Phòng Hẻm Dừa trong hẻm cụt rẽ ra từ đường Chợ, Phòng Cầu Tre bên kia rạch (qua cây cầu tre sau Bến Cạn), nhà dì Năm ở đầu đường An Hòa gần trạm xe. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
 
-**Bản đồ phường An Hòa** (`data/map.json`, dựng bởi `scripts/world/city_map.gd`): không còn là một con phố thẳng mà là một khu ven kênh kiểu Sài Gòn, bố cục dựa theo các xóm hẻm và rạch thật ở TP.HCM:
+**Map của truyện là khu thật Quận 8, ven kênh Tàu Hủ** (`"map": "q8_tau_hu"` trong `data/config.json`): đường, hẻm, kênh, cầu, nhà lấy từ OpenStreetMap và Open Buildings, nướng sẵn vào `data/maps/q8_tau_hu.json` (4.400 nhà, 415 đoạn đường) nên người chơi không cần mạng. Truyện giữ tên hư cấu: con kênh là rạch Bờ Me, cầu chữ Y là Cầu Nhỏ, đường Phạm Thế Hiển là đường Bờ Me… (bảng `names` trong `data/maps/q8_tau_hu_story.json`). File đặt truyện ghi chỗ của từng địa điểm (game tự tìm đường gần nhất làm mặt tiền, quay cửa ra đường, dọn nhà thật ở lô đó), lời tả địa điểm theo địa hình thật, vùng tìm mèo, tuyến người bán rong, giờ đi bộ mỗi mét. Nhà có số để giao hàng, thùng rác, đèn đường, chỗ ngập ngày mưa (đường sát kênh ngập ngày 15, lan vào trong ngày 29), xe máy và người đi bộ đều tính theo đường thật.
+
+Nướng thêm khu khác: `Godot --headless --path . -s res://tools/bake_map.gd -- --id=<tên> --bbox=nam,tây,bắc,đông [--osm=<file overpass.json>]`, rồi viết `data/maps/<tên>_story.json` và đổi `"map"` trong config. Đặt `"map": "an_hoa"` (hay chạy với `-- --map=an_hoa`) để chơi lại phường vẽ tay bên dưới.
+
+**Phường An Hòa vẽ tay** (`data/map.json`, dựng bởi `scripts/world/city_map.gd`): không còn là một con phố thẳng mà là một khu ven kênh kiểu Sài Gòn, bố cục dựa theo các xóm hẻm và rạch thật ở TP.HCM:
 - **Đường An Hòa** (đường lớn, hai chiều, có trạm xe số 6 và cổng khu công nghiệp ở đầu đường), **đường Chợ Cầu Nhỏ** chạy xuống tới chân cầu (kiểu chợ đầu cầu), **đường Bờ Me** ven rạch có lan can, hàng cây và đèn.
 - **Hẻm 42** (cổng "Khu phố 3"), **Hẻm 88** (cổng "Khu phố 4", hẻm ba gác hẹp hơn), hẻm nhánh **42/7** nối ngang hai hẻm, **Hẻm Dừa** là hẻm cụt rẽ từ đường Chợ, đầu hẻm có cây dừa. Dây điện chằng chịt trên hẻm.
 - **Rạch Bờ Me** uốn nhẹ, có bờ kè, ghe xuồng; **Cầu Nhỏ** (cầu bê tông) và **Cầu Tre** (cầu ván) bắc sang **Hẻm Bờ Nam**, nhà sàn chân cột quay lưng ra rạch, phía sau là ruộng rau muống.
@@ -75,6 +79,7 @@ Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi l
 data/
   realmap.json    chế độ Dựng khu thật: địa chỉ các nguồn, giờ chờ, luật lọc nhà, bề rộng đường, màu nhà
   schedules.json  việc riêng theo giờ của 8 nhân vật, tuyến của người bán rong
+  maps/           khu thật nướng sẵn (q8_tau_hu.json) và file đặt truyện (q8_tau_hu_story.json)
   map.json        bản đồ phường An Hòa: đường, hẻm, rạch, cầu, cổng hẻm, chỗ đặt từng địa điểm
   config.json     số liệu: tiền sinh hoạt, Mệt, nhu cầu cơ thể, chỗ ở, điểm xuất phát của 3 tuyến, việc làm, trò chơi nhỏ, giao đồ, ve chai
   events.json     cảnh chính ngày 1–30 (địa điểm, khung giờ, lựa chọn, nếu bỏ lỡ), biến thể theo tuyến, sự kiện hệ thống
@@ -88,6 +93,7 @@ assets/           texture, HDRI, mô hình đồ vật Poly Haven, âm thanh
 prototype/        bản thử HTML đầu tiên (cốt truyện cũ)
 tools/
   gen_sounds.py   tổng hợp âm thanh tạm
+  bake_map.gd     nướng một khu thật thành map của truyện (OSM + Open Buildings, cắt theo khung)
 scripts/
   game_logic.gd   toàn bộ luật chơi, không phụ thuộc giao diện
   game_state.gd   autoload GameState: giữ ván chơi, tự lưu
@@ -102,7 +108,9 @@ scripts/
   realmap/fgb_reader.gd  đọc FlatGeobuf từ xa theo chỉ mục không gian (Open Buildings)
   realmap/area_data.gd   đọc dữ liệu OSM, ghép và lọc nhà Open Buildings
   realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ
+  realmap/walk_grid.gd   lưới đi bộ 1 m và tìm đường cho khu thật
   realmap/map_view.gd    bản đồ nền tối: kéo, phóng, tìm, vẽ khung hay đa giác
+  world/real_city.gd   map của truyện từ khu thật nướng sẵn: đặt địa điểm, đổi tên đường, nhà có số, thùng rác, chỗ ngập
   world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)
   world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
   world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
