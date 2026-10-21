@@ -73,6 +73,9 @@ func _start() -> void:
 	for k in GameLogic.ROUTES:
 		var pre: Dictionary = game.cfg.presets[k]
 		_box.add_child(UI.choice(pre.name, pre.desc, "", game.new_game.bind(k)))
+	_box.add_child(UI.label("Chế độ riêng, ngoài truyện:", 11, UI.INK_SOFT))
+	_box.add_child(UI.choice("Dựng một khu thật ở Việt Nam", "Gõ tên phường, phố; lấy nhà, đường, sông hồ từ OpenStreetMap và Open Buildings rồi đi dạo (cần mạng)", "",
+		func() -> void: get_tree().change_scene_to_file("res://scenes/realmap.tscn")))
 
 
 func _event() -> void:

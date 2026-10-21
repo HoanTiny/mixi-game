@@ -1,0 +1,49 @@
+{
+  "_ghi_chu": "Chế độ Dựng khu thật: trình duyệt (hay bản máy tính) tự gọi thẳng các nguồn dưới đây, không qua máy chủ nào khác. Đổi địa chỉ, giờ chờ, luật lọc, bề rộng đường, màu nhà ở đây.",
+  "nominatim": {
+    "url": "https://nominatim.openstreetmap.org/search",
+    "countrycodes": "vn",
+    "limit": 6,
+    "userAgent": "TruocMuaMua/1.0 (game Godot, che do dung khu that)"
+  },
+  "overpass": {
+    "_ghi_chu": "Hỏi máy đầu tiên; sau waitSeconds giây chưa trả lời thì hỏi thêm các máy còn lại, máy nào trả trước thì dùng.",
+    "servers": [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.private.coffee/api/interpreter",
+      "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+    ],
+    "waitSeconds": 7,
+    "timeoutSeconds": 60
+  },
+  "openBuildings": {
+    "_ghi_chu": "Bản gộp Google + Microsoft của VIDA trên Source Cooperative, dạng FlatGeobuf một file mỗi nước (có chỉ mục không gian): app chỉ tải phần đầu file, các nút chỉ mục cần thiết và đúng các nhà trong khung, bằng yêu cầu Range. {iso3} là mã nước 3 chữ (VNM). Nếu đường dẫn đổi thì sửa url; đọc lỗi thì vẫn dựng bằng nhà OSM.",
+    "url": "https://data.source.coop/vida/google-microsoft-open-buildings/flatgeobuf/by_country/country_iso={iso3}/{iso3}.fgb",
+    "minConfidence": 0.7,
+    "_unknownConfidence": "Nhà không ghi độ tin cậy (thường là nguồn Microsoft) thì giữ, vì không có số để so.",
+    "keepUnknownConfidence": true,
+    "maxFeatures": 12000,
+    "mergeGapBytes": 65536
+  },
+  "iso3": {"vn": "VNM", "la": "LAO", "kh": "KHM", "th": "THA", "cn": "CHN", "my": "MYS", "id": "IDN", "ph": "PHL", "mm": "MMR", "sg": "SGP"},
+  "area": {"defaultMeters": 400, "minMeters": 150, "maxMeters": 600, "previewMeters": 1600},
+  "roads": {
+    "_ghi_chu": "Bề rộng mặt đường (mét) theo highway; có tag width hay lanes thì dùng tag. small: tô màu bê tông như hẻm.",
+    "width": {"motorway": 16, "trunk": 14, "primary": 12, "secondary": 10, "tertiary": 8, "unclassified": 6, "residential": 6,
+      "living_street": 4, "service": 4, "pedestrian": 5, "track": 3, "footway": 2, "path": 1.6, "cycleway": 2, "steps": 2,
+      "motorway_link": 7, "trunk_link": 7, "primary_link": 7, "secondary_link": 6, "tertiary_link": 6},
+    "small": ["service", "living_street", "footway", "path", "steps", "track", "pedestrian", "cycleway"],
+    "default": 4
+  },
+  "waterways": {"river": 14, "canal": 8, "stream": 3, "ditch": 1.5, "drain": 1.5},
+  "buildings": {
+    "levelHeight": 3.2,
+    "_defaultLevels": "Nhà không ghi số tầng: lấy ngẫu nhiên (cố định theo vị trí) trong khoảng này, kiểu nhà ống phố Việt.",
+    "defaultLevels": [2, 5],
+    "walls": ["f1e3b8", "e9c9a3", "f4efe1", "d9e3d0", "c9dbe3", "f0c9b8", "e8d27a", "d8c3e0", "f6f3ea", "bfd1c4"],
+    "flatRoof": "8e8a83",
+    "pitchedRoof": "a5523a",
+    "worshipWall": "d9b56b",
+    "worshipRoof": "6e2f22"
+  }
+}

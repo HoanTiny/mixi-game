@@ -1,0 +1,6 @@
+{
+  "_ghi_chu": "Cấu hình thử chế độ Dựng khu thật với máy chủ giả trên máy (tools trong tests/realmap_fixtures). Máy Overpass đầu chờ 10 s, máy thứ hai báo lỗi, máy thứ ba trả ngay: kiểm luật hỏi thêm sau 7 s.",
+  "nominatim": {"url": "http://127.0.0.1:8765/nominatim/search"},
+  "overpass": {"servers": ["http://127.0.0.1:8765/slow/api/interpreter", "http://127.0.0.1:8765/broken/api/interpreter", "http://127.0.0.1:8765/fast/api/interpreter"]},
+  "openBuildings": {"url": "http://127.0.0.1:8765/ob/{iso3}.fgb"}
+}

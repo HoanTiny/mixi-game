@@ -15,6 +15,16 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 - Số nhà đánh như thật: số lẻ một bên, chẵn một bên; nhà trong hẻm mang số có gạch chéo theo căn ở đầu hẻm (42/3, 42/7/5…), app Giao Nhanh giao tới đúng các địa chỉ này.
 - An đi theo đường thật (tìm đường A* trên lưới 1 m, không xuyên nhà), nhà che khuất An thì tự ẩn. Bản đồ nhỏ góc trên; phím **M** hoặc bấm bản đồ nhỏ mở **bản đồ lớn** có tên đường, bấm chỗ nào thì An đi tới đó.
 
+**Dựng một khu thật ở Việt Nam** (chế độ riêng, ngoài truyện; nút ở màn đầu, hay thêm `?khu` vào địa chỉ bản web): gõ tên khu (ví dụ "Khương Thượng, Đống Đa"), chọn kết quả, kéo khung vàng trên bản đồ nét (150–600 m) rồi bấm **Dựng khu này**. Trình duyệt tự gọi thẳng ba nguồn miễn phí, không qua máy chủ nào khác:
+
+| Nguồn | Lấy gì |
+|---|---|
+| OpenStreetMap qua Overpass API | Nhà vẽ tay (số tầng, chiều cao, màu tường, kiểu và màu mái nếu có), đường, sông, hồ, kênh, công viên, đình chùa, di tích, tường rào, đường sắt. Hỏi `overpass-api.de` trước; sau 7 giây chưa trả lời (hay báo lỗi) thì hỏi thêm `overpass.private.coffee` và `maps.mail.ru`, máy nào trả trước thì dùng. |
+| Open Buildings (Google + Microsoft, bản gộp của VIDA) | Đường viền nhà dò từ ảnh vệ tinh, kèm độ tin cậy, trên `data.source.coop`. File FlatGeobuf mỗi nước vài GB, app chỉ đọc đúng phần byte của khung đã chọn (yêu cầu Range qua chỉ mục không gian). |
+| Nominatim | Tên khu ra tọa độ, khung và mã nước (để biết đọc file Open Buildings nào). |
+
+Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu độ tin cậy dưới 0,7, trùng chỗ nhà OSM, nằm trên lòng đường hoặc trên mặt nước. Nhà không ghi số tầng lấy 2–5 tầng như nhà ống; mặt tường có cửa sổ theo tầng, sân thượng có bồn nước inox; chùa, đình mái bốn dốc. Địa chỉ máy chủ, giờ chờ, ngưỡng tin cậy, bề rộng đường, màu nhà nằm trong `data/realmap.json`. Bảng khi đi dạo ghi số nhà mỗi nguồn, số nhà bị bỏ theo từng lý do, số byte đã đọc, và ghi công nguồn dữ liệu (© OpenStreetMap, ODbL; Open Buildings: Google CC BY 4.0, Microsoft ODbL).
+
 **Gợi ý cách chơi:** lần đầu gặp chuyện gì (có cảnh chính, đói, bẩn, Mệt lên, có người nhờ việc, đứng cạnh thùng rác, sau 20 giờ…) thì ô Gợi ý ở góc trái hiện một lần. Nội dung ở mục `tips` của `data/story.json`.
 
 **Cảnh chính mỗi ngày:** bảng mục tiêu ghi "Hôm nay: …" kèm nơi và khung giờ, trên phố có dấu ◆ vàng. Tới nơi bấm thẻ ◆ để vào cảnh, chọn một trong ba cách. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong. Tin nhắn, mưa và ngày 30 tự bật buổi sáng.
@@ -58,6 +68,7 @@ Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi l
 
 ```
 data/
+  realmap.json    chế độ Dựng khu thật: địa chỉ các nguồn, giờ chờ, luật lọc nhà, bề rộng đường, màu nhà
   schedules.json  việc riêng theo giờ của 8 nhân vật, tuyến của người bán rong
   map.json        bản đồ phường An Hòa: đường, hẻm, rạch, cầu, cổng hẻm, chỗ đặt từng địa điểm
   config.json     số liệu: tiền sinh hoạt, Mệt, nhu cầu cơ thể, chỗ ở, điểm xuất phát của 3 tuyến, việc làm, trò chơi nhỏ, giao đồ, ve chai
@@ -81,6 +92,12 @@ scripts/
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/character.gd   nhân vật có khớp dựng bằng khối: An, 8 nhân vật, người đi đường; hoạt cảnh đi, đứng, ngồi xe
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
+  realmap/realmap.gd     chế độ Dựng khu thật: tìm tên, chọn khung, tải, dựng, đi dạo
+  realmap/fetcher.gd     gọi Nominatim, Overpass (nhiều máy, chờ 7 s), đọc file theo byte (Range)
+  realmap/fgb_reader.gd  đọc FlatGeobuf từ xa theo chỉ mục không gian (Open Buildings)
+  realmap/area_data.gd   đọc dữ liệu OSM, ghép và lọc nhà Open Buildings
+  realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ
+  realmap/area_picker.gd bản đồ nét có khung kéo được
   world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)
   world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
   world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
@@ -97,6 +114,7 @@ scenes/
 tests/
   sim.gd          tự chơi lát cắt cho 3 tuyến × 3 cách chơi
   playtest.gd     người chơi máy chơi lát cắt trên màn phố thật, in nhật ký từng ngày
+  realmap_test.gd thử chế độ Dựng khu thật với máy chủ giả (realmap_fixtures/: tạo dữ liệu mẫu, máy chủ có Range)
 ```
 
 ## Texture và ánh sáng tả thực

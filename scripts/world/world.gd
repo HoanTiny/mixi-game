@@ -182,6 +182,15 @@ func _ready() -> void:
 			audio.play("dialog"))
 	game.changed.connect(_on_changed)
 	_on_changed()
+	# Vào thẳng chế độ Dựng khu thật: bản web có "?khu" trên địa chỉ, hay đối số "--realmap-auto=…" khi thử tự động.
+	var to_realmap := false
+	for arg in OS.get_cmdline_user_args():
+		to_realmap = to_realmap or arg.begins_with("--realmap-auto=")
+	if OS.has_feature("web"):
+		to_realmap = to_realmap or str(JavaScriptBridge.eval("window.location.search", true)).contains("khu")
+	if to_realmap:
+		get_tree().change_scene_to_file.call_deferred("res://scenes/realmap.tscn")
+		return
 	# Dùng khi chụp màn hình kiểm tra: "-- --demo --demo-open=com_hanh" mở sẵn một địa điểm.
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--demo-open="):
