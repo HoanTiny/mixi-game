@@ -478,7 +478,15 @@ func canal_z(x: float) -> float:
 	return canal_pts[canal_pts.size() - 1].y
 
 
-## Cửa của địa điểm: trên vỉa hè trước mặt tiền.
+## Phường vẽ tay không có mặt cầu cao (xem real_city.ground_y).
+func ground_y(_p: Vector2) -> float:
+	return 0.0
+
+
+## Cửa của địa điểm: trên vỉa hè trước mặt tiền, cách mặt tiền door_out mét.
+var door_out := 0.9
+
+
 func loc_door(id: String) -> Vector2:
 	var p: Dictionary = locs[id]
-	return (p.center as Vector2) + (p.normal as Vector2) * 0.9
+	return (p.center as Vector2) + (p.normal as Vector2) * door_out

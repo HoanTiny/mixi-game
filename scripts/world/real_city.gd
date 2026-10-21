@@ -149,7 +149,8 @@ func _place_locations() -> void:
 		var c: Vector2 = q - n * (hw + 0.3)
 		var w := float(s.get("w", 8))
 		var d := float(s.get("d", 10))
-		locs[k] = {"center": c, "normal": n, "w": w, "d": d, "street": street_name(str(nr.road.name)), "loc": k, "no": "", "address": ""}
+		locs[k] = {"center": c, "normal": n, "w": w, "d": d, "street": street_name(str(nr.road.name)), "loc": k, "no": "", "address": "",
+			"line": nr.road.line, "road_w": float(nr.road.width)}
 		# Dọn nhà thật trong lô (và chắn trước cửa) để dựng nhà của địa điểm.
 		var t := Vector2(n.y, -n.x)
 		var lot := PackedVector2Array([c - t * (w / 2.0 + 0.5), c + t * (w / 2.0 + 0.5), c + t * (w / 2.0 + 0.5) - n * (d + 0.5), c - t * (w / 2.0 + 0.5) - n * (d + 0.5)])
@@ -164,13 +165,39 @@ func _place_locations() -> void:
 			return Geometry2D.intersect_polygons(b.poly, lot).is_empty())
 
 
+## Đầu hẻm của con đường địa điểm nằm trên: đầu nào chạm đường lớn hơn thì là đầu hẻm; trả về chỗ ở mép hẻm,
+## phía dãy nhà của địa điểm, cách miệng hẻm 2,5 m (chỗ trồng cây dừa của Hẻm Dừa).
+func alley_mouth(loc_id: String) -> Vector2:
+	var p: Dictionary = locs[loc_id]
+	var line: PackedVector2Array = p.line
+	var best := 0
+	var best_d := INF
+	for end in [0, line.size() - 1]:
+		var e: Vector2 = line[end]
+		var nr := _nearest_road(e, float(p.road_w) + 0.5)
+		if not nr.is_empty() and float(nr.d) < best_d:
+			best_d = float(nr.d)
+			best = end
+	var e: Vector2 = line[best]
+	var nxt: Vector2 = line[1] if best == 0 else line[line.size() - 2]
+	var into := (nxt - e).normalized()
+	var side := into.orthogonal()
+	if side.dot(-(p.normal as Vector2)) < 0.0:
+		side = -side
+	return e + into * 2.5 + side * (float(p.road_w) / 2.0 + 0.5)
+
+
 static func footprint(p: Dictionary) -> Rect2:
 	return CityMap.footprint(p)
 
 
+## Chỗ đứng trước cửa: ra khỏi mép mái hiên (sâu 1,5 m), vì mặt tiền quay ngang thì mái hiên che người đứng dưới.
+var door_out := 1.9
+
+
 func loc_door(loc_id: String) -> Vector2:
 	var p: Dictionary = locs[loc_id]
-	return (p.center as Vector2) + (p.normal as Vector2) * 0.9
+	return (p.center as Vector2) + (p.normal as Vector2) * door_out
 
 
 # ---------------------------------------------------------------- nhà, thùng rác, chỗ ngập
@@ -273,6 +300,24 @@ func _place_floods() -> void:
 
 func walkable(p: Vector2) -> bool:
 	return grid.walkable(p)
+
+
+## Độ cao mặt đất chỗ p: trên mặt cầu thì cao hơn mặt đường (AreaBuilder.BRIDGE_Y), người đi qua cầu không bị lún.
+func ground_y(p: Vector2) -> float:
+	if _bridges.is_empty():
+		for r in data.roads:
+			if r.bridge:
+				for i in r.line.size() - 1:
+					_bridges.append([r.line[i], r.line[i + 1], float(r.width) / 2.0 + 0.3])
+		if _bridges.is_empty():
+			_bridges.append([Vector2(INF, INF), Vector2(INF, INF), 0.0])
+	for s in _bridges:
+		if Geo.seg_dist(p, s[0], s[1]) <= float(s[2]):
+			return AreaBuilder.BRIDGE_Y
+	return 0.0
+
+
+var _bridges: Array = []
 
 
 func nearest_walkable(p: Vector2) -> Vector2:

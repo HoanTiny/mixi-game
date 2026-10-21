@@ -25,12 +25,13 @@ Từ khi có chế độ Dựng khu thật, map chơi là một khu có thật �
 | Đường Bờ Me | Đường dọc bờ nam kênh |
 | Xóm trọ Bờ Me | Dãy nhà ven kênh, phía tây cầu |
 | Cơm Hạnh, Dãy quán Bến Cạn | Trên đường Bờ Me, giữa xóm trọ và chân cầu |
-| Tiệm Sáu Sửa | Đầu hẻm sau xóm trọ |
-| Chợ Cầu Nhỏ, Hẻm Dừa | Phía đông chân cầu |
+| Tiệm Sáu Sửa | Miệng hẻm từ xóm trọ ra đường Bờ Me |
+| Chợ Cầu Nhỏ | Góc đường Bờ Me và đường Chợ Cầu Nhỏ, ngay chân cầu |
+| Hẻm Dừa | Hẻm nhỏ rẽ ra từ đường Bờ Me sát chân cầu, cây dừa ở miệng hẻm |
 | Phòng Cầu Tre | Bờ bắc kênh, phải đi vòng qua cầu |
 | Bến xe số 6, Nhà dì Năm | Phía tây nam, trên đường lớn |
 
-Đi bộ từ xóm trọ: Tiệm Sáu 76 m, Cơm Hạnh 110 m, Bến Cạn 145 m, bến xe 163 m, nhà dì Năm 198 m, chợ 240 m, Hẻm Dừa 280 m, Cầu Tre 354 m. Map chỉnh ở `data/maps/q8_tau_hu_story.json`.
+Đi bộ từ xóm trọ (theo phố và hẻm, không chui khe nhà): Tiệm Sáu 70 m, Cơm Hạnh 112 m, bến xe 141 m, Bến Cạn 155 m, chợ 198 m, nhà dì Năm 211 m, Hẻm Dừa 238 m, Cầu Tre 363 m. Map chỉnh ở `data/maps/q8_tau_hu_story.json`.
 
 ## Bản đồ phường An Hòa (vẽ tay, map cũ)
 

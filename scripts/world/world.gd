@@ -56,8 +56,6 @@ const LOCATIONS := {
 		"tube": {"floors": 2, "sign": "DÃY QUÁN BẾN CẠN", "units": 5}, "color": "9c9a93",
 		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
 }
-## Cửa của địa điểm: trên vỉa hè, cách mặt tiền chừng này mét.
-const DOOR_OUT := 0.9
 const SPEED := 6.0
 ## Camera xa nhất (nhìn toàn phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức.
 const CAM_OFFSET := Vector3(0, 24, 17)
@@ -229,7 +227,7 @@ static func plot_point(p: Dictionary, along: float, out: float, y := 0.0) -> Vec
 
 
 func loc_point(id: String, along: float, out: float) -> Vector3:
-	return plot_point(city.locs[id], along, DOOR_OUT + out)
+	return plot_point(city.locs[id], along, city.door_out + out)
 
 
 ## Nút đặt tại giữa mặt tiền của lô, quay cho mặt trước (trục +z cục bộ) nhìn ra đường.
@@ -491,7 +489,10 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	body.add_child(cs)
 	holder.add_child(body)
 	holder.add_child(_label3d(str(loc.name), Vector3(0, sign_height, 0.5), 36))
-	occluders.append({"node": bld, "rect": CityMap.footprint(p), "h": top})
+	var occ := {"node": bld, "rect": CityMap.footprint(p), "h": top}
+	if real:
+		occ.merge(_cut_stand_in(p, holder, color, top))
+	occluders.append(occ)
 
 	# Vòng sáng trước cửa: điểm tương tác.
 	var ring := MeshInstance3D.new()
@@ -505,7 +506,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	mat.emission = Color("f2c14e")
 	mat.emission_energy_multiplier = 0.6
 	ring.material_override = mat
-	ring.position = Vector3(0, 0.2, DOOR_OUT)
+	ring.position = Vector3(0, 0.2, city.door_out)
 	ring.scale = Vector3(1, 0.3, 1)
 	holder.add_child(ring)
 	door_rings[id] = ring
@@ -513,7 +514,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	var slot := 0
 	for who in loc.get("npcs", []):
 		var npc := _character("npc." + str(who.id), Color(who.color), Color("3a3a40"))
-		npc.position = Vector3(1.6 + slot * 1.7, 0, DOOR_OUT + 0.2 + (slot % 2) * 0.45)
+		npc.position = Vector3(1.6 + slot * 1.7, 0, city.door_out + 0.2 + (slot % 2) * 0.45)
 		npc.rotation.y = PI
 		holder.add_child(npc)
 		npc.add_child(_label3d(who.name, Vector3(0, 2.0 + (slot % 2) * 0.3, 0), 22))
@@ -547,6 +548,52 @@ func _build_tube(id: String, loc: Dictionary, holder: Node3D, width: float, dept
 		top = maxf(top, tubes.house(holder, x, w, maxf(depth, 6.0), int(tube.get("floors", 3)), wall, rng,
 			str(tube.get("sign", "")) if main else "", bool(tube.get("shop", true)) and main))
 	return top
+
+
+## Map thật: đường viền lô (để xét có che An không) và khối thay thế khi hạ nhà của địa điểm: hộp màu tường cao 1 m
+## (co giãn theo độ cao đang hạ), mặt trên màu vữa sáng như nhà thật bị hạ.
+func _cut_stand_in(p: Dictionary, holder: Node3D, color: Color, top: float) -> Dictionary:
+	var w := float(p.w)
+	var d := maxf(float(p.d), 6.0)
+	var n: Vector2 = p.normal
+	var t := Vector2(n.y, -n.x)
+	var c: Vector2 = p.center
+	var poly := PackedVector2Array([c - t * w / 2.0, c + t * w / 2.0, c + t * w / 2.0 - n * d, c - t * w / 2.0 - n * d])
+	var pivot := Node3D.new()
+	pivot.visible = false
+	holder.add_child(pivot)
+	var box := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(w, 1.0, d)
+	box.mesh = bm
+	box.position = Vector3(0, 0.5, -d / 2.0)
+	if _stand_shader == null:
+		_stand_shader = Shader.new()
+		_stand_shader.code = STAND_SHADER
+	var m := ShaderMaterial.new()
+	m.shader = _stand_shader
+	m.set_shader_parameter("wall", color)
+	# Mặt cắt cùng màu với nhà thật bị hạ (shader nhà dùng màu đỉnh thô, không đổi sang không gian tuyến tính).
+	m.set_shader_parameter("top", AreaBuilder.CUT_COLOR.lerp(color, 0.2))
+	box.material_override = m
+	pivot.add_child(box)
+	return {"poly": poly, "stand": pivot, "cap": top}
+
+
+const STAND_SHADER := """
+shader_type spatial;
+uniform vec3 wall : source_color;
+uniform vec3 top;
+varying float up;
+void vertex() {
+	up = NORMAL.y;
+}
+void fragment() {
+	ALBEDO = up > 0.5 ? top : wall;
+	ROUGHNESS = 0.9;
+}
+"""
+var _stand_shader: Shader
 
 
 ## Mái che trạm xe đưa rước: bốn cột, mái tôn, ghế dài và tấm bảng tuyến xe.
@@ -616,7 +663,7 @@ func _build_houses() -> void:
 		node.add_child(board)
 		_clutter(p, node, rng)
 		occluders.append({"node": node, "rect": CityMap.footprint(p), "h": h})
-		homes.append({"pos": plot_point(p, 0.0, DOOR_OUT), "no": str(p.no), "name": "Nhà " + str(p.address)})
+		homes.append({"pos": plot_point(p, 0.0, city.door_out), "no": str(p.no), "name": "Nhà " + str(p.address)})
 
 
 ## Khối nhà phía trong lô phố: chỉ thấy tường cũ và mái, có bồn nước inox trên nóc.
@@ -862,11 +909,11 @@ func _build_gates() -> void:
 			add_child(_label3d(str(st.display), _v3(sp, 3.6), 24))
 
 
-func _coconut(pos: Vector3, rng: RandomNumberGenerator) -> void:
-	var trunk := _block(Vector3(0.3, 6.5, 0.3), pos, Color("7a6a55"))
+func _coconut(pos: Vector3, rng: RandomNumberGenerator, parent: Node3D = null) -> void:
+	var trunk := _block(Vector3(0.3, 6.5, 0.3), pos, Color("7a6a55"), parent)
 	trunk.rotation.z = 0.12
 	for k in 7:
-		var leaf := _block(Vector3(2.6, 0.06, 0.5), pos + Vector3(0.8, 6.3, 0), Color("4f7a3a").lerp(Color("6f9a4a"), rng.randf()))
+		var leaf := _block(Vector3(2.6, 0.06, 0.5), pos + Vector3(0.8, 6.3, 0), Color("4f7a3a").lerp(Color("6f9a4a"), rng.randf()), parent)
 		leaf.rotation = Vector3(0, float(k) * TAU / 7.0, -0.45)
 		leaf.position = pos + Vector3(0.8 + cos(float(k) * TAU / 7.0) * 1.1, 6.2, -sin(float(k) * TAU / 7.0) * 1.1)
 
@@ -1115,8 +1162,12 @@ func _build_real() -> void:
 	area.ground_material = Surfaces.get_mat("duong", 4.0, Color(0.78, 0.76, 0.72), true)
 	area.water_color = Color("2a4a4c")
 	add_child(area)
+	var mid := Vector2.ZERO
 	for id in city.locs:
 		area.keep_clear.append(city.loc_door(id))
+		mid += city.loc_door(id)
+	# Đồ phố Việt quanh các địa điểm của truyện; biển hiệu, cổng hẻm, bảng tên đường có chữ ở gần, tên đường hư cấu.
+	area.dress_opts = {"center": mid / maxf(city.locs.size(), 1.0), "radius": 300.0, "label_radius": 190.0, "name_of": city.street_name}
 	area.build(city.data, city.clip, city.grid)
 	for m in area.cut_materials:
 		m.set_shader_parameter("cut_on", true)
@@ -1145,11 +1196,17 @@ func _build_real() -> void:
 	_build_real_lamps()
 	_build_real_traffic()
 	_build_real_canal()
-	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra.
+	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra. Đứng chắn trước An thì thu nhỏ như cây thường.
 	if city.locs.has("hem_dua"):
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 5
-		_coconut(loc_point("hem_dua", float(city.locs.hem_dua.w) / 2.0 + 1.2, 0.6), rng)
+		var palm := Node3D.new()
+		palm.position = _v3(city.alley_mouth("hem_dua"))
+		add_child(palm)
+		_coconut(Vector3.ZERO, rng, palm)
+		var c := Vector2(palm.position.x, palm.position.z)
+		var sq := PackedVector2Array([c + Vector2(-3, -3), c + Vector2(3, -3), c + Vector2(3, 3), c + Vector2(-3, 3)])
+		occluders.append({"node": palm, "rect": Geo.bounds(sq), "h": 6.6, "poly": sq, "cap": 6.6, "stand": null})
 
 
 ## Kênh rạch trên map thật: bờ kè đá dọc mép nước (bỏ các cạnh trùng mép khung), ghe xuồng neo sát bờ,
@@ -1350,6 +1407,7 @@ func _physics_process(delta: float) -> void:
 		step = _follow_path(_speed() * delta)
 	if step != Vector3.ZERO:
 		player.position += step
+		player.position.y = lerpf(player.position.y, city.ground_y(Vector2(player.position.x, player.position.z)), clampf(delta * 12.0, 0.0, 1.0))
 		_add_walk(step.length() * (RainLayer.WADE_COST if _wading() else 1.0))
 		audio.step(delta)
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
@@ -1368,11 +1426,7 @@ func _physics_process(delta: float) -> void:
 	var cam_goal := player.position + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, zoom), 0), Vector3.UP)
-	_update_cutaway()
-	if area != null:
-		for m in area.cut_materials:
-			m.set_shader_parameter("player_pos", player.position)
-			m.set_shader_parameter("cam_pos", camera.global_position)
+	_update_cutaway(delta)
 
 	var near := nearest_location()
 	var bin := nearest_bin()
@@ -1536,11 +1590,33 @@ func route_preview(loc: String) -> Dictionary:
 
 
 ## Nhà nào nằm giữa camera và An (phía nam, đủ cao để che theo góc nhìn hiện tại) thì ẩn đi.
-func _update_cutaway() -> void:
+## Map thật: nhà thật hạ dần thành khối thấp (AreaBuilder.update_cut); nhà của địa điểm cũng vậy, thay bằng khối
+## cùng màu có mặt cắt sáng hạ thấp dần, tên địa điểm và người trước cửa vẫn hiện.
+func _update_cutaway(delta := 0.0) -> void:
 	var off := cam_offset()
 	var k := off.z / maxf(off.y, 0.1)
 	var px := player.position.x
 	var pz := player.position.z
+	if real:
+		var here := Vector2(px, pz)
+		area.update_cut(here, off.y / off.z, delta)
+		for o in occluders:
+			var top := float(o.h)
+			var cur := move_toward(float(o.cap), minf(AreaBuilder.cut_target(o.poly, here, off.y / off.z), top), float(AreaBuilder.CUT.speed) * delta)
+			o["cap"] = cur
+			var low := cur < top - 0.05
+			var node: Node3D = o.node
+			if o.stand == null:
+				# Cây (dừa): thu nhỏ dần, hạ hẳn thì ẩn.
+				node.scale = Vector3.ONE * clampf((cur - AreaBuilder.CUT.stub) / (top - AreaBuilder.CUT.stub), 0.0, 1.0)
+				node.visible = node.scale.x > 0.02
+				continue
+			node.visible = not low
+			var stand: Node3D = o.stand
+			stand.visible = low
+			if low:
+				stand.scale.y = maxf(cur, 0.05)
+		return
 	for o in occluders:
 		var r: Rect2 = o.rect
 		var hide := r.position.x - CUT_MARGIN < px and px < r.end.x + CUT_MARGIN and r.end.y > pz + 0.4 \

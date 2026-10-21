@@ -112,6 +112,7 @@ func _update_npc(id: String, delta: float) -> void:
 		_arrive(n, "going")
 	if str(n.state) in ["going", "returning"]:
 		_step(n, delta)
+	node.global_position.y = world.city.ground_y(_v2(node.global_position))
 
 
 func _start_walk(n: Dictionary, a: Vector2, b: Vector2, state: String) -> void:

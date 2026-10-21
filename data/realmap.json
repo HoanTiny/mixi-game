@@ -145,5 +145,17 @@
       "3f6f9a",
       "4f7f4a"
     ]
+  },
+  "street": {
+    "_ghi_chu": "Đồ phố Việt (scripts/realmap/street_dress.gd): mặt tiền nhìn ra đường có mái hiên (awningShare), biển hiệu (signShare, chữ lấy ngẫu nhiên trong signs, trong hẻm lấy hemSigns), ghế nhựa quán cóc (stoolShare); cột điện mỗi poleStep mét dọc đường, dây giăng ngang hẻm; cổng hẻm ghi gateText ở miệng hẻm có tên.",
+    "awningShare": 0.7,
+    "signShare": 0.5,
+    "stoolShare": 0.12,
+    "poleStep": 27,
+    "awnings": ["2f6fb0", "c0392b", "2e8b57", "d9d9d9", "e67e22", "1f8a9a", "3a7d44", "b8432f"],
+    "boards": ["c0392b", "1e5aa8", "f1c40f", "1b7a43", "8e2b8e", "e8e4da", "d35400"],
+    "signs": ["TẠP HÓA", "PHỞ BÒ", "CƠM TẤM", "SỬA XE", "CẮT TÓC", "BÁNH MÌ", "PHOTOCOPY", "NHÀ THUỐC", "SIM THẺ", "GỘI ĐẦU", "BÚN BÒ HUẾ", "ĐIỆN THOẠI", "VẢI SỢI", "CÀ PHÊ", "HỦ TIẾU", "GẠO", "NƯỚC MÍA", "ĐIỆN NƯỚC", "VÀNG BẠC", "XE ÔM", "TIỆM MAY", "BÁNH CUỐN", "TRÀ SỮA", "BIA HƠI", "NHA KHOA", "VẬT LIỆU XÂY DỰNG"],
+    "hemSigns": ["TẠP HÓA", "CẮT TÓC", "CHÈ", "NƯỚC MÍA", "BÁNH CUỐN", "SỬA ĐIỆN THOẠI", "GIẶT ỦI", "BÁNH MÌ", "PHÒNG TRỌ", "BÁN XÔI", "SỬA XE", "NƯỚC ĐÁ"],
+    "gateText": "KHU PHỐ VĂN HÓA"
   }
 }

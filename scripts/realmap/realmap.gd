@@ -614,6 +614,8 @@ func _build_area() -> void:
 	if builder != null:
 		builder.queue_free()
 	builder = AreaBuilder.new()
+	# Đồ phố Việt cả khu: mái hiên, biển hiệu, cột điện, cổng hẻm (không chữ, không dây điện khi nhìn xa).
+	builder.dress_opts = {"center": Geo.centroid(clip), "wires": false}
 	_world.add_child(builder)
 	builder.build(d, clip)
 	var build_s := (Time.get_ticks_msec() - tb) / 1000.0
@@ -746,6 +748,8 @@ func _toggle_walk() -> void:
 	_walk_btn.text = "✕ Thôi đi dạo" if walking else "Thả An vào đi dạo"
 	for m in builder.cut_materials:
 		m.set_shader_parameter("cut_on", walking)
+	if not walking:
+		builder.reset_cut()
 	if walking:
 		if player == null:
 			player = Node3D.new()
@@ -822,9 +826,7 @@ func _physics_process(delta: float) -> void:
 		body.animate(delta, 1.0 if step != Vector2.ZERO else 0.0)
 	camera.position = camera.position.lerp(player.position + WALK_CAM, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - WALK_CAM + Vector3(0, 1.2, 0), Vector3.UP)
-	for m in builder.cut_materials:
-		m.set_shader_parameter("player_pos", player.position)
-		m.set_shader_parameter("cam_pos", camera.global_position)
+	builder.update_cut(Vector2(player.position.x, player.position.z), WALK_CAM.y / WALK_CAM.z, delta)
 
 
 # ---------------------------------------------------------------- thử tự động

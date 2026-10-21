@@ -10,6 +10,8 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Map của truyện là khu thật Quận 8, ven kênh Tàu Hủ** (`"map": "q8_tau_hu"` trong `data/config.json`): đường, hẻm, kênh, cầu, nhà lấy từ OpenStreetMap và Open Buildings, nướng sẵn vào `data/maps/q8_tau_hu.json` (4.400 nhà, 415 đoạn đường) nên người chơi không cần mạng. Truyện giữ tên hư cấu: con kênh là rạch Bờ Me, cầu chữ Y là Cầu Nhỏ, đường Phạm Thế Hiển là đường Bờ Me… (bảng `names` trong `data/maps/q8_tau_hu_story.json`). File đặt truyện ghi chỗ của từng địa điểm (game tự tìm đường gần nhất làm mặt tiền, quay cửa ra đường, dọn nhà thật ở lô đó), lời tả địa điểm theo địa hình thật, vùng tìm mèo, tuyến người bán rong, giờ đi bộ mỗi mét. Nhà có số để giao hàng, thùng rác, đèn đường, chỗ ngập ngày mưa (đường sát kênh ngập ngày 15, lan vào trong ngày 29), xe máy và người đi bộ đều tính theo đường thật. Dọc kênh có bờ kè đá, ghe xuồng neo sát bờ và vài chiếc ghe chở hàng trôi qua lại. Bản đồ lớn (phím M) có chấm cho từng nhân vật đang ở đâu, rê chuột tới để xem tên. Khi An đi tới đâu, mặt đường hiện vệt chấm vàng chỉ lối (chấm đi qua rồi thì tắt) và bản đồ vẽ nét vàng đường đang đi; rê chuột lên một địa điểm trên bản đồ lớn thì thấy đường đi tới đó, số mét và số phút đi bộ.
 
+Đường đi bám theo phố, hẻm, vỉa hè, công viên; khe hở giữa các dãy nhà và bãi đất trống vẫn đi được (phím WASD) nhưng tìm đường tính đắt gấp 6 lần nên chỉ chui khe khi không còn lối nào. Nhà nào che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt màu vữa (dải ngay trước mặt An hạ còn chân tường, hai bên hạ ít hơn cho thấy mặt phố), hạ và nâng từ từ; nhà đứng ngang An như chính tiệm An đang đứng trước cửa thì để nguyên; cây chắn trước mặt thì thu tán lại. Quanh các địa điểm có đồ phố Việt: mái hiên tôn, bạt, biển hiệu có chữ (tạp hóa, phở, cơm tấm, sửa xe…), bàn ghế nhựa quán cóc, cột điện bê tông và dây điện võng, dây giăng ngang hẻm, cổng hẻm "khu phố văn hóa", bảng tên đường xanh, xe máy dựng vào lề. Đi qua cầu thì An đứng trên mặt cầu.
+
 Nướng thêm khu khác: `Godot --headless --path . -s res://tools/bake_map.gd -- --id=<tên> --bbox=nam,tây,bắc,đông [--osm=<file overpass.json>]`, rồi viết `data/maps/<tên>_story.json` và đổi `"map"` trong config. Đặt `"map": "an_hoa"` (hay chạy với `-- --map=an_hoa`) để chơi lại phường vẽ tay bên dưới.
 
 **Phường An Hòa vẽ tay** (`data/map.json`, dựng bởi `scripts/world/city_map.gd`): không còn là một con phố thẳng mà là một khu ven kênh kiểu Sài Gòn, bố cục dựa theo các xóm hẻm và rạch thật ở TP.HCM:
@@ -107,8 +109,9 @@ scripts/
   realmap/fetcher.gd     gọi Nominatim, Overpass (nhiều máy, chờ 7 s), đọc file theo byte (Range)
   realmap/fgb_reader.gd  đọc FlatGeobuf từ xa theo chỉ mục không gian (Open Buildings)
   realmap/area_data.gd   đọc dữ liệu OSM, ghép và lọc nhà Open Buildings
-  realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ
-  realmap/walk_grid.gd   lưới đi bộ 1 m và tìm đường cho khu thật
+  realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ; hạ nhà che An
+  realmap/street_dress.gd đồ phố Việt: mái hiên, biển hiệu, cột điện, dây điện, cổng hẻm, bảng tên đường, ghế quán cóc
+  realmap/walk_grid.gd   lưới đi bộ 1 m và tìm đường cho khu thật (đường, hẻm rẻ; khe nhà, bãi trống đắt)
   realmap/map_view.gd    bản đồ nền tối: kéo, phóng, tìm, vẽ khung hay đa giác
   world/real_city.gd   map của truyện từ khu thật nướng sẵn: đặt địa điểm, đổi tên đường, nhà có số, thùng rác, chỗ ngập
   world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)

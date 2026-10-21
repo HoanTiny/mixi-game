@@ -5,11 +5,11 @@
   "walkHoursPerMeter": 0.0013,
   "locations": {
     "xom_bo_me": {"at": [-122, 72], "w": 13, "d": 10},
-    "cho_cau_nho": {"at": [98, 66], "w": 14, "d": 10},
-    "hem_dua": {"at": [152, 82], "w": 5.5, "d": 8},
+    "cho_cau_nho": {"at": [57, 57], "w": 14, "d": 10},
+    "hem_dua": {"at": [66, 10], "w": 5.5, "d": 8},
     "ben_can": {"at": [8, 60], "w": 18, "d": 8},
     "com_hanh": {"at": [-28, 84], "w": 8, "d": 11},
-    "tiem_sau": {"at": [-70, 127], "w": 8, "d": 11},
+    "tiem_sau": {"at": [-65, 94], "w": 8, "d": 11},
     "cau_tre": {"at": [-135, -38], "w": 9, "d": 9},
     "ben_xe_6": {"at": [-186, 178], "w": 7, "d": 3},
     "nha_di_nam": {"at": [-232, 214], "w": 7, "d": 10}
@@ -37,11 +37,11 @@
   "fallbackNames": ["Đường Xóm Chiếu", "Đường Bến Phà", "Đường Ông Lãnh", "Đường Xóm Dầu", "Đường Bến Vựa"],
   "descriptions": {
     "ben_xe_6": "Trạm xe đưa rước công nhân trên đường Bờ Me, xe chạy ra khu công nghiệp. Trung tâm nghề của Linh cũng đi xe ở đây.",
-    "cho_cau_nho": "Chợ ở chân Cầu Nhỏ, cây cầu chữ Y bắc qua rạch: sạp vật tư, hàng đồ cũ, tiệm photo, sạp ve chai của cô Út và quán trà đá có bảng tin cho thuê phòng.",
+    "cho_cau_nho": "Chợ ở góc đường Bờ Me và đường Chợ Cầu Nhỏ, ngay chân Cầu Nhỏ, cây cầu chữ Y bắc qua rạch: sạp vật tư, hàng đồ cũ, tiệm photo, sạp ve chai của cô Út và quán trà đá có bảng tin cho thuê phòng.",
     "com_hanh": "Quán cơm phần cho người làm ca trên đường Bờ Me, gần đầu hẻm vô xóm trọ. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.",
     "tiem_sau": "Tiệm sửa xe ở đầu hẻm ra đường Bờ Me, cách xóm trọ vài bước, có thêm một bàn sửa đồ gia dụng.",
     "xom_bo_me": "Tám phòng quanh khoảng sân cuối hẻm, sau lưng là rạch Bờ Me; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
-    "hem_dua": "Phòng trong hẻm nhỏ rẽ ra từ đường Chợ Cầu Nhỏ, đầu hẻm có cây dừa, cách chợ vài bước. Phòng nhỏ, cửa sát mặt hẻm, ít chỗ phơi.",
+    "hem_dua": "Phòng trong hẻm nhỏ rẽ ra từ đường Bờ Me, sát chân Cầu Nhỏ, đầu hẻm có cây dừa, cách chợ vài bước. Phòng nhỏ, cửa sát mặt hẻm, ít chỗ phơi.",
     "cau_tre": "Bên kia rạch, phải đi vòng qua Cầu Nhỏ. Dãy nhà lưng quay ra kênh; phòng thoáng, có hiên rộng, đi làm xa hơn.",
     "nha_di_nam": "Nhà dì Năm trên đường An Hòa, gần trạm xe. Ở tạm được bảy ngày, phải gửi bớt đồ.",
     "ben_can": "Năm quán ven rạch trên đường Bờ Me, gần chân Cầu Nhỏ, lưng quay ra kênh, chung lối đi và hạ tầng điện cũ. Hợp đồng của anh Phúc."

@@ -3,7 +3,7 @@ extends Node3D
 ## để chạy nhẹ cả trên trình duyệt với vài nghìn căn nhà:
 ## - Nhà: đùn đường viền lên theo chiều cao (height, số tầng; thiếu thì lấy 2–5 tầng như nhà ống), màu tường,
 ##   mái bằng, mái hai dốc, mái bốn dốc, mái chóp theo roof:shape; chùa, đình mái ngói bốn dốc. Mặt tường có ô cửa sổ
-##   theo tầng. Nhà che An thì khoét một lỗ nhìn xuyên (shader), không phải giấu cả căn.
+##   theo tầng. Nhà che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt sáng (shader), cây che thì thu nhỏ.
 ## - Đường có vỉa hè, vạch giữa; ngõ nhỏ lát bê tông; cầu có lan can. Sông, hồ, kênh, công viên, sân bóng,
 ##   tường rào, đường sắt, nhãn tên đường, hồ, chùa, di tích.
 ## - Lưới đi bộ 1 m: không đi xuyên nhà, tường, mặt nước (trừ trên cầu).
@@ -13,41 +13,58 @@ extends Node3D
 const Geo := preload("res://scripts/realmap/geo.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const WalkGrid := preload("res://scripts/realmap/walk_grid.gd")
+const StreetDress := preload("res://scripts/realmap/street_dress.gd")
 
 const BUILDING_SHADER := """
 shader_type spatial;
 render_mode cull_disabled;
-uniform vec3 player_pos;
-uniform vec3 cam_pos;
-uniform float hole = 3.2;
-uniform float band_half = 9.0;
-uniform float band_depth = 26.0;
+// Hạ nhà che An: mỗi căn một độ cao tối đa đọc từ ảnh caps (AreaBuilder.update_cut tính bên GDScript, hạ và nâng
+// từ từ). Cả căn hạ một lượt, mái thành mặt cắt màu vữa sáng, không khoét lỗ giữa tường.
 uniform bool cut_on = false;
-// Tán cây: dùng một màu thay cho màu đỉnh.
+uniform sampler2D caps : filter_nearest;
+uniform int caps_w = 128;
+// Màu mặt cắt của nhà bị hạ.
+uniform vec3 cut_color;
+// Cây: dùng một màu thay cho màu đỉnh; cây đứng chắn trước An thì tán thu nhỏ lại, thân hạ còn gốc
+// (INSTANCE_CUSTOM.r: 1 bình thường, 0 khi thu hẳn). trunk: thân cây, lưới hình trụ cao 2,4 m tâm ở giữa.
 uniform bool flat_color = false;
+uniform bool trunk = false;
 uniform vec3 tint = vec3(1.0);
-varying vec3 wpos;
+varying float v_cut;
+varying float v_up;
+varying float v_kind;
+
 void vertex() {
-	wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	v_cut = 0.0;
+	v_up = NORMAL.y;
+	// CUSTOM0: số thứ tự căn nhà, loại (1 nhà, 2 bồn nước trên mái). Mô hình khu đặt ở gốc tọa độ.
+	v_kind = CUSTOM0.y;
+	if (cut_on && trunk) {
+		VERTEX.y = (VERTEX.y + 1.2) * max(INSTANCE_CUSTOM.r, 0.12) - 1.2;
+	} else if (cut_on && flat_color) {
+		VERTEX *= INSTANCE_CUSTOM.r;
+	} else if (cut_on && CUSTOM0.y > 0.5) {
+		int i = int(CUSTOM0.x + 0.5);
+		float cap = texelFetch(caps, ivec2(i % caps_w, i / caps_w), 0).r;
+		if (CUSTOM0.y > 1.5) {
+			// Đồ gắn kèm (bồn nước, mái hiên, biển hiệu, cổng hẻm; UV2.y là đỉnh của món đồ): hạ thấp hơn đỉnh là ẩn.
+			if (cap < UV2.y + 0.2) {
+				VERTEX = vec3(0.0, -10.0, 0.0);
+			}
+		} else if (VERTEX.y > cap) {
+			UV.y -= VERTEX.y - cap;
+			VERTEX.y = cap;
+			v_cut = 1.0;
+		}
+	}
 }
+
 void fragment() {
-	// Lỗ nhìn xuyên: bỏ phần nhà nằm giữa camera và An, gần phía An.
-	vec3 a = cam_pos;
-	vec3 b = player_pos + vec3(0.0, 1.0, 0.0);
-	vec3 ab = b - a;
-	float t = clamp(dot(wpos - a, ab) / max(dot(ab, ab), 0.001), 0.0, 1.0);
-	float d = length(wpos - (a + ab * t));
-	if (cut_on && t > 0.08 && t < 0.985 && d < hole * smoothstep(0.08, 0.7, t) + 0.6) {
-		discard;
-	}
-	// Camera luôn nhìn về hướng bắc: nhà ở dải phía nam (trước mặt camera) gần An bị cắt còn chân tường thấp,
-	// như kiểu cắt nhà ở màn phố, để thấy An và mặt phố.
-	float dz = wpos.z - player_pos.z;
-	if (cut_on && dz > 1.2 && dz < band_depth && abs(wpos.x - player_pos.x) < band_half + dz * 0.35 && wpos.y > 0.7) {
-		discard;
-	}
 	vec3 col = flat_color ? tint : COLOR.rgb;
-	if (!flat_color && UV2.x > 0.5) {
+	if (v_cut > 0.999 && v_up > 0.4) {
+		// Mặt cắt của nhà bị hạ: sáng hơn mặt đường hẳn, nhìn ra ngay đâu là nhà, đâu là lối đi.
+		col = mix(cut_color, col, 0.2);
+	} else if (!flat_color && UV2.x > 0.5) {
 		// Tường: vạch sàn mỗi tầng, ô cửa sổ kính tối, tầng trệt cửa cuốn rộng hơn.
 		float fy = fract(UV.y / 3.2);
 		float fx = fract(UV.x / 2.6);
@@ -63,8 +80,25 @@ void fragment() {
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.88;
+	if (v_kind > 1.5) {
+		METALLIC = 0.6;
+		ROUGHNESS = 0.35;
+	}
 }
 """
+## Mặt cầu cao hơn mặt đường chừng này (màn phố nâng người đi trên cầu theo, xem real_city.ground_y).
+const BRIDGE_Y := 0.5
+## Hạ nhà che An (xem cut_target). near_w: nửa bề ngang dải ngay trước mặt An (bằng người); wide_w: dải rộng hai
+## bên, hạ ít hơn wide_add mét; beside: căn trong dải rộng phải nằm hẳn phía nam An quá chừng này mới hạ; focus_r:
+## khoảng trước mặt An luôn thấy mặt đường; stub: chân tường còn lại; speed: mét mỗi giây khi hạ, nâng; reach: xa nhất
+## về phía nam còn phải xét.
+const CUT := {"near_w": 0.45, "wide_w": 6.0, "wide_add": 2.0, "beside": 0.5, "focus_r": 2.5, "stub": 0.5, "speed": 30.0, "reach": 45.0}
+## Màu mặt cắt của nhà bị hạ (vữa sáng).
+const CUT_COLOR := Color(0.66, 0.62, 0.55)
+## Giá trị trong ảnh caps nghĩa là căn để nguyên.
+const CUT_NONE := 10000.0
+const CUT_CELL := 10.0
+const CAPS_W := 128
 
 var data
 var cfg: Dictionary
@@ -85,6 +119,10 @@ var keep_clear: Array = []
 ## Màu nước (màn phố của truyện dùng màu kênh đục, sẫm hơn).
 var water_color := Color("2b6a8f")
 var cut_materials: Array = []
+## Đồ phố Việt (street_dress.gd): đặt tùy chọn trước khi build (center, radius, label_radius, wires, name_of);
+## để trống là không dựng.
+var dress_opts := {}
+var dress = null
 var _flat := {}
 var _rng := RandomNumberGenerator.new()
 
@@ -99,10 +137,13 @@ func build(d, clip_poly: PackedVector2Array, walk = null) -> void:
 	data.clip_to(clip)
 	counts.buildings = data.buildings.size()
 	font = UI.text_font()
+	if not dress_opts.is_empty():
+		dress = StreetDress.new(self, dress_opts)
 	building_mat = ShaderMaterial.new()
 	var sh := Shader.new()
 	sh.code = BUILDING_SHADER
 	building_mat.shader = sh
+	building_mat.set_shader_parameter("cut_color", CUT_COLOR)
 	cut_materials.append(building_mat)
 	_ground()
 	_parks()
@@ -118,6 +159,9 @@ func build(d, clip_poly: PackedVector2Array, walk = null) -> void:
 	_street_trees()
 	_multimesh_trees()
 	_vehicles()
+	if dress != null:
+		dress.streets()
+		dress.finish()
 
 
 # ---------------------------------------------------------------- lưới gộp
@@ -284,7 +328,7 @@ func _roads() -> void:
 		var y := 0.05 + float(i) * 0.00002
 		i += 1
 		if r.bridge:
-			y = 0.5
+			y = BRIDGE_Y
 		if r.small:
 			_strip(_st("ground"), r.line, w, y, Color("a8a296") if str(r.kind) != "steps" else Color("9c958a"))
 			continue
@@ -387,13 +431,17 @@ func _buildings() -> void:
 	var lh := float(bc.get("levelHeight", 3.2))
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var tanks := []
+	st.set_custom_format(0, SurfaceTool.CUSTOM_RGBA_FLOAT)
 	for b in data.buildings:
 		var poly: PackedVector2Array = b.poly
 		if poly.size() < 3:
 			continue
 		var c := Geo.centroid(poly)
 		var a := absf(Geo.area(poly))
+		# Số thứ tự căn nhà cho shader hạ nhà: cả căn đọc chung một độ cao trong ảnh caps.
+		var idx := _cut_polys.size()
+		_cut_polys.append(poly)
+		st.set_custom(0, Color(idx, 1.0, 0.0, 0.0))
 		_rng.seed = hash(Vector2i(roundi(c.x * 10.0), roundi(c.y * 10.0)))
 		var h := float(b.height)
 		if h <= 0.0:
@@ -441,6 +489,7 @@ func _buildings() -> void:
 			# Có ghi chiều cao tổng thì mái nằm trong chiều cao đó.
 			if b.known and h - rh > base + 2.0:
 				h -= rh
+		_cut_tops.append(h + rh)
 		_walls_of(st, poly, base, h, wall_col, not b.worship)
 		if pitched and float(rect.fill) > 0.82 and shape in ["gabled", "hipped", "half-hipped", "gambrel", "mansard", "skillion"]:
 			_rect_roof(st, rect, h, rh, roof_col, wall_col, shape == "gabled" or shape == "skillion")
@@ -448,17 +497,53 @@ func _buildings() -> void:
 			_pyramid(st, poly, c, h, rh, roof_col)
 		else:
 			_fill(st, poly, h, roof_col)
-			# Bồn nước inox trên sân thượng: thứ thấy khắp phố Việt.
+			# Bồn nước inox trên sân thượng: thứ thấy khắp phố Việt. Gộp vào lưới nhà để hạ nhà thì bồn ẩn theo.
 			if a > 28.0 and not b.worship and _rng.randf() < 0.45:
 				var tp := c + Vector2(_rng.randf_range(-1.2, 1.2), _rng.randf_range(-1.2, 1.2))
 				if Geometry2D.is_point_in_polygon(tp, poly):
-					tanks.append(Vector3(tp.x, h, tp.y))
+					st.set_custom(0, Color(idx, 2.0, 0.0, 0.0))
+					_tank(st, tp, h)
+		if dress != null:
+			dress.front(st, idx, poly, base, h)
+	if dress != null:
+		dress.gates(st)
 	st.generate_tangents()
 	var mi := MeshInstance3D.new()
 	mi.mesh = st.commit()
 	mi.material_override = building_mat
 	add_child(mi)
-	_multimesh_tanks(tanks)
+	# Lưới ô tìm căn gần An, ảnh caps (mỗi căn một điểm ảnh) cho shader.
+	for i in _cut_polys.size():
+		var r := Geo.bounds(_cut_polys[i])
+		for gx in range(floori(r.position.x / CUT_CELL), floori(r.end.x / CUT_CELL) + 1):
+			for gz in range(floori(r.position.y / CUT_CELL), floori(r.end.y / CUT_CELL) + 1):
+				var k := Vector2i(gx, gz)
+				if not _cut_cells.has(k):
+					_cut_cells[k] = PackedInt32Array()
+				_cut_cells[k].append(i)
+	_cut_img = Image.create(CAPS_W, maxi(1, ceili(_cut_polys.size() / float(CAPS_W))), false, Image.FORMAT_RF)
+	_cut_img.fill(Color(CUT_NONE, 0, 0))
+	_cut_tex = ImageTexture.create_from_image(_cut_img)
+	building_mat.set_shader_parameter("caps", _cut_tex)
+	building_mat.set_shader_parameter("caps_w", CAPS_W)
+
+
+## Bồn nước inox đứng trên mái ở độ cao y (UV2.y giữ đỉnh bồn để shader biết khi nào ẩn bồn).
+static func _tank(st: SurfaceTool, p: Vector2, y: float) -> void:
+	var col := Color("cfd3d8")
+	var r := 0.55
+	var top := y + 1.3
+	var uv2 := Vector2(0.0, top)
+	var none := [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO]
+	for k in 10:
+		var a0 := TAU * k / 10.0
+		var a1 := TAU * (k + 1) / 10.0
+		var p0 := p + Vector2(cos(a0), sin(a0)) * r
+		var p1 := p + Vector2(cos(a1), sin(a1)) * r
+		var n := Vector3(cos((a0 + a1) / 2.0), 0, sin((a0 + a1) / 2.0))
+		_tri(st, _v(p0, y), _v(p1, y), _v(p1, top), n, col, none, uv2)
+		_tri(st, _v(p0, y), _v(p1, top), _v(p0, top), n, col, none, uv2)
+		_tri(st, _v(p, top), _v(p0, top), _v(p1, top), Vector3.UP, col.lightened(0.1), none, uv2)
 
 
 ## Tường quanh đường viền, từ y0 tới y1. UV.x là quãng đường dọc tường, UV.y là độ cao (để shader vẽ cửa sổ theo tầng).
@@ -559,28 +644,173 @@ func _pyramid(st: SurfaceTool, poly: PackedVector2Array, c: Vector2, e: float, r
 		_tri(st, a, b, apex, n, roof)
 
 
-func _multimesh_tanks(tanks: Array) -> void:
-	if tanks.is_empty():
+# ---------------------------------------------------------------- hạ nhà che An
+
+## Footprint, đỉnh (tính cả mái) của từng căn theo số thứ tự trong lưới nhà; lưới ô CUT_CELL mét để tìm căn gần An;
+## độ cao hiện tại của các căn đang hạ; ảnh caps gửi cho shader. Cây: bán kính tán, lưới ô, độ to hiện tại của tán.
+var _cut_polys: Array = []
+var _cut_tops := PackedFloat32Array()
+var _cut_cells := {}
+var _cut_now := {}
+var _cut_img: Image
+var _cut_tex: ImageTexture
+var _cut_labels := {}
+var _crowns: MultiMesh
+var _trunks: MultiMesh
+var _tree_r := PackedFloat32Array()
+var _tree_cells := {}
+var _crown_now := {}
+
+
+## Thêm một ô trong ảnh caps cho đồ dựng kèm nhà (mái hiên, cổng hẻm) có đường viền và đỉnh riêng.
+func _cut_add(poly: PackedVector2Array, top: float) -> int:
+	_cut_polys.append(poly)
+	_cut_tops.append(top)
+	return _cut_polys.size() - 1
+
+
+## Chữ gắn với ô idx (biển hiệu theo nhà, chữ cổng hẻm theo cổng): ẩn khi ô hạ thấp hơn thr mét (đỉnh món đồ).
+func _cut_label(idx: int, label: Label3D, thr: float) -> void:
+	if not _cut_labels.has(idx):
+		_cut_labels[idx] = []
+	_cut_labels[idx].append([label, thr])
+
+
+## Độ cao tối đa của một căn (đường viền poly) để không che An đứng ở p; slope là tia nhìn lên bao nhiêu mét cho mỗi
+## mét lùi về phía nam (camera nhìn về hướng bắc). INF: không phải hạ.
+## - Dải hẹp ngay trước mặt An (rộng bằng người): căn nào chạm dải ở phía nam An thì hạ, sát An còn chân tường,
+##   càng xa về phía camera càng được cao.
+## - Dải rộng hai bên cho thấy mặt phố quanh An: chỉ hạ căn nằm hẳn phía nam An (căn đứng ngang An, như chính căn
+##   An đang đứng trước cửa, để nguyên), hạ ít hơn dải hẹp.
+static func cut_target(poly: PackedVector2Array, p: Vector2, slope: float) -> float:
+	var best := INF
+	var zr := _strip_z(poly, p.x - CUT.near_w, p.x + CUT.near_w)
+	if zr.y > p.y:
+		best = CUT.stub + maxf(zr.x - p.y - CUT.focus_r, 0.0) * slope
+	zr = _strip_z(poly, p.x - CUT.wide_w, p.x + CUT.wide_w)
+	if zr.x < INF and zr.x > p.y + CUT.beside:
+		best = minf(best, CUT.stub + CUT.wide_add + maxf(zr.x - p.y - CUT.focus_r, 0.0) * slope)
+	return best
+
+
+## Khoảng z (nhỏ nhất, lớn nhất) của phần đa giác nằm trong dải x0 ≤ x ≤ x1; (INF, -INF) nếu không chạm.
+## Chỗ cao nhất, thấp nhất của phần giao luôn nằm trên một cạnh đa giác (đã cắt theo dải), nên chỉ cần xét các cạnh.
+static func _strip_z(poly: PackedVector2Array, x0: float, x1: float) -> Vector2:
+	var lo := INF
+	var hi := -INF
+	var n := poly.size()
+	for i in n:
+		var a := poly[i]
+		var b := poly[(i + 1) % n]
+		if (a.x < x0 and b.x < x0) or (a.x > x1 and b.x > x1):
+			continue
+		var t0 := 0.0
+		var t1 := 1.0
+		var dx := b.x - a.x
+		if absf(dx) > 1e-6:
+			var ta := (x0 - a.x) / dx
+			var tb := (x1 - a.x) / dx
+			t0 = maxf(0.0, minf(ta, tb))
+			t1 = minf(1.0, maxf(ta, tb))
+			if t0 > t1:
+				continue
+		var za := a.y + (b.y - a.y) * t0
+		var zb := a.y + (b.y - a.y) * t1
+		lo = minf(lo, minf(za, zb))
+		hi = maxf(hi, maxf(za, zb))
+	return Vector2(lo, hi)
+
+
+## Mỗi khung hình ở màn phố: căn nào che An (cut_target) thì hạ dần xuống, hết che thì nâng dần lên lại; tán cây chắn
+## trước An thu nhỏ dần. p: chỗ An đứng (x, z).
+func update_cut(p: Vector2, slope: float, delta: float) -> void:
+	if _cut_img == null:
 		return
-	var cm := CylinderMesh.new()
-	cm.top_radius = 0.55
-	cm.bottom_radius = 0.55
-	cm.height = 1.3
-	cm.radial_segments = 10
-	var m := StandardMaterial3D.new()
-	m.albedo_color = Color("cfd3d8")
-	m.metallic = 0.6
-	m.roughness = 0.35
-	cm.material = m
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = cm
-	mm.instance_count = tanks.size()
-	for i in tanks.size():
-		mm.set_instance_transform(i, Transform3D(Basis.IDENTITY, tanks[i] + Vector3(0, 0.65, 0)))
-	var mmi := MultiMeshInstance3D.new()
-	mmi.multimesh = mm
-	add_child(mmi)
+	var cells := _cells_near(p)
+	var want := {}
+	var seen := {}
+	for k in cells:
+		for i in _cut_cells.get(k, PackedInt32Array()):
+			if seen.has(i):
+				continue
+			seen[i] = true
+			var t := cut_target(_cut_polys[i], p, slope)
+			if t < _cut_tops[i]:
+				want[i] = t
+				if not _cut_now.has(i):
+					_cut_now[i] = _cut_tops[i]
+	var changed := false
+	for i in _cut_now.keys():
+		var top: float = _cut_tops[i]
+		var was := float(_cut_now[i])
+		var cur := move_toward(was, float(want.get(i, top)), float(CUT.speed) * delta)
+		if cur == was and want.has(i):
+			continue
+		changed = true
+		if cur >= top and not want.has(i):
+			_cut_now.erase(i)
+			_cut_img.set_pixel(i % CAPS_W, i / CAPS_W, Color(CUT_NONE, 0, 0))
+			cur = CUT_NONE
+		else:
+			_cut_now[i] = cur
+			_cut_img.set_pixel(i % CAPS_W, i / CAPS_W, Color(cur, 0, 0))
+		for lb in _cut_labels.get(i, []):
+			(lb[0] as Label3D).visible = cur >= float(lb[1])
+	if changed:
+		_cut_tex.update(_cut_img)
+	_update_crowns(cells, p, slope, delta)
+
+
+## Tán cây: coi như một khối vuông bằng tán; che An (theo cut_target) thì thu nhỏ hẳn, hết che thì to lại.
+func _update_crowns(cells: Array, p: Vector2, slope: float, delta: float) -> void:
+	if _crowns == null:
+		return
+	var want := {}
+	for k in cells:
+		for i in _tree_cells.get(k, PackedInt32Array()):
+			if want.has(i):
+				continue
+			var o: Vector2 = _trees[i]
+			var r: float = _tree_r[i]
+			var sq := PackedVector2Array([o + Vector2(-r, -r), o + Vector2(r, -r), o + Vector2(r, r), o + Vector2(-r, r)])
+			# Ngọn tán cao chừng 2,5 lần bán kính: phải hạ thấp hơn thế là tán chắn tầm nhìn.
+			if cut_target(sq, p, slope) < r * 2.5:
+				want[i] = true
+				if not _crown_now.has(i):
+					_crown_now[i] = 1.0
+	for i in _crown_now.keys():
+		var cur := move_toward(float(_crown_now[i]), 0.0 if want.has(i) else 1.0, 5.0 * delta)
+		if cur >= 1.0 and not want.has(i):
+			_crown_now.erase(i)
+		else:
+			_crown_now[i] = cur
+		_crowns.set_instance_custom_data(i, Color(cur, 0, 0, 0))
+		_trunks.set_instance_custom_data(i, Color(cur, 0, 0, 0))
+
+
+## Các ô lưới có thể có căn che An: hai bên An một dải rộng, từ ngang An về phía nam tới reach mét.
+func _cells_near(p: Vector2) -> Array:
+	var out := []
+	for gx in range(floori((p.x - CUT.wide_w - 1.0) / CUT_CELL), floori((p.x + CUT.wide_w + 1.0) / CUT_CELL) + 1):
+		for gz in range(floori((p.y - 1.0) / CUT_CELL), floori((p.y + CUT.reach) / CUT_CELL) + 1):
+			out.append(Vector2i(gx, gz))
+	return out
+
+
+## Thôi hạ nhà (rời chế độ đi dạo): mọi căn, mọi tán cây về như cũ.
+func reset_cut() -> void:
+	if _cut_img == null:
+		return
+	_cut_now.clear()
+	_cut_img.fill(Color(CUT_NONE, 0, 0))
+	_cut_tex.update(_cut_img)
+	for i in _cut_labels:
+		for lb in _cut_labels[i]:
+			(lb[0] as Label3D).visible = true
+	for i in _crown_now:
+		_crowns.set_instance_custom_data(i, Color(1, 0, 0, 0))
+		_trunks.set_instance_custom_data(i, Color(1, 0, 0, 0))
+	_crown_now.clear()
 
 
 func _multimesh_trees() -> void:
@@ -590,7 +820,13 @@ func _multimesh_trees() -> void:
 	trunk.top_radius = 0.15
 	trunk.bottom_radius = 0.2
 	trunk.height = 2.4
-	trunk.material = _solid(Color("6b4f3a"))
+	var bark := ShaderMaterial.new()
+	bark.shader = building_mat.shader
+	bark.set_shader_parameter("flat_color", true)
+	bark.set_shader_parameter("trunk", true)
+	bark.set_shader_parameter("tint", Color("6b4f3a"))
+	cut_materials.append(bark)
+	trunk.material = bark
 	var crown := SphereMesh.new()
 	crown.radius = 2.1
 	crown.height = 3.4
@@ -605,15 +841,32 @@ func _multimesh_trees() -> void:
 	for pair in [[trunk, 1.2], [crown, 3.6]]:
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
+		# INSTANCE_CUSTOM.r là độ to của cây (1 bình thường, 0 khi thu hẳn vì chắn trước An).
+		mm.use_custom_data = true
 		mm.mesh = pair[0]
 		mm.instance_count = _trees.size()
 		for i in _trees.size():
 			var p: Vector2 = _trees[i]
 			var s := 0.8 + fmod(absf(p.x * 13.1 + p.y * 7.7), 0.5)
 			mm.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * s), Vector3(p.x, float(pair[1]) * s, p.y)))
+			mm.set_instance_custom_data(i, Color(1, 0, 0, 0))
 		var mmi := MultiMeshInstance3D.new()
 		mmi.multimesh = mm
 		add_child(mmi)
+		if pair[0] == crown:
+			_crowns = mm
+		else:
+			_trunks = mm
+	for i in _trees.size():
+		var p: Vector2 = _trees[i]
+		var r := 2.1 * (0.8 + fmod(absf(p.x * 13.1 + p.y * 7.7), 0.5))
+		_tree_r.append(r)
+		for gx in range(floori((p.x - r) / CUT_CELL), floori((p.x + r) / CUT_CELL) + 1):
+			for gz in range(floori((p.y - r) / CUT_CELL), floori((p.y + r) / CUT_CELL) + 1):
+				var c := Vector2i(gx, gz)
+				if not _tree_cells.has(c):
+					_tree_cells[c] = PackedInt32Array()
+				_tree_cells[c].append(i)
 
 
 static func _solid(c: Color) -> StandardMaterial3D:
@@ -706,7 +959,7 @@ static func _along(line: PackedVector2Array, step: float, f: Callable) -> void:
 		carry = s - l
 
 
-## Ô tô đậu dọc đường lớn, xe máy dựng sát vỉa hè đường nhỏ: khối thấp nhiều màu.
+## Ô tô đậu dọc đường lớn (từ 8 m), xe máy dựng sát vỉa hè đường nhỏ: khối thấp nhiều màu.
 func _vehicles() -> void:
 	_rng.seed = 531
 	var cars: Array = []
@@ -717,24 +970,31 @@ func _vehicles() -> void:
 		var w := float(r.width)
 		_along(r.line, 9.0 if w >= 6.0 else 6.0, func(p: Vector2, d: Vector2) -> void:
 			var side := -1.0 if _rng.randf() < 0.5 else 1.0
-			if w >= 6.0 and _rng.randf() < 0.32:
+			if w >= 8.0 and _rng.randf() < 0.32:
 				var q: Vector2 = p + d.orthogonal() * (w / 2.0 - 1.4) * side
-				if Geometry2D.is_point_in_polygon(q, clip):
+				if Geometry2D.is_point_in_polygon(q, clip) and walkable(q):
 					cars.append([q, d])
 			elif _rng.randf() < 0.25:
 				var q: Vector2 = p + d.orthogonal() * (w / 2.0 - 0.5) * side
-				if Geometry2D.is_point_in_polygon(q, clip):
+				# Mép đường lấn vào nền nhà (nhà vẽ sát đường) thì thôi, khỏi có xe nằm trong nhà.
+				if Geometry2D.is_point_in_polygon(q, clip) and walkable(q):
 					bikes.append([q, d.orthogonal()]))
 	var palette := [Color("e8e6e1"), Color("2b2d33"), Color("b23a32"), Color("3a6ea5"), Color("c9ccd1"), Color("e0b23c"), Color("5a7d4f")]
-	_vehicle_mesh(cars, Vector3(1.8, 0.75, 4.2), Vector3(1.6, 0.6, 2.1), palette)
-	_vehicle_mesh(bikes, Vector3(0.5, 0.75, 1.8), Vector3(0.4, 0.35, 0.7), palette)
+	# Mỗi phần: cỡ khối, độ cao đáy, lệch theo chiều xe, màu (null: màu thân xe).
+	_vehicle_mesh(cars, [[Vector3(1.8, 0.75, 4.2), 0.25, 0.0, null], [Vector3(1.6, 0.6, 2.1), 1.0, -0.2, Color("2c3440")]], palette)
+	# Xe máy dựng chéo vào lề: thân, yên, cổ xe, ghi đông, hai bánh.
+	var tyre := Color("1b1b1d")
+	_vehicle_mesh(bikes, [[Vector3(0.34, 0.4, 1.5), 0.24, -0.05, null], [Vector3(0.3, 0.12, 0.7), 0.64, -0.25, Color("202022")],
+		[Vector3(0.14, 0.55, 0.16), 0.42, 0.6, null], [Vector3(0.64, 0.05, 0.06), 0.97, 0.6, Color("2a2a2c")],
+		[Vector3(0.1, 0.46, 0.46), 0.0, 0.62, tyre], [Vector3(0.1, 0.46, 0.46), 0.0, -0.62, tyre]],
+		[Color("b23a32"), Color("2b2d33"), Color("e8e6e1"), Color("3a6ea5"), Color("c9ccd1"), Color("7a2a3a")])
 	counts.cars = cars.size() + bikes.size()
 
 
-func _vehicle_mesh(items: Array, body: Vector3, cabin: Vector3, palette: Array) -> void:
+func _vehicle_mesh(items: Array, parts: Array, palette: Array) -> void:
 	if items.is_empty():
 		return
-	for part in [[body, 0.25], [cabin, 0.25 + body.y]]:
+	for part in parts:
 		var bm := BoxMesh.new()
 		bm.size = part[0]
 		var m := StandardMaterial3D.new()
@@ -751,9 +1011,9 @@ func _vehicle_mesh(items: Array, body: Vector3, cabin: Vector3, palette: Array) 
 			var d: Vector2 = items[i][1]
 			var basis := Basis(Vector3.UP, atan2(d.x, d.y))
 			var size: Vector3 = part[0]
-			mm.set_instance_transform(i, Transform3D(basis, Vector3(p.x, float(part[1]) + size.y / 2.0, p.y)))
-			var col: Color = palette[i % palette.size()]
-			mm.set_instance_color(i, col if part[0] == body else Color("2c3440"))
+			var at := Vector3(p.x, float(part[1]) + size.y / 2.0, p.y) + Vector3(d.x, 0, d.y).normalized() * float(part[2])
+			mm.set_instance_transform(i, Transform3D(basis, at))
+			mm.set_instance_color(i, palette[i % palette.size()] if part[3] == null else part[3])
 		var mmi := MultiMeshInstance3D.new()
 		mmi.multimesh = mm
 		add_child(mmi)
