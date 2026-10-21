@@ -1,6 +1,6 @@
 # 04 · Địa điểm
 
-Bảy nơi trong truyện, và cách đặt chúng lên con phố 3D đang có (`scripts/world/world.gd`, bảng `LOCATIONS`). Cột **ID mới** là tên đề xuất khi viết lại code.
+Bảy nơi trong truyện, và cách đặt chúng lên bản đồ phường An Hòa (`data/map.json`, nội dung từng nơi ở bảng `LOCATIONS` của `scripts/world/world.gd`). Cột **ID mới** là ID đang dùng trong code.
 
 | Nơi trong truyện | Mô tả | ID mới | Thay cho địa điểm cũ |
 |---|---|---|---|
@@ -10,17 +10,38 @@ Bảy nơi trong truyện, và cách đặt chúng lên con phố 3D đang có (
 | **Chợ Cầu Nhỏ** | Sạp vật tư, hàng đồ cũ, quán nước có bảng tin cho thuê phòng. Giá rẻ thường kèm điều kiện cần hỏi rõ, nhưng không phải món nào cũng là bẫy. | `cho_cau_nho` | `cua_hang`, `tra_da` |
 | **Dãy quán Bến Cạn** | Năm hộ kinh doanh chung lối đi và hạ tầng cũ. Làm ở đây phải hỏi lịch từng quán, ghi việc rõ, và có người đủ tay nghề giám sát. Anh Phúc đại diện. | `ben_can` | `cong_trinh` |
 | **Bến xe số 6 và trung tâm nghề** | Không gian riêng của Linh: bảng tuyển thực tập, giờ xe, bạn cùng lớp, những lựa chọn không xoay quanh An. | `ben_xe_6` | `trung_tam`, `tram_xe_buyt` |
-| **Ba chỗ ở mới** | Phòng Hẻm Dừa gần việc, phòng Cầu Tre xa hơn nhưng thoáng, nhà dì Năm ở tạm. Ưu nhược điểm của từng nơi được báo trước. | `hem_dua`, `cau_tre`, `nha_di_nam` | Mới, đặt ở hai đầu phố hoặc đi bằng xe |
+| **Ba chỗ ở mới** | Phòng Hẻm Dừa gần việc, phòng Cầu Tre xa hơn nhưng thoáng, nhà dì Năm ở tạm. Ưu nhược điểm của từng nơi được báo trước. | `hem_dua`, `cau_tre`, `nha_di_nam` | Mới: Hẻm Dừa, Hẻm Bờ Nam, đường An Hòa |
 
 **Bỏ đi:** `phuong`, `thu_vien`, `nga_tu`, `quan_ca_phe`. Truyện mới không dùng các nơi này. Nếu muốn giữ cho phố đông vui, có thể để làm cảnh nền không tương tác.
 
-## Gợi ý bố cục phố
+## Bản đồ phường An Hòa
 
-- **Xóm trọ Bờ Me** đặt ở giữa phố, là nơi xuất phát và nơi đi ngủ mỗi tối.
-- **Cơm Hạnh** và **Tiệm Sáu Sửa** đặt gần xóm trọ vì An ghé hằng ngày.
-- **Chợ Cầu Nhỏ** đặt cạnh một cây cầu nhỏ bắc qua con rạch, chi tiết nhận diện của phường An Hòa.
-- **Dãy quán Bến Cạn** là năm mặt tiền nhỏ liền nhau ở một đầu phố, bên bờ rạch.
-- **Bến xe số 6** ở đầu phố còn lại. Từ đây đi được tới trung tâm nghề và tới Cầu Tre, mất thêm thời gian di chuyển.
-- **Hẻm Dừa** là một con hẻm rẽ ra từ phố chính, gần chợ. **Nhà dì Năm** ở hẻm khác, chỉ mở sau khi đã hỏi ở ngày 3.
+Bố cục lấy theo kiểu một khu ven kênh ở TP.HCM: đường lớn phía bắc, các hẻm chạy xuống rạch, chợ ở đầu cầu, dãy nhà quay lưng ra rạch, bên kia rạch là xóm nhà sàn và ruộng rau. Tọa độ: x tăng về hướng đông, z tăng về hướng nam (camera nhìn về hướng bắc).
+
+```
+            Cổng KCN
+               │
+ ══════════ Đường An Hòa (đường lớn, 2 chiều) ═══════════════════════
+  Bến xe 6   Nhà dì Năm      Cơm Hạnh   ┃ Tiệm Sáu Sửa   ┃
+               ┃                         ┃                 ┃
+   Hẻm Dừa ════╣ đường                   ┣═══ Hẻm 42/7 ════┫
+   (hẻm cụt)   ┃ Chợ                   Hẻm 42           Hẻm 88
+               ┃                         ┃                 ┃
+ ═══════ Chợ Cầu Nhỏ ═══ Đường Bờ Me ═══ Xóm trọ Bờ Me ═══ Dãy quán Bến Cạn ══
+ ~~~~~~~~~~~~~~┃~~~~~~~~ Rạch Bờ Me ~~~~~~~~~~~~~~~~~~~~~~~~~~~┃~~~~~~~~
+             Cầu Nhỏ                                         Cầu Tre
+ ════════════ Hẻm Bờ Nam (nhà sàn) ═══════════════════════ Phòng Cầu Tre
+                         ruộng rau muống
+```
+
+- **Xóm trọ Bờ Me** ở giữa đường Bờ Me, nhìn ra rạch. Là nơi xuất phát và nơi đi ngủ mỗi tối.
+- **Cơm Hạnh** và **Tiệm Sáu Sửa** ở trên đường An Hòa, hai bên Hẻm 42 (Cơm Hạnh phía tây, tiệm Sáu phía đông): từ xóm trọ đi thẳng hẻm lên là tới, An ghé hằng ngày.
+- **Chợ Cầu Nhỏ** ở góc đường Chợ và đường Bờ Me, ngay chân Cầu Nhỏ (kiểu chợ đầu cầu). Đường Chợ có sạp hai bên.
+- **Dãy quán Bến Cạn** là năm mặt tiền nhỏ liền nhau ở cuối đường Bờ Me, sát Cầu Tre.
+- **Bến xe số 6** ở đầu đường An Hòa, cạnh đường vào khu công nghiệp (ca kho đi từ đây).
+- **Hẻm Dừa** là hẻm cụt rẽ ra từ đường Chợ, đầu hẻm có cây dừa. **Phòng Cầu Tre** ở Hẻm Bờ Nam, bên kia rạch. **Nhà dì Năm** ở đầu đường An Hòa, gần trạm xe.
+- Đường đi từ xóm trọ: chợ khoảng 60 m, Cơm Hạnh 100 m, Cầu Tre 100 m, bến xe 150 m.
+
+**Tham khảo khi vẽ:** cách phân loại hẻm (hẻm chính, hẻm nhánh, hẻm cụt; hẻm ba gác và hẻm xe hơi) và cách đánh số nhà trong hẻm có gạch chéo ở TP.HCM; mô hình phố, chợ, bến và chợ đầu cầu của đô thị Nam Bộ; dãy nhà quay lưng ra kênh rạch, nhà sàn ven rạch; cổng hẻm ghi tên khu phố. Không chép bản đồ một phường cụ thể nào: phường An Hòa là nơi hư cấu, chỉ lấy cách tổ chức không gian.
 
 Ngày 15 và 29, sân xóm trọ và đường ven rạch đọng nước. Đây là chỗ để thể hiện mưa bằng hình ảnh, không chỉ bằng chữ.

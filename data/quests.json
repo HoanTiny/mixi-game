@@ -244,14 +244,16 @@
    "steps": [
     {
      "kind": "find",
-     "x": [
-      -56,
-      -26
-     ],
      "chance": 0.45,
      "item": "meo",
-     "text": "Lục mấy thùng rác gần chợ Cầu Nhỏ tìm con Mun",
-     "found_text": "Meo! Con Mun lấm lem chui ra từ sau thùng rác"
+     "text": "Lục mấy thùng rác quanh chợ Cầu Nhỏ và đường Chợ tìm con Mun",
+     "found_text": "Meo! Con Mun lấm lem chui ra từ sau thùng rác",
+     "area": [
+      -64,
+      -36,
+      -26,
+      22
+     ]
     },
     {
      "kind": "visit",

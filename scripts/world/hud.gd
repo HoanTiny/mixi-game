@@ -21,6 +21,7 @@ var dialogs: DialogLayer
 
 var _objectives: PanelContainer
 var _map: Control
+var _big_map: Control
 var _loc_scroll: ScrollContainer
 var _objective_box: VBoxContainer
 var _status: PanelContainer
@@ -108,13 +109,20 @@ func _ready() -> void:
 
 	# Hàng dưới: hướng dẫn điều khiển bên trái, thanh công cụ bên phải.
 	var bottom := _pass(HBoxContainer.new(), rows)
-	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · Esc: đóng", 12, UI.HUD_TEXT)
+	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · M: bản đồ · Esc: đóng", 12, UI.HUD_TEXT)
 	hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	hint.add_theme_constant_override("outline_size", 5)
 	hint.size_flags_vertical = Control.SIZE_SHRINK_END
 	bottom.add_child(hint)
 	_spacer(bottom)
 	_build_bottom(bottom)
+
+	# Bản đồ lớn phủ giữa màn hình (phím M hoặc bấm bản nhỏ).
+	_big_map = StreetMap.new()
+	_big_map.world = world
+	_big_map.big = true
+	root.add_child(_big_map)
+	_map.other = _big_map
 
 	dialogs = DialogLayer.new()
 	dialogs.game = game
@@ -127,7 +135,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible or _working or minigame != null
+	return dialogs.visible or _working or minigame != null or (_big_map != null and _big_map.visible)
 
 
 func location_open() -> String:

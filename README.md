@@ -6,7 +6,14 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29, chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
 
-**Chỗ ở trên phố:** Phòng Hẻm Dừa ở hẻm cạnh chợ, Phòng Cầu Tre ở cuối phố qua khỏi Bến Cạn, nhà dì Năm ở đầu phố. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
+**Chỗ ở trên phố:** Phòng Hẻm Dừa trong hẻm cụt rẽ ra từ đường Chợ, Phòng Cầu Tre bên kia rạch (qua cây cầu tre sau Bến Cạn), nhà dì Năm ở đầu đường An Hòa gần trạm xe. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
+
+**Bản đồ phường An Hòa** (`data/map.json`, dựng bởi `scripts/world/city_map.gd`): không còn là một con phố thẳng mà là một khu ven kênh kiểu Sài Gòn, bố cục dựa theo các xóm hẻm và rạch thật ở TP.HCM:
+- **Đường An Hòa** (đường lớn, hai chiều, có trạm xe số 6 và cổng khu công nghiệp ở đầu đường), **đường Chợ Cầu Nhỏ** chạy xuống tới chân cầu (kiểu chợ đầu cầu), **đường Bờ Me** ven rạch có lan can, hàng cây và đèn.
+- **Hẻm 42** (cổng "Khu phố 3"), **Hẻm 88** (cổng "Khu phố 4", hẻm ba gác hẹp hơn), hẻm nhánh **42/7** nối ngang hai hẻm, **Hẻm Dừa** là hẻm cụt rẽ từ đường Chợ, đầu hẻm có cây dừa. Dây điện chằng chịt trên hẻm.
+- **Rạch Bờ Me** uốn nhẹ, có bờ kè, ghe xuồng; **Cầu Nhỏ** (cầu bê tông) và **Cầu Tre** (cầu ván) bắc sang **Hẻm Bờ Nam**, nhà sàn chân cột quay lưng ra rạch, phía sau là ruộng rau muống.
+- Số nhà đánh như thật: số lẻ một bên, chẵn một bên; nhà trong hẻm mang số có gạch chéo theo căn ở đầu hẻm (42/3, 42/7/5…), app Giao Nhanh giao tới đúng các địa chỉ này.
+- An đi theo đường thật (tìm đường A* trên lưới 1 m, không xuyên nhà), nhà che khuất An thì tự ẩn. Bản đồ nhỏ góc trên; phím **M** hoặc bấm bản đồ nhỏ mở **bản đồ lớn** có tên đường, bấm chỗ nào thì An đi tới đó.
 
 **Gợi ý cách chơi:** lần đầu gặp chuyện gì (có cảnh chính, đói, bẩn, Mệt lên, có người nhờ việc, đứng cạnh thùng rác, sau 20 giờ…) thì ô Gợi ý ở góc trái hiện một lần. Nội dung ở mục `tips` của `data/story.json`.
 
@@ -25,6 +32,7 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 | Bấm vào cửa tiệm hoặc người | Đi tới và mở việc ở đó |
 | WASD hoặc phím mũi tên | Đi lại |
 | E | Vào địa điểm đang đứng gần |
+| M | Mở/đóng bản đồ lớn; bấm một chỗ trên bản đồ để đi tới |
 | Esc | Đóng bảng |
 | Nút **Về xóm trọ** | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
 
@@ -50,6 +58,7 @@ Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi l
 
 ```
 data/
+  map.json        bản đồ phường An Hòa: đường, hẻm, rạch, cầu, cổng hẻm, chỗ đặt từng địa điểm
   config.json     số liệu: tiền sinh hoạt, Mệt, nhu cầu cơ thể, chỗ ở, điểm xuất phát của 3 tuyến, việc làm, trò chơi nhỏ, giao đồ, ve chai
   events.json     cảnh chính ngày 1–30 (địa điểm, khung giờ, lựa chọn, nếu bỏ lỡ), biến thể theo tuyến, sự kiện hệ thống
   story.json      lời mở đầu, tên nhân vật, 8 kết thúc, thẻ hậu truyện của Linh, bà Tư và quan hệ nghề
@@ -71,7 +80,8 @@ scripts/
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/character.gd   nhân vật có khớp dựng bằng khối: An, 8 nhân vật, người đi đường; hoạt cảnh đi, đứng, ngồi xe
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
-  world/street_map.gd  bản đồ phố thu nhỏ, bấm để đi tới
+  world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
+  world/street_map.gd  bản đồ nhỏ và bản đồ lớn (phím M), bấm để đi tới
   world/hud.gd    HUD kiểu Nobody: mục tiêu, tiền và Mệt, bảng địa điểm, điện thoại, Sổ, Nhật ký, việc nhờ
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động, hai cột tiền, Sổ dạng chữ
   ui/dialog_layer.gd  hộp thoại chọn tuyến, sự kiện, đi ngủ, tổng kết lát cắt

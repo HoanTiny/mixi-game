@@ -24,7 +24,7 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - **8 kết thúc E1–E8** xét theo thứ tự E8 → E6 → E7 → E5 → E4 → E2 → E3 → E1 (`ending_key()` trong `game_logic.gd`, ngưỡng ở `endings` của `config.json`), màn kết có thẻ Linh, thẻ bà Tư, một thẻ quan hệ nghề và các khoản còn phải xử lý.
   - Việc tùy chọn theo ngày và việc giữ lời hứa (`showIfPromise`) ở các địa điểm; việc nhờ mở từ lựa chọn trong cảnh (sửa quạt ngày 2, giao 12 suất ngày 6, đón Bắp ngày 9).
   - `tests/sim.gd` chạy thêm 30 ngày cho 3 tuyến × 4 cách chơi; `tests/playtest.gd -- --demo --full` cho người chơi máy đi hết 30 ngày trên màn phố thật.
-  - Ba chỗ ở dựng trên phố (Hẻm Dừa cạnh chợ, Cầu Tre cuối phố, nhà dì Năm đầu phố) để xem phòng và dắt bà đi thử tận nơi; ngày 30 cảnh khép lại diễn ra trước chỗ ở đã chọn, có chậu húng dưới mái hiên.
+  - Ba chỗ ở dựng trên phố (Hẻm Dừa cạnh chợ, Cầu Tre bên kia rạch, nhà dì Năm đầu đường An Hòa) để xem phòng và dắt bà đi thử tận nơi; ngày 30 cảnh khép lại diễn ra trước chỗ ở đã chọn, có chậu húng dưới mái hiên.
   - Gợi ý cách chơi hiện một lần khi lần đầu gặp từng tình huống (`tips` trong `story.json`).
 - **Nhận xét từ mô phỏng 30 ngày:** lắng nghe ra E1/E2/E3 theo tuyến, giữ tiếp ra E4 hoặc E6, áp đặt ra E8, làm quá sức ra E6 hoặc E4. Tiền cuối tháng sau khi trả Hẻm Dừa từ 0,4 đến 6 triệu. Cách chơi "giấu" (làm việc đàng hoàng nhưng giấu chuyện, ép người nhà) ra E5 ở cả ba tuyến. E7 chỉ ra khi thiếu tiền phòng ngày 26 (đã thử riêng); mô phỏng "ít việc" (mỗi ngày một việc ngắn) vẫn vừa đủ Hẻm Dừa, nên cần người thật chơi thử để biết áp lực tiền có đủ không.
 - **Đã tự chơi thử một lượt 30 ngày** (tuyến C, người chơi cẩn thận, ra E3) và sửa theo những chỗ vướng:
@@ -45,6 +45,10 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - **Món cầm trên tay ngày 30** (`cam_tren_tay`): chậu húng, túi đồ nghề, hoặc món đã giữ được (cánh tủ, tập hồ sơ của Linh, tấm bảng). Chỉ đổi hình ảnh kết, không cộng điểm.
   - **Màn kết** thêm phần "Sau đó" (các mạch riêng khép lại), "Trong thùng đồ cuối cùng" (`keepsakes`), và một dòng cho từng người ở xóm và ở phố (`npcCards` có thêm `extra` theo việc đã làm), thay vì chỉ một người nổi bật nhất.
   - Việc nhỏ cho những khoảng vui: đánh cầu lông với Linh ngoài sân (không có khi trời mưa).
+- **Bản đồ phường An Hòa vẽ lại** (trước đây chỉ là một con phố thẳng): khu ven kênh kiểu Sài Gòn trong `data/map.json`, có đường lớn, đường chợ, đường ven rạch, hai hẻm chính có cổng khu phố, hẻm nhánh, hẻm cụt, rạch có bờ kè, hai cây cầu, xóm nhà sàn bên kia rạch. Xem [04-dia-diem.md](04-dia-diem.md).
+  - `city_map.gd` chia lô nhà theo mặt tiền từng đường, đánh số nhà kiểu thật (lẻ, chẵn, gạch chéo trong hẻm), dựng lưới đi bộ 1 m và tìm đường A*. Thời gian đi bộ tính theo quãng đường thật (`walkHoursPerMeter` 0,0022), tiền giao hàng theo mét đi thật.
+  - Việc nhờ "tìm" dùng vùng chữ nhật trên bản đồ (`area`) thay vì khúc phố theo trục x.
+  - Bản đồ lớn (phím M) có tên đường, tên rạch; bấm chỗ nào đi tới chỗ đó.
 - **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
 
 ## Câu hỏi đã chốt

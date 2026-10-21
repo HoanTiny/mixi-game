@@ -136,9 +136,9 @@
   "loc": "cho_cau_nho",
   "title": "Phòng ở cuối hẻm",
   "who": "Linh",
-  "text": "Linh gỡ ba mẩu tin cho thuê ở bảng tin chợ. Bà Tư không hỏi giá, chỉ hỏi nơi nào buổi sáng có người ngồi trước cửa.\n• Phòng Hẻm Dừa: hẻm nhỏ ngay cạnh chợ, gần việc, phòng nhỏ. Vào ở 5.000.000đ (cọc, tháng đầu, chuyển đồ).\n• Phòng Cầu Tre: cuối phố, qua khỏi Bến Cạn. Thoáng, có hiên. Vào ở 4.200.000đ, đi làm xa hơn.\n• Nhà dì Năm: đầu phố. Ở tạm 7 ngày, góp 500.000đ, phải gửi bớt đồ.",
+  "text": "Linh gỡ ba mẩu tin cho thuê ở bảng tin chợ. Bà Tư không hỏi giá, chỉ hỏi nơi nào buổi sáng có người ngồi trước cửa.\n• Phòng Hẻm Dừa: hẻm nhỏ ngay cạnh chợ, gần việc, phòng nhỏ. Vào ở 5.000.000đ (cọc, tháng đầu, chuyển đồ).\n• Phòng Cầu Tre: bên kia rạch Bờ Me, qua cây cầu tre sau Bến Cạn. Thoáng, có hiên. Vào ở 4.200.000đ, đi làm xa hơn.\n• Nhà dì Năm: đầu đường An Hòa, gần trạm xe. Ở tạm 7 ngày, góp 500.000đ, phải gửi bớt đồ.",
   "quote": "Linh: \"Rẻ hơn tám trăm, nhưng mỗi ngày anh chạy xa hơn. Mình tính cả cái đó nữa.\"",
-  "missed": "Mấy mẩu tin vẫn dán trên bảng tin ở chợ Cầu Nhỏ. Muốn xem phòng thì tự tới Hẻm Dừa (cạnh chợ) hay Cầu Tre (cuối phố).",
+  "missed": "Mấy mẩu tin vẫn dán trên bảng tin ở chợ Cầu Nhỏ. Muốn xem phòng thì tự tới Hẻm Dừa (cạnh chợ) hay Cầu Tre (bên kia rạch).",
   "choices": [
    {
     "label": "Hẹn đi xem Hẻm Dừa ngay sáng nay",
@@ -153,7 +153,7 @@
    },
    {
     "label": "Hẹn đi xem Cầu Tre",
-    "hint": "Mất 2,5 giờ vì ở cuối phố. Xa hơn nhưng có hiên",
+    "hint": "Mất 2,5 giờ vì phải vòng qua cầu tre. Xa hơn nhưng có hiên",
     "effects": {
      "hours": 2.5,
      "fatigue": 4,

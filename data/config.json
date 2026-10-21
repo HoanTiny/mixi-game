@@ -4,7 +4,7 @@
   "lateHour": 20,
   "lateFatigue": 5,
   "livingCostPerDay": 120000,
-  "walkHoursPerMeter": 0.004,
+  "walkHoursPerMeter": 0.0022,
   "workSecondsPerHour": 0.35,
   "fatigue": {
     "warn": 70,
@@ -32,7 +32,7 @@
   },
   "delivery": {
     "shops": {"com_hanh": "2 hộp cơm phần", "cho_cau_nho": "túi rau và trái cây ở chợ", "tiem_sau": "cái nồi cơm điện vừa sửa"},
-    "base": 12000, "perMeter": 100, "cookHours": 0.15, "slackFactor": 1.5, "slackHours": 0.2,
+    "base": 12000, "perMeter": 60, "cookHours": 0.15, "slackFactor": 1.5, "slackHours": 0.2,
     "tip": [3000, 10000], "tipIfLeft": 0.35, "latePay": 0.6,
     "fatigue": 3, "lateFatigue": 2, "cancelFatigue": 2,
     "rush": [[10, 13.5], [17, 21]], "offerSec": [3, 7], "offPeakSec": [25, 45]

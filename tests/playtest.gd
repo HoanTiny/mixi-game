@@ -147,9 +147,9 @@ func _quests() -> void:
 						await _events()
 				"find":
 					for b in w.bins:
-						if float(b.pos.x) >= float(step.x[0]) and float(b.pos.x) <= float(step.x[1]) and game.scrap_lock(b.id) == "" and game.quest_state(id) == "active" and game.quest_step(id) == step:
+						if game.in_area(step.area, b.pos.x, b.pos.z) and game.scrap_lock(b.id) == "" and game.quest_state(id) == "active" and game.quest_step(id) == step:
 							hud.close_location()
-							w._target = b.pos
+							w.walk_to(b.pos)
 							var f := 0
 							while w._target != null and f < 3000 and game.day() == d:
 								f += 1
@@ -176,7 +176,8 @@ func _scrap(d: int) -> void:
 	if not game.has_needs() or game.fatigue_warn():
 		return
 	var near: Array = w.bins.duplicate()
-	near.sort_custom(func(a, b) -> bool: return absf(a.pos.x - w.player.position.x) < absf(b.pos.x - w.player.position.x))
+	var pp := Vector2(w.player.position.x, w.player.position.z)
+	near.sort_custom(func(a, b) -> bool: return Vector2(a.pos.x, a.pos.z).distance_to(pp) < Vector2(b.pos.x, b.pos.z).distance_to(pp))
 	var done := 0
 	for b in near:
 		if done >= 3 or game.day() != d or game.hours_left() < 1.5:
@@ -184,7 +185,7 @@ func _scrap(d: int) -> void:
 		if game.scrap_lock(b.id) != "":
 			continue
 		hud.close_location()
-		w._target = b.pos
+		w.walk_to(b.pos)
 		var f := 0
 		while w._target != null and f < 3000 and game.day() == d:
 			f += 1

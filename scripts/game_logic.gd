@@ -1368,11 +1368,11 @@ func delivery_rush() -> bool:
 
 
 ## Đơn mới: lấy ở tiệm shop, giao tới dest; meters là quãng đường cả đi lấy lẫn đi giao.
-func delivery_offer(shop: String, shop_name: String, dest: String, dest_x: float, meters: float) -> Dictionary:
+func delivery_offer(shop: String, shop_name: String, dest: String, dest_x: float, meters: float, dest_z := 0.0) -> Dictionary:
 	var d: Dictionary = cfg.delivery
 	var walk_h := meters * float(cfg.get("walkHoursPerMeter", 0.004))
 	return {
-		"shop": shop, "shop_name": shop_name, "item": str(d.shops[shop]), "dest": dest, "dest_x": dest_x,
+		"shop": shop, "shop_name": shop_name, "item": str(d.shops[shop]), "dest": dest, "dest_x": dest_x, "dest_z": dest_z,
 		"pay": round_k(float(d.base) + meters * float(d.perMeter)),
 		"deadline": clock() + walk_h * float(d.slackFactor) + float(d.cookHours) + float(d.slackHours),
 		"picked": false,
@@ -1621,7 +1621,7 @@ func quest_target(id: String) -> Dictionary:
 		"action":
 			return {"loc": str(get_action(str(step.action)).get("location", ""))}
 		"find":
-			return {"x": step.x}
+			return {"area": step.area}
 	return {}
 
 
@@ -1845,11 +1845,16 @@ func _quest_on_action(action_id: String, result: Dictionary) -> void:
 			_quest_advance(id)
 
 
-## Lục thùng rác đúng khúc phố của bước "find": có xác suất ra đồ, xui ba lần liền thì lần sau chắc chắn ra.
-func _quest_on_scavenge(x: float) -> String:
+## Vùng tìm đồ của bước "find": [x0, z0, x1, z1] trên bản đồ phường.
+func in_area(area: Array, x: float, z: float) -> bool:
+	return x >= float(area[0]) and x <= float(area[2]) and z >= float(area[1]) and z <= float(area[3])
+
+
+## Lục thùng rác đúng vùng của bước "find": có xác suất ra đồ, xui ba lần liền thì lần sau chắc chắn ra.
+func _quest_on_scavenge(x: float, z := INF) -> String:
 	for id in quests_active():
 		var step := quest_step(id)
-		if step.get("kind", "") != "find" or x < float(step.x[0]) or x > float(step.x[1]):
+		if step.get("kind", "") != "find" or not in_area(step.area, x, z):
 			continue
 		var st: Dictionary = s.quests[id]
 		if randf() < float(step.get("chance", 1.0)) or int(st.get("misses", 0)) >= 3:
@@ -1892,8 +1897,8 @@ func scrap_lock(bin_id: String) -> String:
 
 
 ## Lục một thùng rác: mất ít phút, bẩn người, được vài chai, lon, bìa giấy. Trả về số món nhặt được.
-## x: vị trí thùng dọc phố, để việc nhờ kiểu "tìm trong thùng rác cuối phố" biết thùng nào đúng chỗ.
-func scavenge(bin_id: String, x := INF) -> Dictionary:
+## x, z: vị trí thùng trên bản đồ, để việc nhờ kiểu "tìm trong thùng rác quanh chợ" biết thùng nào nằm trong vùng.
+func scavenge(bin_id: String, x := INF, z := INF) -> Dictionary:
 	if scrap_lock(bin_id) != "":
 		return {}
 	var c: Dictionary = cfg.scrap
@@ -1911,7 +1916,7 @@ func scavenge(bin_id: String, x := INF) -> Dictionary:
 		need_adj(k, float(c.dirty[k]))
 	add_fatigue(float(c.fatigue))
 	add_log("Lục thùng rác: " + (", ".join(parts) if not parts.is_empty() else "không có gì"))
-	var found := _quest_on_scavenge(x)
+	var found := _quest_on_scavenge(x, z)
 	if found != "":
 		got["_quest"] = found
 	_commit()

@@ -150,7 +150,7 @@ func _quests(g) -> void:
 						g.quest_visit(id)
 						_answer_full(g, "A", 1)
 				"find":
-					g.scavenge("q%d_%d" % [g.day(), n], (float(step.x[0]) + float(step.x[1])) / 2.0)
+					g.scavenge("q%d_%d" % [g.day(), n], (float(step.area[0]) + float(step.area[2])) / 2.0, (float(step.area[1]) + float(step.area[3])) / 2.0)
 				"action":
 					g.do_action(str(step.action), {"ratio": 1.0, "bonus": 0})
 
