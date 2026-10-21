@@ -204,6 +204,7 @@ func _draw() -> void:
 	if big:
 		for id in world.LOCATIONS:
 			_label(font, to_map(city.loc_door(id)), 6.0, str(world.LOCATIONS[id].name), placed)
+	_draw_routes(self, font)
 	if big:
 		_draw_people(self, font)
 	# An: mũi tên vàng chỉ theo hướng đang đi.
@@ -377,6 +378,7 @@ func _draw_real_over() -> void:
 	if big:
 		for id in city.locs:
 			_label_on(c, font, to_map(city.loc_door(id)), 6.0, str(world.LOCATIONS[id].name), placed)
+	_draw_routes(c, font)
 	if big:
 		_draw_people(c, font)
 	var pp := to_map(Vector2(world.player.position.x, world.player.position.z))
@@ -456,4 +458,26 @@ func _draw_people(c: Control, font: Font) -> void:
 			var wn := font.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 			c.draw_string_outline(font, p + Vector2(14, -10), name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 4, Color(0, 0, 0, 0.8))
 			c.draw_string(font, p + Vector2(14, -10), name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
+
+## Đường đang đi: nét vàng đứt quãng; bản lớn rê chuột lên địa điểm: nét trắng mờ kèm số mét, số phút đi bộ.
+func _draw_routes(c: Control, font: Font) -> void:
+	var ap: PackedVector2Array = world.active_path()
+	if ap.size() >= 2:
+		var pts := PackedVector2Array()
+		for p in ap:
+			pts.append(to_map(p))
+		for i in pts.size() - 1:
+			c.draw_dashed_line(pts[i], pts[i + 1], UI.GOLD, 2.5 if big else 1.8, 6.0 if big else 4.0)
+	if big and _hover != "":
+		var r: Dictionary = world.route_preview(_hover)
+		var pts := PackedVector2Array()
+		for p in r.path:
+			pts.append(to_map(p))
+		if pts.size() >= 2:
+			c.draw_polyline(pts, Color(0, 0, 0, 0.55), 5.0, true)
+			c.draw_polyline(pts, Color("7fd3ff"), 2.6, true)
+			var end := pts[pts.size() - 1]
+			var t := "%d m · khoảng %d phút đi bộ" % [roundi(float(r.meters)), maxi(1, roundi(float(r.minutes)))]
+			c.draw_string_outline(font, end + Vector2(10, 22), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 4, Color(0, 0, 0, 0.8))
+			c.draw_string(font, end + Vector2(10, 22), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
 

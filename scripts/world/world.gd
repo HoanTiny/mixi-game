@@ -123,6 +123,7 @@ var _mat_cache := {}
 
 
 func _ready() -> void:
+	var t0 := Time.get_ticks_msec()
 	game = GameState.game
 	font = UI.text_font()
 	var map_id := _map_id()
@@ -194,6 +195,7 @@ func _ready() -> void:
 			audio.play("dialog"))
 	game.changed.connect(_on_changed)
 	_on_changed()
+	print("[world] dựng màn phố %d ms (map %s)" % [Time.get_ticks_msec() - t0, _map_id()])
 	# Vào thẳng chế độ Dựng khu thật: bản web có "?khu" trên địa chỉ, hay đối số "--realmap-auto=…" khi thử tự động.
 	var to_realmap := false
 	for arg in OS.get_cmdline_user_args():
@@ -1382,6 +1384,7 @@ func _physics_process(delta: float) -> void:
 	if hud.location_open() != "" and door_of(hud.location_open()).distance_to(player.position) > INTERACT_RANGE + 1.5:
 		hud.close_location()
 
+	_update_trail()
 	_update_traffic(delta)
 	if real:
 		_update_boats(delta)
@@ -1437,6 +1440,99 @@ func walk_to(pos: Vector3, loc := "") -> void:
 		_target_loc = ""
 		return
 	_target = _v3(_path[_path.size() - 1])
+	_make_trail()
+
+
+# ---------------------------------------------------------------- dẫn đường
+
+## Vệt chấm vàng trên mặt đường chỉ lối An đang đi; chấm nào An đi qua rồi thì tắt.
+var _trail: MultiMeshInstance3D
+var _trail_pts := PackedVector2Array()
+const TRAIL_STEP := 2.2
+
+
+func _make_trail() -> void:
+	if _trail == null:
+		_trail = MultiMeshInstance3D.new()
+		_trail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		var dot := CylinderMesh.new()
+		dot.top_radius = 0.28
+		dot.bottom_radius = 0.28
+		dot.height = 0.02
+		dot.radial_segments = 10
+		dot.rings = 1
+		var m := StandardMaterial3D.new()
+		m.albedo_color = Color(0.95, 0.76, 0.3, 0.85)
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.no_depth_test = true
+		dot.material = m
+		mm.mesh = dot
+		_trail.multimesh = mm
+		add_child(_trail)
+	# Chấm xếp từ đích ngược về An: số chấm còn hiện chính là số chấm phía trước.
+	_trail_pts = PackedVector2Array()
+	var carry := TRAIL_STEP
+	for i in range(_path.size() - 1, 0, -1):
+		var a := _path[i]
+		var b := _path[i - 1]
+		var l := a.distance_to(b)
+		var s := carry
+		while s < l:
+			_trail_pts.append(a.lerp(b, s / l))
+			s += TRAIL_STEP
+		carry = s - l
+	var mm := _trail.multimesh
+	mm.instance_count = _trail_pts.size()
+	for i in _trail_pts.size():
+		mm.set_instance_transform(i, Transform3D(Basis.IDENTITY, _v3(_trail_pts[i], 0.21)))
+	mm.visible_instance_count = _trail_pts.size()
+	_trail.visible = true
+
+
+func _update_trail() -> void:
+	if _trail == null or not _trail.visible:
+		return
+	if _target == null:
+		_trail.visible = false
+		return
+	var here := Vector2(player.position.x, player.position.z)
+	var n := _trail.multimesh.visible_instance_count
+	while n > 0 and _trail_pts[n - 1].distance_to(here) < 1.2:
+		n -= 1
+	# Chấm cuối (gần An nhất) đã bị vượt qua thì tắt luôn.
+	while n > 1 and _trail_pts[n - 2].distance_to(here) < _trail_pts[n - 1].distance_to(_trail_pts[n - 2]):
+		n -= 1
+	_trail.multimesh.visible_instance_count = n
+
+
+## Đường đang đi (còn lại phía trước An), để bản đồ vẽ.
+func active_path() -> PackedVector2Array:
+	if _target == null or _path_i >= _path.size():
+		return PackedVector2Array()
+	var out := PackedVector2Array([Vector2(player.position.x, player.position.z)])
+	out.append_array(_path.slice(_path_i))
+	return out
+
+
+## Đường từ An tới một địa điểm và số phút đi bộ (giờ trong game), cho bản đồ lớn khi rê chuột.
+var _preview_cache := {}
+
+
+func route_preview(loc: String) -> Dictionary:
+	var here := Vector2(player.position.x, player.position.z)
+	var key := "%s|%d|%d" % [loc, roundi(here.x / 3.0), roundi(here.y / 3.0)]
+	if not _preview_cache.has(key):
+		_preview_cache.clear()
+		var d: Vector3 = door_of(loc)
+		var pts: PackedVector2Array = city.path(here, Vector2(d.x, d.z))
+		var m := 0.0
+		for i in range(1, pts.size()):
+			m += pts[i - 1].distance_to(pts[i])
+		_preview_cache[key] = {"path": pts, "meters": m, "minutes": m * float(game.cfg.get("walkHoursPerMeter", 0.0)) * 60.0}
+	return _preview_cache[key]
 
 
 ## Nhà nào nằm giữa camera và An (phía nam, đủ cao để che theo góc nhìn hiện tại) thì ẩn đi.
