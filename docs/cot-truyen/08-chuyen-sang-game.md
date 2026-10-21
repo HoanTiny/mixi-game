@@ -27,7 +27,16 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - Ba chỗ ở dựng trên phố (Hẻm Dừa cạnh chợ, Cầu Tre cuối phố, nhà dì Năm đầu phố) để xem phòng và dắt bà đi thử tận nơi; ngày 30 cảnh khép lại diễn ra trước chỗ ở đã chọn, có chậu húng dưới mái hiên.
   - Gợi ý cách chơi hiện một lần khi lần đầu gặp từng tình huống (`tips` trong `story.json`).
 - **Nhận xét từ mô phỏng 30 ngày:** lắng nghe ra E1/E2/E3 theo tuyến, giữ tiếp ra E4 hoặc E6, áp đặt ra E8, làm quá sức ra E6 hoặc E4. Tiền cuối tháng sau khi trả Hẻm Dừa từ 0,4 đến 6 triệu. Cách chơi "giấu" (làm việc đàng hoàng nhưng giấu chuyện, ép người nhà) ra E5 ở cả ba tuyến. E7 chỉ ra khi thiếu tiền phòng ngày 26 (đã thử riêng); mô phỏng "ít việc" (mỗi ngày một việc ngắn) vẫn vừa đủ Hẻm Dừa, nên cần người thật chơi thử để biết áp lực tiền có đủ không.
-- **Còn lại:** chỉnh cân bằng sau khi chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
+- **Đã tự chơi thử một lượt 30 ngày** (tuyến C, người chơi cẩn thận, ra E3) và sửa theo những chỗ vướng:
+  - Nói chuyện với 8 nhân vật có mạch chuyện từ ngày 2 (16 đoạn mới cho ngày 2–17, khớp với cảnh chính). Trước đó tới ngày 17 chỉ có câu tán gẫu lặp lại. Câu tán gẫu của Linh đổi sau khi em đã chọn chỗ thực tập. Tán gẫu chỉ còn +1 thân thiết, vì bà Tư lên 100/100 từ ngày 14.
+  - Tới sớm bước "tới nơi" của việc nhờ (đón Bắp, lấy cơm) thì ngồi chờ tới giờ như cảnh chính, không bị khóa.
+  - Việc có khung giờ báo "Trễ rồi: phải bắt đầu trước HH:MM" thay vì chỉ ghi khung giờ.
+  - Ca kho 8 tiếng có suất cơm ca, buổi làm ở Bến Cạn có quán bao cơm trưa, ăn cơm với bà cũng no bụng: trước đó làm xong một ca dài là đói lả, Phong độ tụt còn 70% lương.
+  - Bảng mục tiêu: "Ngày 26 chốt chỗ ở" (việc chốt diễn ra ở cảnh ngày 26), kèm số tiền còn thiếu cho chỗ kế tiếp. Đủ buổi cho nghiệm thu giữa kỳ thì ghi rõ làm thêm được tính cho giai đoạn cuối.
+  - Ẩn thẻ khóa "Chưa mở" của việc tùy chọn còn chờ lựa chọn trước; ẩn "Xem phòng" khi đã xem ở cảnh ngày 3; ẩn "Đưa bà xem ảnh" khi chưa xem phòng nào; "Kể khoản lãi dự kiến" chỉ hiện sau khi nhận hợp đồng; có cơm giá quen thì ẩn dĩa cơm giá thường.
+  - Câu đố sửa quạt không còn lộ đáp án trong gợi ý. Linh nộp hồ sơ chiều thứ Ba (ngày 9) cho khớp cảnh đón Bắp. Ngày 5 đổi thành "Hai cuộc hẹn trùng giờ".
+  - Tiền sinh hoạt cả nhà 120.000đ/ngày (trước là 100.000đ): theo mô phỏng, người chơi chịu khó còn 1–6 triệu sau khi vào Hẻm Dừa, người làm ít còn dưới 0,2 triệu và có khi không trả kịp công người phụ (ra E4).
+- **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử, thêm cảnh phụ ngày 30 (thứ An cầm trên tay khi rời phòng), hình ảnh sân đọng nước ngày mưa.
 
 ## Câu hỏi đã chốt
 
@@ -123,7 +132,7 @@ Bỏ: `milestones`, `debt`, `interest_paid`, `smuggle`, `evidence`, `phapLy`, `h
 ### HUD (`scripts/world/hud.gd`)
 
 - Bảng **Mục tiêu quan trọng** đổi thành:
-  - Chốt chỗ ở trước ngày 26 (trạng thái nhà ở hiện tại)
+  - Ngày 26 chốt chỗ ở (tiền dự kiến, chỗ đủ tiền, còn thiếu bao nhiêu cho chỗ kế tiếp)
   - Trả chìa khóa ngày 30
   - Lương cũ: đã nhận X / 3.600.000đ
   - Hợp đồng Bến Cạn (nếu đang làm): tiền về trước ngày 30 / sau ngày 30

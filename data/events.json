@@ -5,7 +5,7 @@
   "mode": "full",
   "title": "Tờ giấy trên cánh cửa",
   "who": "Bà Tư",
-  "text": "Xe khách thả An ở đầu đường. Anh về tới xóm trọ Bờ Me lúc cuối chiều. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Tư để phần cá kho trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn 1.200.000đ. Tiệm cũ còn nợ 3.600.000đ tiền công.",
+  "text": "Chuyến xe đêm thả An ở đầu đường lúc trời vừa sáng. Anh về tới xóm trọ Bờ Me. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Tư để phần cá kho trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn 1.200.000đ. Tiệm cũ còn nợ 3.600.000đ tiền công.",
   "quote": "Bà Tư: \"Cơm còn nóng. Chuyện nào khó thì ăn xong rồi nói, đừng để nguội cả hai.\"",
   "choices": [
    {
@@ -229,9 +229,9 @@
    8,
    15
   ],
-  "title": "Hai cuộc hẹn lúc ba giờ",
+  "title": "Hai cuộc hẹn trùng giờ",
   "who": "Chị Hạnh",
-  "text": "Chị Hạnh cần người phụ quán đột xuất lúc ba giờ chiều, đúng lúc An hẹn đưa bà Tư đi xem phòng. Linh đã biết đường tới đó, nhưng An chưa quen giao việc nhà cho em.",
+  "text": "Chị Hạnh cần người phụ quán đột xuất mấy tiếng, đúng lúc An hẹn đưa bà Tư đi xem phòng. Linh đã biết đường tới đó, nhưng An chưa quen giao việc nhà cho em.",
   "quote": "Bà Tư: \"Bà đi với con Linh được. Con đừng làm như chỉ mình con biết đường.\"",
   "missed": "Chủ nhà gửi lịch xem phòng khác. Bà Tư đã thay áo chờ cả buổi, không trách gì, chỉ cất lại cái nón.",
   "missed_effects": {
@@ -2365,7 +2365,7 @@
   "eyebrow": "Ngày 1 · cách chơi",
   "title": "Ba mươi ngày",
   "who": "",
-  "text": "Mỗi ngày có một cảnh chính ở một nơi trên phố: dấu ◆ vàng trên phố và thẻ ★ ở địa điểm. Có cảnh chỉ diễn ra trong một khung giờ. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong.\nTiền mặt tách riêng tiền phải thu: tiền chưa về thì chưa tiêu được. Mỗi tối trừ tiền sinh hoạt của cả nhà; cơm của An tự trả ở quán.\nNgày 26 chốt chỗ ở. Ngày 30 trả chìa khóa phòng cũ.",
+  "text": "Mỗi ngày có một cảnh chính ở một nơi trên phố: dấu ◆ vàng trên phố và thẻ ◆ ở địa điểm. Có cảnh chỉ diễn ra trong một khung giờ; tới sớm thì ngồi chờ. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong.\nTiền mặt tách riêng tiền phải thu: tiền chưa về thì chưa tiêu được. Mỗi tối trừ tiền sinh hoạt của cả nhà; cơm của An tự trả ở quán.\nNgày 26 chốt chỗ ở. Ngày 30 trả chìa khóa phòng cũ.",
   "choices": [
    {
     "label": "Bắt đầu",

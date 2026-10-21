@@ -55,7 +55,7 @@
       "choices": [
        {
         "label": "Thay cái tụ khởi động của quạt",
-        "hint": "Đẩy tay mới quay thì thường là tụ",
+        "hint": "Tốn một cái tụ của tiệm",
         "effects": {
          "item.quat": 1,
          "fatigue": 3,
@@ -64,7 +64,7 @@
        },
        {
         "label": "Tra dầu vô bạc trục",
-        "hint": "Nhanh, nhưng có đúng bệnh không?",
+        "hint": "Ít tốn, làm nhanh",
         "goto": "stay",
         "effects": {
          "fatigue": 2,
@@ -232,7 +232,7 @@
     "fatigue": -4,
     "flag.minhNoMotLan": true
    },
-   "reward_text": "Minh ôm con Mun, chụp hình gửi vợ. \"Thằng Bắp mà biết chắc nó vẽ thêm mày vô cái xe chở cả xóm.\" Rồi Minh nói nhỏ: \"Tuần sau mày cần chở đồ thì hẹn giờ trước, tao chở.\"",
+   "reward_text": "Minh ôm con Mun, chụp hình gửi vợ. \"Thằng Bắp mà biết chắc nó vẽ thêm mày vô cái xe chở cả xóm.\" Rồi Minh nói nhỏ: \"Bữa nào rảnh tao bao mày ly cà phê.\"",
    "fail": {
     "rep.MINH": -3
    },
@@ -371,13 +371,13 @@
    "giver": "xom_bo_me",
    "days": [
     7,
-    9
+    8
    ],
    "offer_window": [
     6,
     18
    ],
-   "intro": "Linh đưa An cái USB. \"Mai em lên trung tâm nghề nộp hồ sơ. Anh đi ngang tiệm photo ở chợ in giùm em hai bộ, tối em cần. Anh in đúng bản em gửi nghen, đừng sửa gì.\"",
+   "intro": "Linh đưa An cái USB. \"Chiều thứ Ba em lên trung tâm nghề nộp hồ sơ. Anh đi ngang tiệm photo ở chợ in giùm em hai bộ, tối em cần. Anh in đúng bản em gửi nghen, đừng sửa gì.\"",
    "accept": "\"Ừ, tối anh đem về.\"",
    "decline": "\"Bữa nay anh không ghé chợ được, em tự in nha.\"",
    "deadline_days": 0,
@@ -386,7 +386,7 @@
    "reward": {
     "rep.LINH": 5
    },
-   "reward_text": "Linh lật từng trang, kẹp vô bìa. \"Cảm ơn anh. Mai em tự đi nộp.\"",
+   "reward_text": "Linh lật từng trang, kẹp vô bìa. \"Cảm ơn anh. Thứ Ba em tự đi nộp.\"",
    "fail": {
     "rep.LINH": -3,
     "family": {

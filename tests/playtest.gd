@@ -204,7 +204,7 @@ func _care() -> void:
 	if not game.has_needs():
 		return
 	if game.need("fed") < 45.0:
-		await _do("banh_mi" if game.clock() < 10.0 else "an_com")
+		await _do("banh_mi" if game.clock() < 10.0 else ("an_com_quen" if game.s.flags.get("comQuen", false) else "an_com"))
 	if game.need("clean") < 30.0:
 		await _do("tam_rua")
 	if game.need("neat") < 30.0:

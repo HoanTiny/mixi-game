@@ -568,6 +568,12 @@ func check(req: Dictionary) -> String:
 		elif key == "from_day":
 			if day() < int(v):
 				fail = "Mở từ ngày %d" % int(v)
+		elif key == "to_day":
+			if day() > int(v):
+				fail = "Chỉ tới ngày %d" % int(v)
+		elif key == "linh_decided":
+			if (s.linh.decision != "") != bool(v):
+				fail = "-"
 		elif key == "cash_min":
 			if int(s.cash) < int(v):
 				fail = "Cần tiền mặt từ %s" % fmt_money(int(v))
@@ -668,6 +674,17 @@ func is_hidden(a: Dictionary) -> bool:
 		return true
 	if a.has("showIfFlag") and not s.flags.get(a.showIfFlag, false):
 		return true
+	if a.has("hideIfFlag") and s.flags.get(a.hideIfFlag, false):
+		return true
+	# Việc phụ còn chờ một lựa chọn trước đó thì giấu luôn, khỏi hiện thẻ khóa "Chưa mở".
+	if a.get("group", "") == "optional" and a.has("require"):
+		for k in a.require:
+			if str(k).begins_with("flag.") and check({k: a.require[k]}) != "":
+				return true
+	if a.get("showIfSeenAny", false) and housing().seen.is_empty():
+		return true
+	if a.has("hideIfSeen") and housing().seen.has(str(a.hideIfSeen)):
+		return true
 	if a.has("showIfPromise"):
 		var p = _find(s.promises, str(a.showIfPromise))
 		if p == null or p.status != "open":
@@ -711,6 +728,9 @@ func action_status(a: Dictionary) -> Dictionary:
 		limit = minf(float(a.window[1]), limit)
 	if start + float(a.hours) > limit + 0.001:
 		if a.has("window"):
+			var latest := limit - float(a.hours)
+			if clock() > latest and latest >= float(a.window[0]):
+				return {"ok": false, "reason": "Trễ rồi: phải bắt đầu trước %s mới xong trong khung %s–%s" % [hh(latest), hh(a.window[0]), hh(a.window[1])]}
 			return {"ok": false, "reason": "Chỉ trong khung %s–%s" % [hh(a.window[0]), hh(a.window[1])]}
 		return {"ok": false, "reason": "Không đủ giờ hôm nay"}
 	return {"ok": true, "reason": "", "start": start}
@@ -968,11 +988,20 @@ func scene_lock(id: String) -> String:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return "-"
 	var e := scene_info(id)
-	if e.has("window") and (clock() < float(e.window[0]) or clock() > float(e.window[1])):
-		return "Chỉ trong khung %s–%s" % [hh(float(e.window[0])), hh(float(e.window[1]))]
-	if hours_left() < float(e.get("hours", 0.5)):
+	# Tới sớm thì vẫn vào được: An ngồi chờ tới giờ (như các việc có khung giờ). Quá giờ thì lỡ.
+	if e.has("window") and clock() > float(e.window[1]):
+		return "Đã quá khung %s–%s" % [hh(float(e.window[0])), hh(float(e.window[1]))]
+	if hours_left() < float(e.get("hours", 0.5)) + maxf(0.0, scene_wait(id)):
 		return "Không đủ giờ hôm nay"
 	return ""
+
+
+## Số giờ phải ngồi chờ trước khi cảnh bắt đầu (0 nếu đã tới giờ).
+func scene_wait(id: String) -> float:
+	var e := scene_info(id)
+	if e.has("window"):
+		return maxf(0.0, float(e.window[0]) - clock())
+	return 0.0
 
 
 ## Tới nơi và mở cảnh chính: tốn một chút thời gian, rồi hiện hộp thoại lựa chọn.
@@ -980,7 +1009,7 @@ func open_scene(id: String) -> void:
 	if scene_lock(id) != "":
 		return
 	s.scenes_done.append(id)
-	s["used"] = float(s.used) + float(scene_info(id).get("hours", 0.5))
+	s["used"] = float(s.used) + scene_wait(id) + float(scene_info(id).get("hours", 0.5))
 	s.queue.append({"id": id, "data": {}})
 	_commit()
 
@@ -1529,17 +1558,26 @@ func quest_step_lock(id: String) -> String:
 	var step := quest_step(id)
 	if step.get("kind", "") != "visit":
 		return "-"
-	if step.has("window") and (clock() < float(step.window[0]) or clock() > float(step.window[1])):
-		return "Chỉ trong khung %s–%s" % [hh(float(step.window[0])), hh(float(step.window[1]))]
+	# Tới sớm thì ngồi chờ tới giờ như cảnh chính; quá giờ thì lỡ.
+	if step.has("window") and clock() > float(step.window[1]):
+		return "Đã quá khung %s–%s" % [hh(float(step.window[0])), hh(float(step.window[1]))]
 	for k in step.get("need_items", {}):
 		var need := int(step.need_items[k])
 		if item_count(k) < need:
 			if need == 1:
 				return "Chưa có: " + item_name(k).to_lower()
 			return "Cần %d %s (đang có %d)" % [need, item_name(k), item_count(k)]
-	if hours_left() < float(step.get("hours", 0.0)):
+	if hours_left() < float(step.get("hours", 0.0)) + quest_step_wait(id):
 		return "Không đủ giờ"
 	return ""
+
+
+## Số giờ phải chờ trước khi làm được bước tới-nơi của việc nhờ id.
+func quest_step_wait(id: String) -> float:
+	var step := quest_step(id)
+	if step.has("window"):
+		return maxf(0.0, float(step.window[0]) - clock())
+	return 0.0
 
 
 ## Bấm vào người nhờ: hiện lời nhờ để nhận hay từ chối.
@@ -1556,7 +1594,7 @@ func quest_visit(id: String) -> void:
 	if quest_step_lock(id) != "":
 		return
 	var step := quest_step(id)
-	s["used"] = float(s.used) + float(step.get("hours", 0.0))
+	s["used"] = float(s.used) + quest_step_wait(id) + float(step.get("hours", 0.0))
 	if step.get("consume", false):
 		for k in step.need_items:
 			_add_item(k, -int(step.need_items[k]))

@@ -217,7 +217,7 @@ func _care(g) -> void:
 	if not g.has_needs():
 		return
 	if g.need("fed") < 45.0:
-		g.do_action("an_com")
+		g.do_action("an_com_quen" if g.s.flags.get("comQuen", false) else "an_com")
 	if g.need("clean") < 35.0:
 		g.do_action("tam_rua")
 	if g.need("neat") < 35.0:

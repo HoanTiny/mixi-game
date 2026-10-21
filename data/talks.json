@@ -2,6 +2,24 @@
   "_ghi_chu": "Hội thoại khi bấm Nói chuyện với nhân vật (khóa theo story.reps). story: các đoạn mạch chuyện, mở lần lượt khi thỏa 'when' (cùng cú pháp điều kiện với events.json), mỗi đoạn chỉ kể một lần. chat: chuyện phiếm khi chưa có đoạn mạch nào mở, mỗi lần cộng chatRep thân thiết.",
   "BA_TU": {
     "story": [
+      { "id": "bt_ke_bep", "when": {"from_day": 3, "to_day": 9},
+        "title": "Cái kệ bếp của ông",
+        "text": "Bà Tư lau cái kệ bếp gỗ đã sậm màu. \"Cái kệ này ông con đóng hồi mới về đây. Qua chỗ mới không biết có chỗ kê không con.\"",
+        "choices": [
+          { "label": "Lấy thước đo kệ, đi xem phòng thì coi chỗ kê", "hint": "Bà Tư +4",
+            "effects": {"rep.BA_TU": 4, "flag.doKeBep": true, "family": {"who": "BA_TU", "kind": "support", "text": "Đo cái kệ bếp của bà để chọn phòng có chỗ kê"}} },
+          { "label": "\"Kệ cũ rồi bà, qua bển mua cái mới.\"", "hint": "Bà Tư −1",
+            "effects": {"rep.BA_TU": -1, "log": "Bà gật đầu, tay vẫn lau cái kệ."} }
+        ] },
+      { "id": "bt_tien_cho", "when": {"from_day": 10, "to_day": 17},
+        "title": "Tờ giấy tiền chợ",
+        "text": "Bà đưa An tờ giấy ghi tiền chợ mấy bữa nay, chữ to và nghiêng. \"Bà ghi cho con coi. Bà không tiêu hoang. Mà tiền nhà thì con cũng đừng giấu bà.\"",
+        "choices": [
+          { "label": "Kẹp tờ giấy vô sổ, đọc cho bà nghe các khoản nhà", "hint": "Bà Tư +4",
+            "effects": {"rep.BA_TU": 4, "family": {"who": "BA_TU", "kind": "support", "text": "Cho bà xem sổ tiền nhà cùng tờ tiền chợ của bà"}} },
+          { "label": "\"Bà khỏi ghi, con lo được hết.\"", "hint": "Bà Tư −1",
+            "effects": {"rep.BA_TU": -1, "log": "Bà xếp tờ giấy làm tư, cất vô túi áo."} }
+        ] },
       { "id": "bt_an_chua", "when": { "from_day": 18 },
         "title": "Bà ngồi lặt rau ngoài hiên",
         "text": "\"Con ăn gì chưa? Ăn rồi thì ngồi đây lặt rau với bà một chút. Mấy bữa nay con về là cắm mặt vô điện thoại.\"",
@@ -28,6 +46,24 @@
   },
   "LINH": {
     "story": [
+      { "id": "li_trang_gioi_thieu", "when": {"from_day": 4, "to_day": 8},
+        "title": "Câu cuối trong trang giới thiệu",
+        "text": "Linh đọc thử trang giới thiệu bản thân. \"Câu cuối em viết: em muốn được đánh giá bằng việc em làm. Nghe có cứng quá không anh?\"",
+        "choices": [
+          { "label": "\"Câu đó là của em. Em thấy đúng thì giữ.\"", "hint": "Linh tin +1, Linh +4",
+            "effects": {"respect": 1, "rep.LINH": 4} },
+          { "label": "\"Sửa mềm lại đi, người ta dễ nhận hơn.\"", "hint": "Linh −1",
+            "effects": {"rep.LINH": -1, "log": "Linh không cãi. Em lưu file lại, không sửa chữ nào."} }
+        ] },
+      { "id": "li_sang_thu_bay", "when": {"from_day": 11, "to_day": 17},
+        "title": "Sáng thứ Bảy đi chợ",
+        "text": "Linh hỏi nhỏ: \"Nếu em đi thực tập xa thì cuối tuần em mới về. Vậy sáng thứ Bảy ai đưa bà đi chợ?\"",
+        "choices": [
+          { "label": "\"Mình lập lịch chung, em không phải lo một mình.\"", "hint": "Linh +4",
+            "effects": {"rep.LINH": 4, "family": {"who": "LINH", "kind": "support", "text": "Cùng Linh lập lịch đưa bà đi chợ khi em đi xa"}} },
+          { "label": "\"Em lo học đi, chuyện nhà anh lo.\"", "hint": "Linh +1",
+            "effects": {"rep.LINH": 1, "log": "Linh gật, nhưng vẫn ghi giờ đi chợ của bà vô sổ của em."} }
+        ] },
       { "id": "li_may_do", "when": { "from_day": 18 },
         "title": "Linh và cái máy đo",
         "text": "Linh đang tập đọc số trên máy chẩn đoán mô phỏng của trường. \"Anh coi thử nè, em đo ra lỗi này rồi mà chưa chắc. Anh đừng nói đáp án, chỉ hỏi em thôi.\"",
@@ -48,13 +84,33 @@
         ] }
     ],
     "chat": [
-      { "text": "\"Anh hỏi em có đi được không, hay hỏi em có được đi không?\"" },
-      { "text": "\"Bạn em nói xưởng bên đó có thầy hướng dẫn kỹ lắm.\"" },
-      { "text": "\"Anh ăn cơm chưa? Bà hỏi em hoài.\"" }
+      { "text": "\"Anh hỏi em có đi được không, hay hỏi em có được đi không?\"", "when": { "linh_decided": false } },
+      { "text": "\"Bạn em nói xưởng bên đó có thầy hướng dẫn kỹ lắm.\"", "when": { "linh_decided": false } },
+      { "text": "\"Anh ăn cơm chưa? Bà hỏi em hoài.\"" },
+      { "text": "\"Em in lịch xe về cuối tuần rồi, dán trên tủ cho bà coi.\"", "when": { "linh_decided": true } },
+      { "text": "\"Anh đừng nhắn hỏi em ăn chưa mỗi tiếng nghen. Em lớn rồi.\"", "when": { "linh_decided": true } }
     ]
   },
   "DUYEN": {
     "story": [
+      { "id": "du_giu_chia", "when": {"from_day": 3, "to_day": 7},
+        "title": "Người giữ chìa",
+        "text": "Cô Duyên đứng lâu trước bảng thông báo dọn nhà. \"Cô biết tụi con trách cô. Cô chỉ giữ chìa, nhà là của người ta.\"",
+        "choices": [
+          { "label": "\"Con hiểu. Cô cần phụ gì thì nói con.\"", "hint": "Cô Duyên +4",
+            "effects": {"rep.DUYEN": 4} },
+          { "label": "\"Cô nói với chủ cho tụi con ở thêm đi cô.\"", "hint": "Cô Duyên −1",
+            "effects": {"rep.DUYEN": -1, "log": "Cô Duyên thở dài: \"Cô nói rồi, con.\""} }
+        ] },
+      { "id": "du_thung_ghi_ten", "when": {"from_day": 9, "to_day": 17},
+        "title": "Cây bút lông",
+        "text": "Cô Duyên đưa An cây bút lông. \"Thùng nào gửi tạm thì ghi tên, ghi luôn ngày lấy. Bữa trước có nhà quên, cô giữ tới giờ.\"",
+        "choices": [
+          { "label": "Ghi tên và ngày lấy lên từng thùng", "hint": "Cô Duyên +3, Mệt +2",
+            "effects": {"rep.DUYEN": 3, "fatigue": 2, "flag.ghiTenThung": true} },
+          { "label": "\"Gần ngày con ghi.\"", "hint": "",
+            "effects": {"log": "Cô Duyên để cây bút lên bậu cửa phòng An."} }
+        ] },
       { "id": "du_lich_don", "when": { "from_day": 18 },
         "title": "Bảng lịch dọn xóm",
         "text": "Cô Duyên dán thêm một tờ giấy cạnh thông báo cũ: lịch mượn xe ba gác và chỗ gửi đồ tạm. \"Cô hứa cái nào làm được thì cô hứa. Chuyện hết tháng phải dọn, cô không nói khác được.\"",
@@ -72,6 +128,24 @@
   },
   "HANH": {
     "story": [
+      { "id": "ha_so_no", "when": {"from_day": 2, "to_day": 8},
+        "title": "Sổ nợ dưới hũ tăm",
+        "text": "Chị Hạnh dò cuốn sổ nợ dưới hũ tăm. \"Khách quen ghi nợ thì chị ghi. Chị không sợ người ta nợ. Chị sợ người ta im luôn rồi mất.\"",
+        "choices": [
+          { "label": "\"Em nợ chị bữa nào thì em nói trước.\"", "hint": "Chị Hạnh +3",
+            "effects": {"rep.HANH": 3} },
+          { "label": "\"Em đâu có nợ chị.\"", "hint": "Chị Hạnh +1",
+            "effects": {"rep.HANH": 1, "log": "Chị Hạnh cười: \"Chưa thôi.\""} }
+        ] },
+      { "id": "ha_ca_cho_minh", "when": {"from_day": 9, "to_day": 17},
+        "title": "Xếp ca cho đỡ Minh",
+        "text": "Chị Hạnh lau tay vô tạp dề. \"Minh chạy đơn từ sáng tới tối, đón con cũng trễ. Em rảnh giờ nào thì nói chị, chị xếp ca cho đỡ nó.\"",
+        "choices": [
+          { "label": "Báo giờ rảnh cụ thể từng ngày", "hint": "Chị Hạnh +3, Minh +2",
+            "effects": {"rep.HANH": 3, "rep.MINH": 2} },
+          { "label": "\"Rảnh thì em ghé.\"", "hint": "Chị Hạnh +1",
+            "effects": {"rep.HANH": 1} }
+        ] },
       { "id": "ha_gio_con", "when": { "from_day": 18 },
         "title": "Giờ đón con",
         "text": "Chị Hạnh vừa múc cơm vừa liếc đồng hồ. \"Năm giờ chị phải đi đón con. Ai phụ chị được ca chiều thì chị trả đàng hoàng. Mà nhận rồi thì đừng có trễ nghen.\"",
@@ -89,6 +163,24 @@
   },
   "SAU": {
     "story": [
+      { "id": "sa_dong_ho_do", "when": {"from_day": 2, "to_day": 6},
+        "title": "Cái đồng hồ đo cũ",
+        "text": "Chú Sáu đưa An cái đồng hồ đo điện cũ. \"Đo thử coi kim còn đúng không. Đồ của tiệm, đo xong để lại chỗ cũ.\"",
+        "choices": [
+          { "label": "Đo, ghi sai số lên băng keo, để đúng chỗ cũ", "hint": "Chú Sáu +4",
+            "effects": {"rep.SAU": 4} },
+          { "label": "Đo đại cho xong", "hint": "",
+            "effects": {"log": "Chú Sáu đo lại lần nữa, không nói gì."} }
+        ] },
+      { "id": "sa_bao_ngay_xong", "when": {"from_day": 10, "to_day": 17},
+        "title": "Báo giá thì báo luôn ngày xong",
+        "text": "Chú Sáu gạch giá trên tờ giấy. \"Báo giá thì báo luôn ngày xong. Khách không sợ giá cao bằng sợ chờ mà không biết tới bao giờ.\"",
+        "choices": [
+          { "label": "Chép câu đó vô sổ", "hint": "Chú Sáu +3",
+            "effects": {"rep.SAU": 3} },
+          { "label": "\"Dạ.\"", "hint": "Chú Sáu +1",
+            "effects": {"rep.SAU": 1} }
+        ] },
       { "id": "sa_tay_run", "when": { "from_day": 18 },
         "title": "Cái tua vít rơi",
         "text": "Chú Sáu làm rơi cái tua vít lần thứ hai. Chú cười gượng. \"Tay chú dạo này hay run. Cái bàn sửa đồ này, chú cũng chưa biết giao cho ai.\"",
@@ -106,6 +198,24 @@
   },
   "MINH": {
     "story": [
+      { "id": "mi_tre_hai_muoi_phut", "when": {"from_day": 2, "to_day": 8},
+        "title": "Trễ hai mươi phút",
+        "text": "Minh ngồi trên yên xe coi điện thoại. \"Bữa qua tao đón thằng Bắp trễ hai mươi phút. Nó đứng ôm cặp ngoài cổng, không khóc. Vậy mà tao thấy còn tệ hơn khóc.\"",
+        "choices": [
+          { "label": "\"Bữa nào kẹt thì báo sớm, tao coi giờ được không.\"", "hint": "Minh +4",
+            "effects": {"rep.MINH": 4} },
+          { "label": "\"Ai mà không trễ.\"", "hint": "Minh +1",
+            "effects": {"rep.MINH": 1} }
+        ] },
+      { "id": "mi_hen_gio_cho", "when": {"from_day": 11, "to_day": 17},
+        "title": "Hẹn giờ chở",
+        "text": "Minh hỏi: \"Mày nhận vụ Bến Cạn hả? Chở đồ thì hẹn giờ trước, đừng gọi lúc tao đang chở khách.\"",
+        "choices": [
+          { "label": "Hẹn giờ cố định, trả tiền chuyến rõ ràng", "hint": "Minh +3",
+            "effects": {"rep.MINH": 3} },
+          { "label": "\"Gấp thì tao gọi.\"", "hint": "Minh −1",
+            "effects": {"rep.MINH": -1} }
+        ] },
       { "id": "mi_don_bap", "when": { "from_day": 18 },
         "title": "Lịch đón bé Bắp",
         "text": "Minh dựa vào xe, lướt điện thoại nhận đơn. \"Tao tới được. Nhưng tới mấy giờ thì mày phải nói thiệt. Năm rưỡi tao đón thằng Bắp, trễ là vợ tao chửi.\"",
@@ -123,6 +233,24 @@
   },
   "TRAM": {
     "story": [
+      { "id": "tr_lam_duoc_toi_dau", "when": {"from_day": 2, "to_day": 9},
+        "title": "Làm được tới đâu",
+        "text": "Trâm đang dò dây ở quán đầu dãy. \"Em là thợ tiệm cũ hả? Nghe nói tiệm đóng rồi. Cần tiền thì nhận việc, mà nhớ coi mình làm được tới đâu.\"",
+        "choices": [
+          { "label": "\"Dạ. Phần nào em chưa chắc, em hỏi chị.\"", "hint": "Trâm +4",
+            "effects": {"rep.TRAM": 4} },
+          { "label": "\"Việc gì em cũng làm được hết chị.\"", "hint": "",
+            "effects": {"log": "Trâm nhướng mày: \"Không ai làm gì cũng được hết.\""} }
+        ] },
+      { "id": "tr_ai_lam_gi", "when": {"from_day": 11, "to_day": 17, "route": ["B", "C"]},
+        "title": "Ai làm phần nào",
+        "text": "Trâm đưa danh sách đã khảo sát. \"Phần tủ điện tổng chị đứng tên. Phần ổ cắm, bóng đèn em làm. Mình viết rõ ai làm gì trước khi nhận tiền.\"",
+        "choices": [
+          { "label": "Viết rõ phần của từng người vô sổ hợp đồng", "hint": "Trâm +4",
+            "effects": {"rep.TRAM": 4} },
+          { "label": "\"Cứ làm đi, tới đâu tính tới đó.\"", "hint": "Trâm −2",
+            "effects": {"rep.TRAM": -2} }
+        ] },
       { "id": "tr_ghi_chua_xong", "when": { "from_day": 18 },
         "title": "Tờ phiếu nghiệm thu",
         "text": "Trâm gõ bút lên tờ phiếu. \"Chưa xong thì ghi chưa xong. Mình còn làm tiếp được. Ghi xong rồi mới khó.\"",
@@ -140,6 +268,24 @@
   },
   "PHUC": {
     "story": [
+      { "id": "ph_loi_khen", "when": {"from_day": 3, "to_day": 9},
+        "title": "Lời khen của chị Hạnh",
+        "text": "Anh Phúc ngồi uống cà phê. \"Chị Hạnh khen em kỹ. Mấy quán dưới này lo điện trước mùa mưa mà anh chưa biết hỏi ai.\"",
+        "choices": [
+          { "label": "\"Anh cần thì em xem trước, báo rõ phần em làm được.\"", "hint": "Anh Phúc +3",
+            "effects": {"rep.PHUC": 3} },
+          { "label": "\"Việc gì em cũng nhận.\"", "hint": "Anh Phúc +1",
+            "effects": {"rep.PHUC": 1} }
+        ] },
+      { "id": "ph_noi_som", "when": {"from_day": 12, "to_day": 17, "route": ["B", "C"]},
+        "title": "Nói sớm",
+        "text": "Anh Phúc nhắn: \"Tiền đợt đầu anh chuyển rồi đó. Cần thêm gì thì nói, mà nói sớm nghen. Để sát ngày anh xoay không kịp.\"",
+        "choices": [
+          { "label": "Gửi anh bảng chi từng khoản đã ứng", "hint": "Anh Phúc +3",
+            "effects": {"rep.PHUC": 3} },
+          { "label": "\"Dạ, có gì em nói.\"", "hint": "Anh Phúc +1",
+            "effects": {"rep.PHUC": 1} }
+        ] },
       { "id": "ph_nam_quan", "when": { "from_day": 18 },
         "title": "Năm quán, năm cái lịch",
         "text": "Anh Phúc cầm xấp giấy ghi yêu cầu của năm quán. \"Quán đầu xin làm sáng, quán cuối xin làm tối. Anh gom lại cho em đây. Cuối tuần anh gom đủ tiền.\"",

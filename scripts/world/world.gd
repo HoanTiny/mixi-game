@@ -1308,7 +1308,7 @@ func _update_quests() -> void:
 		return
 	for id in game.quests_active():
 		var step: Dictionary = game.quest_step(id)
-		if step.get("kind", "") == "visit" and step.get("auto", false) and game.quest_step_lock(id) == "" \
+		if step.get("kind", "") == "visit" and step.get("auto", false) and game.quest_step_lock(id) == "" and game.quest_step_wait(id) <= 0.0 \
 				and door_of(str(step.loc)).distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE:
 			game.quest_visit(id)
 			audio.play("done")

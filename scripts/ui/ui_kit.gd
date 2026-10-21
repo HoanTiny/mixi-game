@@ -196,6 +196,9 @@ static func effects_text(game, a: Dictionary) -> String:
 		var mark := "+" if v > 0 else "−"
 		if key == "fatigue":
 			out.append("Mệt %s%d" % [mark, int(absf(v))])
+		elif key.begins_with("need."):
+			var need_name: String = {"fed": "No bụng", "clean": "Vệ sinh", "neat": "Quần áo"}.get(key.substr(5), key)
+			out.append("%s %s%d" % [need_name, mark, int(absf(v))])
 		elif key == "progress":
 			out.append("Tiến độ +%d" % int(v))
 		elif key == "respect":

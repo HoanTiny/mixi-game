@@ -595,11 +595,19 @@ func _refresh_objectives(s: Dictionary) -> void:
 	else:
 		var proj: int = game.projected_cash(deadline)
 		var best: String = game.best_housing(proj)
-		var best_name := "chưa đủ cả chỗ ở tạm" if best == "" else str(game.cfg.housing[best].name)
-		var sub := "Không kiếm thêm thì sáng ngày %d còn %s · đủ cho %s" % [deadline, GameLogic.fmt_money(proj), best_name]
+		var sub := "Không kiếm thêm thì sáng ngày %d còn %s" % [deadline, GameLogic.fmt_money(proj)]
+		sub += " · chưa đủ cả chỗ ở tạm" if best == "" else " · đủ cho %s" % game.cfg.housing[best].name
+		# Mốc kế tiếp: chỗ rẻ nhất mà chưa đủ tiền, để người chơi biết còn thiếu bao nhiêu.
+		var next := ""
+		for k in game.cfg.housing:
+			var c := int(game.cfg.housing[k].cost)
+			if c > proj and (next == "" or c < int(game.cfg.housing[next].cost)):
+				next = k
+		if next != "":
+			sub += " · thiếu %s cho %s" % [GameLogic.fmt_money(int(game.cfg.housing[next].cost) - proj), game.cfg.housing[next].name]
 		if h.state == "reserved":
 			sub = "Đã cọc giữ %s, còn thiếu %s · " % [game.cfg.housing[h.place].name, GameLogic.fmt_money(game.housing_cost(h.place))] + sub
-		_objective("Chốt chỗ ở trước ngày %d" % deadline, sub, "current" if game.day() >= 20 else "normal")
+		_objective("Ngày %d chốt chỗ ở" % deadline, sub, "current" if game.day() >= 20 else "normal")
 	if game.is_full():
 		for r in s.receivables:
 			if str(r.id).begins_with("luong_cu") and r.status == "pending":
@@ -623,7 +631,10 @@ func _refresh_objectives(s: Dictionary) -> void:
 		if final_open:
 			_objective("Bàn giao giai đoạn cuối Bến Cạn trước tối ngày 27", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], "current")
 		elif game.day() <= 22:
-			_objective("Nghiệm thu đợt giữa Bến Cạn tối ngày 20", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], state)
+			var sub := "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)]
+			if state == "current" and int(s.progress) >= int(s.progress_need):
+				sub += " · đủ rồi; làm thêm thì tính cho giai đoạn cuối"
+			_objective("Nghiệm thu đợt giữa Bến Cạn tối ngày 20", sub, state)
 	if game.day() <= 22:
 		var linh_state := "done" if s.linh.decision != "" else ("current" if game.day() >= 19 else "normal")
 		_objective("Nghe Linh nói về chỗ thực tập (ngày 22)", "Quyết định là của Linh", linh_state)
@@ -716,6 +727,8 @@ func _refresh_location() -> void:
 		var meta := "Cảnh chính hôm nay · %d phút" % roundi(float(e.get("hours", 0.5)) * 60.0)
 		if e.has("window"):
 			meta += " · %s–%s" % [GameLogic.hh(float(e.window[0])), GameLogic.hh(float(e.window[1]))]
+		if game.scene_wait(id) > 0.0:
+			meta += " · chờ tới %s mới bắt đầu" % GameLogic.hh(float(e.window[0]))
 		_loc_cards.add_child(_quest_card("◆  " + game.fill(str(e.title)), meta + "\n" + str(e.get("who", "")),
 			game.scene_lock(id), game.open_scene.bind(id)))
 		found += 1
@@ -734,6 +747,8 @@ func _refresh_location() -> void:
 		var meta: String = game.quest_deadline_text(id)
 		if float(step.get("hours", 0.0)) > 0.0:
 			meta = "%d phút · %s" % [roundi(float(step.hours) * 60.0), meta]
+		if game.quest_step_wait(id) > 0.0:
+			meta += " · chờ tới %s" % GameLogic.hh(float(step.window[0]))
 		_loc_cards.add_child(_quest_card("★  " + str(game.quest_def(id).title), game.quest_progress_text(id) + "\n" + meta,
 			game.quest_step_lock(id), game.quest_visit.bind(id)))
 		found += 1
@@ -818,6 +833,7 @@ func _close_tip() -> void:
 		if not game.s.has("tips_seen"):
 			game.s["tips_seen"] = []
 		game.s.tips_seen.append(_tip_id)
+		game.changed.emit()
 	_tip_id = ""
 	_tip.visible = false
 
