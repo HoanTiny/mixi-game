@@ -15,6 +15,7 @@ const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
+const StreetLife := preload("res://scripts/world/street_life.gd")
 
 ## Xóm trọ của An: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối.
 const HOME := "xom_bo_me"
@@ -95,6 +96,9 @@ var walkers: Array = []
 var bikes: Array = []
 ## Khối nhà có thể che An: {"node", "rect": Rect2 nền nhà, "h": chiều cao}.
 var occluders: Array = []
+## Nhân vật có tên: id -> {node, body, name, loc}; street_life cho họ đi lại theo giờ.
+var npc_nodes := {}
+var life: Node
 
 ## Đích cuối của lượt đi bộ đang chạy (null khi đứng yên) và các điểm rẽ trên đường đi.
 var _target = null
@@ -161,6 +165,9 @@ func _ready() -> void:
 	camera.position = player.position + cam_offset()
 	camera.look_at(player.position + Vector3(0, 1, 0), Vector3.UP)
 	camera.current = true
+	life = StreetLife.new()
+	add_child(life)
+	life.setup(self)
 
 	hud = Hud.new()
 	hud.world = self
@@ -498,6 +505,8 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		ncs.position = Vector3(0, 0.95, 0)
 		nb.add_child(ncs)
 		npc.add_child(nb)
+		if str(who.id) != "":
+			npc_nodes[str(who.id)] = {"node": npc, "body": nb, "name": str(who.name), "loc": id}
 
 
 ## Tiệm dựng thành một hoặc vài căn nhà ống liền nhau (toạ độ cục bộ của lô); biển hiệu đặt ở căn giữa.
@@ -1548,6 +1557,16 @@ func location_info(id: String) -> Dictionary:
 
 func door_of(id: String) -> Vector3:
 	return _v3(city.loc_door(id))
+
+
+## Nhân vật đang ở địa điểm nào ("" nếu đang đi đường hay đi khỏi phường).
+func npc_where(id: String) -> String:
+	return life.npc_where(id)
+
+
+## Người có tên đang có mặt ở địa điểm: [{id, name}].
+func npcs_at(loc: String) -> Array:
+	return life.npcs_at(loc)
 
 
 func nearest_location() -> String:

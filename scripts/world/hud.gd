@@ -753,13 +753,15 @@ func _refresh_location() -> void:
 		_loc_cards.add_child(_quest_card("◆  " + game.fill(str(e.title)), meta + "\n" + str(e.get("who", "")),
 			game.scene_lock(id), game.open_scene.bind(id)))
 		found += 1
-	for who in loc.get("npcs", []):
+	for who in world.npcs_at(_loc_id):
 		var npc := str(who.id)
-		if npc == "":
-			continue
 		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(who.name),
 			"%d phút · Thân thiết %d/100" % [roundi(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
 			game.talk_lock(npc), game.talk.bind(npc)))
+	# Người quen của chỗ này đang đi việc riêng: ghi đi đâu, mấy giờ về.
+	for note in world.life.notes_at(_loc_id):
+		_loc_cards.add_child(UI.choice("%s %s" % [note.name, note.what], "", "Vắng · khoảng %s về" % GameLogic.hh(float(note.back)),
+			func() -> void: pass))
 	for q in game.quest_offers(_loc_id):
 		_loc_cards.add_child(_quest_card("!  Việc nhờ: " + str(q.title), "%s đang cần người giúp. Bấm để nghe chuyện." % q.who, "", game.quest_offer.bind(q.id)))
 		found += 1
@@ -880,9 +882,7 @@ func _tip_due(id: String) -> bool:
 					return true
 		"noi_chuyen":
 			if _loc_id != "":
-				for who in world.location_info(_loc_id).get("npcs", []):
-					if str(who.id) != "":
-						return true
+				return not world.npcs_at(_loc_id).is_empty()
 		"met":
 			return float(s.fatigue) >= 55.0
 		"viec_nho":

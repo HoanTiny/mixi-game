@@ -48,7 +48,7 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 **Giao đồ (kiểu Nobody):** bấm **Điện thoại** ở thanh dưới, bật *App Giao Nhanh*. Đơn hiện lên (lấy ở Cơm Hạnh, chợ hay tiệm Sáu, giao tới nhà số mấy, tiền công, hạn giờ), nhận thì tự đi lấy rồi tìm đúng nhà để giao: mũi tên cam chỉ chỗ lấy, xanh chỉ nhà khách. Giao sớm có tip, trễ bị trừ tiền và thêm Mệt. Số liệu trong `delivery` của `data/config.json`.
 
-**Nói chuyện:** người đứng trước cửa (bà Tư, Linh, cô Duyên ở xóm trọ; chị Hạnh, Minh ở Cơm Hạnh; chú Sáu; anh Phúc, Trâm ở Bến Cạn) có nút **Nói chuyện**, tốn 30 phút, mỗi người một lần mỗi ngày. Mạch chuyện mở dần theo ngày và độ thân thiết, có lựa chọn ghi vào sổ gia đình. Viết trong `data/talks.json`.
+**Nói chuyện:** người đứng trước cửa (bà Tư, Linh, cô Duyên ở xóm trọ; chị Hạnh, Minh ở Cơm Hạnh; chú Sáu; anh Phúc, Trâm ở Bến Cạn) có nút **Nói chuyện**. Mỗi người có việc riêng theo giờ (`data/schedules.json`) và đi bộ thật trên đường: bà Tư đi chợ sáng, Linh ra bến xe đi học (thứ Hai tới thứ Sáu), Minh chở cơm xuống Bến Cạn, chú Sáu ra chợ trưa, cô Duyên mua cơm tối… Người đang ở đâu thì nói chuyện ở đó; chỗ quen ghi "đi đâu, khoảng mấy giờ về". Người bán rong (bánh mì, xôi buổi sáng, ve chai ban ngày, chè, hủ tiếu gõ buổi tối) đẩy xe vòng qua các hẻm, tiếng rao phát ra từ chính chiếc xe, ngày mưa thì nghỉ. Nói chuyện tốn 30 phút, mỗi người một lần mỗi ngày. Mạch chuyện mở dần theo ngày và độ thân thiết, có lựa chọn ghi vào sổ gia đình. Viết trong `data/talks.json`.
 
 **Việc nhờ (kiểu Nobody):** người trong phố nhờ những việc nhiều bước, có hạn giờ và có lựa chọn. Chỗ có người nhờ hiện dấu **!** vàng; nhận việc thì bảng mục tiêu hiện bước đang làm, dấu **◆** xanh chỉ chỗ cần tới. Lát cắt có 7 việc: sửa quạt của cô bán trái cây (đọc triệu chứng, chọn đúng bệnh, trả trước 18:00), rửa bát đủ chỉ tiêu rồi chở 20 suất cơm xuống Bến Cạn trước khi nguội, gom lon nhôm cho cô Út, tìm mèo của bé Bắp, chậu mới cho cây húng của bà Tư (để bà tự chọn hay chọn thay), in hồ sơ thực tập cho Linh (in đúng bản em gửi hay tự ý sửa), đo lại trước nghiệm thu với Trâm (tuyến B, C). Quá hạn là hỏng việc; làm xong được tiền, thân thiết hoặc ưu đãi (cơm giá quen, ve chai được giá). Viết trong `data/quests.json`.
 
@@ -58,6 +58,7 @@ Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi l
 
 ```
 data/
+  schedules.json  việc riêng theo giờ của 8 nhân vật, tuyến của người bán rong
   map.json        bản đồ phường An Hòa: đường, hẻm, rạch, cầu, cổng hẻm, chỗ đặt từng địa điểm
   config.json     số liệu: tiền sinh hoạt, Mệt, nhu cầu cơ thể, chỗ ở, điểm xuất phát của 3 tuyến, việc làm, trò chơi nhỏ, giao đồ, ve chai
   events.json     cảnh chính ngày 1–30 (địa điểm, khung giờ, lựa chọn, nếu bỏ lỡ), biến thể theo tuyến, sự kiện hệ thống
@@ -80,6 +81,7 @@ scripts/
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
   world/character.gd   nhân vật có khớp dựng bằng khối: An, 8 nhân vật, người đi đường; hoạt cảnh đi, đứng, ngồi xe
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
+  world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)
   world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
   world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
   world/street_map.gd  bản đồ nhỏ và bản đồ lớn (phím M), bấm để đi tới

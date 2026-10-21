@@ -51,7 +51,11 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - `city_map.gd` chia lô nhà theo mặt tiền từng đường, đánh số nhà kiểu thật (lẻ, chẵn, gạch chéo trong hẻm), dựng lưới đi bộ 1 m và tìm đường A*. Thời gian đi bộ tính theo quãng đường thật (`walkHoursPerMeter` 0,0022), tiền giao hàng theo mét đi thật.
   - Việc nhờ "tìm" dùng vùng chữ nhật trên bản đồ (`area`) thay vì khúc phố theo trục x.
   - Bản đồ lớn (phím M) có tên đường, tên rạch; bấm chỗ nào đi tới chỗ đó.
-- **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử, cho nhân vật đi lại theo giờ trên bản đồ (bà Tư ra chợ, Linh ra bến xe), người bán rong rao vào từng hẻm.
+- **Phố sống theo giờ** (`data/schedules.json`, `scripts/world/street_life.gd`):
+  - Mỗi nhân vật có việc riêng: bà Tư đi chợ 6:30–8:30 (ngày mưa ở nhà), Linh đi học ở trung tâm nghề 7:30–11:30 từ thứ Hai tới thứ Sáu (ra bến xe rồi lên xe), Minh chở cơm xuống Bến Cạn, chú Sáu ra chợ trưa, Trâm ra sạp vật tư, anh Phúc qua tiệm Sáu mượn đồ, cô Duyên mua cơm tối. Ở gần An thì đi bộ thật theo đường, ở xa thì đổi chỗ ngay.
+  - Người đang ở đâu thì nói chuyện ở đó; ở chỗ quen hiện thẻ "Bà Tư đi chợ Cầu Nhỏ · Vắng, khoảng 08:30 về" để người chơi biết mà hẹn giờ.
+  - Người bán rong đẩy xe vòng qua hẻm 42, 42/7, 88, đường Chợ, Hẻm Dừa và Bờ Me theo khung giờ (bánh mì, xôi, ve chai, chè, hủ tiếu gõ), dừng ở đầu hẻm, góc đường. Tiếng rao phát ra từ chính chiếc xe, chữ nổi hiện khi An ở gần.
+- **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử.
 
 ## Câu hỏi đã chốt
 

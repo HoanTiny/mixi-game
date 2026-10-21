@@ -262,7 +262,11 @@ func _do(id: String) -> void:
 func _talk(npc: String) -> void:
 	var d: int = game.day()
 	var t0: float = game.clock()
-	await _walk(NPC_LOC[npc])
+	# Nhân vật có thể đang đi việc riêng (schedules.json): tới chỗ người đó đang ở, đang đi đường thì để lúc khác.
+	var where: String = w.npc_where(npc)
+	if where == "":
+		return
+	await _walk(where)
 	stats.walk += game.clock() - t0
 	if game.day() != d or game.talk_lock(npc) != "":
 		return
