@@ -2,12 +2,14 @@ extends RefCounted
 ## Đồ phố Việt cho khu thật (map của truyện, mô hình Dựng khu thật), dựng cùng lúc với nhà ở area_builder.gd:
 ## - Mặt tiền nhìn ra đường: mái hiên tôn hay bạt, biển hiệu (quanh chỗ của truyện thì có chữ: tạp hóa, phở, sửa
 ##   xe…), trước vài nhà có bàn ghế nhựa quán cóc.
-## - Cột điện bê tông dọc đường, dây điện võng giữa các cột, dây giăng ngang hẻm; cột có thùng điện, có cuộn dây.
+## - Cột điện bê tông tròn dọc đường, dây điện võng giữa các cột, dây giăng ngang hẻm; xà có sứ cách điện, cột có
+##   thùng điện, có cuộn dây, vài cột có bình biến áp.
 ## - Cổng hẻm "khu phố văn hóa" ở miệng hẻm có tên, bảng tên đường xanh ở chỗ hai đường có tên gặp nhau.
 ## Mái hiên, biển hiệu, cổng hẻm nằm trong lưới nhà (kiểu 2 trong shader): nhà hạ thì biển ẩn theo, mái hiên và cổng
 ## có ô riêng trong ảnh caps nên tự ẩn khi chắn trước An. Chữ là Label3D, update_cut của area_builder bật tắt theo.
 
 const Geo := preload("res://scripts/realmap/geo.gd")
+const Props3D := preload("res://scripts/world/props3d.gd")
 const SEG_CELL := 20.0
 
 var b
@@ -352,17 +354,38 @@ func streets() -> void:
 		b.add_child(mi)
 
 
-## Cột điện bê tông vuông 8 m, xà ngang, sứ cách điện; cột chẵn có thùng điện, có cuộn dây thừa.
+## Cột điện bê tông ly tâm tròn thon 8 m, xà ngang có ba sứ cách điện; cột có thùng điện, có cuộn dây thừa, vài cột
+## có hai bình biến áp trên giá.
 func _pole(q: Vector2, d: Vector2) -> void:
 	var col := Color("7a776f")
 	var n := d.orthogonal()
-	_box(_st_poles, Vector3(q.x, 0.0, q.y), d, Vector3(0.26, 8.0, 0.26), col)
+	_cyl(_st_poles, Vector3(q.x, 0.0, q.y), 0.17, 0.11, 8.0, col)
 	_box(_st_poles, Vector3(q.x, 7.15, q.y), n, Vector3(1.7, 0.14, 0.14), col.darkened(0.15))
+	for o in [-0.7, 0.0, 0.7]:
+		_cyl(_st_poles, Vector3(q.x + n.x * o, 7.29, q.y + n.y * o), 0.05, 0.035, 0.16, Color("e8e4da"), 5)
 	if _rng.randf() < 0.45:
 		_box(_st_poles, Vector3(q.x + n.x * 0.25, 4.6, q.y + n.y * 0.25), d, Vector3(0.55, 0.8, 0.35), Color("6e7378"))
 	if wires and _rng.randf() < 0.5:
 		# Cuộn dây thừa quấn quanh cột.
 		_box(_st_wires, Vector3(q.x, 5.4, q.y), d, Vector3(0.5, 0.35, 0.5), Color("232325"))
+	if counts.poles % 6 == 3:
+		# Bình biến áp: giá đỡ, hai bình xám tròn.
+		_box(_st_poles, Vector3(q.x - n.x * 0.35, 5.6, q.y - n.y * 0.35), n, Vector3(1.0, 0.08, 0.5), col.darkened(0.2))
+		for o in [-0.62, -0.1]:
+			_cyl(_st_poles, Vector3(q.x + n.x * o, 5.68, q.y + n.y * o), 0.21, 0.21, 0.62, Color("8d949a"), 8)
+
+
+## Trụ tròn côn đứng tại chân p: cao h, bán kính r0 ở chân, r1 ở ngọn, segs mặt, nắp trên.
+static func _cyl(st: SurfaceTool, p: Vector3, r0: float, r1: float, h: float, col: Color, segs := 7) -> void:
+	var none := [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO]
+	var top := p + Vector3(0, h, 0)
+	for j in segs:
+		var d0 := Vector3(cos(TAU * j / segs), 0, sin(TAU * j / segs))
+		var d1 := Vector3(cos(TAU * (j + 1) / segs), 0, sin(TAU * (j + 1) / segs))
+		var nn := (d0 + d1).normalized()
+		b_tri(st, p + d0 * r0, p + d1 * r0, top + d1 * r1, nn, col, none, Vector2.ZERO)
+		b_tri(st, p + d0 * r0, top + d1 * r1, top + d0 * r1, nn, col, none, Vector2.ZERO)
+		b_tri(st, top, top + d0 * r1, top + d1 * r1, Vector3.UP, col.lightened(0.06), none, Vector2.ZERO)
 
 
 ## Hộp đứng tại chân p (giữa đáy), trục dài theo d (mặt đất), kích thước s = (dọc d, cao, ngang).
@@ -457,30 +480,31 @@ func finish() -> void:
 		if not b.walkable(p):
 			continue
 		var col := Color(["2f6fb0", "c0392b", "2f6fb0", "e8e4da"][_rng.randi() % 4])
-		items.append([p, d, Vector3(0.6, 0.45, 0.6), Color("c0392b") if col == Color("2f6fb0") else Color("2f6fb0")])
+		items.append([p, d, "table", Color("c0392b") if col == Color("2f6fb0") else Color("2f6fb0")])
 		for k in _rng.randi_range(2, 4):
 			var a := TAU * k / 4.0 + _rng.randf_range(-0.3, 0.3)
-			items.append([p + Vector2(cos(a), sin(a)) * 0.55, d, Vector3(0.3, 0.42 if k % 2 == 0 else 0.26, 0.3), col])
-	if items.is_empty():
-		return
-	var bm := BoxMesh.new()
-	bm.size = Vector3.ONE
+			items.append([p + Vector2(cos(a), sin(a)) * 0.55, d, "tall" if k % 2 == 0 else "low", col])
+	# Ghế đẩu thấp, ghế cao, bàn (props3d.gd): mỗi loại một MultiMesh, màu từng cái là màu instance.
 	var m := StandardMaterial3D.new()
 	m.vertex_color_use_as_albedo = true
-	m.roughness = 0.6
-	bm.material = m
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.use_colors = true
-	mm.mesh = bm
-	mm.instance_count = items.size()
-	for i in items.size():
-		var it: Array = items[i]
-		var p: Vector2 = it[0]
-		var s: Vector3 = it[2]
-		var basis := Basis(Vector3.UP, atan2((it[1] as Vector2).x, (it[1] as Vector2).y)).scaled(s)
-		mm.set_instance_transform(i, Transform3D(basis, Vector3(p.x, s.y / 2.0, p.y)))
-		mm.set_instance_color(i, it[3])
-	var mmi := MultiMeshInstance3D.new()
-	mmi.multimesh = mm
-	b.add_child(mmi)
+	m.vertex_color_is_srgb = true
+	m.roughness = 0.55
+	for kind in ["low", "tall", "table"]:
+		var mine := items.filter(func(it: Array) -> bool: return it[2] == kind)
+		if mine.is_empty():
+			continue
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.use_colors = true
+		mm.mesh = Props3D.stool(kind)
+		mm.instance_count = mine.size()
+		for i in mine.size():
+			var it: Array = mine[i]
+			var p: Vector2 = it[0]
+			var yaw := atan2((it[1] as Vector2).x, (it[1] as Vector2).y) + 0.4 * float(i % 3)
+			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, yaw), Vector3(p.x, 0.0, p.y)))
+			mm.set_instance_color(i, it[3])
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		mmi.material_override = m
+		b.add_child(mmi)

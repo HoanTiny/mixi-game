@@ -6,6 +6,7 @@ extends Node
 ## Nhân vật ở xa An thì đổi chỗ ngay, chỉ đi bộ từng bước khi An có thể nhìn thấy.
 
 const CityMap := preload("res://scripts/world/city_map.gd")
+const Props3D := preload("res://scripts/world/props3d.gd")
 const WALK_SPEED := 1.6
 const VENDOR_SPEED := 1.0
 ## Trong bán kính này (mét) mới cho nhân vật đi bộ thật; xa hơn thì đổi chỗ ngay.
@@ -234,27 +235,23 @@ func _add_vendor(v: Dictionary) -> void:
 	rng.seed = hash(str(v.id))
 	var who: Node3D = world._character("people", Color.from_hsv(rng.randf(), 0.25, 0.7), Color("3a3a40"), rng, str(v.get("hat", "")))
 	root.add_child(who)
-	var cart := Node3D.new()
-	cart.position = Vector3(0, 0, 0.95)
-	root.add_child(cart)
-	var col := Color(str(v.get("cart", "8a6a4a")))
-	world._block(Vector3(0.75, 0.55, 1.05), Vector3(0, 0.38, 0), col, cart)
-	world._block(Vector3(0.7, 0.36, 0.95), Vector3(0, 0.93, 0), Color(0.85, 0.9, 0.92, 0.45), cart, true)
-	for sx in [-0.42, 0.42]:
-		var wheel := MeshInstance3D.new()
-		var cm := CylinderMesh.new()
-		cm.top_radius = 0.2
-		cm.bottom_radius = 0.2
-		cm.height = 0.06
-		wheel.mesh = cm
-		wheel.material_override = world._mat_cached(Color("2b2b2b"))
-		wheel.rotation.z = PI / 2.0
-		wheel.position = Vector3(sx, 0.2, 0.1)
-		cart.add_child(wheel)
-	world._block(Vector3(0.04, 0.04, 0.55), Vector3(0, 0.85, -0.75), Color("6b6a66"), cart)
-	var sign: Label3D = world._label3d(str(v.get("name", "")).to_upper(), Vector3(0, 1.55, 0), 20)
+	var body: Node3D = who.get_child(0)
+	var sign_at := Vector3(0, 2.15, 0)
+	if str(v.get("carry", "cart")) == "ganh" and body.has_method("add_item"):
+		# Gánh trên vai: đòn gánh tre, hai thúng.
+		body.add_item("chest", Props3D.ganh())
+		body.hold("carry")
+	else:
+		# Xe đẩy theo món (props3d.gd), người bán đứng sau, hai tay nắm tay đẩy.
+		var cart := Props3D.instance(Props3D.cart(str(v.id)), Color(str(v.get("cart", "8a6a4a"))))
+		cart.position = Vector3(0, 0, 0.48 - Props3D.CART_GRIP_Z)
+		root.add_child(cart)
+		if body.has_method("hold"):
+			body.hold("push")
+		sign_at = Vector3(0, 1.75, cart.position.z)
+	var sign: Label3D = world._label3d(str(v.get("name", "")).to_upper(), sign_at, 20)
 	sign.modulate = Color("ffe7a8")
-	cart.add_child(sign)
+	root.add_child(sign)
 	var length := 0.0
 	for k in pts.size() - 1:
 		length += pts[k].distance_to(pts[k + 1])

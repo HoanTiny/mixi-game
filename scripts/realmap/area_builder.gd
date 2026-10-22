@@ -14,6 +14,7 @@ const Geo := preload("res://scripts/realmap/geo.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const WalkGrid := preload("res://scripts/realmap/walk_grid.gd")
 const StreetDress := preload("res://scripts/realmap/street_dress.gd")
+const Props3D := preload("res://scripts/world/props3d.gd")
 
 const BUILDING_SHADER := """
 shader_type spatial;
@@ -25,18 +26,21 @@ uniform sampler2D caps : filter_nearest;
 uniform int caps_w = 128;
 // Màu mặt cắt của nhà bị hạ.
 uniform vec3 cut_color;
-// Cây: dùng một màu thay cho màu đỉnh; cây đứng chắn trước An thì tán thu nhỏ lại, thân hạ còn gốc
-// (INSTANCE_CUSTOM.r: 1 bình thường, 0 khi thu hẳn). trunk: thân cây, lưới hình trụ cao 2,4 m tâm ở giữa.
+// Cây: màu tint nhân độ sáng trong màu đỉnh (tán sáng trên sẫm dưới); cây đứng chắn trước An thì tán thu nhỏ lại,
+// thân hạ còn gốc (INSTANCE_CUSTOM.r: 1 bình thường, 0 khi thu hẳn; .g: sắc lá riêng từng cây, 0..1).
+// trunk: thân cây, lưới cao 2,4 m tâm ở giữa.
 uniform bool flat_color = false;
 uniform bool trunk = false;
 uniform vec3 tint = vec3(1.0);
 varying float v_cut;
 varying float v_up;
 varying float v_kind;
+varying float v_var;
 
 void vertex() {
 	v_cut = 0.0;
 	v_up = NORMAL.y;
+	v_var = flat_color ? INSTANCE_CUSTOM.g : 0.5;
 	// CUSTOM0: số thứ tự căn nhà, loại (1 nhà, 2 bồn nước trên mái). Mô hình khu đặt ở gốc tọa độ.
 	v_kind = CUSTOM0.y;
 	if (cut_on && trunk) {
@@ -60,7 +64,7 @@ void vertex() {
 }
 
 void fragment() {
-	vec3 col = flat_color ? tint : COLOR.rgb;
+	vec3 col = flat_color ? tint * COLOR.rgb * mix(vec3(0.82, 0.86, 0.95), vec3(1.16, 1.12, 0.92), v_var) : COLOR.rgb;
 	if (v_cut > 0.999 && v_up > 0.4) {
 		// Mặt cắt của nhà bị hạ: sáng hơn mặt đường hẳn, nhìn ra ngay đâu là nhà, đâu là lối đi.
 		col = mix(cut_color, col, 0.2);
@@ -99,6 +103,8 @@ const CUT_COLOR := Color(0.66, 0.62, 0.55)
 const CUT_NONE := 10000.0
 const CUT_CELL := 10.0
 const CAPS_W := 128
+## Cây, xe đậu chia theo ô vuông này (mét) thành nhiều MultiMesh để ô nằm ngoài khung nhìn khỏi phải vẽ.
+const TILE := 200.0
 
 var data
 var cfg: Dictionary
@@ -655,9 +661,13 @@ var _cut_now := {}
 var _cut_img: Image
 var _cut_tex: ImageTexture
 var _cut_labels := {}
-var _crowns: MultiMesh
-var _trunks: MultiMesh
+## Cây chia theo ô TILE mét, mỗi ô một MultiMesh tán, một MultiMesh thân (ô ngoài tầm nhìn thì khỏi vẽ); _tree_slot[i]:
+## (ô, chỗ trong ô) của cây thứ i.
+var _crown_mms: Array = []
+var _trunk_mms: Array = []
+var _tree_slot: Array = []
 var _tree_r := PackedFloat32Array()
+var _tree_var := PackedFloat32Array()
 var _tree_cells := {}
 var _crown_now := {}
 
@@ -763,7 +773,7 @@ func update_cut(p: Vector2, slope: float, delta: float) -> void:
 
 ## Tán cây: coi như một khối vuông bằng tán; che An (theo cut_target) thì thu nhỏ hẳn, hết che thì to lại.
 func _update_crowns(cells: Array, p: Vector2, slope: float, delta: float) -> void:
-	if _crowns == null:
+	if _crown_mms.is_empty():
 		return
 	var want := {}
 	for k in cells:
@@ -784,8 +794,7 @@ func _update_crowns(cells: Array, p: Vector2, slope: float, delta: float) -> voi
 			_crown_now.erase(i)
 		else:
 			_crown_now[i] = cur
-		_crowns.set_instance_custom_data(i, Color(cur, 0, 0, 0))
-		_trunks.set_instance_custom_data(i, Color(cur, 0, 0, 0))
+		_tree_size(i, cur)
 
 
 ## Các ô lưới có thể có căn che An: hai bên An một dải rộng, từ ngang An về phía nam tới reach mét.
@@ -808,55 +817,56 @@ func reset_cut() -> void:
 		for lb in _cut_labels[i]:
 			(lb[0] as Label3D).visible = true
 	for i in _crown_now:
-		_crowns.set_instance_custom_data(i, Color(1, 0, 0, 0))
-		_trunks.set_instance_custom_data(i, Color(1, 0, 0, 0))
+		_tree_size(i, 1.0)
 	_crown_now.clear()
 
 
 func _multimesh_trees() -> void:
 	if _trees.is_empty():
 		return
-	var trunk := CylinderMesh.new()
-	trunk.top_radius = 0.15
-	trunk.bottom_radius = 0.2
-	trunk.height = 2.4
+	var trunk := Props3D.trunk()
 	var bark := ShaderMaterial.new()
 	bark.shader = building_mat.shader
 	bark.set_shader_parameter("flat_color", true)
 	bark.set_shader_parameter("trunk", true)
 	bark.set_shader_parameter("tint", Color("6b4f3a"))
 	cut_materials.append(bark)
-	trunk.material = bark
-	var crown := SphereMesh.new()
-	crown.radius = 2.1
-	crown.height = 3.4
-	crown.radial_segments = 8
-	crown.rings = 5
+	var crown := Props3D.crown()
 	var leaf := ShaderMaterial.new()
 	leaf.shader = building_mat.shader
 	leaf.set_shader_parameter("flat_color", true)
 	leaf.set_shader_parameter("tint", Color("4f7d3c"))
 	cut_materials.append(leaf)
-	crown.material = leaf
-	for pair in [[trunk, 1.2], [crown, 3.6]]:
-		var mm := MultiMesh.new()
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-		# INSTANCE_CUSTOM.r là độ to của cây (1 bình thường, 0 khi thu hẳn vì chắn trước An).
-		mm.use_custom_data = true
-		mm.mesh = pair[0]
-		mm.instance_count = _trees.size()
-		for i in _trees.size():
-			var p: Vector2 = _trees[i]
-			var s := 0.8 + fmod(absf(p.x * 13.1 + p.y * 7.7), 0.5)
-			mm.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * s), Vector3(p.x, float(pair[1]) * s, p.y)))
-			mm.set_instance_custom_data(i, Color(1, 0, 0, 0))
-		var mmi := MultiMeshInstance3D.new()
-		mmi.multimesh = mm
-		add_child(mmi)
-		if pair[0] == crown:
-			_crowns = mm
-		else:
-			_trunks = mm
+	_tree_slot.resize(_trees.size())
+	for i in _trees.size():
+		var p: Vector2 = _trees[i]
+		_tree_var.append(fposmod(p.x * 0.731 + p.y * 1.37, 1.0))
+	var tiles := _tiles(_trees)
+	for key in tiles:
+		var ids: PackedInt32Array = tiles[key]
+		for pair in [[trunk, 1.2, bark, _trunk_mms], [crown, 3.6, leaf, _crown_mms]]:
+			var mm := MultiMesh.new()
+			mm.transform_format = MultiMesh.TRANSFORM_3D
+			# INSTANCE_CUSTOM.r là độ to của cây (1 bình thường, 0 khi thu hẳn vì chắn trước An), .g là sắc lá. Màu
+			# instance trắng: bản Compatibility (web) nhân màu đỉnh với màu instance, thiếu thì thành đen.
+			mm.use_custom_data = true
+			mm.use_colors = true
+			mm.mesh = pair[0]
+			mm.instance_count = ids.size()
+			for j in ids.size():
+				var i := ids[j]
+				var p: Vector2 = _trees[i]
+				var s := 0.8 + fmod(absf(p.x * 13.1 + p.y * 7.7), 0.5)
+				var yaw := fmod(absf(p.x * 3.7 - p.y * 5.3), TAU)
+				mm.set_instance_transform(j, Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * s), Vector3(p.x, float(pair[1]) * s, p.y)))
+				mm.set_instance_custom_data(j, Color(1, _tree_var[i], 0, 0))
+				mm.set_instance_color(j, Color.WHITE)
+				_tree_slot[i] = Vector2i(pair[3].size(), j)
+			var mmi := MultiMeshInstance3D.new()
+			mmi.multimesh = mm
+			mmi.material_override = pair[2]
+			add_child(mmi)
+			pair[3].append(mm)
 	for i in _trees.size():
 		var p: Vector2 = _trees[i]
 		var r := 2.1 * (0.8 + fmod(absf(p.x * 13.1 + p.y * 7.7), 0.5))
@@ -867,6 +877,26 @@ func _multimesh_trees() -> void:
 				if not _tree_cells.has(c):
 					_tree_cells[c] = PackedInt32Array()
 				_tree_cells[c].append(i)
+
+
+## Độ to của cây thứ i (1 bình thường, 0 thu hẳn) cho shader tán, thân.
+func _tree_size(i: int, v: float) -> void:
+	var slot: Vector2i = _tree_slot[i]
+	var c := Color(v, _tree_var[i], 0, 0)
+	(_crown_mms[slot.x] as MultiMesh).set_instance_custom_data(slot.y, c)
+	(_trunk_mms[slot.x] as MultiMesh).set_instance_custom_data(slot.y, c)
+
+
+## Chia các điểm theo ô TILE mét: {ô: các chỉ số điểm trong ô}.
+static func _tiles(points: Array) -> Dictionary:
+	var out := {}
+	for i in points.size():
+		var p: Vector2 = points[i]
+		var k := Vector2i(floori(p.x / TILE), floori(p.y / TILE))
+		if not out.has(k):
+			out[k] = PackedInt32Array()
+		out[k].append(i)
+	return out
 
 
 static func _solid(c: Color) -> StandardMaterial3D:
@@ -959,7 +989,7 @@ static func _along(line: PackedVector2Array, step: float, f: Callable) -> void:
 		carry = s - l
 
 
-## Ô tô đậu dọc đường lớn (từ 8 m), xe máy dựng sát vỉa hè đường nhỏ: khối thấp nhiều màu.
+## Ô tô đậu dọc đường lớn (từ 8 m), xe máy dựng sát vỉa hè đường nhỏ: xe dựng bằng code (props3d.gd), nhiều màu.
 func _vehicles() -> void:
 	_rng.seed = 531
 	var cars: Array = []
@@ -979,43 +1009,41 @@ func _vehicles() -> void:
 				# Mép đường lấn vào nền nhà (nhà vẽ sát đường) thì thôi, khỏi có xe nằm trong nhà.
 				if Geometry2D.is_point_in_polygon(q, clip) and walkable(q):
 					bikes.append([q, d.orthogonal()]))
-	var palette := [Color("e8e6e1"), Color("2b2d33"), Color("b23a32"), Color("3a6ea5"), Color("c9ccd1"), Color("e0b23c"), Color("5a7d4f")]
-	# Mỗi phần: cỡ khối, độ cao đáy, lệch theo chiều xe, màu (null: màu thân xe).
-	_vehicle_mesh(cars, [[Vector3(1.8, 0.75, 4.2), 0.25, 0.0, null], [Vector3(1.6, 0.6, 2.1), 1.0, -0.2, Color("2c3440")]], palette)
-	# Xe máy dựng chéo vào lề: thân, yên, cổ xe, ghi đông, hai bánh.
-	var tyre := Color("1b1b1d")
-	_vehicle_mesh(bikes, [[Vector3(0.34, 0.4, 1.5), 0.24, -0.05, null], [Vector3(0.3, 0.12, 0.7), 0.64, -0.25, Color("202022")],
-		[Vector3(0.14, 0.55, 0.16), 0.42, 0.6, null], [Vector3(0.64, 0.05, 0.06), 0.97, 0.6, Color("2a2a2c")],
-		[Vector3(0.1, 0.46, 0.46), 0.0, 0.62, tyre], [Vector3(0.1, 0.46, 0.46), 0.0, -0.62, tyre]],
-		[Color("b23a32"), Color("2b2d33"), Color("e8e6e1"), Color("3a6ea5"), Color("c9ccd1"), Color("7a2a3a")])
+	# Ô tô, xe máy (tay ga, xe số xen nhau, bản nhẹ) dựng bằng code (props3d.gd), mỗi chiếc một màu sơn.
+	_vehicle_mm(cars, Props3D.car(), [Color("e8e6e1"), Color("2b2d33"), Color("b23a32"), Color("3a6ea5"), Color("c9ccd1"), Color("e0b23c"), Color("5a7d4f")])
+	var kinds := [[], []]
+	for i in bikes.size():
+		kinds[1 if i % 3 == 2 else 0].append(bikes[i])
+	var bike_palette := [Color("b23a32"), Color("2b2d33"), Color("e8e6e1"), Color("3a6ea5"), Color("c9ccd1"), Color("7a2a3a"), Color("e0b23c")]
+	_vehicle_mm(kinds[0], Props3D.motorbike("tay_ga", false), bike_palette)
+	_vehicle_mm(kinds[1], Props3D.motorbike("xe_so", false), bike_palette)
 	counts.cars = cars.size() + bikes.size()
 
 
-func _vehicle_mesh(items: Array, parts: Array, palette: Array) -> void:
-	if items.is_empty():
-		return
-	for part in parts:
-		var bm := BoxMesh.new()
-		bm.size = part[0]
-		var m := StandardMaterial3D.new()
-		m.vertex_color_use_as_albedo = true
-		m.roughness = 0.5
-		bm.material = m
+## Một loại xe đậu thành một MultiMesh: [chỗ, hướng đầu xe] mỗi chiếc, màu sơn theo bảng xoay vòng; xe máy chiếc
+## chẵn chiếc lẻ quay đầu ngược nhau.
+func _vehicle_mm(items: Array, mesh: Mesh, palette: Array) -> void:
+	var tiles := _tiles(items.map(func(it: Array) -> Vector2: return it[0]))
+	for key in tiles:
+		var ids: PackedInt32Array = tiles[key]
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
+		# Màu sơn ở custom data; màu instance trắng (xem _multimesh_trees).
+		mm.use_custom_data = true
 		mm.use_colors = true
-		mm.mesh = bm
-		mm.instance_count = items.size()
-		for i in items.size():
+		mm.mesh = mesh
+		mm.instance_count = ids.size()
+		for j in ids.size():
+			var i := ids[j]
 			var p: Vector2 = items[i][0]
 			var d: Vector2 = items[i][1]
-			var basis := Basis(Vector3.UP, atan2(d.x, d.y))
-			var size: Vector3 = part[0]
-			var at := Vector3(p.x, float(part[1]) + size.y / 2.0, p.y) + Vector3(d.x, 0, d.y).normalized() * float(part[2])
-			mm.set_instance_transform(i, Transform3D(basis, at))
-			mm.set_instance_color(i, palette[i % palette.size()] if part[3] == null else part[3])
+			var yaw := atan2(d.x, d.y) + (PI if i % 2 == 1 else 0.0)
+			mm.set_instance_transform(j, Transform3D(Basis(Vector3.UP, yaw), Vector3(p.x, 0.0, p.y)))
+			mm.set_instance_custom_data(j, palette[i % palette.size()])
+			mm.set_instance_color(j, Color.WHITE)
 		var mmi := MultiMeshInstance3D.new()
 		mmi.multimesh = mm
+		mmi.material_override = Props3D.instanced_material()
 		add_child(mmi)
 
 

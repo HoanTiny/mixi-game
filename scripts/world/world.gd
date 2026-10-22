@@ -19,6 +19,7 @@ const Geo := preload("res://scripts/realmap/geo.gd")
 const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
+const Props3D := preload("res://scripts/world/props3d.gd")
 
 ## Xóm trọ của An: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối.
 const HOME := "xom_bo_me"
@@ -785,7 +786,7 @@ func _build_props() -> void:
 		var bike := _bike(Color.from_hsv(rng.randf(), 0.45, 0.7), rng)
 		var bp := r.get_center() + (Vector2(rng.randf_range(-r.size.x / 3.0, r.size.x / 3.0), r.size.y / 2.0 - 0.7) if horiz else Vector2(r.size.x / 2.0 - 0.7, rng.randf_range(-r.size.y / 3.0, r.size.y / 3.0)))
 		bike.position = _v3(bp, 0.06)
-		bike.rotation.y = 0.0 if horiz else PI / 2.0
+		bike.rotation.y = PI / 2.0 if horiz else 0.0
 		add_child(bike)
 	# Bờ nam: vài cây đèn, cây dừa.
 	if city.streets.has("bo_nam"):
@@ -827,18 +828,15 @@ func _tree(pos: Vector3, rng: RandomNumberGenerator, scale := 1.0) -> void:
 		tree.scale = Vector3.ONE * scale
 		add_child(tree)
 		return
-	_block(Vector3(0.3, 2.4 * scale, 0.3), pos, Color("5a4634"))
-	for k in 7:
-		var crown := MeshInstance3D.new()
-		var sm := SphereMesh.new()
-		sm.radius = rng.randf_range(0.45, 0.75) * scale
-		sm.height = sm.radius * 1.6
-		sm.radial_segments = 10
-		sm.rings = 6
-		crown.mesh = sm
-		crown.material_override = _mat_cached(Color("3d5531").lerp(Color("5f7a3f"), float(k) / 6.0))
-		crown.position = pos + Vector3(rng.randf_range(-0.8, 0.8) * scale, (2.7 + rng.randf_range(0.0, 0.9)) * scale, rng.randf_range(-0.7, 0.7) * scale)
-		add_child(crown)
+	var trunk := Props3D.instance(Props3D.trunk(), Color("5a4634"))
+	trunk.position = pos + Vector3(0, 1.2 * scale, 0)
+	trunk.scale = Vector3.ONE * scale
+	add_child(trunk)
+	var crown := Props3D.instance(Props3D.crown(), Color("3d5531").lerp(Color("6f8a45"), rng.randf()))
+	crown.position = pos + Vector3(0, 3.5 * scale, 0)
+	crown.scale = Vector3.ONE * scale * 0.78
+	crown.rotation.y = rng.randf() * TAU
+	add_child(crown)
 
 
 func _lamp(pos: Vector3, rot := 0.0) -> void:
@@ -909,13 +907,12 @@ func _build_gates() -> void:
 			add_child(_label3d(str(st.display), _v3(sp, 3.6), 24))
 
 
+## Cây dừa (props3d.gd): thân cong có đốt, tàu lá rủ, buồng dừa.
 func _coconut(pos: Vector3, rng: RandomNumberGenerator, parent: Node3D = null) -> void:
-	var trunk := _block(Vector3(0.3, 6.5, 0.3), pos, Color("7a6a55"), parent)
-	trunk.rotation.z = 0.12
-	for k in 7:
-		var leaf := _block(Vector3(2.6, 0.06, 0.5), pos + Vector3(0.8, 6.3, 0), Color("4f7a3a").lerp(Color("6f9a4a"), rng.randf()), parent)
-		leaf.rotation = Vector3(0, float(k) * TAU / 7.0, -0.45)
-		leaf.position = pos + Vector3(0.8 + cos(float(k) * TAU / 7.0) * 1.1, 6.2, -sin(float(k) * TAU / 7.0) * 1.1)
+	var palm := Props3D.instance(Props3D.palm())
+	palm.position = pos
+	palm.rotation.y = rng.randf() * TAU
+	(parent if parent != null else self).add_child(palm)
 
 
 ## Sạp chợ trên vỉa hè trước chợ và dọc đường Chợ: bàn gỗ, bạt xanh, thùng nhựa, giỏ hàng; ghế đẩu quán trà đá.
@@ -1098,24 +1095,15 @@ func _build_traffic() -> void:
 	for lane in lanes:
 		for i in int(lane.n):
 			var bike := _bike(Color.from_hsv(rng.randf(), 0.5, 0.75), rng)
-			var rider := _character("people", Color.from_hsv(rng.randf(), 0.35, 0.6), Color("30323a"), rng, "helmet")
-			rider.position = Vector3(0, 0.45, 0)
-			# Người mẫu nhìn theo trục z, xe chạy theo trục x: quay người cho ngồi đúng chiều xe.
-			rider.rotation.y = PI / 2.0
-			Models.play(rider.get_child(0), "sit")
-			if rider.get_child(0).has_method("sit"):
-				var c: Node3D = rider.get_child(0)
-				c.sit(true)
-				c.animate(0.0, 0.0)
-			bike.add_child(rider)
+			_ride(bike, rng)
 			var u := rng.randf_range(float(lane.lo), float(lane.hi))
 			var dir := float(lane.dir)
 			if lane.axis == "x":
 				bike.position = Vector3(u, 0, float(lane.c))
-				bike.rotation.y = 0.0 if dir > 0 else PI
+				bike.rotation.y = PI / 2.0 if dir > 0 else -PI / 2.0
 			else:
 				bike.position = Vector3(float(lane.c), 0, u)
-				bike.rotation.y = -PI / 2.0 if dir > 0 else PI / 2.0
+				bike.rotation.y = 0.0 if dir > 0 else PI
 			add_child(bike)
 			bikes.append({"node": bike, "dir": dir, "speed": rng.randf_range(5.0, 9.0) if lane.n > 2 else rng.randf_range(3.0, 5.0), "lane": lane})
 	# Người đi bộ: mỗi người đi tới đi lui trên một vỉa hè hoặc một con hẻm.
@@ -1260,21 +1248,15 @@ func _build_real_canal() -> void:
 			boats.append({"node": boat, "dir": m[1], "speed": rng.randf_range(0.8, 1.6), "home": m[0], "range": rng.randf_range(25.0, 60.0), "s": 0.0, "sign": 1.0})
 
 
-## Ghe gỗ mũi nhọn, có mui che (ghe chở hàng) hay để trống (xuồng nhỏ).
+## Ghe gỗ (props3d.gd): ghe chở hàng có mui bạt hay mui lá, mắt ghe, máy đuôi tôm, bao hàng; xuồng nhỏ sơn xanh,
+## sơn gỗ, có mái chèo. Dài ngắn khác nhau thì co giãn theo chiều dài.
 func _boat(rng: RandomNumberGenerator, cargo: bool) -> Node3D:
 	var boat := Node3D.new()
 	var len := rng.randf_range(5.5, 8.0) if cargo else rng.randf_range(3.5, 4.8)
-	var wood := Color("6b4a32").lerp(Color("8a5a3a"), rng.randf())
-	_block(Vector3(1.5 if cargo else 1.1, 0.5, len * 0.7), Vector3.ZERO, wood, boat)
-	for sgn in [-1.0, 1.0]:
-		var tip := _block(Vector3(0.9 if cargo else 0.7, 0.45, len * 0.2), Vector3(0, 0.05, sgn * len * 0.42), wood.darkened(0.1), boat)
-		tip.rotation.x = sgn * -0.25
-	if cargo:
-		var roof := _block(Vector3(1.6, 0.08, len * 0.35), Vector3(0, 1.3, -len * 0.05), Color("3f6f9a") if rng.randf() < 0.5 else Color("2f5f3a"), boat)
-		roof.rotation.z = 0.04
-		for px in [-0.65, 0.65]:
-			_block(Vector3(0.06, 0.8, 0.06), Vector3(px, 0.5, -len * 0.05), Color("4a3a2a"), boat)
-		_block(Vector3(1.1, 0.4, len * 0.25), Vector3(0, 0.5, len * 0.12), Color("c9a86a"), boat)
+	var paint := Color(["3f6f9a", "2f5f3a", "8a7a5a", "3f6f9a"][rng.randi() % 4]) if cargo else Color(["4f7f5a", "3f6f8a", "9a6a42", "6a8a5a"][rng.randi() % 4])
+	var mi := Props3D.instance(Props3D.boat(cargo), paint)
+	mi.scale = Vector3(1, 1, len / float(Props3D.BOAT_LEN["cargo" if cargo else "small"]))
+	boat.add_child(mi)
 	return boat
 
 
@@ -1335,6 +1317,7 @@ func _build_real_traffic() -> void:
 		var lane: Dictionary = big[k]
 		for j in 3:
 			var bike := _bike(Color.from_hsv(rng.randf(), 0.5, 0.8), rng)
+			_ride(bike, rng)
 			add_child(bike)
 			bikes.append({"node": bike, "dir": 1.0 if j % 2 == 0 else -1.0, "speed": rng.randf_range(5.0, 8.5), "lane": lane, "s": rng.randf() * float(lane.len)})
 	small.shuffle()
@@ -2116,32 +2099,32 @@ func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenera
 	return root
 
 
+## Xe máy nhìn về +z: theo models.json nếu có file mô hình (nằm dọc trục x, xoay lại), không thì xe dựng bằng code
+## (props3d.gd), tay ga hay xe số.
 func _bike(color: Color, rng: RandomNumberGenerator) -> Node3D:
+	var root := Node3D.new()
 	var m := models.spawn("bike", rng)
 	if m == null:
-		return _motorbike(color)
-	var root := Node3D.new()
+		root.add_child(Props3D.instance(Props3D.motorbike("tay_ga" if rng.randf() < 0.62 else "xe_so"), color))
+		return root
+	m.rotation.y = -PI / 2.0
 	root.add_child(m)
 	return root
 
 
-func _motorbike(color: Color) -> Node3D:
-	var root := Node3D.new()
-	_block(Vector3(1.7, 0.45, 0.32), Vector3(0, 0.3, 0), color, root)
-	_block(Vector3(0.7, 0.18, 0.36), Vector3(-0.2, 0.75, 0), Color("222224"), root)
-	_block(Vector3(0.1, 0.55, 0.5), Vector3(0.75, 0.6, 0), Color("38383c"), root)
-	for wx in [-0.62, 0.62]:
-		var wheel := MeshInstance3D.new()
-		var cm := CylinderMesh.new()
-		cm.top_radius = 0.3
-		cm.bottom_radius = 0.3
-		cm.height = 0.12
-		wheel.mesh = cm
-		wheel.material_override = _mat_cached(Color("1a1a1a"))
-		wheel.rotation = Vector3(PI / 2.0, 0, 0)
-		wheel.position = Vector3(wx, 0.3, 0)
-		root.add_child(wheel)
-	return root
+## Người lái đội mũ bảo hiểm ngồi trên xe, đôi khi chở thêm một người ngồi sau.
+func _ride(bike: Node3D, rng: RandomNumberGenerator, back_chance := 0.25) -> void:
+	for back in ([false, true] if rng.randf() < back_chance else [false]):
+		var who := _character("people", Color.from_hsv(rng.randf(), 0.35, 0.6), Color("30323a"), rng, "helmet")
+		var body: Node3D = who.get_child(0)
+		who.position = Vector3(0, 0, Props3D.BACK_Z if back else Props3D.RIDER_Z)
+		Models.play(body, "sit")
+		if body.has_method("sit"):
+			body.sit(true, Props3D.SEAT_H, back)
+			body.animate(0.0, 0.0)
+		else:
+			who.position.y = 0.45
+		bike.add_child(who)
 
 
 func _float_text(text: String, color: Color) -> void:

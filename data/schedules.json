@@ -1,5 +1,5 @@
 {
-  "_ghi_chu": "Lịch đi lại trên bản đồ. errands: việc riêng của nhân vật theo giờ trong game; tới giờ thì người đó rời chỗ quen đi tới 'to' (một địa điểm), xong thì về. Lúc đang ở 'to' thì nói chuyện ở đó; away: true là đi khỏi phường (lên xe), không gặp được tới khi về. weekdays: 0 Chủ Nhật, 1 Thứ Hai … 6 Thứ Bảy (bỏ trống là ngày nào cũng đi). noRain: ngày mưa ở nhà. vendors: người bán rong đẩy xe theo tuyến (các điểm [x, z] trên bản đồ, đi vòng lại), chỉ ra phố trong khung giờ, ngày mưa nghỉ; tiếng rao trong sounds.json gắn với xe qua khóa vendor.",
+  "_ghi_chu": "Lịch đi lại trên bản đồ. errands: việc riêng của nhân vật theo giờ trong game; tới giờ thì người đó rời chỗ quen đi tới 'to' (một địa điểm), xong thì về. Lúc đang ở 'to' thì nói chuyện ở đó; away: true là đi khỏi phường (lên xe), không gặp được tới khi về. weekdays: 0 Chủ Nhật, 1 Thứ Hai … 6 Thứ Bảy (bỏ trống là ngày nào cũng đi). noRain: ngày mưa ở nhà. vendors: người bán rong đẩy xe theo tuyến (các điểm [x, z] trên bản đồ, đi vòng lại), chỉ ra phố trong khung giờ, ngày mưa nghỉ; xe đẩy dựng theo món (id), cart là màu thùng xe, carry: \"ganh\" là gánh trên vai thay cho xe đẩy; tiếng rao trong sounds.json gắn với xe qua khóa vendor.",
   "errands": [
     {"npc": "BA_TU", "to": "cho_cau_nho", "hours": [6.5, 8.5], "what": "đi chợ Cầu Nhỏ", "noRain": true},
     {"npc": "LINH", "to": "ben_xe_6", "hours": [7.5, 11.5], "what": "đi học ở trung tâm nghề", "away": true, "weekdays": [1, 2, 3, 4, 5]},
@@ -12,7 +12,7 @@
   "vendors": [
     {"id": "banh_mi", "name": "Bánh mì", "hours": [6, 9], "cart": "e8c48a", "hat": "non_la",
       "route": [[0, -32], [0, 10], [28, 16], [55, 10], [55, -10], [3, -10], [0, -32]]},
-    {"id": "xoi", "name": "Xôi", "hours": [6, 9], "cart": "d9a35b", "hat": "non_la",
+    {"id": "xoi", "name": "Xôi", "hours": [6, 9], "cart": "d9a35b", "hat": "non_la", "carry": "ganh",
       "route": [[-48, -32], [-48, -14], [-82, -14], [-48, -14], [-48, 10], [-20, 16], [-48, 10], [-48, -32]]},
     {"id": "ve_chai", "name": "Ve chai", "hours": [9, 17], "cart": "6b5a44", "hat": "non_la",
       "route": [[-40, 16], [90, 16], [55, 10], [55, -10], [3, -10], [0, 10], [-40, 16]]},

@@ -6,8 +6,9 @@ extends Node3D
 ## Nón lá, nón kết, mũ bảo hiểm, ba lô, tạp dề gắn theo xương đầu, ngực, lưng.
 ##
 ## look: skin, hair, hair_style (short | long | bun | ponytail), shirt, sleeve (short | long), pants, legs (long |
-##       shorts), shoes, footwear (sandals | shoes), hat (none | non_la | cap | helmet), bag, apron, tunic (áo dài
-##       qua hông như áo bà ba), female, height (mét), build (độ đậm người, 0.9–1.15)
+##       shorts), shoes, footwear (sandals | shoes), hat (none | non_la | cap | helmet), helmet (màu mũ bảo hiểm),
+##       bag, apron, tunic (áo dài qua hông như áo bà ba), female, height (mét), build (độ đậm người, 0.9–1.15)
+## Tư thế: sit (lái xe máy hay ngồi sau), hold (đẩy xe đẩy bằng hai tay, tay phải giữ đòn gánh trên vai).
 
 const LOOKS := {
 	# An, 27 tuổi, thợ sửa điện máy: áo thun xám xanh, quần kaki, dép quai hậu, ba lô đồ nghề.
@@ -128,6 +129,9 @@ var _mat: ShaderMaterial
 var _phase := 0.0
 var _move := 0.0
 var _sitting := false
+var _back := false
+var _hip_h := 0.93
+var _hold := ""
 
 
 static func make(look_in: Dictionary) -> Node3D:
@@ -159,6 +163,7 @@ static func random_look(rng: RandomNumberGenerator) -> Dictionary:
 		"shoes": ["e8efe9", "3b3b3b", "8b5a2b", "2f6fb0"][rng.randi() % 4],
 		"footwear": "shoes" if rng.randf() < 0.3 else "sandals",
 		"hat": hat, "bag": rng.randf() < 0.2,
+		"helmet": ["c0392b", "f2f0ea", "2f6fb0", "1f1f24", "f1c40f", "d98fa0", "7d8c6a"][rng.randi() % 7],
 		"height": rng.randf_range(1.55, 1.68) if female else rng.randf_range(1.62, 1.78),
 		"build": rng.randf_range(0.92, 1.1),
 		"female": female,
@@ -216,11 +221,16 @@ func _build() -> void:
 		"cap":
 			_attach("head", _acc("cap"), Color(str(look.get("shirt", "3f6f8f"))).darkened(0.1))
 		"helmet":
-			_attach("head", _acc("helmet"), Color("c0392b"))
+			_attach("head", _acc("helmet"), Color(str(look.get("helmet", "c0392b"))))
 	if bool(look.get("bag", false)):
 		_attach("chest", _acc("bag"), Color("4a4f3a"))
 	if bool(look.get("apron", false)):
 		_attach("spine", _acc("apron"), Color("f1ece0"))
+
+
+## Gắn thêm một món đồ mang theo (lưới dựng theo khung người cao 1,72 m, như đòn gánh) vào xương.
+func add_item(bone: String, mesh: Mesh) -> void:
+	_attach(bone, mesh, Color(1, 1, 1))
 
 
 ## Gắn một lưới phụ kiện (màu đỉnh nhân với tint) vào xương.
@@ -481,28 +491,59 @@ func animate(delta: float, moving: float) -> void:
 	_rot("spine", 0.04 * _move, s * 0.06 * _move)
 	_rot("chest", 0.02 * _move + sin(_phase * 0.5) * 0.01 * (1.0 - _move), -s * 0.05 * _move)
 	_rot("head", -0.05 * _move)
+	match _hold:
+		"push":
+			# Hai tay nắm tay đẩy trước bụng (cao chừng 1 m, cách người nửa mét).
+			_rot("arm_l", -0.75, 0.0, 0.06)
+			_rot("arm_r", -0.75, 0.0, -0.06)
+			_rot("forearm_l", -0.5)
+			_rot("forearm_r", -0.5)
+		"carry":
+			# Tay phải đưa lên giữ đòn gánh trên vai.
+			_rot("arm_r", -0.5, 0.0, -0.1)
+			_rot("forearm_r", -2.27)
 	# Nhún người khi bước, thở nhẹ khi đứng.
 	_sk.position.y = absf(sin(_phase)) * 0.035 * _move + sin(_phase * 0.5) * 0.003 * (1.0 - _move)
 
 
-func sit(on: bool) -> void:
+## Ngồi xe máy: hip_h là độ cao khớp hông so với gốc người (gốc đặt ở mặt đất dưới yên); back: ngồi sau, hai tay để
+## trên đùi, gối dạng ra ôm hông người lái.
+func sit(on: bool, hip_h := 0.93, back := false) -> void:
 	_sitting = on
+	_hip_h = hip_h
+	_back = back
 
 
-## Ngồi xe máy: đùi đưa ra trước, cẳng chân thả xuống, hai tay vươn lên tay lái.
+## "push": đẩy xe đẩy, "carry": gánh, "": tay đung đưa khi đi.
+func hold(kind: String) -> void:
+	_hold = kind
+
+
+## Ngồi xe máy: đùi đưa ra trước, cẳng chân gập về sau cho bàn chân đặt trên sàn xe, lưng hơi đổ tới, hai tay vươn
+## tới tay lái (cao hơn hông chừng 0,12 m, xa hơn hông chừng 0,53 m về phía trước).
 func _pose_sit() -> void:
-	_rot("thigh_l", -1.35, 0.0, 0.12)
-	_rot("thigh_r", -1.35, 0.0, -0.12)
-	_rot("shin_l", 1.25)
-	_rot("shin_r", 1.25)
-	_rot("foot_l", 0.1)
-	_rot("foot_r", 0.1)
-	_rot("arm_l", -1.0, 0.0, 0.12)
-	_rot("arm_r", -1.0, 0.0, -0.12)
-	_rot("forearm_l", -0.45)
-	_rot("forearm_r", -0.45)
-	_rot("spine", 0.12)
-	_sk.position.y = -0.42
+	var spread := 0.3 if _back else 0.12
+	_rot("thigh_l", -1.3, 0.0, spread)
+	_rot("thigh_r", -1.3, 0.0, -spread)
+	_rot("shin_l", 1.6)
+	_rot("shin_r", 1.6)
+	_rot("foot_l", -0.3)
+	_rot("foot_r", -0.3)
+	if _back:
+		_rot("arm_l", -0.35, 0.0, 0.12)
+		_rot("arm_r", -0.35, 0.0, -0.12)
+		_rot("forearm_l", -0.95)
+		_rot("forearm_r", -0.95)
+		_rot("spine", 0.05)
+	else:
+		_rot("arm_l", -0.9, 0.0, 0.1)
+		_rot("arm_r", -0.9, 0.0, -0.1)
+		_rot("forearm_l", -0.4)
+		_rot("forearm_r", -0.4)
+		_rot("spine", 0.2)
+	_rot("chest", 0.0)
+	_rot("head", -0.12 if not _back else 0.0)
+	_sk.position.y = _hip_h - 0.95 * _sk.scale.y
 
 
 func _rot(bone: String, x: float, y := 0.0, z := 0.0) -> void:

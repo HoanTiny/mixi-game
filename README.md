@@ -2,7 +2,7 @@
 
 Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh phường An Hòa của thành phố hư cấu Bình Giang. An, 27 tuổi, vừa mất việc ở tiệm điện máy. Cả nhà có 30 ngày để dọn khỏi xóm trọ Bờ Me và tìm chỗ ở mới. Thiết kế đầy đủ nằm trong [docs/](docs/README.md).
 
-Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
+Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người, xe máy, ô tô, xe đẩy, ghe, cây dựng bằng code thành lưới 3D bo tròn (`scripts/world/character.gd`, `scripts/world/props3d.gd`); có file mô hình thật trong `assets/` thì dùng file đó (xem mục *Thêm mô hình thật*).
 
 **Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29 (rạch dâng, chỗ trũng ngập, lội nước tốn giờ), chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
 
@@ -11,6 +11,8 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 **Map của truyện là khu thật Quận 8, ven kênh Tàu Hủ** (`"map": "q8_tau_hu"` trong `data/config.json`): đường, hẻm, kênh, cầu, nhà lấy từ OpenStreetMap và Open Buildings, nướng sẵn vào `data/maps/q8_tau_hu.json` (4.400 nhà, 415 đoạn đường) nên người chơi không cần mạng. Truyện giữ tên hư cấu: con kênh là rạch Bờ Me, cầu chữ Y là Cầu Nhỏ, đường Phạm Thế Hiển là đường Bờ Me… (bảng `names` trong `data/maps/q8_tau_hu_story.json`). File đặt truyện ghi chỗ của từng địa điểm (game tự tìm đường gần nhất làm mặt tiền, quay cửa ra đường, dọn nhà thật ở lô đó), lời tả địa điểm theo địa hình thật, vùng tìm mèo, tuyến người bán rong, giờ đi bộ mỗi mét. Nhà có số để giao hàng, thùng rác, đèn đường, chỗ ngập ngày mưa (đường sát kênh ngập ngày 15, lan vào trong ngày 29), xe máy và người đi bộ đều tính theo đường thật. Dọc kênh có bờ kè đá, ghe xuồng neo sát bờ và vài chiếc ghe chở hàng trôi qua lại. Bản đồ lớn (phím M) có chấm cho từng nhân vật đang ở đâu, rê chuột tới để xem tên. Khi An đi tới đâu, mặt đường hiện vệt chấm vàng chỉ lối (chấm đi qua rồi thì tắt) và bản đồ vẽ nét vàng đường đang đi; rê chuột lên một địa điểm trên bản đồ lớn thì thấy đường đi tới đó, số mét và số phút đi bộ.
 
 Đường đi bám theo phố, hẻm, vỉa hè, công viên; khe hở giữa các dãy nhà và bãi đất trống vẫn đi được (phím WASD) nhưng tìm đường tính đắt gấp 6 lần nên chỉ chui khe khi không còn lối nào. Nhà nào che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt màu vữa (dải ngay trước mặt An hạ còn chân tường, hai bên hạ ít hơn cho thấy mặt phố), hạ và nâng từ từ; nhà đứng ngang An như chính tiệm An đang đứng trước cửa thì để nguyên; cây chắn trước mặt thì thu tán lại. Quanh các địa điểm có đồ phố Việt: mái hiên tôn, bạt, biển hiệu có chữ (tạp hóa, phở, cơm tấm, sửa xe…), bàn ghế nhựa quán cóc, cột điện bê tông và dây điện võng, dây giăng ngang hẻm, cổng hẻm "khu phố văn hóa", bảng tên đường xanh, xe máy dựng vào lề. Đi qua cầu thì An đứng trên mặt cầu.
+
+**Người và đồ vật 3D:** mỗi người là một lưới liền bo tròn gắn khung xương, cử động mềm ở vai, khuỷu, hông, gối: dáng nam, nữ; mặt có mắt, mày, mũi, miệng, tai; tóc ngắn, dài, búi, đuôi ngựa; nón lá, nón kết, mũ bảo hiểm, ba lô, tạp dề; đi, đứng thở, ngồi xe, đẩy xe, gánh hàng. Xe máy tay ga và xe số chạy ngoài đường có người lái đội mũ bảo hiểm, nhiều chiếc chở thêm người ngồi sau. Người bán rong: xe bánh mì có tủ kính bày ổ bánh mì, xe chè với hai tầng hũ chè, xe hủ tiếu gõ có nồi nước lèo, xe ve chai chất các-tông và bao tải, chị bán xôi gánh hai thúng trên vai. Trên kênh: ghe chở hàng có mui bạt, mắt ghe, máy đuôi tôm, bao hàng; xuồng có mái chèo. Trên phố: ghế đẩu, bàn nhựa quán cóc, cột điện bê tông tròn có sứ cách điện và bình biến áp, ô tô, xe máy đậu dọc lề, cây tán lồi lõm, cây dừa đầu Hẻm Dừa. Mỗi món dựng một lần rồi dùng chung, màu sơn từng chiếc là tham số; cây, xe đậu chia theo ô 200 m nên chỉ vẽ phần đang thấy.
 
 Nướng thêm khu khác: `Godot --headless --path . -s res://tools/bake_map.gd -- --id=<tên> --bbox=nam,tây,bắc,đông [--osm=<file overpass.json>]`, rồi viết `data/maps/<tên>_story.json` và đổi `"map"` trong config. Đặt `"map": "an_hoa"` (hay chạy với `-- --map=an_hoa`) để chơi lại phường vẽ tay bên dưới.
 
@@ -103,7 +105,8 @@ scripts/
   world/models.gd nạp mô hình, co giãn cho vừa chỗ, phát hoạt cảnh
   world/surfaces.gd    vật liệu texture chiếu theo tọa độ thế giới
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
-  world/character.gd   nhân vật có khớp dựng bằng khối: An, 8 nhân vật, người đi đường; hoạt cảnh đi, đứng, ngồi xe
+  world/character.gd   nhân vật 3D liền khối có khung xương: An, 8 nhân vật, người đi đường; đi, đứng, ngồi xe, đẩy xe, gánh
+  world/props3d.gd     đồ vật 3D dựng bằng code: xe máy, ô tô, ghế bàn nhựa, xe đẩy bán rong, gánh hàng, ghe, cây, cây dừa
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
   realmap/realmap.gd     chế độ Dựng khu thật: giao diện hai nửa, tiến độ, camera xoay nghiêng, tải .glb, đi dạo
   realmap/fetcher.gd     gọi Nominatim, Overpass (nhiều máy, chờ 7 s), đọc file theo byte (Range)
@@ -141,7 +144,7 @@ Mặt đường, vỉa hè, tường nhà ống và nắp cống dùng texture P
 
 ## Thêm mô hình thật
 
-Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file mô hình nào. Thiếu file nào thì chỗ đó vẫn là khối hình, nên có thể thêm dần từng cái.
+Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file mô hình nào. Thiếu file nào thì người, xe máy, cây dùng lưới dựng bằng code (`character.gd`, `props3d.gd`), nhà dùng nhà ống tự tạo, nên có thể thêm dần từng cái.
 
 1. Tải các bộ miễn phí (giấy phép CC0, dùng thương mại được):
    - Người: [Kenney Mini Characters](https://kenney.nl/assets/mini-characters), có sẵn hoạt cảnh đứng, đi, ngồi.
