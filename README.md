@@ -1,10 +1,12 @@
 # Trước mùa mưa
 
-Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh phường An Hòa của thành phố hư cấu Bình Giang. An, 27 tuổi, vừa mất việc ở tiệm điện máy. Cả nhà có 30 ngày để dọn khỏi xóm trọ Bờ Me và tìm chỗ ở mới. Thiết kế đầy đủ nằm trong [docs/](docs/README.md).
+Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh phường An Hòa của thành phố hư cấu Bình Giang. An, 27 tuổi, vừa mất việc ở tiệm điện máy. Cả nhà có 30 ngày để dọn khỏi xóm trọ Bờ Me và tìm chỗ ở mới; chơi tiếp 30 ngày nữa ở chỗ mới khi mùa mưa tới và má An về nhà sau mười sáu năm. Thiết kế đầy đủ nằm trong [docs/](docs/README.md).
 
 Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người, xe máy, ô tô, xe đẩy, ghe, cây dựng bằng code thành lưới 3D bo tròn (`scripts/world/character.gd`, `scripts/world/props3d.gd`); có file mô hình thật trong `assets/` thì dùng file đó (xem mục *Thêm mô hình thật*).
 
 **Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29 (rạch dâng, chỗ trũng ngập, lội nước tốn giờ), chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
+
+**Chương 2 · Mùa mưa (ngày 31–60):** màn kết ngày 30 có nút **Chơi tiếp**; chỗ ở, tuyến nghề, tiền, độ thân thiết, Linh đi xa hay gần và mọi lựa chọn đi tiếp. Ba nhân vật mới: **má** (cô Hậu) về nhà sau mười sáu năm chỉ về ngày Tết, **ông Ba Lành** hàng xóm sát vách xưa chèo đò ngang, **Kha** thợ sửa điện thoại năm sao trên ứng dụng. Các mạch: đôi mắt của bà (khám, ai quyết lịch mổ, ngày mổ, nhỏ thuốc, tái khám), mùa mưa (mưa ngày 35, 41, 45, 52, 57, đêm triều cường ngày 45, bao cát, sửa máy bơm giá thường hay giá mưa), bí mật cái mỏ lết khắc tên và xấp biên lai gửi "Lê Văn Sáu", má mất việc mà giấu, Linh và cuốn sổ bảo trì, con trai ông Ba tới đón ông, sạp chung với Kha, giỗ ông ngoại tối ngày 60. Gồm 42 cảnh chính (nhiều cảnh đổi lời theo chỗ ở, tuyến, lựa chọn cũ), 20 việc mới (ứng dụng Thợ Tới, tổ trưởng ca chiều ở kho, đi lại điện chợ với tổ Trâm, đơn sửa sau mưa, ngồi bàn chú Sáu thứ Bảy, nghe radio và đánh cờ với ông Ba, ăn cơm má nấu, nhỏ thuốc mắt cho bà…), 5 việc nhờ, 32 đoạn thoại, **6 kết thúc** K1–K6 và thẻ hậu truyện của má, bà, Linh. Chương 1 có gieo sẵn manh mối: bà nhờ đọc tờ thông báo vì chữ in nhỏ, cái mỏ lết là món duy nhất trong thùng đồ nghề có khắc tên, xấp biên lai kẹp riêng dưới đáy hộp thiếc. Thử nhanh chương 2: thêm `?ch2` vào địa chỉ bản web (máy tự chơi xong chương 1 rồi mở sáng ngày 31, không ghi đè bản lưu thật).
 
 **Chỗ ở trên phố:** Phòng Hẻm Dừa trong hẻm cụt rẽ ra từ đường Chợ, Phòng Cầu Tre bên kia rạch (qua cây cầu tre sau Bến Cạn), nhà dì Năm ở đầu đường An Hòa gần trạm xe. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
 
@@ -182,7 +184,18 @@ Kết quả gần nhất của bản 30 ngày (bỏ qua đường đi bộ; kế
 | B · Tổ đội | E2 · 4,09 tr | E4 · 0,38 tr | (khóa B, sang A) | E4 · 1,99 tr |
 | C · Dịch vụ riêng | E3 · 4,96 tr | E4 · 1,58 tr | E8 · 1,23 tr | E6 · 1,71 tr |
 
-- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, cảnh chính, việc nhờ, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Bỏ `--full` để chơi lát cắt:
+Chơi tiếp chương 2 (ngày 31–60) từ đúng màn kết ở trên; kết chương 2 và tiền mặt tối ngày 60 sau khi đã đóng tiền nhà tháng sau. "Giấu" giấu chuyện và ép người nhà ở các cảnh gia đình; "Ít việc" mỗi ngày chỉ làm một việc ngắn; "Để má chọn" như lắng nghe nhưng không giữ chỗ cho máy may của má:
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
+|---|---|---|---|---|---|---|---|
+| A | K3 · 7,13 tr | K6 · 3,22 tr | K6 · 11,65 tr | K6 · 1,70 tr | K3 · 4,97 tr | K4 · 0 | K2 · 7,13 tr |
+| B | K3 · 8,32 tr | K6 · 1,67 tr | K6 · 11,65 tr | K6 · 3,24 tr | K6 · 5,36 tr | K4 · 0 | K2 · 8,32 tr |
+| C | K3 · 10,45 tr | K6 · 3,23 tr | K6 · 12,02 tr | K6 · 4,00 tr | K6 · 7,37 tr | K4 · 0 | K2 · 10,45 tr |
+
+Cách chơi không nghỉ (giữ tiếp, áp đặt, gồng) kiệt sức ở mùa mưa (K6) và má đi lặng lẽ; lắng nghe mà chừa chỗ cho máy may thì má ở lại mở sạp (K3), không chừa thì má quay lại nghề ở xa có hẹn gọi về (K2). K1 (má ở lại, mâm giỗ đủ chén) cần bà chưa mổ hay chưa ai hỏi ý má; K5 bị K6 che trong bảng vì các cách chơi giấu chuyện đều làm quá sức.
+
+- Đọc lại một lượt chơi chương 2 (lựa chọn và sổ tay ngày 31–60): `... -s res://tests/sim.gd -- trace C 0` (tuyến, cách chơi 0–6).
+- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, cảnh chính, việc nhờ, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Bỏ `--full` để chơi lát cắt; `--ch2` thay cho `--full` để chơi tiếp chương 2 tới ngày 60, thêm `--fast1` để chương 1 chạy nhanh không đi bộ:
 
 ```bash
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --full --route=B --talk
@@ -191,6 +204,7 @@ Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res:
 **Chạy thử nhanh** (thêm vào sau lệnh chạy game, không ghi đè bản lưu thật):
 
 - `-- --demo --demo-full`: vào thẳng ngày 1 của bản 30 ngày.
+- `-- --demo-ch2`: máy tự chơi xong chương 1, vào thẳng sáng ngày 31 của chương 2 (bản web: `?ch2`).
 - `-- --demo --demo-route=C`: vào thẳng ngày 18 của tuyến C.
 - Thêm `--demo-open=ben_can`: mở sẵn một địa điểm.
 - Thêm `--demo-end`: tự chơi tới hết ngày 22 để xem bảng tổng kết.

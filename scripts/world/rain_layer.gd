@@ -290,7 +290,7 @@ func apply(l: int, flags: Dictionary) -> void:
 		world.walkers[i].node.visible = l == 0 or i % 3 == 0
 	for i in world.bikes.size():
 		world.bikes[i].node.visible = l == 0 or i % 2 == 0
-	var key := "" if l == 0 else "%d:%s" % [l, _prep_state(l, flags)]
+	var key := "" if l == 0 else "%d:%s:%s:%s" % [l, _prep_state(l, flags), world.home, flags.get("baoCat", false)]
 	# Đồ phơi: đã chuẩn bị thì cất vô từ trước, chưa thì còn ướt sũng trên dây.
 	for c in get_tree().get_nodes_in_group("do_phoi"):
 		c.visible = l == 0 or _prep_state(l, flags) == "uot"
@@ -367,18 +367,44 @@ func _prep_state(l: int, flags: Dictionary) -> String:
 	return "uot"
 
 
+## Chương 2: bao cát chèn trước cửa chỗ ở mới nếu đã xúc cát với cả hẻm (cờ baoCat), không thì nước tràn qua bậc
+## cửa, có thau hứng nước dột.
+func _build_sandbags(home: Node3D, p: Dictionary, flags: Dictionary) -> void:
+	var half := float(p.w) / 2.0
+	if flags.get("baoCat", false):
+		for i in int(p.w / 0.62):
+			var x := -half + 0.35 + i * 0.62
+			for r in 2:
+				var bag: MeshInstance3D = world._block(Vector3(0.58, 0.2, 0.4), Vector3(x + (0.3 if r == 1 else 0.0), 0.0 + r * 0.19, 0.35),
+					Color("b9a27a").darkened(0.08 * float(i % 3)), home)
+				bag.rotation.y = 0.05 * float((i + r) % 3 - 1)
+		return
+	var basin := MeshInstance3D.new()
+	var cm := CylinderMesh.new()
+	cm.top_radius = 0.32
+	cm.bottom_radius = 0.24
+	cm.height = 0.18
+	basin.mesh = cm
+	basin.material_override = world._mat_cached(Color("c8503f"))
+	basin.position = Vector3(-half + 1.0, 0.1, 0.5)
+	home.add_child(basin)
+
+
 ## Thùng đồ trước xóm trọ: ngày 15 vài thùng, ngày 29 cả chồng thùng chuyển nhà xếp ngoài hiên.
 func _build_yard(l: int, flags: Dictionary) -> void:
 	if _yard != null:
 		_yard.queue_free()
 		_yard = null
-	if l <= 0 or not world.city.locs.has(world.HOME):
+	if l <= 0 or not world.city.locs.has(world.home):
 		return
-	var p: Dictionary = world.city.locs[world.HOME]
+	var p: Dictionary = world.city.locs[world.home]
 	_yard = Node3D.new()
 	add_child(_yard)
 	var home: Node3D = world._frame_node(p)
 	_yard.add_child(home)
+	if world.game.chapter() == 2:
+		_build_sandbags(home, p, flags)
+		return
 	var state := _prep_state(l, flags)
 	var half := float(p.w) / 2.0
 	var cols := 3 if l >= 2 else 2

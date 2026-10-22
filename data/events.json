@@ -5,7 +5,7 @@
   "mode": "full",
   "title": "Tờ giấy trên cánh cửa",
   "who": "Bà Tư",
-  "text": "Chuyến xe đêm thả An ở đầu đường lúc trời vừa sáng. Anh về tới xóm trọ Bờ Me. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Tư để phần cá kho trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn 1.200.000đ. Tiệm cũ còn nợ 3.600.000đ tiền công.",
+  "text": "Chuyến xe đêm thả An ở đầu đường lúc trời vừa sáng. Anh về tới xóm trọ Bờ Me. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Tư nhờ An đọc to lên, \"chữ in nhỏ quá\", rồi đi lấy phần cá kho để trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn 1.200.000đ. Tiệm cũ còn nợ 3.600.000đ tiền công.",
   "quote": "Bà Tư: \"Cơm còn nóng. Chuyện nào khó thì ăn xong rồi nói, đừng để nguội cả hai.\"",
   "choices": [
    {
@@ -365,7 +365,7 @@
   "loc": "tiem_sau",
   "title": "Chiếc mỏ lết có khắc tên",
   "who": "Chú Sáu",
-  "text": "Trong thùng đồ nghề của tiệm, An thấy cái mỏ lết có tên mình khắc vụng ở cán, từ hồi anh phụ việc sau giờ học. Chú Sáu vẫn giữ. Sắp tới có việc, An cần dụng cụ.",
+  "text": "Trong thùng đồ nghề của tiệm, An thấy cái mỏ lết có tên mình khắc vụng ở cán, từ hồi anh phụ việc sau giờ học. Chú Sáu vẫn giữ. Lạ một điều: cả thùng đồ nghề, không món nào khác có khắc tên ai. Sắp tới có việc, An cần dụng cụ.",
   "quote": "Chú Sáu: \"Tên con khắc đó. Đồ thì của chú. Đừng thấy tên mà ôm về nghen.\"",
   "missed": "Chú Sáu nhắn: lúc nào cần dụng cụ thì ghé thuê theo buổi, không sao.",
   "choices": [

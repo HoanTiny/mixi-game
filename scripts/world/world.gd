@@ -21,7 +21,8 @@ const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 
-## Xóm trọ của An: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối.
+## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
+## (game.home_loc()); bà, Linh, má đứng trước cửa chỗ đó, ông Ba ở sát vách.
 const HOME := "xom_bo_me"
 ## Để HUD đọc được id nhà mà không cần truy cập hằng số qua instance.
 var home: String = HOME
@@ -165,7 +166,8 @@ func _ready() -> void:
 	marker.position = Vector3(0, 0.18, 0)
 	player.add_child(marker)
 	player.add_child(_label3d("An", Vector3(0, 2.15, 0), 22))
-	player.position = loc_point(HOME, -1.5, 0.8)
+	home = game.home_loc() if game.is_started() and LOCATIONS.has(game.home_loc()) else HOME
+	player.position = loc_point(home, -1.5, 0.8)
 	# Về từ màn khác thì hiện ra ở chỗ đó.
 	var gs := get_node("/root/GameState")
 	if gs.spawn_at != "" and LOCATIONS.has(gs.spawn_at):
@@ -1761,7 +1763,7 @@ func _check_day_end() -> void:
 		return
 	_target = null
 	_target_loc = ""
-	if door_of(HOME).distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
+	if door_of(home).distance_to(Vector3(player.position.x, 0, player.position.z)) <= INTERACT_RANGE + 1.0:
 		if _night_prompt_day != game.day():
 			_night_prompt_day = game.day()
 			hud.close_location()
@@ -1848,22 +1850,24 @@ func _update_traffic(delta: float) -> void:
 func _on_changed() -> void:
 	if not game.is_started():
 		_last_money = -1
-		if _ending_home != null:
-			_ending_home.queue_free()
-			_ending_home = null
+		_clear_ending_home()
 		return
-	if game.is_over() and str(game.s.over.get("kind", "")) == "full" and _ending_home == null:
+	_sync_home()
+	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2"] and _ending_home == null:
 		_show_ending_home()
+	elif not game.is_over() and _ending_home != null:
+		# Chơi tiếp chương 2 từ màn kết: dọn hình ảnh khép lại của chương 1.
+		_clear_ending_home()
 	var money := int(game.s.cash)
 	if _last_money >= 0 and money != _last_money:
 		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
 			Color("7fe0a0") if money > _last_money else Color("ff8a7a"))
 		audio.play("earn" if money > _last_money else "spend")
 	_last_money = money
-	# Sang ngày mới: An thức dậy trước cửa xóm trọ.
+	# Sang ngày mới: An thức dậy trước cửa chỗ ở.
 	if game.day() != _last_day:
 		if _last_day != -1:
-			player.position = loc_point(HOME, -1.5, 0.8)
+			player.position = loc_point(home, -1.5, 0.8)
 			camera.position = player.position + cam_offset()
 			_target = null
 			_target_loc = ""
@@ -1955,11 +1959,15 @@ func _set_rain(on: bool) -> void:
 
 ## Thông tin địa điểm; map thật thay lời tả theo địa hình của khu (file đặt truyện).
 func location_info(id: String) -> Dictionary:
+	var d: Dictionary = LOCATIONS[id]
 	if real and city.story.get("descriptions", {}).has(id):
-		var d: Dictionary = LOCATIONS[id].duplicate()
+		d = d.duplicate()
 		d["desc"] = str(city.story.descriptions[id])
-		return d
-	return LOCATIONS[id]
+	# Chương 2: xóm cũ đang dỡ làm kho, các chỗ khác có thể đổi lời tả (story2.locations).
+	if game.is_started() and game.chapter() == 2 and game.story2.get("locations", {}).has(id):
+		d = d.duplicate()
+		d.merge(game.story2.locations[id], true)
+	return d
 
 
 func door_of(id: String) -> Vector3:
@@ -2138,11 +2146,91 @@ func _float_text(text: String, color: Color) -> void:
 	tw.chain().tween_callback(l.queue_free)
 
 
+# ---------------------------------------------------------------- chỗ ở, nhân vật chương 2
+
+## Người nhà đứng trước cửa chỗ ở, theo thứ tự chỗ đứng; ông Ba là hàng xóm sát vách nên đứng xa nhất.
+const HOME_NPCS := ["BA_TU", "LINH", "MA", "ONG_BA"]
+var _npc_home := HOME
+var _ch2_spawned := false
+
+
+## Chỗ ở đổi (chương 2, hay dọn khỏi nhà dì Năm) thì người nhà dời theo; vào chương 2 thì thêm nhân vật mới.
+func _sync_home() -> void:
+	var h: String = game.home_loc()
+	if not LOCATIONS.has(h):
+		h = HOME
+	home = h
+	if game.chapter() == 2 and not _ch2_spawned:
+		_ch2_spawned = true
+		for e in game.story2.get("npcs", []):
+			_spawn_npc(e)
+	if _npc_home == home:
+		return
+	_npc_home = home
+	# Đứng sau người của chính địa điểm đó (cô chủ phòng, chú chủ nhà, dì Năm) để không chồng lên nhau.
+	var slot := 0
+	for who in LOCATIONS.get(home, {}).get("npcs", []):
+		if not HOME_NPCS.has(str(who.id)):
+			slot += 1
+	for id in HOME_NPCS:
+		if npc_nodes.has(id):
+			_place_npc(id, home, slot)
+			slot += 1
+
+
+func _place_npc(id: String, loc: String, slot: int) -> void:
+	var n: Dictionary = npc_nodes[id]
+	var node: Node3D = n.node
+	node.global_position = loc_point(loc, 1.6 + slot * 1.7, 0.2 + (slot % 2) * 0.45)
+	node.global_rotation.y = CityMap.rot_y(city.locs[loc].normal) + PI
+	n["loc"] = loc
+	(n.body as Node).set_meta("loc", loc)
+	life.relocate(id, loc)
+
+
+## Nhân vật mới của chương 2 (story2.npcs): đứng trước cửa địa điểm như nhân vật cũ; "when" là lúc có mặt.
+func _spawn_npc(e: Dictionary) -> void:
+	var id := str(e.id)
+	if npc_nodes.has(id):
+		return
+	var loc: String = game.loc_of(str(e.loc))
+	var npc := _character("npc." + id, Color(str(e.color)), Color("3a3a40"))
+	add_child(npc)
+	npc.add_child(_label3d(str(e.name), Vector3(0, 2.0, 0), 22))
+	var nb := StaticBody3D.new()
+	nb.set_meta("loc", loc)
+	var ncs := CollisionShape3D.new()
+	var cap := CapsuleShape3D.new()
+	cap.radius = 0.45
+	cap.height = 1.9
+	ncs.shape = cap
+	ncs.position = Vector3(0, 0.95, 0)
+	nb.add_child(ncs)
+	npc.add_child(nb)
+	npc_nodes[id] = {"node": npc, "body": nb, "name": str(e.name), "loc": loc, "color": str(e.color)}
+	life.add_npc(id, e.get("when", {}))
+	if str(e.loc) == "home":
+		_npc_home = ""
+	else:
+		_place_npc(id, loc, int(e.get("slot", 1)))
+
+
 # ---------------------------------------------------------------- ngày 30
 
 ## Hình ảnh khép lại: An đứng trước chỗ ở mới, bà Tư bên cạnh (Linh có mặt nếu không đi thực tập xa),
 ## chậu húng đặt dưới mái hiên. Hộp thoại kết thúc hiện đè lên cảnh này.
 var _ending_home: Node3D
+
+
+## Dọn cảnh khép lại trước chỗ ở; người trong cảnh đó phải ra khỏi danh sách đứng thở trước khi bị xóa.
+func _clear_ending_home() -> void:
+	if _ending_home == null:
+		return
+	for c in idlers.duplicate():
+		if _ending_home.is_ancestor_of(c):
+			idlers.erase(c)
+	_ending_home.queue_free()
+	_ending_home = null
 
 
 func _show_ending_home() -> void:
@@ -2155,6 +2243,10 @@ func _show_ending_home() -> void:
 	var family := ["BA_TU"]
 	if str(game.s.linh.decision) != "xa":
 		family.append("LINH")
+	if game.chapter() == 2:
+		# Chương 2: người nhà đã đứng sẵn trước chỗ ở (má thì tùy má đi hay ở), chỉ thêm chậu húng.
+		loc = home
+		family = []
 	var i := 0
 	for id in family:
 		var who := _character("npc." + id, Color("8a6f9a"), Color("3a3a40"))

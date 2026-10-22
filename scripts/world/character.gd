@@ -45,6 +45,18 @@ const LOOKS := {
 	"PHUC": {"skin": "c99a76", "hair": "1b1714", "hair_style": "short", "shirt": "efeee8", "sleeve": "short",
 		"pants": "6f7277", "shoes": "3b3b3b", "footwear": "shoes", "hat": "none", "bag": false, "height": 1.7,
 		"build": 1.12},
+	# Chương 2 · Má (cô Hậu), 49 tuổi: áo sơ mi caro tay dài của người làm xưởng, quần đen, tóc búi có sợi bạc.
+	"MA": {"skin": "c99a76", "hair": "3a3028", "hair_style": "bun", "shirt": "7a8f6a", "sleeve": "long",
+		"pants": "26262c", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.55, "build": 1.02,
+		"female": true},
+	# Ông Ba Lành, 78 tuổi: áo thun trắng ngả màu, quần đùi, tóc bạc trắng.
+	"ONG_BA": {"skin": "b07a52", "hair": "e0e0dc", "hair_style": "short", "shirt": "e6e1d3", "sleeve": "short",
+		"pants": "4a4a52", "legs": "shorts", "shoes": "6b4f3a", "hat": "none", "bag": false, "height": 1.6,
+		"build": 0.94},
+	# Kha, 23 tuổi, sửa điện thoại ở chợ: áo thun đen, quần jean, giày trắng.
+	"KHA": {"skin": "d9a77c", "hair": "1b1714", "hair_style": "short", "shirt": "2b2b31", "sleeve": "short",
+		"pants": "3b5b82", "shoes": "f2f0ea", "footwear": "shoes", "hat": "none", "bag": false, "height": 1.7,
+		"build": 0.95},
 }
 
 ## Xương: tên, cha, vị trí trong khung (mét, dáng cao 1,72 m, mặt nhìn về +z). Dáng nữ co vai, nở hông.

@@ -129,7 +129,7 @@ func _build_actions() -> Control:
 	col.add_child(bar_panel)
 	var toolbar := HBoxContainer.new()
 	bar_panel.add_child(toolbar)
-	toolbar.add_child(UI.label("Mỗi tối trừ %s tiền sinh hoạt cả nhà" % GameLogic.fmt_money(int(game.cfg.livingCostPerDay)), 13, UI.INK_SOFT))
+	toolbar.add_child(UI.label("Mỗi tối trừ %s tiền sinh hoạt cả nhà" % GameLogic.fmt_money(game.living_cost()), 13, UI.INK_SOFT))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	toolbar.add_child(spacer)

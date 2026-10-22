@@ -2,7 +2,7 @@
 
 "Trước mùa mưa" là cốt truyện chính mới của game, thay cho cốt truyện "Lên Phố" cũ (Minh trả nợ nặng lãi, lo học phí cho Lan). Bộ tài liệu này viết lại hồ sơ cốt truyện bản 1.0 thành từng phần để đội làm game tra cứu và chuyển dần vào code.
 
-Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát cắt ngày 18–22 để thử nhanh. Tiến độ chi tiết và việc còn lại nằm ở [08-chuyen-sang-game.md](cot-truyen/08-chuyen-sang-game.md).
+Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát cắt ngày 18–22 để thử nhanh. Màn kết ngày 30 có nút **Chơi tiếp** sang **Chương 2 · Mùa mưa** (ngày 31–60, 6 kết thúc), mọi lựa chọn của chương 1 đi tiếp. Tiến độ chi tiết và việc còn lại nằm ở [08-chuyen-sang-game.md](cot-truyen/08-chuyen-sang-game.md).
 
 ## Đọc theo thứ tự
 
@@ -16,12 +16,14 @@ Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát c�
 | [06 · Kết thúc](cot-truyen/06-ket-thuc.md) | 8 kết thúc chính, thứ tự xét, hậu truyện của Linh và bà Tư, quan hệ xóm và nghề |
 | [07 · Hội thoại mẫu](cot-truyen/07-hoi-thoai-mau.md) | 4 cảnh mẫu ngày 1, 20, 22, 30 |
 | [08 · Chuyển sang game](cot-truyen/08-chuyen-sang-game.md) | So với game hiện tại, việc cần đổi trong data và code, thứ tự làm |
+| [09 · Chương 2 · Mùa mưa](cot-truyen/09-chuong-2-mua-mua.md) | Ngày 31–60 ở chỗ mới: má về, đôi mắt của bà, mùa mưa và đêm triều cường, bí mật cái mỏ lết, ông Ba và Kha, giỗ ông; 6 kết thúc K1–K6 |
 
 Dữ liệu gốc dạng JSON (nhân vật, 30 ngày, kết thúc, nhánh) nằm ở [data/narrative_design.json](data/narrative_design.json), dùng làm nguồn khi chuyển nội dung sang `data/events.json`.
 
 ## Con số chính
 
 - **Quy mô:** 9 nhân vật · 30 ngày · 90 lựa chọn · 8 kết thúc chính · 4 hậu truyện của Linh · 3 hậu truyện của bà Tư.
+- **Chương 2:** thêm 3 nhân vật (má, ông Ba, Kha) · 30 ngày · 42 cảnh chính · 20 việc mới · 5 việc nhờ · 32 đoạn thoại · 6 kết thúc · thẻ hậu truyện của má, bà, Linh.
 - **Mốc cố định:** mưa sớm ngày 15, mưa lớn ngày 29, trả chìa khóa ngày 30.
 - **Tiền khởi đầu:** 1,2 triệu tiền mặt, cộng 3,6 triệu lương cũ còn phải thu.
 

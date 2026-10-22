@@ -1,5 +1,6 @@
 extends Control
-## Lớp hộp thoại ở giữa màn hình: mở đầu, sự kiện, buổi tối, màn kết 30 ngày và tổng kết lát cắt.
+## Lớp hộp thoại ở giữa màn hình: mở đầu, sự kiện, buổi tối, màn kết 30 ngày (có nút chơi tiếp chương 2),
+## màn kết chương 2 và tổng kết lát cắt.
 ## Tự hiện khi trạng thái game cần người chơi chọn, tự ẩn khi không.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
@@ -50,10 +51,13 @@ func refresh() -> void:
 	if not game.is_started():
 		_start()
 	elif game.is_over():
-		if str(game.s.over.get("kind", "")) == "full":
-			_ending()
-		else:
-			_report()
+		match str(game.s.over.get("kind", "")):
+			"full":
+				_ending()
+			"full2":
+				_ending2()
+			_:
+				_report()
 	elif not game.s.queue.is_empty():
 		_event()
 	elif night_open:
@@ -162,7 +166,13 @@ func _ending() -> void:
 	var e: Dictionary = game.story.endings[over.key]
 	_box.add_child(UI.label("%s · %s" % [str(over.key), str(e.tag).to_upper()], 12, UI.TIM))
 	_head("", e.title, "", e.text, e.quote)
-	_box.add_child(UI.wrap(e.epilogue, 14, UI.INK_SOFT))
+	if game.can_continue():
+		# Còn chương 2: hậu truyện ba tháng sau chỉ đúng nếu dừng ở đây.
+		_box.add_child(UI.label("NẾU CÂU CHUYỆN DỪNG Ở ĐÂY", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap(e.epilogue, 14, UI.INK_SOFT))
+		_box.add_child(UI.choice("Chơi tiếp: Chương 2 · Mùa mưa", str(game.story2.get("continue", "Ngày 31–60 ở chỗ mới")), "", game.start_chapter2))
+	else:
+		_box.add_child(UI.wrap(e.epilogue, 14, UI.INK_SOFT))
 	var codas: Array = game.codas()
 	if not codas.is_empty():
 		_box.add_child(UI.label("SAU ĐÓ", 11, UI.INK_SOFT))
@@ -217,6 +227,65 @@ func _ending() -> void:
 				rows.append("Ngày %d · %s" % [int(x.day), x.text])
 			_box.add_child(UI.wrap("\n".join(rows), 13, UI.INK))
 		_box.add_child(UI.choice("Gấp sổ tay lại" if _diary_open else "Đọc lại sổ tay của An", "%d dòng, từ ngày 1 tới ngày 30" % diary.size(), "", _toggle_diary))
+	_box.add_child(UI.choice("Chơi lại từ ngày 1", "", "", GameState.restart))
+	_box.add_child(UI.choice("Sao chép kết quả lượt chơi", "Dán vào chat để phân tích cân bằng", "", func() -> void: DisplayServer.clipboard_set(game.summary())))
+
+
+## Màn kết chương 2 (ngày 60, giỗ ông): cảnh chính, hậu truyện, thẻ của má, bà, Linh, từng người ở phố mới và phố cũ.
+func _ending2() -> void:
+	var over: Dictionary = game.s.over
+	var st: Dictionary = game.story2
+	# Kết có thể có biến thể (K3 ở sạp chung với Kha hay trước hiên nhà).
+	var e: Dictionary = game._merge_variants(st.endings[over.key])
+	_box.add_child(UI.label("CHƯƠNG 2 · %s · %s" % [str(over.key), str(e.tag).to_upper()], 12, UI.TIM))
+	_head("", e.title, "", e.text, e.quote)
+	_box.add_child(UI.wrap(e.epilogue, 14, UI.INK_SOFT))
+	var codas: Array = game.codas()
+	if not codas.is_empty():
+		_box.add_child(UI.label("SAU ĐÓ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n\n".join(codas), 14, UI.INK))
+	var keep: Array = game.keepsakes()
+	if not keep.is_empty():
+		_box.add_child(UI.label("TRÊN BÀN THỜ VÀ TRONG NHÀ MỚI", 11, UI.INK_SOFT))
+		var items := []
+		for k in keep:
+			items.append("• %s: %s" % [k.name, k.text])
+		_box.add_child(UI.wrap("\n".join(items), 13, UI.INK))
+	var h: Dictionary = game.housing()
+	var place := str(game.cfg.housing.get(h.place, {}).get("name", "chưa rõ"))
+	if h.state == "reserved":
+		place = "%s (đã đặt cọc, dọn sau giỗ)" % place
+	_box.add_child(UI.wrap("Chỗ ở: %s · Tuyến %s · Tiền mặt: %s" % [place, str(game.s.route), GameLogic.fmt_money(int(game.s.cash))], 14, UI.INK))
+	for pair in [["MÁ", "maCards", over.ma], ["BÀ TƯ", "baTuCards", over.ba_tu], ["LINH", "linhCards", over.linh]]:
+		var card: Dictionary = st.get(pair[1], {}).get(pair[2], {})
+		if not card.is_empty():
+			_box.add_child(UI.label(pair[0], 11, UI.INK_SOFT))
+			_box.add_child(UI.wrap("%s\n%s" % [card.title, card.text], 14, UI.INK))
+	var people := []
+	for x in game.npc_lines():
+		people.append("%s · %s" % [game.rep_name(x.who), x.text])
+	if not people.is_empty():
+		_box.add_child(UI.label("Ở PHỐ MỚI VÀ PHỐ CŨ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n\n".join(people), 13, UI.INK))
+	var left := []
+	for x in game.s.payables:
+		if x.status in ["unpaid", "renegotiated"] or (x.status == "pending" and int(x.due) > 60):
+			left.append("• %s: %s" % [x.label, GameLogic.fmt_money(int(x.amount))])
+	for pr in game.s.promises:
+		if pr.status in ["overdue", "renegotiated"] and int(pr.get("made", 0)) > 30:
+			left.append("• %s (%s)" % [pr.text, GameLogic.PROMISE_STATUS.get(pr.status, pr.status)])
+	if not left.is_empty():
+		_box.add_child(UI.label("CÒN PHẢI XỬ LÝ", 11, UI.INK_SOFT))
+		_box.add_child(UI.wrap("\n".join(left), 13, UI.INK_SOFT))
+	var diary: Array = game.s.get("diary", [])
+	if not diary.is_empty():
+		if _diary_open:
+			_box.add_child(UI.label("SỔ TAY HAI THÁNG", 11, UI.INK_SOFT))
+			var rows := []
+			for x in diary:
+				rows.append("Ngày %d · %s" % [int(x.day), x.text])
+			_box.add_child(UI.wrap("\n".join(rows), 13, UI.INK))
+		_box.add_child(UI.choice("Gấp sổ tay lại" if _diary_open else "Đọc lại sổ tay của An", "%d dòng, từ ngày 1 tới ngày 60" % diary.size(), "", _toggle_diary))
 	_box.add_child(UI.choice("Chơi lại từ ngày 1", "", "", GameState.restart))
 	_box.add_child(UI.choice("Sao chép kết quả lượt chơi", "Dán vào chat để phân tích cân bằng", "", func() -> void: DisplayServer.clipboard_set(game.summary())))
 

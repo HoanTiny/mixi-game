@@ -556,11 +556,12 @@ func _refresh() -> void:
 		return
 	var s: Dictionary = game.s
 	_refresh_objectives(s)
-	_day_label.text = "Ngày %d/30 · %s" % [game.day(), game.weekday_name()]
+	var last: int = game.last_day() if game.is_full() else 30
+	_day_label.text = "Ngày %d/%d · %s" % [game.day(), last, game.weekday_name()]
 	_clock_label.text = "%s  ·  còn %s giờ trong ngày" % [GameLogic.hh(minf(game.clock(), 22.0)), GameLogic.num(game.hours_left())]
 	_cash_label.text = GameLogic.fmt_money(int(s.cash))
-	_recv_label.text = "Phải thu: %s trước ngày 30 · %s sau\nPhải trả: %s" % [
-		GameLogic.fmt_k(game.receivable_sum(0, 30)), GameLogic.fmt_k(game.receivable_sum(31, 999)), GameLogic.fmt_k(game.payable_sum(999))]
+	_recv_label.text = "Phải thu: %s trước ngày %d · %s sau\nPhải trả: %s" % [
+		GameLogic.fmt_k(game.receivable_sum(0, last)), last, GameLogic.fmt_k(game.receivable_sum(last + 1, 999)), GameLogic.fmt_k(game.payable_sum(999))]
 	var warn := float(game.cfg.fatigue.warn)
 	_fatigue_label.text = "Mệt %d/100%s" % [int(s.fatigue), "  · cần nghỉ" if game.fatigue_warn() else ""]
 	UI.set_bar(_fatigue_bar, float(s.fatigue), 100.0, UI.STAMP if float(s.fatigue) >= warn else (UI.WARN if float(s.fatigue) >= warn - 20 else UI.GOOD))
@@ -576,6 +577,7 @@ func _refresh() -> void:
 		var worst := minf(game.need("fed"), minf(game.need("clean"), game.need("neat")))
 		_needs_label.add_theme_color_override("font_color", UI.HUD_SOFT if worst >= 35.0 else (UI.GOLD if worst >= 15.0 else Color("ff8a7a")))
 	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
+	_end_day_btn.text = "Về nhà" if game.chapter() == 2 else "Về xóm trọ"
 	_refresh_skills(s)
 	_log_text.text = UI.log_bbcode(game)
 	_refresh_location()
@@ -596,6 +598,9 @@ func _refresh_objectives(s: Dictionary) -> void:
 		if e.has("window"):
 			where += " · %s–%s" % [GameLogic.hh(float(e.window[0])), GameLogic.hh(float(e.window[1]))]
 		_objective("Hôm nay: " + game.fill(str(e.title)), "Tới " + where, "current")
+	if game.chapter() == 2:
+		_refresh_objectives2(s)
+		return
 	var deadline := int(game.cfg.housingDeadline)
 	var h: Dictionary = game.housing()
 	if h.state == "signed":
@@ -653,6 +658,58 @@ func _refresh_objectives(s: Dictionary) -> void:
 	if due_today > 0:
 		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
 	_objective("Trả chìa khóa phòng cũ cho cô Duyên ngày 30", "", "normal")
+	_quest_objectives()
+
+
+## Chương 2: tiền nhà tháng sau, đôi mắt của bà, má, giỗ ông; cảnh chính và việc nhờ như chương 1.
+func _refresh_objectives2(s: Dictionary) -> void:
+	var due := int(game.cfg.chapter2.rentDue)
+	var h: Dictionary = game.housing()
+	var rent = null
+	for x in s.payables:
+		if x.id == ("tien_nha_t2" if game.has_long_home() else "phong_moi"):
+			rent = x
+	var title := "Tiền nhà tháng sau" if game.has_long_home() else "Phần còn lại phòng mới, dọn sau giỗ"
+	if rent == null and not game.has_long_home():
+		_objective("Đặt cọc phòng mới trước giỗ ông", "Ở nhờ dì Năm tới sau giỗ · cọc Hẻm Dừa hay Cầu Tre, dọn sau ngày %d" % due, "current")
+	elif rent != null and rent.status == "pending":
+		var proj: int = game.projected_cash(due)
+		var sub := "%s · không kiếm thêm thì tối ngày %d còn %s" % [GameLogic.fmt_money(int(rent.amount)), due, GameLogic.fmt_money(proj)]
+		sub += " · đủ" if proj >= int(rent.amount) else " · thiếu %s" % GameLogic.fmt_money(int(rent.amount) - proj)
+		_objective("%s (tối ngày %d)" % [title, due], sub, "current" if game.day() >= 54 else "normal")
+	elif rent != null:
+		_objective(title, "Đã đóng" if rent.status == "paid" else "Chưa đủ, phải hẹn lại", "done" if rent.status == "paid" else "failed")
+	for r in s.receivables:
+		if r.status == "pending" and int(r.due) <= due and int(r.due) >= game.day():
+			_objective("Còn chờ nhận: %s" % r.label, "%s · hạn ngày %d" % [GameLogic.fmt_money(int(r.amount)), int(r.due)], "normal")
+	var f: Dictionary = s.flags
+	if f.get("daMo", false):
+		_objective("Mắt của bà: đã mổ", "Nhỏ thuốc mỗi ngày, không để nước vào mắt", "done")
+	elif f.get("moSom", false):
+		_objective("Mổ mắt cho bà sáng ngày 43", "Ai đi cùng, ai ở nhà nhỏ thuốc", "current" if game.day() >= 41 else "normal")
+	elif f.get("moBhyt", false):
+		_objective("Mổ mắt cho bà sáng ngày 46", "Suất bảo hiểm, ngay sau con nước rằm", "current" if game.day() >= 44 else "normal")
+	elif f.get("moDoi", false):
+		_objective("Bà chọn để sau Tết mới mổ", "Quyết định là của bà", "done")
+	elif game.day() <= 36:
+		_objective("Đưa bà đi khám mắt sáng ngày 36", "Bệnh viện mắt thành phố, đi xe buýt ở bến xe số 6", "current" if game.day() >= 35 else "normal")
+	else:
+		_objective("Cả nhà bàn chuyện mổ mắt (ngày 40)", "Người quyết là bà", "current" if game.day() >= 38 else "normal")
+	if f.get("maVe", false) and not s.has("ma"):
+		_objective("Má đang ở nhà", "Đi hay ở là quyết định của má", "normal")
+	var due_today := 0
+	for p in s.promises:
+		if p.status == "open" and int(p.due) == game.day():
+			due_today += 1
+	if due_today > 0:
+		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
+	var home_place := str(s.get("home2", {}).get("place", h.place))
+	_objective("Giỗ ông ngoại tối ngày 60", "Ở " + str(game.cfg.housing.get(home_place, {}).get("name", "chỗ mới")), "current" if game.day() >= 58 else "normal")
+	_quest_objectives()
+
+
+## Việc nhờ đang làm và người đang cần giúp.
+func _quest_objectives() -> void:
 	var active: Array = game.quests_active()
 	if not active.is_empty():
 		_objective_box.add_child(UI.label("Việc nhờ đang làm", 14, Color("9fc4ff")))
@@ -696,7 +753,8 @@ func _refresh_skills(s: Dictionary) -> void:
 	var lines := [UI.ledger_bbcode(game), "", "[b]Thân thiết[/b]"]
 	var reps := []
 	for k in game.story.reps:
-		reps.append("%s %d" % [game.rep_name(k), int(s.rep.get(k, 0))])
+		if s.rep.has(k):
+			reps.append("%s %d" % [game.rep_name(k), int(s.rep.get(k, 0))])
 	lines.append(" · ".join(reps))
 	var inv := []
 	for k in s.get("inv", {}):
@@ -777,7 +835,7 @@ func _refresh_location() -> void:
 		found += 1
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
-			if a.get("location", "") == _loc_id:
+			if game.action_loc(a) == _loc_id:
 				_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
 				found += 1
 	if loc.get("scrap", false):

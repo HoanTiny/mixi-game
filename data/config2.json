@@ -1,0 +1,478 @@
+{
+ "_ghi_chu": "Việc làm, sinh hoạt, việc tùy chọn thêm ở chương 2 (cùng cú pháp actions trong config.json). \"home\" là chỗ ở hiện tại.",
+ "actions": [
+  {
+   "id": "app_tho",
+   "group": "work",
+   "location": "home",
+   "name": "Chạy việc Thợ Tới quanh phường (phí 20%)",
+   "hours": 3,
+   "pay": 240000,
+   "rainPay": 330000,
+   "perDay": 2,
+   "days": [
+    34,
+    60
+   ],
+   "showIfFlag": "appTho",
+   "dirty": {
+    "clean": -8,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 16
+   },
+   "desc": "Ứng dụng báo đơn sửa quanh phường; ngày mưa giá cao hơn. Phí nền tảng 20% đã trừ."
+  },
+  {
+   "id": "app_tho_cuoi_tuan",
+   "group": "work",
+   "location": "home",
+   "name": "Chạy việc Thợ Tới cuối tuần (phí 20%)",
+   "hours": 3,
+   "pay": 240000,
+   "rainPay": 330000,
+   "perDay": 1,
+   "days": [
+    34,
+    60
+   ],
+   "showIfFlag": "appHanChe",
+   "require": {
+    "weekend": true
+   },
+   "dirty": {
+    "clean": -8,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 16
+   },
+   "desc": "Chỉ bật ứng dụng thứ Bảy, Chủ Nhật."
+  },
+  {
+   "id": "sua_may_bom",
+   "group": "work",
+   "location": "home",
+   "name": "Sửa máy bơm, cầu dao cho hàng xóm ngày ngập",
+   "hours": 2,
+   "pay": 160000,
+   "perDay": 1,
+   "days": [
+    35,
+    60
+   ],
+   "onlyRain": true,
+   "dirty": {
+    "clean": -12,
+    "neat": -10
+   },
+   "effects": {
+    "fatigue": 12,
+    "rep.ONG_BA": 1
+   },
+   "desc": "Ngày nước lên, hẻm nào cũng có máy bơm không chạy, cầu dao nhảy."
+  },
+  {
+   "id": "bao_tri_ben_can",
+   "group": "work",
+   "location": "ben_can",
+   "name": "Bảo trì dãy quán Bến Cạn sau mưa",
+   "hours": 4,
+   "pay": 260000,
+   "days": [
+    33,
+    60
+   ],
+   "require": {
+    "route": [
+     "B",
+     "C"
+    ]
+   },
+   "dirty": {
+    "clean": -8,
+    "neat": -8
+   },
+   "effects": {
+    "fatigue": 14
+   },
+   "desc": "Kiểm ổ điện, máng xối, cầu dao năm quán sau mỗi trận mưa."
+  },
+  {
+   "id": "radio_ong_ba",
+   "group": "life",
+   "location": "home",
+   "name": "Ngồi nghe radio cải lương với ông Ba",
+   "hours": 1,
+   "window": [
+    6,
+    9
+   ],
+   "days": [
+    31,
+    60
+   ],
+   "perDay": 1,
+   "rest": true,
+   "hideIfFlag": "ongBaDi",
+   "effects": {
+    "fatigue": -6,
+    "rep.ONG_BA": 2
+   }
+  },
+  {
+   "id": "co_tuong",
+   "group": "life",
+   "location": "home",
+   "name": "Đánh một ván cờ tướng với ông Ba",
+   "hours": 1,
+   "window": [
+    16,
+    21
+   ],
+   "days": [
+    31,
+    60
+   ],
+   "perDay": 1,
+   "rest": true,
+   "hideIfFlag": "ongBaDi",
+   "effects": {
+    "fatigue": -5,
+    "rep.ONG_BA": 2
+   }
+  },
+  {
+   "id": "com_ma_nau",
+   "group": "life",
+   "location": "home",
+   "name": "Ăn cơm má nấu",
+   "hours": 1,
+   "window": [
+    17,
+    21
+   ],
+   "days": [
+    37,
+    60
+   ],
+   "showIfFlag": "maVe",
+   "hideIfFlag": "maDaDi",
+   "rest": true,
+   "effects": {
+    "fatigue": -5,
+    "need.fed": 55,
+    "rep.MA": 2,
+    "rep.BA_TU": 1
+   }
+  },
+  {
+   "id": "goi_video_linh",
+   "group": "optional",
+   "location": "home",
+   "name": "Gọi video cho Linh, nghe em kể chỗ thực tập",
+   "hours": 0.5,
+   "window": [
+    19,
+    22
+   ],
+   "days": [
+    31,
+    60
+   ],
+   "perDay": 1,
+   "showIf": {
+    "linh_decision": "xa"
+   },
+   "rest": true,
+   "effects": {
+    "rep.LINH": 2,
+    "fatigue": -2
+   }
+  },
+  {
+   "id": "dan_ba_chao_xom",
+   "group": "optional",
+   "location": "home",
+   "name": "Dẫn bà đi chào hàng xóm như đã hẹn",
+   "hours": 1,
+   "showIfPromise": "chao_xom_moi",
+   "maxTimes": 1,
+   "effects": {
+    "promise_status": {
+     "id": "chao_xom_moi",
+     "status": "done"
+    },
+    "rep.BA_TU": 3,
+    "rep.ONG_BA": 4,
+    "flag.chaoOngBa": true,
+    "diary": "Chiều mới dẫn bà đi chào hàng xóm, trễ hơn đã nói nửa ngày mà vẫn trong ngày. Ông Ba hỏi: \"Bà Tư bán bánh bò hả? Mai làm một dĩa tui nếm thử.\""
+   }
+  },
+  {
+   "id": "nho_thuoc",
+   "group": "life",
+   "location": "home",
+   "name": "Nhỏ thuốc mắt cho bà",
+   "hours": 0.25,
+   "perDay": 2,
+   "days": [
+    43,
+    60
+   ],
+   "showIfFlag": "baDuongMat",
+   "effects": {
+    "rep.BA_TU": 1
+   },
+   "desc": "Sau mổ: bốn lần mỗi ngày, rửa tay trước, không để nước vô mắt. Má nhỏ hai lần, An nhỏ được lần nào hay lần đó."
+  },
+  {
+   "id": "coc_hem_dua",
+   "group": "optional",
+   "location": "hem_dua",
+   "name": "Đặt cọc phòng Hẻm Dừa, hẹn dọn sau giỗ",
+   "hours": 1,
+   "days": [
+    41,
+    58
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 2200000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "hem_dua",
+    "flag.datCocC2": true,
+    "payable": {
+     "id": "phong_moi",
+     "to": "",
+     "label": "Phần còn lại phòng Hẻm Dừa (dọn sau giỗ)",
+     "amount": 2800000,
+     "due": 60
+    },
+    "diary": "Đặt cọc phòng Hẻm Dừa, hẹn dọn vô sau giỗ ông. Còn hai triệu tám, hạn tối ngày 60."
+   }
+  },
+  {
+   "id": "coc_cau_tre",
+   "group": "optional",
+   "location": "cau_tre",
+   "name": "Đặt cọc phòng Cầu Tre, hẹn dọn sau giỗ",
+   "hours": 1,
+   "days": [
+    41,
+    58
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 1800000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "cau_tre",
+    "flag.datCocC2": true,
+    "payable": {
+     "id": "phong_moi",
+     "to": "",
+     "label": "Phần còn lại phòng Cầu Tre (dọn sau giỗ)",
+     "amount": 2400000,
+     "due": 60
+    },
+    "diary": "Đặt cọc phòng Cầu Tre, hẹn dọn vô sau giỗ ông. Còn hai triệu tư, hạn tối ngày 60."
+   }
+  },
+  {
+   "id": "ca_chieu_kho",
+   "group": "work",
+   "location": "ben_xe_6",
+   "name": "Tổ trưởng ca chiều ở kho",
+   "hours": 8,
+   "pay": 380000,
+   "window": [
+    14,
+    22
+   ],
+   "days": [
+    43,
+    60
+   ],
+   "showIfFlag": "toTruongCa",
+   "hideIfFlag": "toTruongTre",
+   "dirty": {
+    "clean": -15,
+    "neat": -12
+   },
+   "effects": {
+    "fatigue": 30,
+    "need.fed": 30
+   },
+   "desc": "Hai giờ chiều tới mười giờ tối. Về tới nhà thì cả nhà đã ăn cơm."
+  },
+  {
+   "id": "ca_chieu_kho_sau",
+   "group": "work",
+   "location": "ben_xe_6",
+   "name": "Tổ trưởng ca chiều ở kho",
+   "hours": 8,
+   "pay": 380000,
+   "window": [
+    14,
+    22
+   ],
+   "days": [
+    47,
+    60
+   ],
+   "showIfFlag": "toTruongTre",
+   "dirty": {
+    "clean": -15,
+    "neat": -12
+   },
+   "effects": {
+    "fatigue": 30,
+    "need.fed": 30
+   },
+   "desc": "Bắt đầu sau tuần mổ mắt của bà, như đã xin."
+  },
+  {
+   "id": "dien_cho",
+   "group": "work",
+   "location": "cho_cau_nho",
+   "name": "Đi lại điện dãy sạp chợ với tổ Trâm",
+   "hours": 6,
+   "pay": 300000,
+   "days": [
+    42,
+    51
+   ],
+   "showIfFlag": "dienCho",
+   "dirty": {
+    "clean": -10,
+    "neat": -8
+   },
+   "effects": {
+    "fatigue": 18,
+    "rep.TRAM": 1
+   },
+   "desc": "Dây đi trên cao, cầu dao từng dãy, ổ cắm ngang hông. Có hợp đồng, trả theo buổi."
+  },
+  {
+   "id": "don_mua_het",
+   "group": "work",
+   "location": "home",
+   "name": "Chạy đơn sửa sau mưa (nhận hết)",
+   "hours": 3,
+   "pay": 300000,
+   "rainPay": 380000,
+   "perDay": 2,
+   "days": [
+    41,
+    50
+   ],
+   "showIfFlag": "nhanHetDon",
+   "dirty": {
+    "clean": -8,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 15
+   },
+   "desc": "Mười bốn khách hẹn \"trong tuần\". Ai cũng gọi hỏi tới chưa."
+  },
+  {
+   "id": "don_mua",
+   "group": "work",
+   "location": "home",
+   "name": "Chạy đơn sửa sau mưa (theo danh sách hẹn)",
+   "hours": 3,
+   "pay": 300000,
+   "rainPay": 380000,
+   "perDay": 1,
+   "days": [
+    41,
+    52
+   ],
+   "showIfFlag": "nhanCoHen",
+   "dirty": {
+    "clean": -8,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 14
+   },
+   "desc": "Tám khách, mỗi người một ngày hẹn."
+  },
+  {
+   "id": "don_mua_sau",
+   "group": "work",
+   "location": "home",
+   "name": "Chạy đơn sửa sau mưa (khách chịu chờ)",
+   "hours": 3,
+   "pay": 300000,
+   "perDay": 1,
+   "days": [
+    47,
+    55
+   ],
+   "showIfFlag": "hoanDon",
+   "dirty": {
+    "clean": -8,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 14
+   },
+   "desc": "Bốn khách chịu chờ tới sau tuần mổ mắt."
+  },
+  {
+   "id": "tra_hop_chao",
+   "group": "optional",
+   "location": "com_hanh",
+   "name": "Mang hộp cháo trả chị Hạnh",
+   "hours": 0.25,
+   "showIfPromise": "tra_hop_chao",
+   "maxTimes": 1,
+   "effects": {
+    "promise_status": {
+     "id": "tra_hop_chao",
+     "status": "done"
+    },
+    "rep.HANH": 2,
+    "log": "Trả hộp cháo cho chị Hạnh, trong hộp có mấy trái chôm chôm của bà gửi."
+   }
+  },
+  {
+   "id": "ban_sau_thu_bay",
+   "group": "work",
+   "location": "tiem_sau",
+   "name": "Ngồi bàn chú Sáu ngày thứ Bảy (chia đôi tiền công)",
+   "hours": 5,
+   "pay": 260000,
+   "days": [
+    33,
+    60
+   ],
+   "showIfFlag": "thuBaySau",
+   "require": {
+    "weekend": true
+   },
+   "dirty": {
+    "clean": -6,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 14,
+    "rep.SAU": 2
+   },
+   "desc": "Khách của tiệm, ghi rõ trong sổ ai làm máy nào."
+  }
+ ]
+}

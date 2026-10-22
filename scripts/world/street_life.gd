@@ -32,6 +32,8 @@ func setup(w) -> void:
 	errands = data.get("errands", [])
 	var slots := {}
 	for e in errands:
+		if e.has("slot"):
+			continue
 		var to := str(e.to)
 		slots[to] = int(slots.get(to, 0)) + 1
 		e["slot"] = slots[to] - 1
@@ -63,6 +65,9 @@ func _errand_now(id: String) -> Dictionary:
 			continue
 		if e.get("noRain", false) and rain:
 			continue
+		# Việc riêng chỉ có ở một chương hay một hoàn cảnh (Linh đi thực tập xa, má đã về…).
+		if e.has("when") and game.check(e.when) != "":
+			continue
 		return e
 	return {}
 
@@ -87,6 +92,15 @@ func _process(delta: float) -> void:
 func _update_npc(id: String, delta: float) -> void:
 	var n: Dictionary = npcs[id]
 	var node: Node3D = n.node
+	# Nhân vật chưa tới (má trước ngày về) hay đã đi khỏi thì ẩn, không nói chuyện được.
+	var here: bool = not game.is_started() or game.check(n.get("when", {})) == ""
+	if not here:
+		node.visible = false
+		n["state"] = "gone"
+		return
+	if str(n.state) == "gone":
+		n["errand"] = {}
+		_arrive(n, "returning")
 	var want: Dictionary = _errand_now(id)
 	var state := str(n.state)
 	var near: bool = node.global_position.distance_to(world.player.position) < SEE_RANGE
@@ -170,6 +184,25 @@ func _arrive(n: Dictionary, state: String) -> void:
 		n["state"] = "home"
 		n["errand"] = {}
 		n.body.set_meta("loc", str(n.home))
+
+
+## Đổi chỗ quen của nhân vật (chỗ ở mới ở chương 2): nút đã được đặt ở cửa chỗ mới.
+func relocate(id: String, loc: String) -> void:
+	if not npcs.has(id):
+		return
+	var n: Dictionary = npcs[id]
+	n["home"] = loc
+	n["home_pos"] = n.node.global_position
+	n["home_rot"] = n.node.global_rotation.y
+
+
+## Thêm nhân vật mới (chương 2); when: điều kiện có mặt.
+func add_npc(id: String, when: Dictionary) -> void:
+	var w: Dictionary = world.npc_nodes[id]
+	var node: Node3D = w.node
+	npcs[id] = {"node": node, "body": w.body, "name": w.name, "home": w.loc,
+		"home_pos": node.global_position, "home_rot": node.global_rotation.y,
+		"state": "home", "errand": {}, "path": PackedVector2Array(), "i": 0, "when": when}
 
 
 ## Nhân vật đang ở địa điểm nào để nói chuyện ("" nếu đang đi đường hay đi khỏi phường).
