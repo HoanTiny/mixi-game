@@ -23,7 +23,7 @@ Dữ liệu gốc dạng JSON (nhân vật, 30 ngày, kết thúc, nhánh) nằm
 ## Con số chính
 
 - **Quy mô:** 9 nhân vật · 30 ngày · 90 lựa chọn · 8 kết thúc chính · 4 hậu truyện của Linh · 3 hậu truyện của bà Tư.
-- **Chương 2:** thêm 3 nhân vật (má, ông Ba, Kha) · 30 ngày · 42 cảnh chính · 20 việc mới · 5 việc nhờ · 32 đoạn thoại · 6 kết thúc · thẻ hậu truyện của má, bà, Linh.
+- **Chương 2:** thêm 3 nhân vật (má, ông Ba, Kha) · 30 ngày · 38 cảnh chính · 133 lựa chọn · 20 việc mới · 5 việc nhờ · 32 đoạn thoại · 6 kết thúc · thẻ hậu truyện của má, bà, Linh.
 - **Mốc cố định:** mưa sớm ngày 15, mưa lớn ngày 29, trả chìa khóa ngày 30.
 - **Tiền khởi đầu:** 1,2 triệu tiền mặt, cộng 3,6 triệu lương cũ còn phải thu.
 
