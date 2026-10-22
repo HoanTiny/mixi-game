@@ -61,6 +61,8 @@ Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu đ�
 | E | Vào địa điểm đang đứng gần |
 | M | Mở/đóng bản đồ lớn; bấm một chỗ trên bản đồ để đi tới |
 | Con lăn chuột, nút **Toàn cảnh** | Kéo máy quay gần, xa; xa hẳn là nhìn toàn cảnh khu phố |
+
+**Chơi trên điện thoại** (bản web, nên xoay ngang; màn dọc có tấm nhắc xoay và nút Toàn màn hình): chạm mặt đường để đi, chạm cửa tiệm hay người để vào; chụm, mở hai ngón để kéo máy quay xa, gần; chạm lời nhắc giữa màn hình thay cho phím E; bản đồ lớn có nút Đóng. Giao diện tự co theo màn (`scripts/ui/screen_fit.gd`, autoload `ScreenFit`): máy tính giữ cỡ chữ theo mật độ điểm ảnh, màn thấp như điện thoại nằm ngang thì vào chế độ gọn (bảng mục tiêu chỉ hiện hai mục, chạm để xem hết; bản đồ nhỏ thu lại; mở Sổ, Nhật ký, điện thoại hay bảng địa điểm thì cất hàng trên cho bảng đủ cao; ô gợi ý nổi trên thanh công cụ; Bảng cân bằng bỏ cột Sổ). Điện thoại vẽ cảnh 3D ở nửa độ nét (giao diện vẫn nét), bóng nắng hai tầng trên bản đồ bóng nhỏ hơn, đồ chi tiết của nhà chỉ vẽ trong 120 m, bớt một phần ba số xe. Thử trên máy tính: chạy với `-- --phone --dpr=3` ở cửa sổ 2532×1170.
 | Esc | Đóng bảng |
 | Nút **Về xóm trọ** | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
 
@@ -129,6 +131,7 @@ scripts/
   world/street_map.gd  bản đồ nhỏ và bản đồ lớn (phím M), bấm để đi tới
   world/hud.gd    HUD kiểu Nobody: mục tiêu, tiền và Mệt, bảng địa điểm, điện thoại, Sổ, Nhật ký, việc nhờ
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động, hai cột tiền, Sổ dạng chữ
+  ui/screen_fit.gd    autoload ScreenFit: co giao diện theo màn và mật độ điểm ảnh, chế độ gọn cho điện thoại, nhắc xoay ngang
   ui/dialog_layer.gd  hộp thoại chọn tuyến, sự kiện, đi ngủ, tổng kết lát cắt
   ui/minigame_bricks.gd  trò chơi nhỏ bưng xếp hàng (ca kho)
   ui/minigame_dishes.gd  trò chơi nhỏ rửa bát (Cơm Hạnh)

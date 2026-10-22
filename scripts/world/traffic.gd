@@ -36,8 +36,8 @@ var _rng := RandomNumberGenerator.new()
 
 
 ## roads: đường của khu (area_data); chỉ lấy đường lớn (từ 6 m) có đoạn nằm trong vòng radius mét quanh center.
-## bridge_y: mặt cầu cao hơn mặt đường chừng này.
-func build(roads: Array, center: Vector2, radius: float, bridge_y: float) -> void:
+## bridge_y: mặt cầu cao hơn mặt đường chừng này. amount: nhân số xe (điện thoại bớt xe).
+func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount := 1.0) -> void:
 	_rng.seed = 2024
 	var picked := roads.filter(func(r) -> bool:
 		return not r.small and not r.tunnel and float(r.width) >= 6.0 and r.line.size() >= 2 \
@@ -52,8 +52,8 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float) -> voi
 		total += float(r.len) * float(r.k)
 		if float(r.width) >= 8.0:
 			car_total += float(r.len) * float(r.k)
-	var k_bike := minf(BIKES_PER_M, float(MAX_BIKES) / maxf(total, 1.0))
-	var k_car := minf(CARS_PER_M, float(MAX_CARS) / maxf(car_total, 1.0))
+	var k_bike := minf(BIKES_PER_M, float(MAX_BIKES) / maxf(total, 1.0)) * amount
+	var k_car := minf(CARS_PER_M, float(MAX_CARS) / maxf(car_total, 1.0)) * amount
 	# Cụm (ô theo tâm tuyến) → loại xe → các xe [tuyến, vị trí, chiều, lệch làn, tốc độ, màu].
 	var clusters := {}
 	for ri in routes.size():

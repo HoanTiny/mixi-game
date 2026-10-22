@@ -283,6 +283,11 @@ func _build_environment() -> void:
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
 	sun.directional_shadow_max_distance = 70.0
+	if ScreenFit.low_power:
+		# Điện thoại: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
+		RenderingServer.directional_shadow_atlas_set_size(2048, true)
+		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+		sun.directional_shadow_split_1 = 0.4
 	add_child(sun)
 
 
@@ -1162,6 +1167,8 @@ func _build_real() -> void:
 	area.ground_material = AreaBuilder.ground_shader_material(asphalt.albedo_texture, asphalt.normal_texture, Color(0.78, 0.76, 0.72), 4.0)
 	area.water_color = Color("234d4a")
 	area.park_cars_from = Traffic.PARKED_CARS_FROM
+	if ScreenFit.low_power:
+		area.detail_range = 120.0
 	add_child(area)
 	var mid := Vector2.ZERO
 	for id in city.locs:
@@ -1324,7 +1331,8 @@ func _build_real_traffic() -> void:
 			small.append({"poly": r.line, "len": l, "off": float(r.width) / 4.0})
 	traffic = Traffic.new()
 	add_child(traffic)
-	traffic.build(city.data.roads, area.dress.center, 300.0, AreaBuilder.BRIDGE_Y)
+	# Điện thoại: bớt xe cho nhẹ máy.
+	traffic.build(city.data.roads, area.dress.center, 300.0, AreaBuilder.BRIDGE_Y, 0.65 if ScreenFit.low_power else 1.0)
 	small.shuffle()
 	for k in mini(small.size(), 22):
 		var pth: Dictionary = small[k].duplicate()
@@ -1367,18 +1375,70 @@ func _unhandled_input(event: InputEvent) -> void:
 		var step := 0.2 if zoom > 1.0 or (zoom == 1.0 and not up) else 0.08
 		zoom = clampf(zoom + (-step if up else step), 0.0, ZOOM_MAX)
 		return
+	if _pinch(event):
+		return
 	if hud.blocking():
 		return
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_pending_click = event.position
+	# Bấm (chạm) rồi nhả tại chỗ thì An đi tới đó; kéo đi hay đang chụm hai ngón thì thôi. Tọa độ sự kiện ở đây là điểm
+	# ảnh thật của cửa sổ (không theo hệ số co giao diện).
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			_press_at = event.position
+		elif _press_at != null and not _pinched and event.position.distance_to(_press_at) < 14.0 * ScreenFit.dpr:
+			_pending_click = event.position
+		if not event.pressed:
+			_press_at = null
 	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
-		var bin := nearest_bin()
-		if bin != "":
-			_scavenge(bin)
-			return
-		var near := nearest_location()
-		if near != "":
-			hud.open_location(near)
+		interact()
+
+
+## Phím E, hay chạm vào lời nhắc ở giữa màn hình: lục thùng rác đang đứng cạnh, không thì vào địa điểm gần nhất.
+func interact() -> void:
+	if hud.blocking():
+		return
+	var bin := nearest_bin()
+	if bin != "":
+		_scavenge(bin)
+		return
+	var near := nearest_location()
+	if near != "":
+		hud.open_location(near)
+
+
+## Chụm, mở hai ngón trên màn cảm ứng để kéo máy quay gần, xa (như con lăn chuột). Trả true khi đã dùng sự kiện.
+var _touches := {}
+var _pinch_d0 := 0.0
+var _pinch_z0 := 0.0
+var _pinched := false
+var _press_at = null
+
+
+func _pinch(event: InputEvent) -> bool:
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_touches[event.index] = event.position
+		else:
+			_touches.erase(event.index)
+		_pinch_d0 = 0.0
+		if _touches.size() >= 2:
+			_pinched = true
+		elif _touches.is_empty():
+			_pinched = false
+		return _touches.size() >= 2
+	if event is InputEventScreenDrag and _touches.has(event.index):
+		_touches[event.index] = event.position
+		if _touches.size() < 2:
+			return false
+		var pts: Array = _touches.values()
+		var d := (pts[0] as Vector2).distance_to(pts[1])
+		if _pinch_d0 <= 0.0:
+			_pinch_d0 = d
+			_pinch_z0 = zoom
+		else:
+			# Chụm lại (khoảng cách nhỏ đi) là lùi ra xa; mỗi 1,5 lần khoảng cách chừng một nấc góc chơi.
+			zoom = clampf(_pinch_z0 + log(_pinch_d0 / maxf(d, 1.0)) * 1.4, 0.0, ZOOM_MAX)
+		return true
+	return false
 
 
 func _physics_process(delta: float) -> void:
@@ -1426,8 +1486,9 @@ func _physics_process(delta: float) -> void:
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, minf(zoom, 1.0)), 0), Vector3.UP)
 	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút), hai tầng bóng cho đỡ lần vẽ; góc chơi giữ bốn tầng để mặt
 	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
-	sun.directional_shadow_max_distance = lerpf(70.0, 240.0, clampf(zoom - 1.0, 0.0, 1.0))
-	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	var far := clampf(zoom - 1.0, 0.0, 1.0)
+	sun.directional_shadow_max_distance = lerpf(50.0, 180.0, far) if ScreenFit.low_power else lerpf(70.0, 240.0, far)
+	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.low_power else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	if sun.directional_shadow_mode != shadow_mode:
 		sun.directional_shadow_mode = shadow_mode
 	_update_cutaway(delta)

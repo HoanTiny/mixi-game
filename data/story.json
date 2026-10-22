@@ -211,7 +211,8 @@
  "tips": [
   {
    "id": "di_lai",
-   "text": "Bấm chuột vào mặt đường để đi, hoặc dùng phím WASD. Bấm vào cửa tiệm hay người đứng trước cửa để vào. Đi bộ cũng tốn giờ."
+   "text": "Bấm chuột vào mặt đường để đi, hoặc dùng phím WASD. Bấm vào cửa tiệm hay người đứng trước cửa để vào. Đi bộ cũng tốn giờ.",
+   "textTouch": "Chạm vào mặt đường để đi. Chạm vào cửa tiệm hay người đứng trước cửa để vào. Chụm, mở hai ngón để kéo máy quay xa, gần. Đi bộ cũng tốn giờ."
   },
   {
    "id": "canh_chinh",
@@ -251,7 +252,8 @@
   },
   {
    "id": "ve_chai",
-   "text": "Thùng rác dọc vỉa hè: đứng gần bấm E để lục ve chai, đem bán ở sạp cô Út trong chợ. Lục rác thì bẩn người."
+   "text": "Thùng rác dọc vỉa hè: đứng gần bấm E để lục ve chai, đem bán ở sạp cô Út trong chợ. Lục rác thì bẩn người.",
+   "textTouch": "Thùng rác dọc vỉa hè: đứng gần rồi chạm lời nhắc giữa màn hình để lục ve chai, đem bán ở sạp cô Út trong chợ. Lục rác thì bẩn người."
   },
   {
    "id": "dien_thoai",

@@ -41,6 +41,15 @@ func _ready() -> void:
 	if big:
 		visible = false
 		set_anchors_preset(Control.PRESET_CENTER)
+		# Nút đóng ở góc trên bên phải (máy cảm ứng không có phím M, Esc).
+		var close := Button.new()
+		close.text = "Đóng"
+		close.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		close.offset_left = -78
+		close.offset_top = 6
+		close.offset_right = -8
+		close.pressed.connect(func() -> void: visible = false)
+		add_child(close)
 		offset_left = -custom_minimum_size.x / 2.0
 		offset_right = custom_minimum_size.x / 2.0
 		offset_top = -custom_minimum_size.y / 2.0
@@ -68,6 +77,31 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_ESCAPE and visible:
 		visible = false
 		get_viewport().set_input_as_handled()
+
+
+## Cỡ theo màn hình (ScreenFit, hud.gd gọi): bản nhỏ gọn lại trên điện thoại; bản lớn vừa khung màn.
+func fit(compact: bool, view: Vector2) -> void:
+	if big:
+		var sz := Vector2(minf(900.0, view.x - 40.0), minf(560.0, view.y - 40.0))
+		custom_minimum_size = sz
+		offset_left = -sz.x / 2.0
+		offset_right = sz.x / 2.0
+		offset_top = -sz.y / 2.0
+		offset_bottom = sz.y / 2.0
+	else:
+		custom_minimum_size = Vector2(230, 130) if compact else Vector2(330, 186)
+	if _base != null:
+		_base.queue_redraw()
+	queue_redraw()
+
+
+## Dòng chữ đầu bản đồ: máy có bàn phím ghi phím tắt, máy cảm ứng ghi chạm.
+func _open_hint() -> String:
+	return "chạm để mở bản đồ lớn" if ScreenFit.touch else "bấm để mở bản đồ lớn (M)"
+
+
+func _go_hint() -> String:
+	return "chạm một chỗ để đi tới" if ScreenFit.touch else "bấm một chỗ để đi tới · M hoặc Esc để đóng"
 
 
 func toggle() -> void:
@@ -217,7 +251,7 @@ func _draw() -> void:
 	draw_colored_polygon(tri, UI.GOLD)
 	draw_polyline(tri + PackedVector2Array([tri[0]]), Color(0, 0, 0, 0.7), 1.2)
 	# Tiêu đề: tên chỗ đang rê chuột, hay hướng dẫn.
-	var title := "Phường An Hòa · bấm để mở bản đồ lớn (M)" if not big else "Bản đồ phường An Hòa · bấm một chỗ để đi tới · M hoặc Esc để đóng"
+	var title := "Phường An Hòa · " + _open_hint() if not big else "Bản đồ phường An Hòa · " + _go_hint()
 	var col := UI.HUD_SOFT
 	var show_id := _hover if _hover != "" else open
 	if show_id != "":
@@ -389,7 +423,7 @@ func _draw_real_over() -> void:
 	var tri := PackedVector2Array([pp + fwd * 9.0 * k, pp - fwd * 5.0 * k + side * 6.0 * k, pp - fwd * 5.0 * k - side * 6.0 * k])
 	c.draw_colored_polygon(tri, UI.GOLD)
 	c.draw_polyline(tri + PackedVector2Array([tri[0]]), Color(0, 0, 0, 0.7), 1.2)
-	var title := "%s · bấm để mở bản đồ lớn (M)" % city.display if not big else "Bản đồ %s · bấm một chỗ để đi tới · M hoặc Esc để đóng" % city.display
+	var title := "%s · %s" % [city.display, _open_hint()] if not big else "Bản đồ %s · %s" % [city.display, _go_hint()]
 	var col := UI.HUD_SOFT
 	var show_id := _hover if _hover != "" else open
 	if show_id != "":

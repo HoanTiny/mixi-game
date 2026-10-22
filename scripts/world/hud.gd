@@ -63,6 +63,15 @@ var _work_bar: ProgressBar
 var _working := false
 var _loc_id := ""
 var _prompt_id := "-"
+var _hint: Label
+var _top_row: Control
+var _root: Control
+var _left_col: Control
+var _phone_scroll: ScrollContainer
+## Bảng mục tiêu ở chế độ gọn (điện thoại): chỉ hiện vài mục đầu, chạm vào bảng để xem hết.
+var _obj_n := 0
+var _obj_hidden := 0
+var _obj_expanded := false
 
 
 func _ready() -> void:
@@ -70,6 +79,7 @@ func _ready() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.theme = UI.make_theme()
 	add_child(root)
+	_root = root
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	var margin := _pass(MarginContainer.new(), root)
@@ -81,6 +91,7 @@ func _ready() -> void:
 
 	# Hàng trên: mục tiêu bên trái, trạng thái bên phải.
 	var top := _pass(HBoxContainer.new(), rows)
+	_top_row = top
 	_build_objectives(top)
 	_spacer(top)
 	_map = StreetMap.new()
@@ -93,6 +104,7 @@ func _ready() -> void:
 	var middle := _pass(HBoxContainer.new(), rows)
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var left := _pass(VBoxContainer.new(), middle)
+	_left_col = left
 	_build_tip(left)
 	_build_skills(left)
 	_build_log(left)
@@ -118,6 +130,7 @@ func _ready() -> void:
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 160
 	bottom.add_child(hint)
+	_hint = hint
 	_build_bottom(bottom)
 
 	# Bản đồ lớn phủ giữa màn hình (phím M hoặc bấm bản nhỏ).
@@ -132,7 +145,8 @@ func _ready() -> void:
 	root.add_child(dialogs)
 	dialogs.closed.connect(_refresh)
 	game.changed.connect(_refresh)
-	_refresh()
+	ScreenFit.changed.connect(_apply_fit)
+	_apply_fit()
 
 
 # ---------------------------------------------------------------- API cho world.gd
@@ -159,15 +173,68 @@ func close_location() -> void:
 	_refresh()
 
 
+## Bố cục theo màn hình (ScreenFit): điện thoại nằm ngang thì gọn lại (bản đồ nhỏ hơn; Sổ, Nhật ký, bảng địa điểm,
+## điện thoại thấp lại cho vừa; bảng mục tiêu chỉ hiện vài mục đầu); máy cảm ứng ẩn dòng phím tắt.
+func _apply_fit() -> void:
+	var compact: bool = ScreenFit.compact
+	_hint.visible = not compact and not ScreenFit.touch
+	_map.fit(compact, ScreenFit.view_size())
+	_big_map.fit(compact, ScreenFit.view_size())
+	var h := _panel_max_h()
+	_skills_text.custom_minimum_size = Vector2(380 if compact else 400, h)
+	_log_text.custom_minimum_size = Vector2(380 if compact else 380, h)
+	_tip.custom_minimum_size.x = 470 if compact else 360
+	_tip_label.custom_minimum_size.x = 446 if compact else 336
+	# Màn thấp: ô gợi ý nổi ở góc dưới bên trái, trên thanh công cụ và lời nhắc, không chen vào hàng giữa (đẩy thanh
+	# công cụ xuống dưới mép màn).
+	var tip_parent: Control = _root if compact else _left_col
+	if _tip.get_parent() != tip_parent:
+		_tip.reparent(tip_parent, false)
+		if compact:
+			_tip.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+			_tip.grow_vertical = Control.GROW_DIRECTION_BEGIN
+			_tip.offset_left = 16.0
+			_tip.offset_right = 16.0
+			_tip.offset_top = -140.0
+			_tip.offset_bottom = -140.0
+		else:
+			_left_col.move_child(_tip, 0)
+	# Ghi lại lời nhắc ở khung hình sau (chữ "Chạm" hay tên phím).
+	_prompt_id = "-"
+	_refresh()
+
+
+## Chiều cao tối đa của vùng chữ trong Sổ, Nhật ký, điện thoại; loc: vùng thẻ việc của bảng địa điểm. Màn thấp thì
+## hàng trên (mục tiêu, bản đồ nhỏ, trạng thái) cất đi khi bảng mở (_make_room), bảng cao gần hết màn.
+func _panel_max_h(loc := false) -> float:
+	if not ScreenFit.compact:
+		return 420.0
+	return clampf(ScreenFit.view_size().y - (300.0 if loc else 220.0), 120.0, 420.0)
+
+
+## Một bảng giữa màn hình đang mở (Sổ, Nhật ký, điện thoại, địa điểm).
+func _panel_open() -> bool:
+	return _loc_id != "" or _skills.visible or _log.visible or _phone.visible
+
+
+## Màn thấp: có bảng mở thì cất hàng trên và ô gợi ý (coi như đã đọc) cho bảng đủ chỗ, khỏi đẩy thanh công cụ xuống
+## dưới mép màn.
+func _make_room() -> void:
+	var busy := ScreenFit.compact and _panel_open()
+	if busy and _tip.visible:
+		_close_tip()
+	_top_row.visible = not busy
+
+
 func set_prompt(id: String) -> void:
 	if id == _prompt_id:
 		return
 	_prompt_id = id
 	if id.begins_with("bin:"):
 		var lock: String = game.scrap_lock(id.substr(4))
-		_prompt_label.text = "E  ·  Lục thùng rác tìm ve chai" if lock == "" else "Thùng rác · " + lock
+		_prompt_label.text = _key("E") + "Lục thùng rác tìm ve chai" if lock == "" else "Thùng rác · " + lock
 	elif id != "":
-		_prompt_label.text = "E  ·  Vào " + str(world.location_info(id).name)
+		_prompt_label.text = _key("E") + "Vào " + str(world.location_info(id).name)
 	_update_prompt()
 
 
@@ -178,6 +245,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		else:
 			_log.visible = false
 			_skills.visible = false
+			_make_room()
 
 
 # ---------------------------------------------------------------- dựng khối
@@ -228,6 +296,11 @@ func _build_objectives(parent: Control) -> void:
 	_objective_box = VBoxContainer.new()
 	_objective_box.add_theme_constant_override("separation", 2)
 	v.add_child(_objective_box)
+	# Chế độ gọn: chạm vào bảng để xem hết các mục, chạm lần nữa để thu lại.
+	_objectives.gui_input.connect(func(e: InputEvent) -> void:
+		if ScreenFit.compact and e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
+			_obj_expanded = not _obj_expanded
+			_refresh())
 
 
 func _build_status(parent: Control) -> void:
@@ -257,11 +330,21 @@ func _build_status(parent: Control) -> void:
 	v.add_child(_needs_label)
 
 
+## Lời nhắc giữa màn hình (vào địa điểm, lục thùng rác): bấm, chạm vào cũng được như phím E.
 func _build_prompt(parent: Control) -> void:
 	_prompt = _dark_panel(parent)
+	_prompt.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_prompt.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
+			world.interact())
 	_prompt_label = UI.label("", 16, UI.HUD_TEXT)
 	_prompt.add_child(_prompt_label)
 	_prompt.visible = false
+
+
+## Tên phím đầu lời nhắc trên máy có bàn phím; máy cảm ứng thì ghi "Chạm".
+func _key(k: String) -> String:
+	return ("Chạm" if ScreenFit.touch else k) + "  ·  "
 
 
 func _build_work(parent: Control) -> void:
@@ -376,9 +459,14 @@ func _open_minigame(id: String, a: Dictionary) -> void:
 func _build_phone(parent: Control) -> void:
 	_phone = _light_panel(parent)
 	_phone.custom_minimum_size = Vector2(330, 0)
+	# Màn thấp (điện thoại) thì cuộn trong bảng.
+	_phone_scroll = ScrollContainer.new()
+	_phone_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_phone.add_child(_phone_scroll)
 	_phone_box = VBoxContainer.new()
 	_phone_box.add_theme_constant_override("separation", 8)
-	_phone.add_child(_phone_box)
+	_phone_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_phone_scroll.add_child(_phone_box)
 	_phone.visible = false
 
 
@@ -440,6 +528,7 @@ func _new_offer() -> void:
 	_phone.visible = true
 	_skills.visible = false
 	_log.visible = false
+	_make_room()
 	world.audio.play("dialog")
 	_refresh_phone()
 
@@ -494,7 +583,14 @@ func _refresh_phone() -> void:
 			_offer = {}
 			_offer_wait = 2.0
 			_refresh_phone()))
-	_phone_box.add_child(UI.choice("Cất điện thoại", "", "", func() -> void: _phone.visible = false))
+	_phone_box.add_child(UI.choice("Cất điện thoại", "", "", func() -> void:
+		_phone.visible = false
+		_make_room()))
+	_fit_phone.call_deferred()
+
+
+func _fit_phone() -> void:
+	_phone_scroll.custom_minimum_size.y = minf(_phone_box.get_combined_minimum_size().y, _panel_max_h())
 
 
 func _build_log(parent: Control) -> void:
@@ -521,12 +617,15 @@ func _build_bottom(parent: Control) -> void:
 		_phone.visible = not _phone.visible
 		_skills.visible = false
 		_log.visible = false
+		_make_room()
 		_refresh_phone()))
 	h.add_child(_tool_button("Sổ", func() -> void:
 		_skills.visible = not _skills.visible
-		_log.visible = false))
+		_log.visible = false
+		_make_room()))
 	h.add_child(_tool_button("Nhật ký", func() -> void:
 		_log.visible = not _log.visible
+		_make_room()
 		_skills.visible = false))
 	h.add_child(_tool_button("Bảng cân bằng", func() -> void: get_tree().change_scene_to_file("res://scenes/board.tscn")))
 	# Lùi máy quay ra xa ngắm cả khu phố (máy cảm ứng không có con lăn chuột), bấm lần nữa về góc chơi.
@@ -567,6 +666,8 @@ func _refresh() -> void:
 	_cash_label.text = GameLogic.fmt_money(int(s.cash))
 	_recv_label.text = "Phải thu: %s trước ngày %d · %s sau\nPhải trả: %s" % [
 		GameLogic.fmt_k(game.receivable_sum(0, last)), last, GameLogic.fmt_k(game.receivable_sum(last + 1, 999)), GameLogic.fmt_k(game.payable_sum(999))]
+	# Điện thoại: bỏ dòng phải thu, phải trả cho bảng gọn (xem trong Sổ).
+	_recv_label.visible = not ScreenFit.compact
 	var warn := float(game.cfg.fatigue.warn)
 	_fatigue_label.text = "Mệt %d/100%s" % [int(s.fatigue), "  · cần nghỉ" if game.fatigue_warn() else ""]
 	UI.set_bar(_fatigue_bar, float(s.fatigue), 100.0, UI.STAMP if float(s.fatigue) >= warn else (UI.WARN if float(s.fatigue) >= warn - 20 else UI.GOOD))
@@ -587,6 +688,7 @@ func _refresh() -> void:
 	_log_text.text = UI.log_bbcode(game)
 	_refresh_location()
 	_update_prompt()
+	_make_room()
 
 
 func _update_prompt() -> void:
@@ -596,6 +698,16 @@ func _update_prompt() -> void:
 func _refresh_objectives(s: Dictionary) -> void:
 	for c in _objective_box.get_children():
 		c.queue_free()
+	_obj_n = 0
+	_obj_hidden = 0
+	_fill_objectives(s)
+	if _obj_hidden > 0:
+		_objective_box.add_child(UI.label("     +%d mục nữa · chạm để xem hết" % _obj_hidden, 12, UI.HUD_SOFT))
+	elif ScreenFit.compact and _obj_expanded:
+		_objective_box.add_child(UI.label("     chạm để thu gọn", 12, UI.HUD_SOFT))
+
+
+func _fill_objectives(s: Dictionary) -> void:
 	# Cảnh chính hôm nay: đi tới đúng nơi, đúng khung giờ (dấu ◆ vàng trên phố).
 	for id in game.scenes_today():
 		var e: Dictionary = game.scene_info(id)
@@ -720,6 +832,13 @@ func _refresh_objectives2(s: Dictionary) -> void:
 ## Việc nhờ đang làm và người đang cần giúp.
 func _quest_objectives() -> void:
 	var active: Array = game.quests_active()
+	if ScreenFit.compact and not _obj_expanded:
+		# Gọn: mỗi loại một dòng; chạm vào bảng để xem từng việc.
+		if not active.is_empty():
+			_obj_hidden += active.size()
+		if not game.quest_offers().is_empty():
+			_obj_hidden += 1
+		return
 	if not active.is_empty():
 		_objective_box.add_child(UI.label("Việc nhờ đang làm", 14, Color("9fc4ff")))
 	for id in active:
@@ -742,6 +861,11 @@ func _quest_objectives() -> void:
 
 
 func _objective(text: String, sub: String, state: String) -> void:
+	_obj_n += 1
+	var short: bool = ScreenFit.compact and not _obj_expanded
+	if short and _obj_n > 2:
+		_obj_hidden += 1
+		return
 	var color := UI.HUD_TEXT
 	var mark := "◆"
 	match state:
@@ -754,11 +878,11 @@ func _objective(text: String, sub: String, state: String) -> void:
 		"current":
 			color = UI.GOLD
 	_objective_box.add_child(UI.label("%s  %s" % [mark, text], 14, color))
-	if sub != "":
+	if sub != "" and (not short or state == "current"):
 		# Dòng phụ dài thì xuống hàng: bảng mục tiêu gọn lại để hàng trên (và thanh công cụ ở dưới) vừa màn hình hẹp.
 		var l := UI.label("     " + sub, 12, UI.HUD_SOFT)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size.x = 460
+		l.custom_minimum_size.x = 380 if ScreenFit.compact else 460
 		_objective_box.add_child(l)
 
 
@@ -853,7 +977,7 @@ func _refresh_location() -> void:
 				found += 1
 	if loc.get("scrap", false):
 		var v: int = game.scrap_value()
-		_loc_cards.add_child(UI.choice("Bán hết ve chai", ("Được " + GameLogic.fmt_k(v)) if v > 0 else "", "Chưa nhặt được gì, lục thùng rác dọc phố (phím E)" if v <= 0 else "",
+		_loc_cards.add_child(UI.choice("Bán hết ve chai", ("Được " + GameLogic.fmt_k(v)) if v > 0 else "", "Chưa nhặt được gì, lục thùng rác dọc phố (%s)" % ("chạm lời nhắc" if ScreenFit.touch else "phím E") if v <= 0 else "",
 			func() -> void:
 				var got: int = game.sell_scrap()
 				if got > 0:
@@ -865,7 +989,7 @@ func _refresh_location() -> void:
 
 ## Bảng địa điểm cao vừa đủ số thẻ, nhiều quá thì cuộn (tránh khoảng trắng thừa khi chỉ có một việc).
 func _fit_location() -> void:
-	_loc_scroll.custom_minimum_size.y = minf(_loc_cards.get_combined_minimum_size().y, 420.0)
+	_loc_scroll.custom_minimum_size.y = minf(_loc_cards.get_combined_minimum_size().y, _panel_max_h(true))
 
 
 ## Thẻ việc nhờ: nền vàng nhạt để nổi giữa các việc làm, dòng phụ xuống hàng được (bước việc nhờ thường dài).
@@ -923,13 +1047,15 @@ func _build_tip(parent: Control) -> void:
 
 
 func _close_tip() -> void:
-	if _tip_id != "" and game.is_started():
-		if not game.s.has("tips_seen"):
-			game.s["tips_seen"] = []
-		game.s.tips_seen.append(_tip_id)
-		game.changed.emit()
+	# Cất ô trước rồi mới báo đổi trạng thái (vẽ lại HUD có thể gọi lại hàm này qua _make_room).
+	var id := _tip_id
 	_tip_id = ""
 	_tip.visible = false
+	if id != "" and game.is_started():
+		if not game.s.has("tips_seen"):
+			game.s["tips_seen"] = []
+		game.s.tips_seen.append(id)
+		game.changed.emit()
 
 
 func _tip_due(id: String) -> bool:
@@ -982,11 +1108,14 @@ func _update_tip(dt: float) -> void:
 		if _tip_time > 40.0:
 			_close_tip()
 		return
+	if ScreenFit.compact and _panel_open():
+		return
 	var seen: Array = game.s.get("tips_seen", [])
 	for tip in game.story.get("tips", []):
 		if not seen.has(tip.id) and _tip_due(str(tip.id)):
 			_tip_id = str(tip.id)
-			_tip_label.text = str(tip.text)
+			# Máy cảm ứng: lời gợi ý nói chạm, chụm ngón thay cho chuột, phím.
+			_tip_label.text = str(tip.get("textTouch", tip.text)) if ScreenFit.touch else str(tip.text)
 			_tip_time = 0.0
 			_tip.visible = true
 			return

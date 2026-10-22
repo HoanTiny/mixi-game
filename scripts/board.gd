@@ -24,6 +24,7 @@ var flows := {}
 var scene_row: HFlowContainer
 var ledger: RichTextLabel
 var log_label: RichTextLabel
+var right_col: Control
 
 
 func _ready() -> void:
@@ -34,7 +35,15 @@ func _ready() -> void:
 	dialogs.game = game
 	add_child(dialogs)
 	game.changed.connect(_refresh)
+	ScreenFit.changed.connect(_apply_fit)
+	_apply_fit()
 	_refresh()
+
+
+## Màn thấp (điện thoại nằm ngang): bỏ cột Sổ, Nhật ký bên phải và dòng giờ ở đầu (xem ở màn phố) cho vừa màn.
+func _apply_fit() -> void:
+	right_col.visible = not ScreenFit.compact
+	clock_label.visible = not ScreenFit.compact
 
 
 func _build() -> void:
@@ -84,7 +93,8 @@ func _build() -> void:
 	root.add_child(body)
 	body.add_child(_build_status())
 	body.add_child(_build_actions())
-	body.add_child(_build_right())
+	right_col = _build_right()
+	body.add_child(right_col)
 
 
 func _build_status() -> Control:

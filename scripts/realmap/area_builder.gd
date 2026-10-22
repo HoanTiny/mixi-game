@@ -190,9 +190,8 @@ const CAPS_W := 128
 ## Nhà, cây, xe đậu chia theo ô vuông này (mét) thành nhiều lưới để ô nằm ngoài khung nhìn khỏi phải vẽ.
 const TILE := 200.0
 ## Lưới chi tiết của nhà (ban công, hoa giấy, cục nóng, giàn hoa, chậu cây): ô nhỏ hơn, chỉ vẽ khi tâm ô cách máy quay
-## dưới DETAIL_RANGE mét.
+## dưới detail_range mét.
 const DETAIL_TILE := 100.0
-const DETAIL_RANGE := 170.0
 
 var data
 var cfg: Dictionary
@@ -214,6 +213,8 @@ var keep_clear: Array = []
 var water_color := Color("2b6a8f")
 ## Ô tô đậu dọc đường rộng từ chừng này mét (màn phố có dòng xe chạy thì chỉ đậu ở đường rộng, chừa làn).
 var park_cars_from := 8.0
+## Lưới chi tiết của nhà chỉ vẽ khi tâm ô cách máy quay dưới chừng này mét (điện thoại đặt gần hơn cho nhẹ).
+var detail_range := 170.0
 var cut_materials: Array = []
 ## Đồ phố Việt (street_dress.gd): đặt tùy chọn trước khi build (center, radius, label_radius, wires, name_of);
 ## để trống là không dựng.
@@ -655,7 +656,7 @@ func _buildings() -> void:
 		mi.mesh = (_bsts[k] as SurfaceTool).commit()
 		mi.material_override = building_mat
 		if k.z == 1:
-			mi.visibility_range_end = DETAIL_RANGE
+			mi.visibility_range_end = detail_range
 			mi.visibility_range_end_margin = 15.0
 		add_child(mi)
 	_bsts.clear()
