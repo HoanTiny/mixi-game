@@ -180,9 +180,9 @@ Kết quả gần nhất của bản 30 ngày (bỏ qua đường đi bộ; kế
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng (làm 3 việc, không nghỉ) |
 |---|---|---|---|---|
-| A · Làm công | E1 · 5,96 tr | E6 · 3,65 tr | E8 · 3,27 tr | E4 · 2,69 tr |
-| B · Tổ đội | E2 · 4,09 tr | E4 · 0,38 tr | (khóa B, sang A) | E4 · 1,99 tr |
-| C · Dịch vụ riêng | E3 · 4,96 tr | E4 · 1,58 tr | E8 · 1,23 tr | E6 · 1,71 tr |
+| A · Làm công | E1 · 6,03 tr | E6 · 3,37 tr | E8 · 3,60 tr | E4 · 2,18 tr |
+| B · Tổ đội | E2 · 3,82 tr | E4 · 0,33 tr | (khóa B, sang A) | E4 · 2,00 tr |
+| C · Dịch vụ riêng | E3 · 4,98 tr | E4 · 1,12 tr | E8 · 1,07 tr | E4 · 1,53 tr |
 
 Chơi tiếp chương 2 (ngày 31–60) từ đúng màn kết ở trên; kết chương 2 và tiền mặt tối ngày 60 sau khi đã đóng tiền nhà tháng sau. "Giấu" giấu chuyện và ép người nhà ở các cảnh gia đình; "Ít việc" mỗi ngày chỉ làm một việc ngắn; "Để má chọn" như lắng nghe nhưng không giữ chỗ cho máy may của má:
 

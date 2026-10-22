@@ -2150,6 +2150,10 @@ func _float_text(text: String, color: Color) -> void:
 
 ## Người nhà đứng trước cửa chỗ ở, theo thứ tự chỗ đứng; ông Ba là hàng xóm sát vách nên đứng xa nhất.
 const HOME_NPCS := ["BA_TU", "LINH", "MA", "ONG_BA"]
+## Người nhà đứng thành hàng bên trái cửa chỗ ở (phía An thức dậy), mét tính dọc mặt tiền: bên phải cửa là chỗ của
+## cô chủ phòng, chú chủ nhà, dì Năm, và mặt tiền nhà thật hay có chỗ nhô ra che người đứng sát cửa.
+const HOME_ALONG := -3.2
+const HOME_STEP := -1.1
 var _npc_home := HOME
 var _ch2_spawned := false
 
@@ -2167,21 +2171,21 @@ func _sync_home() -> void:
 	if _npc_home == home:
 		return
 	_npc_home = home
-	# Đứng sau người của chính địa điểm đó (cô chủ phòng, chú chủ nhà, dì Năm) để không chồng lên nhau.
 	var slot := 0
-	for who in LOCATIONS.get(home, {}).get("npcs", []):
-		if not HOME_NPCS.has(str(who.id)):
-			slot += 1
 	for id in HOME_NPCS:
 		if npc_nodes.has(id):
 			_place_npc(id, home, slot)
 			slot += 1
 
 
-func _place_npc(id: String, loc: String, slot: int) -> void:
+## at_home: đứng trong hàng người nhà bên trái cửa; không thì đứng bên phải cửa như người của địa điểm đó.
+func _place_npc(id: String, loc: String, slot: int, at_home := true) -> void:
 	var n: Dictionary = npc_nodes[id]
 	var node: Node3D = n.node
-	node.global_position = loc_point(loc, 1.6 + slot * 1.7, 0.2 + (slot % 2) * 0.45)
+	if at_home:
+		node.global_position = loc_point(loc, HOME_ALONG + slot * HOME_STEP, 0.55 + (slot % 2) * 0.35)
+	else:
+		node.global_position = loc_point(loc, 1.6 + slot * 1.7, 0.2 + (slot % 2) * 0.45)
 	node.global_rotation.y = CityMap.rot_y(city.locs[loc].normal) + PI
 	n["loc"] = loc
 	(n.body as Node).set_meta("loc", loc)
@@ -2212,7 +2216,7 @@ func _spawn_npc(e: Dictionary) -> void:
 	if str(e.loc) == "home":
 		_npc_home = ""
 	else:
-		_place_npc(id, loc, int(e.get("slot", 1)))
+		_place_npc(id, loc, int(e.get("slot", 1)), false)
 
 
 # ---------------------------------------------------------------- ngày 30

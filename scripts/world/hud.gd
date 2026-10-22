@@ -673,9 +673,13 @@ func _refresh_objectives2(s: Dictionary) -> void:
 	if rent == null and not game.has_long_home():
 		_objective("Đặt cọc phòng mới trước giỗ ông", "Ở nhờ dì Năm tới sau giỗ · cọc Hẻm Dừa hay Cầu Tre, dọn sau ngày %d" % due, "current")
 	elif rent != null and rent.status == "pending":
+		# Dự kiến đã trừ tiền sinh hoạt mỗi tối và các khoản phải trả khác tới ngày đóng.
 		var proj: int = game.projected_cash(due)
-		var sub := "%s · không kiếm thêm thì tối ngày %d còn %s" % [GameLogic.fmt_money(int(rent.amount)), due, GameLogic.fmt_money(proj)]
-		sub += " · đủ" if proj >= int(rent.amount) else " · thiếu %s" % GameLogic.fmt_money(int(rent.amount) - proj)
+		var sub := "%s · " % GameLogic.fmt_money(int(rent.amount))
+		if proj >= int(rent.amount):
+			sub += "không kiếm thêm vẫn đủ"
+		else:
+			sub += "từ giờ tới tối ngày %d cần kiếm thêm %s (đã tính tiền sinh hoạt)" % [due, GameLogic.fmt_money(int(rent.amount) - proj)]
 		_objective("%s (tối ngày %d)" % [title, due], sub, "current" if game.day() >= 54 else "normal")
 	elif rent != null:
 		_objective(title, "Đã đóng" if rent.status == "paid" else "Chưa đủ, phải hẹn lại", "done" if rent.status == "paid" else "failed")
