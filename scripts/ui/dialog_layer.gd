@@ -73,6 +73,9 @@ func _start() -> void:
 	var p: Dictionary = game.story.prologue
 	_head(p.eyebrow, p.title, "", p.text, p.quote)
 	_box.add_child(UI.choice(p.start, "30 ngày · 1.200.000đ tiền mặt · 3.600.000đ lương cũ còn phải thu", "", game.new_game.bind("full")))
+	if not game.story2.is_empty():
+		_box.add_child(UI.wrap("Hết ngày 30 có nút Chơi tiếp sang %s: thêm 30 ngày ở chỗ mới, mọi lựa chọn của tháng đầu đi theo." %
+			str(game.story2.get("title", "Chương 2 · Mùa mưa")), 12, UI.INK_SOFT))
 	_box.add_child(UI.label(p.slicePick, 11, UI.INK_SOFT))
 	for k in GameLogic.ROUTES:
 		var pre: Dictionary = game.cfg.presets[k]
