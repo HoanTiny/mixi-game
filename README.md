@@ -14,7 +14,9 @@ Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo
 
 Đường đi bám theo phố, hẻm, vỉa hè, công viên; khe hở giữa các dãy nhà và bãi đất trống vẫn đi được (phím WASD) nhưng tìm đường tính đắt gấp 6 lần nên chỉ chui khe khi không còn lối nào. Nhà nào che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt màu vữa (dải ngay trước mặt An hạ còn chân tường, hai bên hạ ít hơn cho thấy mặt phố), hạ và nâng từ từ; nhà đứng ngang An như chính tiệm An đang đứng trước cửa thì để nguyên; cây chắn trước mặt thì thu tán lại. Quanh các địa điểm có đồ phố Việt: mái hiên tôn, bạt, biển hiệu có chữ (tạp hóa, phở, cơm tấm, sửa xe…), bàn ghế nhựa quán cóc, cột điện bê tông và dây điện võng, dây giăng ngang hẻm, cổng hẻm "khu phố văn hóa", bảng tên đường xanh, xe máy dựng vào lề. Đi qua cầu thì An đứng trên mặt cầu.
 
-**Người và đồ vật 3D:** mỗi người là một lưới liền bo tròn gắn khung xương, cử động mềm ở vai, khuỷu, hông, gối: dáng nam, nữ; mặt có mắt, mày, mũi, miệng, tai; tóc ngắn, dài, búi, đuôi ngựa; nón lá, nón kết, mũ bảo hiểm, ba lô, tạp dề; đi, đứng thở, ngồi xe, đẩy xe, gánh hàng. Xe máy tay ga và xe số chạy ngoài đường có người lái đội mũ bảo hiểm, nhiều chiếc chở thêm người ngồi sau. Người bán rong: xe bánh mì có tủ kính bày ổ bánh mì, xe chè với hai tầng hũ chè, xe hủ tiếu gõ có nồi nước lèo, xe ve chai chất các-tông và bao tải, chị bán xôi gánh hai thúng trên vai. Trên kênh: ghe chở hàng có mui bạt, mắt ghe, máy đuôi tôm, bao hàng; xuồng có mái chèo. Trên phố: ghế đẩu, bàn nhựa quán cóc, cột điện bê tông tròn có sứ cách điện và bình biến áp, ô tô, xe máy đậu dọc lề, cây tán lồi lõm, cây dừa đầu Hẻm Dừa. Mỗi món dựng một lần rồi dùng chung, màu sơn từng chiếc là tham số; cây, xe đậu chia theo ô 200 m nên chỉ vẽ phần đang thấy.
+**Phố kiểu mô hình sa bàn** (giống các mô hình "khu phố mùa hạ"): nhà sơn trắng, kem, xanh bạc hà, xanh lá non, vàng, cam đào; cửa sổ nhỏ có khung xanh ngọc, trắng, nâu; tầng trên có ban công lan can song sắt, hoa giấy hồng rủ qua lan can, cục nóng máy lạnh; có nhà lợp mái ngói đỏ cam ở đỉnh mặt tiền. Sân thượng có tường lan can, bồn nước nhựa đen và inox, tum cầu thang lợp ngói, giàn hoa giấy, chậu cây. Đường có vỉa hè lát gạch đỏ, vạch vàng giữa đường, vạch trắng mép đường, vạch chia làn; ngã tư đường lớn có vạch qua đường kẻ sọc và đèn giao thông; sân, hẻm láng xi măng chia ô; cây phượng đỏ xen cây xanh. Gần 500 xe máy (tay ga, xe số, nhiều xe chở thêm người ngồi sau; mỗi người một màu áo, mũ cùng màu xe) và ô tô chạy hai chiều theo làn bên phải, quanh chỗ của truyện đông nhất; ngày mưa vắng bớt một nửa. Nút **Toàn cảnh** ở thanh dưới (hay con lăn chuột) lùi máy quay ra xa ngắm cả khu như mô hình; lúc đó nhà không hạ. Ban công, hoa, đồ trên sân thượng nằm trong lưới chi tiết chia ô 100 m, nhìn xa quá 170 m thì khỏi vẽ; nhà chia ô 200 m; xe chạy gom theo cụm tuyến, cụm xa An thì khỏi cập nhật hình.
+
+**Người và đồ vật 3D:** mỗi người là một lưới liền bo tròn gắn khung xương, cử động mềm ở vai, khuỷu, hông, gối: dáng nam, nữ; mặt có mắt, mày, mũi, miệng, tai; tóc ngắn, dài, búi, đuôi ngựa; nón lá, nón kết, mũ bảo hiểm, ba lô, tạp dề; đi, đứng thở, ngồi xe, đẩy xe, gánh hàng. Xe máy tay ga và xe số chạy ngoài đường có người lái đội mũ bảo hiểm, nhiều chiếc chở thêm người ngồi sau (map thật: dòng xe gộp thành MultiMesh, xem `scripts/world/traffic.gd`). Người bán rong: xe bánh mì có tủ kính bày ổ bánh mì, xe chè với hai tầng hũ chè, xe hủ tiếu gõ có nồi nước lèo, xe ve chai chất các-tông và bao tải, chị bán xôi gánh hai thúng trên vai. Trên kênh: ghe chở hàng có mui bạt, mắt ghe, máy đuôi tôm, bao hàng; xuồng có mái chèo. Trên phố: ghế đẩu, bàn nhựa quán cóc, cột điện bê tông tròn có sứ cách điện và bình biến áp, ô tô, xe máy đậu dọc lề, cây tán lồi lõm, cây dừa đầu Hẻm Dừa. Mỗi món dựng một lần rồi dùng chung, màu sơn từng chiếc là tham số; cây, xe đậu chia theo ô 200 m nên chỉ vẽ phần đang thấy.
 
 Nướng thêm khu khác: `Godot --headless --path . -s res://tools/bake_map.gd -- --id=<tên> --bbox=nam,tây,bắc,đông [--osm=<file overpass.json>]`, rồi viết `data/maps/<tên>_story.json` và đổi `"map"` trong config. Đặt `"map": "an_hoa"` (hay chạy với `-- --map=an_hoa`) để chơi lại phường vẽ tay bên dưới.
 
@@ -38,7 +40,7 @@ Trình duyệt tự gọi thẳng ba nguồn miễn phí, không qua máy chủ 
 | Open Buildings (Google + Microsoft, bản gộp của VIDA) | Đường viền nhà dò từ ảnh vệ tinh, kèm độ tin cậy: `data.source.coop/vida/google-microsoft-open-buildings/flatgeobuf/by_country/country_iso=VNM/VNM.fgb` (17,5 GB, 68,5 triệu nhà). App chỉ đọc đúng phần byte của vùng đã vẽ qua chỉ mục không gian (khoảng 0,5–1,5 MB cho một khu nửa km²). |
 | Nominatim | Tên khu ra tọa độ, khung và mã nước (để biết đọc file Open Buildings nào). |
 
-Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu độ tin cậy dưới 0,7, trùng chỗ nhà OSM, nằm trên lòng đường hoặc trên mặt nước. Nhà không ghi số tầng lấy 2–5 tầng như nhà ống, một phần nhà thấp lợp ngói đỏ; cao ốc kính; mặt tường có cửa sổ theo tầng (mờ dần khi nhìn xa); sân thượng có bồn nước inox; chùa, đình mái bốn dốc; cây ven đường, ô tô và xe máy đậu dọc đường; nhãn địa danh có chấm cam. Địa chỉ máy chủ, giờ chờ, ngưỡng tin cậy, bề rộng đường, màu nhà nằm trong `data/realmap.json`. Bản cài trên máy đi qua proxy được (đọc `HTTPS_PROXY`, chứng chỉ gốc ở `SSL_CERT_FILE`).
+Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu độ tin cậy dưới 0,7, trùng chỗ nhà OSM, nằm trên lòng đường hoặc trên mặt nước. Nhà không ghi số tầng lấy 2–5 tầng như nhà ống, một phần nhà thấp lợp ngói đỏ; cao ốc kính; mặt tường có cửa sổ theo tầng (mờ dần khi nhìn xa); sân thượng có bồn nước inox; mái ngói đỏ cam có hàng ngói; chùa, đình mái bốn dốc; vỉa hè lát gạch, vạch kẻ đường, sân láng xi măng; cây ven đường xen cây phượng, ô tô và xe máy đậu dọc đường; nhãn địa danh có chấm cam. Màu nhà, màu mặt đất ghi bằng mã màu sRGB như trong bảng màu. Địa chỉ máy chủ, giờ chờ, ngưỡng tin cậy, bề rộng đường, màu nhà nằm trong `data/realmap.json`. Bản cài trên máy đi qua proxy được (đọc `HTTPS_PROXY`, chứng chỉ gốc ở `SSL_CERT_FILE`).
 
 **Gợi ý cách chơi:** lần đầu gặp chuyện gì (có cảnh chính, đói, bẩn, Mệt lên, có người nhờ việc, đứng cạnh thùng rác, sau 20 giờ…) thì ô Gợi ý ở góc trái hiện một lần. Nội dung ở mục `tips` của `data/story.json`.
 
@@ -58,6 +60,7 @@ Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu đ�
 | WASD hoặc phím mũi tên | Đi lại |
 | E | Vào địa điểm đang đứng gần |
 | M | Mở/đóng bản đồ lớn; bấm một chỗ trên bản đồ để đi tới |
+| Con lăn chuột, nút **Toàn cảnh** | Kéo máy quay gần, xa; xa hẳn là nhìn toàn cảnh khu phố |
 | Esc | Đóng bảng |
 | Nút **Về xóm trọ** | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
 
@@ -115,11 +118,12 @@ scripts/
   realmap/fgb_reader.gd  đọc FlatGeobuf từ xa theo chỉ mục không gian (Open Buildings)
   realmap/area_data.gd   đọc dữ liệu OSM, ghép và lọc nhà Open Buildings
   realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ; hạ nhà che An
-  realmap/street_dress.gd đồ phố Việt: mái hiên, biển hiệu, cột điện, dây điện, cổng hẻm, bảng tên đường, ghế quán cóc
+  realmap/street_dress.gd đồ phố Việt: mái hiên, biển hiệu, ban công hoa giấy, cục nóng, mái ngói mặt tiền, sân thượng (bồn nước, tum, giàn hoa, chậu cây), cột điện, dây điện, cổng hẻm, bảng tên đường, vạch qua đường, đèn giao thông, ghế quán cóc
   realmap/walk_grid.gd   lưới đi bộ 1 m và tìm đường cho khu thật (đường, hẻm rẻ; khe nhà, bãi trống đắt)
   realmap/map_view.gd    bản đồ nền tối: kéo, phóng, tìm, vẽ khung hay đa giác
   world/real_city.gd   map của truyện từ khu thật nướng sẵn: đặt địa điểm, đổi tên đường, nhà có số, thùng rác, chỗ ngập
   world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)
+  world/traffic.gd     dòng xe máy có người lái và ô tô chạy theo làn trên đường thật (MultiMesh theo cụm tuyến)
   world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
   world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
   world/street_map.gd  bản đồ nhỏ và bản đồ lớn (phím M), bấm để đi tới

@@ -109,12 +109,15 @@ func _ready() -> void:
 
 	# Hàng dưới: hướng dẫn điều khiển bên trái, thanh công cụ bên phải.
 	var bottom := _pass(HBoxContainer.new(), rows)
-	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · M: bản đồ · Esc: đóng", 12, UI.HUD_TEXT)
+	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa, toàn cảnh · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · M: bản đồ · Esc: đóng", 12, UI.HUD_TEXT)
 	hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	hint.add_theme_constant_override("outline_size", 5)
 	hint.size_flags_vertical = Control.SIZE_SHRINK_END
+	# Màn hẹp thì dòng hướng dẫn xuống hàng, nhường đủ chỗ cho thanh công cụ.
+	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.custom_minimum_size.x = 160
 	bottom.add_child(hint)
-	_spacer(bottom)
 	_build_bottom(bottom)
 
 	# Bản đồ lớn phủ giữa màn hình (phím M hoặc bấm bản nhỏ).
@@ -526,6 +529,8 @@ func _build_bottom(parent: Control) -> void:
 		_log.visible = not _log.visible
 		_skills.visible = false))
 	h.add_child(_tool_button("Bảng cân bằng", func() -> void: get_tree().change_scene_to_file("res://scenes/board.tscn")))
+	# Lùi máy quay ra xa ngắm cả khu phố (máy cảm ứng không có con lăn chuột), bấm lần nữa về góc chơi.
+	h.add_child(_tool_button("Toàn cảnh", func() -> void: world.toggle_overview()))
 	_end_day_btn = _tool_button("Về xóm trọ", func() -> void:
 		close_location()
 		world.walk_to_location(world.home))
@@ -750,7 +755,11 @@ func _objective(text: String, sub: String, state: String) -> void:
 			color = UI.GOLD
 	_objective_box.add_child(UI.label("%s  %s" % [mark, text], 14, color))
 	if sub != "":
-		_objective_box.add_child(UI.label("     " + sub, 12, UI.HUD_SOFT))
+		# Dòng phụ dài thì xuống hàng: bảng mục tiêu gọn lại để hàng trên (và thanh công cụ ở dưới) vừa màn hình hẹp.
+		var l := UI.label("     " + sub, 12, UI.HUD_SOFT)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size.x = 460
+		_objective_box.add_child(l)
 
 
 func _refresh_skills(s: Dictionary) -> void:

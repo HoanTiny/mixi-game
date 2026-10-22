@@ -20,6 +20,7 @@ const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
+const Traffic := preload("res://scripts/world/traffic.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
 ## (game.home_loc()); bà, Linh, má đứng trước cửa chỗ đó, ông Ba ở sát vách.
@@ -59,9 +60,13 @@ const LOCATIONS := {
 		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
 }
 const SPEED := 6.0
-## Camera xa nhất (nhìn toàn phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức.
+## Camera góc chơi xa (nhìn cả dãy phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức, lăn tiếp ra
+## xa là nhìn toàn cảnh (CAM_FAR).
 const CAM_OFFSET := Vector3(0, 24, 17)
 const CAM_NEAR := Vector3(0, 6.5, 9.0)
+## Nhìn toàn cảnh (zoom từ 1 tới ZOOM_MAX): máy quay lùi xa, ngắm cả khu phố như mô hình sa bàn.
+const CAM_FAR := Vector3(0, 92, 64)
+const ZOOM_MAX := 2.0
 const INTERACT_RANGE := 2.4
 ## Bảng tên tiệm không cao hơn mức này để không lọt lên mép trên màn hình dưới bảng mục tiêu.
 const SIGN_MAX := 4.6
@@ -101,6 +106,8 @@ var lamps: Array = []
 var door_rings := {}
 var walkers: Array = []
 var bikes: Array = []
+## Dòng xe chạy trên map thật (traffic.gd); map phường vẽ tay dùng bikes.
+var traffic: Node3D = null
 ## Khối nhà có thể che An: {"node", "rect": Rect2 nền nhà, "h": chiều cao}.
 var occluders: Array = []
 ## Nhân vật có tên: id -> {node, body, name, loc}; street_life cho họ đi lại theo giờ.
@@ -257,17 +264,18 @@ func _build_environment() -> void:
 	if sky:
 		env.sky = sky
 		env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	# Màu tươi, nắng trong như mô hình phố: không làm nhạt màu, sương mỏng (đổi theo giờ, trời mưa trong _update_lighting).
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 1.15
+	env.tonemap_exposure = 1.05
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.08
-	env.adjustment_saturation = 0.82
+	env.adjustment_contrast = 1.05
+	env.adjustment_saturation = 1.08
 	env.ssao_enabled = true
 	env.ssao_radius = 1.2
-	env.ssao_intensity = 1.6
+	env.ssao_intensity = 1.4
 	env.fog_enabled = true
-	env.fog_light_color = Color("8f8c86")
-	env.fog_density = 0.004
+	env.fog_light_color = Color("cfe0ec")
+	env.fog_density = 0.0012
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
@@ -275,6 +283,7 @@ func _build_environment() -> void:
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
 	sun.directional_shadow_max_distance = 70.0
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 	add_child(sun)
 
 
@@ -576,8 +585,8 @@ func _cut_stand_in(p: Dictionary, holder: Node3D, color: Color, top: float) -> D
 	var m := ShaderMaterial.new()
 	m.shader = _stand_shader
 	m.set_shader_parameter("wall", color)
-	# Mặt cắt cùng màu với nhà thật bị hạ (shader nhà dùng màu đỉnh thô, không đổi sang không gian tuyến tính).
-	m.set_shader_parameter("top", AreaBuilder.CUT_COLOR.lerp(color, 0.2))
+	# Mặt cắt cùng màu với nhà thật bị hạ (shader nhà đổi màu đỉnh sRGB sang tuyến tính rồi pha với màu mặt cắt).
+	m.set_shader_parameter("top", AreaBuilder.CUT_COLOR.lerp(color.srgb_to_linear(), 0.2))
 	box.material_override = m
 	pivot.add_child(box)
 	return {"poly": poly, "stand": pivot, "cap": top}
@@ -1148,9 +1157,12 @@ func _map_id() -> String:
 func _build_real() -> void:
 	area = AreaBuilder.new()
 	area.show_labels = false
-	# Mặt đường, mặt đất có vân nhựa đường như phường vẽ tay, sẫm hơn cho hợp ánh nắng của màn phố.
-	area.ground_material = Surfaces.get_mat("duong", 4.0, Color(0.78, 0.76, 0.72), true)
-	area.water_color = Color("2a4a4c")
+	# Lòng đường có vân nhựa đường như phường vẽ tay, sẫm hơn cho hợp ánh nắng của màn phố; vỉa hè, sân, hẻm lát gạch,
+	# xi măng (xem AreaBuilder.GROUND_SHADER).
+	var asphalt := Surfaces.get_mat("duong", 4.0, Color(0.78, 0.76, 0.72), true)
+	area.ground_material = AreaBuilder.ground_shader_material(asphalt.albedo_texture, asphalt.normal_texture, Color(0.78, 0.76, 0.72), 4.0)
+	area.water_color = Color("2f6b68")
+	area.park_cars_from = Traffic.PARKED_CARS_FROM
 	add_child(area)
 	var mid := Vector2.ZERO
 	for id in city.locs:
@@ -1295,11 +1307,11 @@ func _build_real_lamps() -> void:
 				_lamp(_v3(q), atan2(d.x, d.y)))
 
 
-## Xe máy chạy hai chiều trên đường lớn, người đi bộ trên đường nhỏ và vỉa hè.
+## Dòng xe máy, ô tô chạy hai chiều trên đường lớn quanh chỗ của truyện (traffic.gd), người đi bộ trên đường nhỏ và vỉa
+## hè.
 func _build_real_traffic() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 808
-	var big := []
 	var small := []
 	for r in city.data.roads:
 		if r.bridge or r.tunnel or r.line.size() < 2:
@@ -1309,19 +1321,11 @@ func _build_real_traffic() -> void:
 			l += (r.line[k] as Vector2).distance_to(r.line[k + 1])
 		if l < 30.0:
 			continue
-		var lane := {"poly": r.line, "len": l, "off": float(r.width) / 4.0}
-		if not r.small and float(r.width) >= 6.0:
-			big.append(lane)
-		elif str(r.kind) not in ["steps"]:
-			small.append(lane)
-	big.sort_custom(func(a, b) -> bool: return float(a.len) > float(b.len))
-	for k in mini(big.size(), 12):
-		var lane: Dictionary = big[k]
-		for j in 3:
-			var bike := _bike(Color.from_hsv(rng.randf(), 0.5, 0.8), rng)
-			_ride(bike, rng)
-			add_child(bike)
-			bikes.append({"node": bike, "dir": 1.0 if j % 2 == 0 else -1.0, "speed": rng.randf_range(5.0, 8.5), "lane": lane, "s": rng.randf() * float(lane.len)})
+		if (r.small or float(r.width) < 6.0) and str(r.kind) not in ["steps"]:
+			small.append({"poly": r.line, "len": l, "off": float(r.width) / 4.0})
+	traffic = Traffic.new()
+	add_child(traffic)
+	traffic.build(city.data.roads, area.dress.center, 300.0, AreaBuilder.BRIDGE_Y)
 	small.shuffle()
 	for k in mini(small.size(), 22):
 		var pth: Dictionary = small[k].duplicate()
@@ -1347,12 +1351,22 @@ static func _poly_at(poly: PackedVector2Array, s: float, off: float) -> Vector2:
 
 
 func cam_offset() -> Vector3:
+	if zoom > 1.0:
+		return CAM_OFFSET.lerp(CAM_FAR, zoom - 1.0)
 	return CAM_NEAR.lerp(CAM_OFFSET, zoom)
+
+
+## Bật tắt nhìn toàn cảnh (nút trên thanh dưới cho máy cảm ứng): đang ở gần thì lùi ra xa hẳn, đang xa thì về góc chơi.
+func toggle_overview() -> void:
+	zoom = 0.3 if zoom > 1.0 else ZOOM_MAX
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-		zoom = clampf(zoom + (-0.08 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 0.08), 0.0, 1.0)
+		var up: bool = event.button_index == MOUSE_BUTTON_WHEEL_UP
+		# Góc chơi nhích từng chút; quá góc chơi xa thì mỗi nấc lùi nhiều hơn, tới toàn cảnh.
+		var step := 0.2 if zoom > 1.0 or (zoom == 1.0 and not up) else 0.08
+		zoom = clampf(zoom + (-step if up else step), 0.0, ZOOM_MAX)
 		return
 	if hud.blocking():
 		return
@@ -1410,7 +1424,9 @@ func _physics_process(delta: float) -> void:
 
 	var cam_goal := player.position + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
-	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, zoom), 0), Vector3.UP)
+	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, minf(zoom, 1.0)), 0), Vector3.UP)
+	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút).
+	sun.directional_shadow_max_distance = lerpf(70.0, 240.0, clampf(zoom - 1.0, 0.0, 1.0))
 	_update_cutaway(delta)
 
 	var near := nearest_location()
@@ -1574,6 +1590,10 @@ func route_preview(loc: String) -> Dictionary:
 	return _preview_cache[key]
 
 
+## Đang nhìn toàn cảnh (zoom từ 1,3): nhà để nguyên, không hạ.
+var _overview := false
+
+
 ## Nhà nào nằm giữa camera và An (phía nam, đủ cao để che theo góc nhìn hiện tại) thì ẩn đi.
 ## Map thật: nhà thật hạ dần thành khối thấp (AreaBuilder.update_cut); nhà của địa điểm cũng vậy, thay bằng khối
 ## cùng màu có mặt cắt sáng hạ thấp dần, tên địa điểm và người trước cửa vẫn hiện.
@@ -1584,10 +1604,17 @@ func _update_cutaway(delta := 0.0) -> void:
 	var pz := player.position.z
 	if real:
 		var here := Vector2(px, pz)
-		area.update_cut(here, off.y / off.z, delta)
+		# Nhìn toàn cảnh thì thôi hạ nhà: An nhỏ xíu, cả khu phố để nguyên như mô hình.
+		var overview := zoom > 1.3
+		if overview and not _overview:
+			area.reset_cut()
+		_overview = overview
+		if not overview:
+			area.update_cut(here, off.y / off.z, delta)
 		for o in occluders:
 			var top := float(o.h)
-			var cur := move_toward(float(o.cap), minf(AreaBuilder.cut_target(o.poly, here, off.y / off.z), top), float(AreaBuilder.CUT.speed) * delta)
+			var want := top if overview else minf(AreaBuilder.cut_target(o.poly, here, off.y / off.z), top)
+			var cur := move_toward(float(o.cap), want, float(AreaBuilder.CUT.speed) * delta)
 			o["cap"] = cur
 			var low := cur < top - 0.05
 			var node: Node3D = o.node
@@ -1795,6 +1822,8 @@ func _handle_click(screen_pos: Vector2) -> void:
 
 
 func _update_traffic(delta: float) -> void:
+	if traffic != null:
+		traffic.update(delta, Vector2(player.position.x, player.position.z))
 	for b in bikes:
 		var n: Node3D = b.node
 		var lane: Dictionary = b.lane
@@ -1845,6 +1874,15 @@ func _update_traffic(delta: float) -> void:
 			var stp: Vector3 = to.normalized() * w.speed * delta
 			n.position += stp
 			n.rotation.y = atan2(stp.x, stp.z)
+
+
+## Chỗ một chiếc xe máy đang chạy gần An để phát tiếng còi; null nếu không có xe.
+func horn_spot():
+	if traffic != null:
+		return traffic.near_vehicle(Vector2(player.position.x, player.position.z))
+	if bikes.is_empty():
+		return null
+	return (bikes.pick_random().node as Node3D).position
 
 
 func _on_changed() -> void:
@@ -1901,16 +1939,21 @@ func _update_lighting(hour: float) -> void:
 		c = c.lerp(Color("8a96a8"), 0.7)
 	sun.light_color = c
 	sun.light_energy = (0.35 if hour >= 20.0 else 1.1) * (0.35 if rain else 1.0)
-	env.ambient_light_color = c.lerp(Color("b49a7c"), 0.2 if rain else 0.6)
-	env.ambient_light_energy = 0.45 if hour >= 20.0 else (0.75 if rain else 0.95)
+	# Vùng bóng hắt sáng xanh nhạt của trời (ngày nắng), xám khi mưa; nền trời sau mô hình cùng màu trời theo giờ.
+	var sky := Color("a9d4ee").lerp(Color("f3b27a"), clampf((hour - 17.0) / 2.0, 0.0, 1.0)).lerp(Color("1d2433"), clampf((hour - 18.5) / 1.5, 0.0, 1.0))
+	if rain:
+		sky = sky.lerp(Color("7d8794"), 0.75)
+	env.background_color = sky
+	env.ambient_light_color = c.lerp(Color("b9cde0"), 0.2 if rain else 0.5)
+	env.ambient_light_energy = 0.45 if hour >= 20.0 else (0.75 if rain else 0.9)
 	var on := hour >= (16.0 if rain else 18.0)
 	for lamp in lamps:
 		lamp.visible = on
 		lamp.light_energy = 2.2 if on else 0.0
 	_set_rain(rain)
-	# Mưa: sương xám dày hơn, nhìn xa mờ hẳn.
-	env.fog_light_color = Color("8f98a3") if rain else Color("8f8c86")
-	env.fog_density = 0.0065 if rain else 0.004
+	# Mưa: sương xám dày hơn, nhìn xa mờ hẳn; trời nắng chỉ hơi mờ xa cho có chiều sâu.
+	env.fog_light_color = Color("8f98a3") if rain else sky.lerp(Color.WHITE, 0.25)
+	env.fog_density = 0.0055 if rain else 0.0012
 	# Mức ngập: theo rainFlood trong config (ngày 15 mức 1, ngày 29 mức 2).
 	var lvl := 0
 	if rain:

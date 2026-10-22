@@ -3,12 +3,14 @@ extends Node3D
 ## để chạy nhẹ cả trên trình duyệt với vài nghìn căn nhà:
 ## - Nhà: đùn đường viền lên theo chiều cao (height, số tầng; thiếu thì lấy 2–5 tầng như nhà ống), màu tường,
 ##   mái bằng, mái hai dốc, mái bốn dốc, mái chóp theo roof:shape; chùa, đình mái ngói bốn dốc. Mặt tường có ô cửa sổ
-##   theo tầng. Nhà che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt sáng (shader), cây che thì thu nhỏ.
-## - Đường có vỉa hè, vạch giữa; ngõ nhỏ lát bê tông; cầu có lan can. Sông, hồ, kênh, công viên, sân bóng,
-##   tường rào, đường sắt, nhãn tên đường, hồ, chùa, di tích.
+##   theo tầng, mái ngói có hàng ngói (shader). Nhà che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt sáng
+##   (shader), cây che thì thu nhỏ. Nhà chia lưới theo ô TILE mét; ban công, hoa, đồ trên sân thượng (street_dress.gd)
+##   ở lưới chi tiết ô DETAIL_TILE mét, nhìn xa thì khỏi vẽ. Màu nhà, màu mặt đất là mã sRGB như trong bảng màu.
+## - Đường có vỉa hè lát gạch, vạch vàng giữa, vạch trắng mép và chia làn; ngõ nhỏ, sân láng xi măng chia ô; cầu có
+##   lan can. Sông, hồ, kênh, công viên, sân bóng, tường rào, đường sắt, nhãn tên đường, hồ, chùa, di tích.
 ## - Lưới đi bộ 1 m: không đi xuyên nhà, tường, mặt nước (trừ trên cầu).
 ## - Kiểu mô hình thu nhỏ: mọi thứ cắt theo vùng đã vẽ, đặt trên một tấm đế đất; cây (cây OSM, hàng cây, công viên,
-##   ven đường), ô tô và xe máy đậu dọc đường, nhãn địa danh có chấm cam.
+##   ven đường; xen cây phượng tán đỏ cam), ô tô và xe máy đậu dọc đường, nhãn địa danh có chấm cam.
 
 const Geo := preload("res://scripts/realmap/geo.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
@@ -27,22 +29,28 @@ uniform int caps_w = 128;
 // Màu mặt cắt của nhà bị hạ.
 uniform vec3 cut_color;
 // Cây: màu tint nhân độ sáng trong màu đỉnh (tán sáng trên sẫm dưới); cây đứng chắn trước An thì tán thu nhỏ lại,
-// thân hạ còn gốc (INSTANCE_CUSTOM.r: 1 bình thường, 0 khi thu hẳn; .g: sắc lá riêng từng cây, 0..1).
-// trunk: thân cây, lưới cao 2,4 m tâm ở giữa.
+// thân hạ còn gốc (INSTANCE_CUSTOM.r: 1 bình thường, 0 khi thu hẳn; .g: sắc lá riêng từng cây, 0..1; .b = 1: cây
+// phượng, tán màu flame_tint). trunk: thân cây, lưới cao 2,4 m tâm ở giữa.
 uniform bool flat_color = false;
 uniform bool trunk = false;
 uniform vec3 tint = vec3(1.0);
+uniform vec3 flame_tint = vec3(0.86, 0.3, 0.12);
 varying float v_cut;
 varying float v_up;
 varying float v_kind;
 varying float v_var;
+varying float v_flame;
+varying float v_idx;
 
 void vertex() {
 	v_cut = 0.0;
 	v_up = NORMAL.y;
 	v_var = flat_color ? INSTANCE_CUSTOM.g : 0.5;
-	// CUSTOM0: số thứ tự căn nhà, loại (1 nhà, 2 bồn nước trên mái). Mô hình khu đặt ở gốc tọa độ.
+	v_flame = (flat_color && !trunk) ? INSTANCE_CUSTOM.b : 0.0;
+	// CUSTOM0: số thứ tự căn nhà, loại (1 nhà; 2 đồ gắn kèm bóng như bồn inox, mái hiên tôn; 3 đồ gắn kèm không bóng:
+	// ban công, hoa, bồn nhựa, tum, mái ngói). Mô hình khu đặt ở gốc tọa độ.
 	v_kind = CUSTOM0.y;
+	v_idx = CUSTOM0.x;
 	if (cut_on && trunk) {
 		VERTEX.y = (VERTEX.y + 1.2) * max(INSTANCE_CUSTOM.r, 0.12) - 1.2;
 	} else if (cut_on && flat_color) {
@@ -64,32 +72,108 @@ void vertex() {
 }
 
 void fragment() {
-	vec3 col = flat_color ? tint * COLOR.rgb * mix(vec3(0.82, 0.86, 0.95), vec3(1.16, 1.12, 0.92), v_var) : COLOR.rgb;
+	vec3 leaf = mix(tint, flame_tint, step(0.5, v_flame));
+	// Màu đỉnh của nhà là mã màu sRGB (như trong bảng màu), đổi sang tuyến tính; tán cây giữ màu tint nhân thẳng.
+	vec3 col = flat_color ? leaf * COLOR.rgb * mix(vec3(0.82, 0.86, 0.95), vec3(1.16, 1.12, 0.92), v_var) : pow(COLOR.rgb, vec3(2.2));
 	if (v_cut > 0.999 && v_up > 0.4) {
 		// Mặt cắt của nhà bị hạ: sáng hơn mặt đường hẳn, nhìn ra ngay đâu là nhà, đâu là lối đi.
 		col = mix(cut_color, col, 0.2);
 	} else if (!flat_color && UV2.x > 0.5) {
-		// Tường: vạch sàn mỗi tầng, ô cửa sổ kính tối, tầng trệt cửa cuốn rộng hơn.
+		// Tường: vạch sàn mỗi tầng, ô cửa sổ nhỏ có khung (xanh ngọc, trắng, nâu hay xanh dương tùy căn), kính tối;
+		// tầng trệt cửa cuốn rộng hơn; chân tường sẫm dần.
 		float fy = fract(UV.y / 3.2);
 		float fx = fract(UV.x / 2.6);
 		float floor_i = floor(UV.y / 3.2);
-		bool win = fy > 0.32 && fy < 0.8 && fx > 0.22 && fx < 0.78 && floor_i >= 1.0 && UV.y < UV2.y - 0.6;
+		bool upper = floor_i >= 1.0 && UV.y < UV2.y - 0.6;
+		bool frame = upper && fy > 0.3 && fy < 0.78 && fx > 0.3 && fx < 0.7;
+		bool glass = upper && fy > 0.35 && fy < 0.74 && fx > 0.35 && fx < 0.65;
 		bool door = floor_i < 1.0 && fy > 0.05 && fy < 0.72 && fx > 0.12 && fx < 0.88 && UV2.y > 4.0;
+		float pick = fract(sin(v_idx * 12.9898) * 43758.5453);
+		vec3 trim = pick < 0.45 ? vec3(0.16, 0.42, 0.39) : (pick < 0.7 ? vec3(0.92, 0.91, 0.87) : (pick < 0.85 ? vec3(0.36, 0.24, 0.17) : vec3(0.2, 0.36, 0.56)));
 		// Nhìn xa (mỗi ô cửa chỉ còn vài điểm ảnh) thì mờ dần cửa sổ, tránh lấm tấm.
 		float fw = max(fwidth(UV.x) / 2.6, fwidth(UV.y) / 3.2);
 		float vis = 1.0 - smoothstep(0.12, 0.3, fw);
-		if (win) col = mix(col, vec3(0.13, 0.17, 0.21), 0.78 * vis);
-		if (door) col = mix(col, vec3(0.32, 0.31, 0.3), 0.6 * vis);
-		if (fy < 0.05) col *= mix(1.0, 0.86, vis);
+		if (frame) col = mix(col, trim, 0.9 * vis);
+		if (glass) col = mix(col, vec3(0.07, 0.11, 0.13), 0.88 * vis);
+		if (door) col = mix(col, vec3(0.3, 0.29, 0.28), 0.6 * vis);
+		if (fy < 0.04) col *= mix(1.0, 0.9, vis);
+		col *= mix(0.86, 1.0, clamp(UV.y / 2.5, 0.0, 1.0));
+	} else if (!flat_color && UV2.x > 0.2) {
+		// Lan can ban công: song dọc, tay vịn, thanh dưới (UV.x: mét dọc lan can, UV.y: 0 ở sàn, 1 ở tay vịn); màu đỉnh
+		// là phần nhìn xuyên qua song. UV2.x 0,3: sắt sơn sẫm; 0,4: sắt sơn trắng. Nhìn xa thì hòa thành màu trung bình.
+		vec3 iron = UV2.x < 0.35 ? vec3(0.08, 0.08, 0.09) : vec3(0.88, 0.88, 0.85);
+		bool bar = fract(UV.x / 0.14) < 0.3 || UV.y > 0.86 || UV.y < 0.08;
+		float vis = 1.0 - smoothstep(0.25, 0.6, fwidth(UV.x) / 0.14);
+		col = mix(mix(col, iron, 0.45), bar ? iron : col, vis);
+	} else if (!flat_color && UV2.x > 0.1) {
+		// Mái ngói: hàng ngói chạy ngang dốc mái (UV.y: mét theo dốc từ mép mái lên nóc).
+		float fv = fract(UV.y / 0.32);
+		float vis = 1.0 - smoothstep(0.2, 0.5, fwidth(UV.y) / 0.32);
+		col *= mix(1.0, 0.82 + 0.18 * smoothstep(0.0, 0.75, fv), vis);
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.88;
-	if (v_kind > 1.5) {
+	if (v_kind > 1.5 && v_kind < 2.5) {
 		METALLIC = 0.6;
 		ROUGHNESS = 0.35;
 	}
 }
 """
+## Mặt đất, mặt đường (màu đỉnh; COLOR.a chọn kiểu mặt, xem các hằng GROUND_*): nhựa đường dán texture theo tọa độ
+## thế giới (nếu có), gạch lát vỉa hè so le mỗi viên đậm nhạt khác nhau, nền xi măng chia ô, màu trơn (cỏ, vạch sơn).
+## Nhìn xa (mỗi viên chỉ còn vài điểm ảnh) thì hòa thành màu trung bình, tránh lấm tấm.
+const GROUND_SHADER := """
+shader_type spatial;
+uniform sampler2D albedo_tex : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D normal_tex : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform bool has_tex = false;
+uniform vec3 tint = vec3(1.0);
+uniform float meters = 4.0;
+varying vec3 v_world;
+
+void vertex() {
+	v_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+}
+
+float hash(vec2 p) {
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void fragment() {
+	// Lòng đường giữ cách tô cũ (màu đỉnh nhân texture); các mặt khác màu đỉnh là mã sRGB, đổi sang tuyến tính.
+	vec3 col = COLOR.a > 0.8 ? COLOR.rgb : pow(COLOR.rgb, vec3(2.2));
+	vec2 w = v_world.xz;
+	if (COLOR.a > 0.8) {
+		if (has_tex) {
+			col *= texture(albedo_tex, w / meters).rgb * tint;
+			NORMAL_MAP = texture(normal_tex, w / meters).rgb;
+			NORMAL_MAP_DEPTH = 0.8;
+		}
+	} else if (COLOR.a > 0.45) {
+		vec2 p = w / 0.32;
+		p.x += 0.5 * mod(floor(p.y), 2.0);
+		vec2 f = fract(p);
+		float vis = 1.0 - smoothstep(0.3, 0.8, max(fwidth(p.x), fwidth(p.y)));
+		col *= mix(1.0, 0.88 + 0.2 * hash(floor(p)), vis);
+		float g = max(step(f.x, 0.08), step(f.y, 0.08));
+		col = mix(col, col * 1.3 + 0.04, g * 0.65 * vis);
+	} else if (COLOR.a > 0.15) {
+		vec2 p = w / 1.1;
+		vec2 f = fract(p);
+		float vis = 1.0 - smoothstep(0.15, 0.5, max(fwidth(p.x), fwidth(p.y)));
+		col *= mix(1.0, 0.94 + 0.08 * hash(floor(p)), vis);
+		float g = max(step(f.x, 0.035), step(f.y, 0.035));
+		col = mix(col, col * 0.84, g * vis);
+	}
+	ALBEDO = col;
+	ROUGHNESS = 0.92;
+}
+"""
+## Kiểu mặt đất trong alpha màu đỉnh (GROUND_SHADER): nhựa đường, gạch vỉa hè, nền xi măng, màu trơn.
+const GROUND_ASPHALT := 1.0
+const GROUND_BRICK := 0.6
+const GROUND_CONCRETE := 0.3
+const GROUND_PLAIN := 0.0
 ## Mặt cầu cao hơn mặt đường chừng này (màn phố nâng người đi trên cầu theo, xem real_city.ground_y).
 const BRIDGE_Y := 0.5
 ## Hạ nhà che An (xem cut_target). near_w: nửa bề ngang dải ngay trước mặt An (bằng người); wide_w: dải rộng hai
@@ -98,13 +182,17 @@ const BRIDGE_Y := 0.5
 ## về phía nam còn phải xét.
 const CUT := {"near_w": 0.45, "wide_w": 6.0, "wide_add": 2.0, "beside": 0.5, "focus_r": 2.5, "stub": 0.5, "speed": 30.0, "reach": 45.0}
 ## Màu mặt cắt của nhà bị hạ (vữa sáng).
-const CUT_COLOR := Color(0.66, 0.62, 0.55)
+const CUT_COLOR := Color(0.4, 0.38, 0.34)
 ## Giá trị trong ảnh caps nghĩa là căn để nguyên.
 const CUT_NONE := 10000.0
 const CUT_CELL := 10.0
 const CAPS_W := 128
-## Cây, xe đậu chia theo ô vuông này (mét) thành nhiều MultiMesh để ô nằm ngoài khung nhìn khỏi phải vẽ.
+## Nhà, cây, xe đậu chia theo ô vuông này (mét) thành nhiều lưới để ô nằm ngoài khung nhìn khỏi phải vẽ.
 const TILE := 200.0
+## Lưới chi tiết của nhà (ban công, hoa giấy, cục nóng, giàn hoa, chậu cây): ô nhỏ hơn, chỉ vẽ khi tâm ô cách máy quay
+## dưới DETAIL_RANGE mét.
+const DETAIL_TILE := 100.0
+const DETAIL_RANGE := 170.0
 
 var data
 var cfg: Dictionary
@@ -124,12 +212,16 @@ var ground_material: Material = null
 var keep_clear: Array = []
 ## Màu nước (màn phố của truyện dùng màu kênh đục, sẫm hơn).
 var water_color := Color("2b6a8f")
+## Ô tô đậu dọc đường rộng từ chừng này mét (màn phố có dòng xe chạy thì chỉ đậu ở đường rộng, chừa làn).
+var park_cars_from := 8.0
 var cut_materials: Array = []
 ## Đồ phố Việt (street_dress.gd): đặt tùy chọn trước khi build (center, radius, label_radius, wires, name_of);
 ## để trống là không dựng.
 var dress_opts := {}
 var dress = null
 var _flat := {}
+## Lưới nhà theo ô (xem _bst): khóa (ô x, ô z, 1 nếu là lưới chi tiết).
+var _bsts := {}
 var _rng := RandomNumberGenerator.new()
 
 
@@ -190,15 +282,32 @@ func _commit_flat() -> void:
 		var m := StandardMaterial3D.new()
 		m.vertex_color_use_as_albedo = true
 		m.roughness = 0.92
-		if key == "ground" and ground_material != null:
-			mi.material_override = ground_material
+		if key == "ground":
+			mi.material_override = ground_material if ground_material != null else ground_shader_material()
 			add_child(mi)
 			continue
 		if key == "water":
-			m.roughness = 0.5
+			m.roughness = 0.2
 		mi.material_override = m
 		add_child(mi)
 	_flat.clear()
+
+
+## Vật liệu mặt đất (GROUND_SHADER): albedo, normal là texture nhựa đường (null: lòng đường màu trơn), tint nhân màu
+## texture, meters: mét mỗi lần lặp texture.
+static func ground_shader_material(albedo: Texture2D = null, normal: Texture2D = null, tint := Color.WHITE, meters := 4.0) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	var sh := Shader.new()
+	sh.code = GROUND_SHADER
+	m.shader = sh
+	m.set_shader_parameter("has_tex", albedo != null)
+	if albedo != null:
+		m.set_shader_parameter("albedo_tex", albedo)
+	if normal != null:
+		m.set_shader_parameter("normal_tex", normal)
+	m.set_shader_parameter("tint", tint)
+	m.set_shader_parameter("meters", meters)
+	return m
 
 
 ## Tam giác có pháp tuyến n, tự đảo thứ tự đỉnh cho mặt trước quay về phía n (Godot: mặt trước theo chiều kim đồng hồ).
@@ -254,7 +363,8 @@ static func _v(p: Vector2, y: float) -> Vector3:
 
 ## Tấm đế: mặt trên là vùng đã vẽ, bốn bề là lớp đất dày 4 m như mô hình sa bàn.
 func _ground() -> void:
-	_fill(_st("ground"), clip, 0.0, Color("a39c90"))
+	# Nền giữa các nhà: sân, lối đi láng xi măng chia ô.
+	_fill(_st("ground"), clip, 0.0, Color("a59d8f", GROUND_CONCRETE))
 	var st := _st("walls")
 	var c := Geo.centroid(clip)
 	for i in clip.size():
@@ -271,16 +381,17 @@ func _ground() -> void:
 
 func _parks() -> void:
 	for p in data.parks:
-		var col := Color("5a8442")
+		var col := Color("7cb24a")
 		match str(p.kind):
 			"pitch":
-				col = Color("5c9a58")
+				col = Color("6cae5a")
 			"playground":
-				col = Color("b9a27c")
+				col = Color("c9b48c")
 			"cemetery":
-				col = Color("8a9a78")
+				col = Color("9fb08c")
 			"forest", "wood", "nature_reserve":
-				col = Color("4f7d40")
+				col = Color("5e9a45")
+		col.a = GROUND_PLAIN if str(p.kind) != "playground" else GROUND_CONCRETE
 		_fill(_st("ground"), p.poly, 0.02, col)
 		# Cây trong công viên: rải theo lưới thưa.
 		if str(p.kind) in ["park", "garden", "forest", "wood", "nature_reserve", "village_green"]:
@@ -288,6 +399,8 @@ func _parks() -> void:
 
 
 var _trees: Array = []
+## Cây phượng (tán đỏ cam): số thứ tự trong _trees.
+var _flame := {}
 
 
 func _trees_in(poly: PackedVector2Array) -> void:
@@ -336,19 +449,45 @@ func _roads() -> void:
 		if r.bridge:
 			y = BRIDGE_Y
 		if r.small:
-			_strip(_st("ground"), r.line, w, y, Color("a8a296") if str(r.kind) != "steps" else Color("9c958a"))
+			# Hẻm, lối đi: láng xi măng chia ô.
+			_strip(_st("ground"), r.line, w, y, Color("a8a296" if str(r.kind) != "steps" else "9c958a", GROUND_CONCRETE))
 			continue
-		if w >= 7.0:
-			# Vỉa hè lát gạch hai bên, rồi mặt nhựa.
-			_strip(_st("ground"), r.line, w + 3.2, y - 0.01, Color("c9bfae"))
+		if w >= 6.0:
+			# Vỉa hè lát gạch đỏ hai bên, rồi mặt nhựa.
+			_strip(_st("ground"), r.line, w + (3.2 if w >= 7.0 else 2.4), y - 0.01, Color("b0664b", GROUND_BRICK))
 		_strip(_st("ground"), r.line, w, y, Color("4a4b4e") if w >= 7.0 else Color("66676a"))
-		if w >= 8.0:
-			_dashes(r.line, y + 0.005)
+		_markings(r.line, w, y + 0.005)
 		if r.bridge:
 			_bridge_rails(r.line, w)
 
 
-func _dashes(line: PackedVector2Array, y: float) -> void:
+## Vạch sơn: đường từ 8 m có vạch vàng liền ở tim, vạch trắng liền hai mép, đường từ 12 m thêm vạch trắng đứt chia làn;
+## đường 6–8 m có vạch trắng đứt ở tim.
+func _markings(line: PackedVector2Array, w: float, y: float) -> void:
+	var st := _st("ground")
+	var white := Color("eeeae0", GROUND_PLAIN)
+	if w >= 8.0:
+		_strip(st, line, 0.16, y, Color("f2c230", GROUND_PLAIN))
+		for side in [-1.0, 1.0]:
+			_strip(st, _offset(line, side * (w / 2.0 - 0.35)), 0.12, y, white)
+			if w >= 12.0:
+				_dashes(_offset(line, side * w / 4.0), y, white)
+	elif w >= 6.0:
+		_dashes(line, y, white)
+
+
+## Đường gấp khúc dời sang ngang d mét (dương: bên trái theo chiều vẽ), mỗi đỉnh dời theo hướng trung bình hai cạnh kề.
+static func _offset(line: PackedVector2Array, d: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for i in line.size():
+		var a: Vector2 = line[maxi(i - 1, 0)]
+		var b: Vector2 = line[mini(i + 1, line.size() - 1)]
+		out.append(line[i] + (b - a).normalized().orthogonal() * d)
+	return out
+
+
+## Vạch đứt: mỗi 7 m một vạch dài 3 m.
+func _dashes(line: PackedVector2Array, y: float, col: Color) -> void:
 	var st := _st("ground")
 	for i in line.size() - 1:
 		var a := line[i]
@@ -357,7 +496,7 @@ func _dashes(line: PackedVector2Array, y: float) -> void:
 		var dir := (b - a) / maxf(l, 0.001)
 		var s := 1.0
 		while s + 3.0 < l:
-			_strip(st, PackedVector2Array([a + dir * s, a + dir * (s + 3.0)]), 0.15, y, Color("e8e4da"))
+			_strip(st, PackedVector2Array([a + dir * s, a + dir * (s + 3.0)]), 0.15, y, col)
 			s += 7.0
 
 
@@ -435,9 +574,6 @@ func _buildings() -> void:
 	var palette: Array = bc.get("walls", ["f1e3b8"])
 	var lv: Array = bc.get("defaultLevels", [2, 5])
 	var lh := float(bc.get("levelHeight", 3.2))
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	st.set_custom_format(0, SurfaceTool.CUSTOM_RGBA_FLOAT)
 	for b in data.buildings:
 		var poly: PackedVector2Array = b.poly
 		if poly.size() < 3:
@@ -447,6 +583,7 @@ func _buildings() -> void:
 		# Số thứ tự căn nhà cho shader hạ nhà: cả căn đọc chung một độ cao trong ảnh caps.
 		var idx := _cut_polys.size()
 		_cut_polys.append(poly)
+		var st := _bst(c)
 		st.set_custom(0, Color(idx, 1.0, 0.0, 0.0))
 		_rng.seed = hash(Vector2i(roundi(c.x * 10.0), roundi(c.y * 10.0)))
 		var h := float(b.height)
@@ -484,8 +621,8 @@ func _buildings() -> void:
 		elif pitched:
 			roof_col = Color(str(bc.get("pitchedRoof", "a5523a")))
 		else:
-			# Mái bằng: xám bê tông nhiều sắc, hay sẫm theo màu tường.
-			var flats := [Color("8a857d"), Color("77736c"), Color("9c9486"), Color("6c6a66"), wall_col.darkened(0.3)]
+			# Mái bằng: sân thượng láng xi măng sáng hay quét sơn nhạt theo màu tường, như mô hình phố nhìn từ trên cao.
+			var flats := [Color("c4beb1"), Color("b7b1a4"), wall_col.darkened(0.08), wall_col.darkened(0.16), Color("aca699")]
 			roof_col = flats[_rng.randi() % flats.size()]
 		var rh := 0.0
 		var rect := {}
@@ -498,9 +635,9 @@ func _buildings() -> void:
 		_cut_tops.append(h + rh)
 		_walls_of(st, poly, base, h, wall_col, not b.worship)
 		if pitched and float(rect.fill) > 0.82 and shape in ["gabled", "hipped", "half-hipped", "gambrel", "mansard", "skillion"]:
-			_rect_roof(st, rect, h, rh, roof_col, wall_col, shape == "gabled" or shape == "skillion")
+			_rect_roof(st, rect, h, rh, roof_col, wall_col, shape == "gabled" or shape == "skillion", tiled or b.worship)
 		elif pitched:
-			_pyramid(st, poly, c, h, rh, roof_col)
+			_pyramid(st, poly, c, h, rh, roof_col, tiled or b.worship)
 		else:
 			_fill(st, poly, h, roof_col)
 			# Bồn nước inox trên sân thượng: thứ thấy khắp phố Việt. Gộp vào lưới nhà để hạ nhà thì bồn ẩn theo.
@@ -510,14 +647,18 @@ func _buildings() -> void:
 					st.set_custom(0, Color(idx, 2.0, 0.0, 0.0))
 					_tank(st, tp, h)
 		if dress != null:
-			dress.front(st, idx, poly, base, h)
+			dress.front(st, idx, poly, base, h, {"flat": not pitched and not b.worship, "wall": wall_col, "lh": lh})
 	if dress != null:
-		dress.gates(st)
-	st.generate_tangents()
-	var mi := MeshInstance3D.new()
-	mi.mesh = st.commit()
-	mi.material_override = building_mat
-	add_child(mi)
+		dress.gates()
+	for k: Vector3i in _bsts:
+		var mi := MeshInstance3D.new()
+		mi.mesh = (_bsts[k] as SurfaceTool).commit()
+		mi.material_override = building_mat
+		if k.z == 1:
+			mi.visibility_range_end = DETAIL_RANGE
+			mi.visibility_range_end_margin = 15.0
+		add_child(mi)
+	_bsts.clear()
 	# Lưới ô tìm căn gần An, ảnh caps (mỗi căn một điểm ảnh) cho shader.
 	for i in _cut_polys.size():
 		var r := Geo.bounds(_cut_polys[i])
@@ -550,6 +691,19 @@ static func _tank(st: SurfaceTool, p: Vector2, y: float) -> void:
 		_tri(st, _v(p0, y), _v(p1, y), _v(p1, top), n, col, none, uv2)
 		_tri(st, _v(p0, y), _v(p1, top), _v(p0, top), n, col, none, uv2)
 		_tri(st, _v(p, top), _v(p0, top), _v(p1, top), Vector3.UP, col.lightened(0.1), none, uv2)
+
+
+## Lưới nhà của ô chứa điểm p (cùng vật liệu nhà, CUSTOM0 dạng RGBA float): ô TILE mét; detail: lưới chi tiết ô
+## DETAIL_TILE mét, nhìn xa thì khỏi vẽ. Mỗi lưới nhớ CUSTOM0 riêng: trước khi thêm đỉnh phải set_custom cho căn đang dựng.
+func _bst(p: Vector2, detail := false) -> SurfaceTool:
+	var size := DETAIL_TILE if detail else TILE
+	var k := Vector3i(floori(p.x / size), floori(p.y / size), 1 if detail else 0)
+	if not _bsts.has(k):
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		st.set_custom_format(0, SurfaceTool.CUSTOM_RGBA_FLOAT)
+		_bsts[k] = st
+	return _bsts[k]
 
 
 ## Tường quanh đường viền, từ y0 tới y1. UV.x là quãng đường dọc tường, UV.y là độ cao (để shader vẽ cửa sổ theo tầng).
@@ -610,8 +764,9 @@ static func _min_rect(poly: PackedVector2Array) -> Dictionary:
 	return best
 
 
-## Mái trên hình chữ nhật: hai dốc (gable = true, hai đầu hồi xây tường) hoặc bốn dốc.
-func _rect_roof(st: SurfaceTool, r: Dictionary, e: float, rh: float, roof: Color, wall: Color, gable: bool) -> void:
+## Mái trên hình chữ nhật: hai dốc (gable = true, hai đầu hồi xây tường) hoặc bốn dốc. tiles: lợp ngói (shader vẽ
+## hàng ngói theo UV.y là mét dọc dốc mái).
+func _rect_roof(st: SurfaceTool, r: Dictionary, e: float, rh: float, roof: Color, wall: Color, gable: bool, tiles := false) -> void:
 	var c: Vector2 = r.c
 	var u: Vector2 = r.u
 	var v := u.orthogonal()
@@ -624,30 +779,35 @@ func _rect_roof(st: SurfaceTool, r: Dictionary, e: float, rh: float, roof: Color
 	var ridge := L if gable else maxf(L - S, 0.0)
 	var R1 := _v(c - u * ridge, e + rh)
 	var R2 := _v(c + u * ridge, e + rh)
+	var uv2 := Vector2(0.15 if tiles else 0.0, 0.0)
+	var up := Vector2(0.0, Vector2(S, rh).length())
 	for quad in [[A, B, R2, R1], [D, C, R2, R1]]:
 		var n: Vector3 = (quad[1] - quad[0]).cross(quad[3] - quad[0]).normalized()
 		if n.y < 0.0:
 			n = -n
-		_tri(st, quad[0], quad[1], quad[2], n, roof)
-		_tri(st, quad[0], quad[2], quad[3], n, roof)
+		_tri(st, quad[0], quad[1], quad[2], n, roof, [Vector2.ZERO, Vector2.ZERO, up], uv2)
+		_tri(st, quad[0], quad[2], quad[3], n, roof, [Vector2.ZERO, up, up], uv2)
+	var up_end := Vector2(0.0, Vector2(L - ridge, rh).length())
 	for tri in [[A, D, R1], [B, C, R2]]:
 		var n: Vector3 = (tri[1] - tri[0]).cross(tri[2] - tri[0]).normalized()
 		var out: Vector3 = tri[0] - _v(c, e)
 		if n.dot(out) < 0.0:
 			n = -n
-		_tri(st, tri[0], tri[1], tri[2], n, wall if gable else roof)
+		_tri(st, tri[0], tri[1], tri[2], n, wall if gable else roof, [Vector2.ZERO, Vector2.ZERO, up_end], Vector2.ZERO if gable else uv2)
 
 
 ## Mái chóp: mỗi cạnh một tam giác dồn về đỉnh giữa nhà.
-func _pyramid(st: SurfaceTool, poly: PackedVector2Array, c: Vector2, e: float, rh: float, roof: Color) -> void:
+func _pyramid(st: SurfaceTool, poly: PackedVector2Array, c: Vector2, e: float, rh: float, roof: Color, tiles := false) -> void:
 	var apex := _v(c, e + rh)
+	var uv2 := Vector2(0.15 if tiles else 0.0, 0.0)
 	for i in poly.size():
 		var a := _v(poly[i], e)
 		var b := _v(poly[(i + 1) % poly.size()], e)
 		var n := (b - a).cross(apex - a).normalized()
 		if n.y < 0.0:
 			n = -n
-		_tri(st, a, b, apex, n, roof)
+		var up := Vector2(0.0, Vector2(Geo.seg_dist(c, poly[i], poly[(i + 1) % poly.size()]), rh).length())
+		_tri(st, a, b, apex, n, roof, [Vector2.ZERO, Vector2.ZERO, up], uv2)
 
 
 # ---------------------------------------------------------------- hạ nhà che An
@@ -835,7 +995,8 @@ func _multimesh_trees() -> void:
 	var leaf := ShaderMaterial.new()
 	leaf.shader = building_mat.shader
 	leaf.set_shader_parameter("flat_color", true)
-	leaf.set_shader_parameter("tint", Color("4f7d3c"))
+	leaf.set_shader_parameter("tint", Color("5a9a35"))
+	leaf.set_shader_parameter("flame_tint", Color("e0441c"))
 	cut_materials.append(leaf)
 	_tree_slot.resize(_trees.size())
 	for i in _trees.size():
@@ -859,7 +1020,7 @@ func _multimesh_trees() -> void:
 				var s := 0.8 + fmod(absf(p.x * 13.1 + p.y * 7.7), 0.5)
 				var yaw := fmod(absf(p.x * 3.7 - p.y * 5.3), TAU)
 				mm.set_instance_transform(j, Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * s), Vector3(p.x, float(pair[1]) * s, p.y)))
-				mm.set_instance_custom_data(j, Color(1, _tree_var[i], 0, 0))
+				mm.set_instance_custom_data(j, Color(1, _tree_var[i], 1.0 if _flame.has(i) else 0.0, 0))
 				mm.set_instance_color(j, Color.WHITE)
 				_tree_slot[i] = Vector2i(pair[3].size(), j)
 			var mmi := MultiMeshInstance3D.new()
@@ -882,7 +1043,7 @@ func _multimesh_trees() -> void:
 ## Độ to của cây thứ i (1 bình thường, 0 thu hẳn) cho shader tán, thân.
 func _tree_size(i: int, v: float) -> void:
 	var slot: Vector2i = _tree_slot[i]
-	var c := Color(v, _tree_var[i], 0, 0)
+	var c := Color(v, _tree_var[i], 1.0 if _flame.has(i) else 0.0, 0)
 	(_crown_mms[slot.x] as MultiMesh).set_instance_custom_data(slot.y, c)
 	(_trunk_mms[slot.x] as MultiMesh).set_instance_custom_data(slot.y, c)
 
@@ -955,10 +1116,16 @@ func _label(text: String, pos: Vector3, size: int, billboard: bool) -> Label3D:
 ## Cây ven đường (mỗi 13 m, hai bên, chỗ không vướng nhà hay nước), cây OSM và hàng cây OSM.
 func _street_trees() -> void:
 	_rng.seed = 77
+	# Cây phượng xen giữa cây xanh: hàng cây ven đường lớn nhiều phượng nhất.
 	for t in data.trees:
+		if _rng.randf() < 0.12:
+			_flame[_trees.size()] = true
 		_trees.append(t)
 	for r in data.tree_rows:
-		_along(r.line, 7.0, func(p: Vector2, _d: Vector2) -> void: _trees.append(p))
+		_along(r.line, 7.0, func(p: Vector2, _d: Vector2) -> void:
+			if _rng.randf() < 0.2:
+				_flame[_trees.size()] = true
+			_trees.append(p))
 	for r in data.roads:
 		if r.small or r.bridge or float(r.width) < 6.0:
 			continue
@@ -968,6 +1135,8 @@ func _street_trees() -> void:
 				var q: Vector2 = p + d.orthogonal() * off * side
 				if _rng.randf() < 0.6 and walkable(q) and not _in_water(q) and Geometry2D.is_point_in_polygon(q, clip) \
 						and not keep_clear.any(func(k: Vector2) -> bool: return k.distance_to(q) < 7.0):
+					if _rng.randf() < 0.35:
+						_flame[_trees.size()] = true
 					_trees.append(q))
 	counts.trees = _trees.size()
 
@@ -989,7 +1158,7 @@ static func _along(line: PackedVector2Array, step: float, f: Callable) -> void:
 		carry = s - l
 
 
-## Ô tô đậu dọc đường lớn (từ 8 m), xe máy dựng sát vỉa hè đường nhỏ: xe dựng bằng code (props3d.gd), nhiều màu.
+## Ô tô đậu dọc đường lớn (từ park_cars_from mét), xe máy dựng sát vỉa hè: xe dựng bằng code (props3d.gd), nhiều màu.
 func _vehicles() -> void:
 	_rng.seed = 531
 	var cars: Array = []
@@ -1000,7 +1169,7 @@ func _vehicles() -> void:
 		var w := float(r.width)
 		_along(r.line, 9.0 if w >= 6.0 else 6.0, func(p: Vector2, d: Vector2) -> void:
 			var side := -1.0 if _rng.randf() < 0.5 else 1.0
-			if w >= 8.0 and _rng.randf() < 0.32:
+			if w >= park_cars_from and _rng.randf() < 0.32:
 				var q: Vector2 = p + d.orthogonal() * (w / 2.0 - 1.4) * side
 				if Geometry2D.is_point_in_polygon(q, clip) and walkable(q):
 					cars.append([q, d])

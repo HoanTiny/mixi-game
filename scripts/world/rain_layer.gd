@@ -290,6 +290,8 @@ func apply(l: int, flags: Dictionary) -> void:
 		world.walkers[i].node.visible = l == 0 or i % 3 == 0
 	for i in world.bikes.size():
 		world.bikes[i].node.visible = l == 0 or i % 2 == 0
+	if world.traffic != null:
+		world.traffic.density = 1.0 if l == 0 else 0.5
 	var key := "" if l == 0 else "%d:%s:%s:%s" % [l, _prep_state(l, flags), world.home, flags.get("baoCat", false)]
 	# Đồ phơi: đã chuẩn bị thì cất vô từ trước, chưa thì còn ướt sũng trên dây.
 	for c in get_tree().get_nodes_in_group("do_phoi"):

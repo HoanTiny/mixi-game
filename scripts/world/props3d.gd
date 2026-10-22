@@ -10,18 +10,28 @@ const Character := preload("res://scripts/world/character.gd")
 const SHADER := """
 shader_type spatial;
 render_mode cull_back;
-// Màu sơn của chiếc này; MultiMesh thì lấy từ INSTANCE_CUSTOM (mã màu sRGB như màu đỉnh).
+// Màu sơn của chiếc này; MultiMesh thì lấy từ INSTANCE_CUSTOM (mã màu sRGB như màu đỉnh). Phần sơn thứ hai (áo người
+// lái, alpha màu đỉnh 0,5): paint2, MultiMesh thì lấy sắc màu ở INSTANCE_CUSTOM.a.
 uniform vec3 paint : source_color = vec3(0.7, 0.2, 0.2);
+uniform vec3 paint2 : source_color = vec3(0.3, 0.5, 0.8);
 uniform bool per_instance = false;
 varying vec3 v_paint;
+varying vec3 v_paint2;
+vec3 shirt(float h) {
+	vec3 k = clamp(abs(fract(h + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);
+	return mix(vec3(1.0), k, 0.55) * 0.88;
+}
 void vertex() {
 	v_paint = per_instance ? pow(INSTANCE_CUSTOM.rgb, vec3(2.2)) : paint;
+	v_paint2 = per_instance ? pow(shirt(INSTANCE_CUSTOM.a), vec3(2.2)) : paint2;
 }
 void fragment() {
 	vec3 base = pow(COLOR.rgb, vec3(2.2));
-	ALBEDO = mix(base, base * v_paint, COLOR.a);
+	float k1 = step(0.75, COLOR.a);
+	float k2 = step(0.25, COLOR.a) - k1;
+	ALBEDO = base * mix(vec3(1.0), v_paint, k1) * mix(vec3(1.0), v_paint2, k2);
 	// Phần sơn bóng hơn nhựa, cao su, gỗ.
-	ROUGHNESS = mix(0.8, 0.4, COLOR.a);
+	ROUGHNESS = mix(0.8, 0.4, k1);
 }
 """
 ## Ngồi xe máy: độ cao khớp hông, chỗ hông người lái và người ngồi sau theo chiều dài xe (xem Character.sit).
@@ -268,6 +278,60 @@ static func motorbike(kind := "tay_ga", detail := true) -> ArrayMesh:
 	if _cache.has(key):
 		return _cache[key]
 	var g = Character.Mesher.new(false)
+	_motorbike(g, kind, detail)
+	var m: ArrayMesh = g.commit()
+	_cache[key] = m
+	return m
+
+
+## Xe máy đang chạy có người lái (dòng xe MultiMesh, xem traffic.gd): xe bản nhẹ, người lái nắm tay lái, chân để
+## trên sàn (tay ga) hay gác chân (xe số); passenger: thêm người ngồi sau.
+static func rider_bike(kind := "tay_ga", passenger := false) -> ArrayMesh:
+	var key := "chay|%s|%s" % [kind, passenger]
+	if _cache.has(key):
+		return _cache[key]
+	var g = Character.Mesher.new(false)
+	_motorbike(g, kind, false)
+	_rider(g, RIDER_Z, Vector3(0.15, 0.34, 0.12) if kind == "tay_ga" else Vector3(0.24, 0.35, 0.24), true)
+	if passenger:
+		_rider(g, BACK_Z, Vector3(0.25, 0.38, -0.3), false)
+	var m: ArrayMesh = g.commit()
+	_cache[key] = m
+	return m
+
+
+## Người ngồi xe máy, gộp vào lưới xe: hông ở (0, SEAT_H, hz), bàn chân ở (±foot.x, foot.y, foot.z); driver: hai tay
+## nắm tay lái, không thì đặt trên đùi. Áo là phần sơn thứ hai (alpha 0,5: MultiMesh cho mỗi người một màu áo), nón
+## bảo hiểm là phần sơn (cùng màu xe).
+static func _rider(g, hz: float, foot: Vector3, driver: bool) -> void:
+	var skin := _c("c99a72")
+	var pants := _c("2f3644")
+	var shirt := Color(1.0, 1.0, 1.0, 0.5)
+	for sx in [-1.0, 1.0]:
+		var hip := Vector3(sx * 0.1, SEAT_H, hz)
+		var knee := Vector3(sx * 0.17, SEAT_H + 0.04, hz + 0.4)
+		var ft := Vector3(sx * foot.x, foot.y, foot.z)
+		_cyl(g, hip, knee, 0.085, 0.07, pants, 5, false)
+		_cyl(g, knee, ft + Vector3(0, 0.06, 0), 0.065, 0.05, pants, 5, false)
+		_box(g, ft + Vector3(0, 0.03, 0.05), Vector3(0.1, 0.07, 0.22), _c("1e1e22"))
+	# Thân từ hông lên vai, người lái chồm tới trước.
+	var lean := 0.12 if driver else 0.04
+	_loft(g, [_r(Vector3(0, SEAT_H + 0.02, hz - 0.02), 0.16, 0.11, shirt), _r(Vector3(0, SEAT_H + 0.28, hz + lean * 0.5), 0.18, 0.11, shirt),
+		_r(Vector3(0, SEAT_H + 0.48, hz + lean), 0.19, 0.1, shirt)], 6)
+	var sh_y := SEAT_H + 0.45
+	var sh_z := hz + lean
+	for sx in [-1.0, 1.0]:
+		var sh := Vector3(sx * 0.2, sh_y, sh_z)
+		var hand := Vector3(sx * 0.3, 1.08, 0.38) if driver else Vector3(sx * 0.16, SEAT_H + 0.08, hz + 0.3)
+		var elbow := sh.lerp(hand, 0.5) + Vector3(sx * 0.05, -0.08, 0.0)
+		_cyl(g, sh, elbow, 0.055, 0.05, shirt, 5, false)
+		_cyl(g, elbow, hand, 0.045, 0.04, skin, 5, false)
+	var head := Vector3(0, sh_y + 0.2, sh_z + 0.03)
+	_blob(g, head, Vector3(0.1, 0.12, 0.11), skin, 3, 6)
+	_blob(g, head + Vector3(0, 0.045, -0.01), Vector3(0.125, 0.11, 0.135), _p(), 3, 6)
+
+
+static func _motorbike(g, kind: String, detail: bool) -> void:
 	var s := 12 if detail else 6
 	var R := 0.27
 	var zf := 0.76
@@ -328,9 +392,6 @@ static func motorbike(kind := "tay_ga", detail := true) -> ArrayMesh:
 			_box(g, Vector3(0.03, 0.3, -0.36), Vector3(0.2, 0.2, 0.42), _c("3a3c40"))
 		_loft(g, [_r(Vector3(-0.13, 0.27, -0.08), 0.025, 0.025, _c("6d6f73")), _r(Vector3(-0.17, 0.33, -0.45), 0.05, 0.05, _c("b8babd")),
 			_r(Vector3(-0.17, 0.37, -0.8), 0.045, 0.045, _c("b8babd"))], 8)
-	var m: ArrayMesh = g.commit()
-	_cache[key] = m
-	return m
 
 
 # ---------------------------------------------------------------- ô tô

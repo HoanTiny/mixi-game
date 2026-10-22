@@ -359,14 +359,18 @@ func _build_view_overlay(parent: Control) -> void:
 func _build_world() -> void:
 	_world = Node3D.new()
 	_vp.add_child(_world)
+	# Nắng trong, màu tươi như mô hình phố (màu nhà, mặt đất là mã sRGB, xem AreaBuilder): nền trời xanh nhạt, vùng bóng
+	# hắt sáng xanh của trời.
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("c3cad2")
+	env.background_color = Color("b9d9ee")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("dfe3ea")
-	env.ambient_light_energy = 0.36
+	env.ambient_light_color = Color("d5e2ee")
+	env.ambient_light_energy = 0.8
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 0.88
+	env.tonemap_exposure = 1.0
+	env.adjustment_enabled = true
+	env.adjustment_saturation = 1.05
 	var we := WorldEnvironment.new()
 	we.environment = env
 	_world.add_child(we)
@@ -378,7 +382,7 @@ func _build_world() -> void:
 	sun.directional_shadow_max_distance = 1400.0
 	sun.rotation_degrees = Vector3(-55, 140, 0)
 	sun.light_color = Color("fff1de")
-	sun.light_energy = 0.52
+	sun.light_energy = 1.05
 	_world.add_child(sun)
 	camera = Camera3D.new()
 	camera.fov = 32
