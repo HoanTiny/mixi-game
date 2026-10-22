@@ -283,7 +283,6 @@ func _build_environment() -> void:
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
 	sun.directional_shadow_max_distance = 70.0
-	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 	add_child(sun)
 
 
@@ -1161,7 +1160,7 @@ func _build_real() -> void:
 	# xi măng (xem AreaBuilder.GROUND_SHADER).
 	var asphalt := Surfaces.get_mat("duong", 4.0, Color(0.78, 0.76, 0.72), true)
 	area.ground_material = AreaBuilder.ground_shader_material(asphalt.albedo_texture, asphalt.normal_texture, Color(0.78, 0.76, 0.72), 4.0)
-	area.water_color = Color("2f6b68")
+	area.water_color = Color("234d4a")
 	area.park_cars_from = Traffic.PARKED_CARS_FROM
 	add_child(area)
 	var mid := Vector2.ZERO
@@ -1425,8 +1424,12 @@ func _physics_process(delta: float) -> void:
 	var cam_goal := player.position + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, minf(zoom, 1.0)), 0), Vector3.UP)
-	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút).
+	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút), hai tầng bóng cho đỡ lần vẽ; góc chơi giữ bốn tầng để mặt
+	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
 	sun.directional_shadow_max_distance = lerpf(70.0, 240.0, clampf(zoom - 1.0, 0.0, 1.0))
+	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	if sun.directional_shadow_mode != shadow_mode:
+		sun.directional_shadow_mode = shadow_mode
 	_update_cutaway(delta)
 
 	var near := nearest_location()

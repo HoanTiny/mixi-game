@@ -295,6 +295,14 @@ static func rider_bike(kind := "tay_ga", passenger := false) -> ArrayMesh:
 	_rider(g, RIDER_Z, Vector3(0.15, 0.34, 0.12) if kind == "tay_ga" else Vector3(0.24, 0.35, 0.24), true)
 	if passenger:
 		_rider(g, BACK_Z, Vector3(0.25, 0.38, -0.3), false)
+	# Bóng giả sát mặt đường: dòng xe đông không đổ bóng thật (đỡ vẽ lại vào các tầng bóng nắng).
+	var disc := PackedInt32Array()
+	var mid: int = g.vert(Vector3(0.0, 0.012, 0.0), Vector3.UP, _c("1c1d20"), NB)
+	for j in 10:
+		var th := TAU * float(j) / 10.0
+		disc.append(g.vert(Vector3(sin(th) * 0.42, 0.012, cos(th) * 1.0 - 0.05), Vector3.UP, _c("26272b"), NB))
+	for j in 10:
+		g.tri(mid, disc[j], disc[(j + 1) % 10])
 	var m: ArrayMesh = g.commit()
 	_cache[key] = m
 	return m

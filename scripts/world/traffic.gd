@@ -85,7 +85,7 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float) -> voi
 			if list.is_empty():
 				continue
 			var parts := str(kk).split("|")
-			_group(Props3D.car() if kk == "car" else Props3D.rider_bike(parts[0], parts[1] == "true"), list, clusters[key].rect)
+			_group(Props3D.car() if kk == "car" else Props3D.rider_bike(parts[0], parts[1] == "true"), list, clusters[key].rect, kk == "car")
 
 
 ## Độ đông xe của tuyến: đủ trong vòng 65 m quanh chỗ của truyện, xa dần thưa dần, xa hẳn còn một phần ba.
@@ -109,8 +109,9 @@ func _add(kinds: Dictionary, kk: String, ri: int, m: int, lane: Vector2, speed: 
 			_rng.randf_range(lane.x, maxf(lane.x, lane.y)), _rng.randf_range(speed.x, speed.y), c])
 
 
-## Một nhóm (cụm, loại xe): MultiMesh khung bao cố định quanh các tuyến trong cụm.
-func _group(mesh: Mesh, list: Array, rect: Rect2) -> void:
+## Một nhóm (cụm, loại xe): MultiMesh khung bao cố định quanh các tuyến trong cụm. shadows: đổ bóng thật (ô tô); xe máy
+## đông nên dùng bóng giả có sẵn trong lưới.
+func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool) -> void:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	# Màu sơn ở custom data (sắc áo ở kênh a); màu instance trắng (bản Compatibility nhân màu đỉnh với màu instance).
@@ -146,6 +147,8 @@ func _group(mesh: Mesh, list: Array, rect: Rect2) -> void:
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
 	mi.material_override = Props3D.instanced_material()
+	if not shadows:
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
 	groups.append(g)
 	counts.groups += 1

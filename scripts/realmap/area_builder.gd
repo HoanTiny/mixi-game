@@ -287,7 +287,7 @@ func _commit_flat() -> void:
 			add_child(mi)
 			continue
 		if key == "water":
-			m.roughness = 0.2
+			m.roughness = 0.3
 		mi.material_override = m
 		add_child(mi)
 	_flat.clear()
