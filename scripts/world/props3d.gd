@@ -15,6 +15,10 @@ render_mode cull_back;
 uniform vec3 paint : source_color = vec3(0.7, 0.2, 0.2);
 uniform vec3 paint2 : source_color = vec3(0.3, 0.5, 0.8);
 uniform bool per_instance = false;
+// Người đi bộ (MultiMesh): tay chân vung theo nhịp bước. UV.x đánh dấu chi (1, 2 chân trái, phải; 3, 4 tay trái,
+// phải), UV.y là độ cao khớp hông, vai; mỗi người một nhịp lệch theo chỗ đứng.
+uniform bool swing = false;
+uniform float swing_speed = 7.0;
 varying vec3 v_paint;
 varying vec3 v_paint2;
 vec3 shirt(float h) {
@@ -24,6 +28,16 @@ vec3 shirt(float h) {
 void vertex() {
 	v_paint = per_instance ? pow(INSTANCE_CUSTOM.rgb, vec3(2.2)) : paint;
 	v_paint2 = per_instance ? pow(shirt(INSTANCE_CUSTOM.a), vec3(2.2)) : paint2;
+	if (swing && UV.x > 0.5) {
+		float limb = floor(UV.x + 0.5);
+		float side = (limb == 1.0 || limb == 4.0) ? 1.0 : -1.0;
+		float phase = dot(MODEL_MATRIX[3].xz, vec2(0.37, 0.71));
+		float ang = sin(TIME * swing_speed + phase) * (limb < 2.5 ? 0.45 : 0.35) * side;
+		float dy = VERTEX.y - UV.y;
+		float dz = VERTEX.z;
+		VERTEX.y = UV.y + dy * cos(ang) - dz * sin(ang);
+		VERTEX.z = dy * sin(ang) + dz * cos(ang);
+	}
 }
 void fragment() {
 	vec3 base = pow(COLOR.rgb, vec3(2.2));
@@ -73,6 +87,19 @@ static func instanced_material() -> ShaderMaterial:
 		m.set_shader_parameter("per_instance", true)
 		_mats["instanced"] = m
 	return _mats["instanced"]
+
+
+## Vật liệu cho MultiMesh người đi bộ (person("walk")): như instanced_material, tay chân vung theo nhịp speed.
+static func walking_material(speed := 7.0) -> ShaderMaterial:
+	var key := "walk|%s" % speed
+	if not _mats.has(key):
+		var m := ShaderMaterial.new()
+		m.shader = _get_shader()
+		m.set_shader_parameter("per_instance", true)
+		m.set_shader_parameter("swing", true)
+		m.set_shader_parameter("swing_speed", speed)
+		_mats[key] = m
+	return _mats[key]
 
 
 static func glass_material() -> StandardMaterial3D:
@@ -400,6 +427,91 @@ static func _motorbike(g, kind: String, detail: bool) -> void:
 			_box(g, Vector3(0.03, 0.3, -0.36), Vector3(0.2, 0.2, 0.42), _c("3a3c40"))
 		_loft(g, [_r(Vector3(-0.13, 0.27, -0.08), 0.025, 0.025, _c("6d6f73")), _r(Vector3(-0.17, 0.33, -0.45), 0.05, 0.05, _c("b8babd")),
 			_r(Vector3(-0.17, 0.37, -0.8), 0.045, 0.045, _c("b8babd"))], 8)
+
+
+# ---------------------------------------------------------------- người đi đường (MultiMesh)
+
+## Người đi đường gọn nhẹ cho đám đông MultiMesh (crowd.gd): pose "stand" đứng, "walk" đứng có đánh dấu tay chân để
+## shader vung theo bước (walking_material), "sit" ngồi ghế đẩu thấp hai tay đặt trên gối. Áo là phần sơn (màu ở
+## INSTANCE_CUSTOM), quần là phần sơn thứ hai sẫm màu (sắc ở INSTANCE_CUSTOM.a); hat: đội nón lá. Nhìn về +z, chân ở
+## mặt đất (ngồi: mông ở độ cao 0,34 m); có bóng giả sát đất như xe máy chạy.
+static func person(pose := "stand", hat := false) -> ArrayMesh:
+	var key := "nguoi|%s|%s" % [pose, hat]
+	if _cache.has(key):
+		return _cache[key]
+	var g = Character.Mesher.new(false)
+	var skin := _c("c99a72")
+	var pants := Color(0.42, 0.42, 0.45, 0.5)
+	var shirt := _p()
+	var walk := pose == "walk"
+	var sit := pose == "sit"
+	var hip := 0.36 if sit else 0.9
+	var shoulder := hip + 0.5
+	for sx in [-1.0, 1.0]:
+		var uv := Vector2(1.0 if sx < 0.0 else 2.0, hip) if walk else Vector2.ZERO
+		var h := Vector3(sx * 0.09, hip, 0.0)
+		if sit:
+			var knee := Vector3(sx * 0.11, hip + 0.06, 0.4)
+			var foot := Vector3(sx * 0.11, 0.07, 0.44)
+			_limb(g, h, knee, 0.08, 0.065, pants, Vector2.ZERO)
+			_limb(g, knee, foot, 0.06, 0.05, pants, Vector2.ZERO)
+			_box(g, foot + Vector3(0, -0.03, 0.05), Vector3(0.1, 0.07, 0.2), _c("1e1e22"))
+		else:
+			var foot := Vector3(sx * 0.1, 0.08, 0.02)
+			_limb(g, h, foot, 0.075, 0.055, pants, uv)
+			_limb(g, foot, foot + Vector3(0, -0.06, 0.12), 0.05, 0.045, _c("1e1e22"), uv)
+		# Tay: bắp tay áo, cẳng tay da; người ngồi đặt tay lên gối.
+		var auv := Vector2(3.0 if sx < 0.0 else 4.0, shoulder) if walk else Vector2.ZERO
+		var sh := Vector3(sx * 0.2, shoulder - 0.03, 0.0)
+		var hand := Vector3(sx * 0.15, hip + 0.12, 0.34) if sit else Vector3(sx * 0.25, hip - 0.04, 0.03)
+		var elbow := sh.lerp(hand, 0.45) + Vector3(sx * 0.04, 0.0, 0.0)
+		_limb(g, sh, elbow, 0.055, 0.05, shirt, auv)
+		_limb(g, elbow, hand, 0.045, 0.04, skin, auv)
+	_loft(g, [_r(Vector3(0, hip + 0.02, -0.01), 0.16, 0.11, shirt), _r(Vector3(0, hip + 0.28, 0.0), 0.18, 0.11, shirt),
+		_r(Vector3(0, shoulder, 0.0), 0.19, 0.1, shirt)], 6)
+	var head := Vector3(0, shoulder + 0.19, 0.01)
+	_blob(g, head, Vector3(0.1, 0.12, 0.11), skin, 3, 6)
+	_blob(g, head + Vector3(0, 0.05, -0.025), Vector3(0.108, 0.1, 0.115), _c("1f1a17"), 3, 6)
+	if hat:
+		_loft(g, [_r(head + Vector3(0, 0.06, 0), 0.3, 0.3, _c("d9c27a")), _r(head + Vector3(0, 0.22, 0), 0.02, 0.02, _c("cbb56c"))], 8, true, false)
+	# Bóng giả sát mặt đất.
+	var disc := PackedInt32Array()
+	var mid: int = g.vert(Vector3(0.0, 0.012, 0.12 if sit else 0.0), Vector3.UP, _c("1c1d20"), NB)
+	for j in 8:
+		var th := TAU * float(j) / 8.0
+		disc.append(g.vert(Vector3(sin(th) * 0.3, 0.012, cos(th) * 0.3 + (0.12 if sit else 0.0)), Vector3.UP, _c("2a2b2f"), NB))
+	for j in 8:
+		g.tri(mid, disc[j], disc[(j + 1) % 8])
+	var m: ArrayMesh = g.commit()
+	_cache[key] = m
+	return m
+
+
+## Ống thon từ a tới b (bán kính r0, r1, 5 mặt, nắp hai đầu) mà mọi đỉnh mang UV uv: shader người đi bộ đọc UV để vung
+## tay chân quanh khớp.
+static func _limb(g, a: Vector3, b: Vector3, r0: float, r1: float, col: Color, uv: Vector2, segs := 5) -> void:
+	var ax := (b - a).normalized()
+	var side := Vector3.RIGHT if absf(ax.x) < 0.9 else Vector3.BACK
+	side = (side - ax * ax.dot(side)).normalized()
+	var up := ax.cross(side)
+	var ra := PackedInt32Array()
+	var rb := PackedInt32Array()
+	for j in segs:
+		var th := TAU * float(j) / float(segs)
+		var d := side * cos(th) + up * sin(th)
+		ra.append(g.vert(a + d * r0, d, col, NB, uv))
+		rb.append(g.vert(b + d * r1, d, col, NB, uv))
+	for j in segs:
+		var j2 := (j + 1) % segs
+		g.tri(ra[j], ra[j2], rb[j2])
+		g.tri(ra[j], rb[j2], rb[j])
+	for end in [[a, ra, -ax, r0], [b, rb, ax, r1]]:
+		var c: int = g.vert(end[0], end[2], col, NB, uv)
+		var ring := PackedInt32Array()
+		for j in segs:
+			ring.append(g.vert(g.pts[end[1][j]], end[2], col, NB, uv))
+		for j in segs:
+			g.tri(c, ring[j], ring[(j + 1) % segs])
 
 
 # ---------------------------------------------------------------- ô tô

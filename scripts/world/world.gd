@@ -21,6 +21,7 @@ const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
+const Crowd := preload("res://scripts/world/crowd.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
 ## (game.home_loc()); bà, Linh, má đứng trước cửa chỗ đó, ông Ba ở sát vách.
@@ -108,6 +109,10 @@ var walkers: Array = []
 var bikes: Array = []
 ## Dòng xe chạy trên map thật (traffic.gd); map phường vẽ tay dùng bikes.
 var traffic: Node3D = null
+## Đám đông trên map thật (crowd.gd): khách quán cóc, chủ tiệm, người đi vỉa hè, trẻ con đá banh.
+var crowd: Node3D = null
+## Chỗ đông người của truyện trên map thật: [địa điểm, số người đứng quanh cổng, bán kính (m)].
+const CROWD_SPOTS := [["cho_cau_nho", 26, 12.0], ["ben_xe_6", 10, 7.0], ["com_hanh", 5, 5.0]]
 ## Khối nhà có thể che An: {"node", "rect": Rect2 nền nhà, "h": chiều cao}.
 var occluders: Array = []
 ## Nhân vật có tên: id -> {node, body, name, loc}; street_life cho họ đi lại theo giờ.
@@ -953,8 +958,14 @@ func _build_stalls(w: float, holder: Node3D) -> void:
 			z += 6.5
 
 
+## Bàn gỗ của các sạp chợ (đám đông trên map thật: người bán đứng sau sạp, người mua đứng trước).
+var _stall_tables: Array[Node3D] = []
+
+
 func _stall(pos: Vector3, holder: Node3D, wood: Material) -> void:
-	_block(Vector3(2.6, 0.8, 1.2), pos, Color("8a6a4a"), holder).material_override = wood
+	var table := _block(Vector3(2.6, 0.8, 1.2), pos, Color("8a6a4a"), holder)
+	table.material_override = wood
+	_stall_tables.append(table)
 	var tarp := _block(Vector3(3.0, 0.05, 1.9), pos + Vector3(0, 2.2, 0), Color("2f6fb0"), holder)
 	tarp.rotation.x = -0.12
 	for px in [-1.3, 1.3]:
@@ -1299,6 +1310,10 @@ func _on_water(p: Vector2) -> bool:
 	return false
 
 
+## Chân cột đèn đường trên map thật (đám đông đi tránh).
+var _lamp_spots: Array = []
+
+
 func _build_real_lamps() -> void:
 	var placed: Array[Vector2] = []
 	for r in city.data.roads:
@@ -1310,6 +1325,7 @@ func _build_real_lamps() -> void:
 			var q: Vector2 = p + d.orthogonal() * (float(r.width) / 2.0 + 0.6)
 			if city.walkable(q):
 				placed.append(p)
+				_lamp_spots.append(q)
 				_lamp(_v3(q), atan2(d.x, d.y)))
 
 
@@ -1333,6 +1349,20 @@ func _build_real_traffic() -> void:
 	add_child(traffic)
 	# Điện thoại: bớt xe cho nhẹ máy.
 	traffic.build(city.data.roads, area.dress.center, 300.0, AreaBuilder.BRIDGE_Y, 0.65 if ScreenFit.low_power else 1.0)
+	# Đám đông: đông nhất quanh cổng chợ, bến xe, quán cơm; đi tránh gốc cây, cột điện, cột đèn.
+	var hot: Array = []
+	for spot in CROWD_SPOTS:
+		if city.locs.has(spot[0]):
+			hot.append([city.loc_door(spot[0]), spot[1], spot[2]])
+	var stalls: Array = []
+	for t in _stall_tables:
+		if t.is_inside_tree():
+			var out := t.global_basis.z
+			stalls.append([Vector2(t.global_position.x, t.global_position.z), Vector2(out.x, out.z).normalized()])
+	crowd = Crowd.new()
+	add_child(crowd)
+	crowd.build(area.dress, city.data.roads, area.dress.center, city.walkable, hot, stalls,
+		area.tree_spots() + area.dress.pole_spots + _lamp_spots, 0.65 if ScreenFit.low_power else 1.0)
 	small.shuffle()
 	for k in mini(small.size(), 22):
 		var pth: Dictionary = small[k].duplicate()
@@ -1888,6 +1918,8 @@ func _handle_click(screen_pos: Vector2) -> void:
 func _update_traffic(delta: float) -> void:
 	if traffic != null:
 		traffic.update(delta, Vector2(player.position.x, player.position.z))
+	if crowd != null:
+		crowd.update(delta, Vector2(player.position.x, player.position.z))
 	for b in bikes:
 		var n: Node3D = b.node
 		var lane: Dictionary = b.lane
@@ -2011,6 +2043,8 @@ func _update_lighting(hour: float) -> void:
 	env.ambient_light_color = c.lerp(Color("b9cde0"), 0.2 if rain else 0.5)
 	env.ambient_light_energy = 0.45 if hour >= 20.0 else (0.75 if rain else 0.9)
 	var on := hour >= (16.0 if rain else 18.0)
+	if crowd != null:
+		crowd.set_time(hour, rain)
 	for lamp in lamps:
 		lamp.visible = on
 		lamp.light_energy = 2.2 if on else 0.0

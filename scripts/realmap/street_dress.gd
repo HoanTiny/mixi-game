@@ -34,6 +34,11 @@ var _rng := RandomNumberGenerator.new()
 var _seg := {}
 var _labels := 0
 var _stools: Array = []
+## Cho đám đông (crowd.gd): chỗ ngồi ghế đẩu quán cóc [chỗ, hướng mặt về bàn, cao ghế]; trước cửa tiệm có biển hiệu
+## [chỗ đứng trên vỉa hè, hướng ra đường]; chân cột điện (người đi bộ đi tránh).
+var seats: Array = []
+var shops: Array = []
+var pole_spots: Array = []
 ## Biển có thể ghi chữ: chọn những biển gần các địa điểm của truyện nhất (keep_clear của builder) khi xong.
 var _boards: Array = []
 ## Đếm để in khi thử: nhà xét, có mặt tiền, mái hiên, biển, ban công, mái ngói mặt tiền, sân thượng, tum, cột, cổng.
@@ -151,6 +156,7 @@ func front(st: SurfaceTool, idx: int, poly: PackedVector2Array, base: float, h: 
 	if h >= 3.9 and l >= 2.0 and _rng.randf() < float(cfg.get("signShare", 0.5)):
 		st.set_custom(0, Color(idx, 2.0, 0.0, 0.0))
 		counts.boards += 1
+		shops.append([(a + e) / 2.0 + n * _rng.randf_range(0.7, 1.1) + d * _rng.randf_range(-0.6, 0.6), n])
 		var board := Color(_pick("boards", ["c0392b"]))
 		var y0 := 2.95
 		var y1 := minf(3.85, h - 0.15)
@@ -639,6 +645,7 @@ func streets() -> void:
 				return
 			_pole(q, d)
 			counts.poles += 1
+			pole_spots.append(q)
 			poles.append(q))
 		if wires:
 			for i in poles.size() - 1:
@@ -878,7 +885,9 @@ func finish() -> void:
 		items.append([p, d, "table", Color("c0392b") if col == Color("2f6fb0") else Color("2f6fb0")])
 		for k in _rng.randi_range(2, 4):
 			var a := TAU * k / 4.0 + _rng.randf_range(-0.3, 0.3)
-			items.append([p + Vector2(cos(a), sin(a)) * 0.55, d, "tall" if k % 2 == 0 else "low", col])
+			var q := p + Vector2(cos(a), sin(a)) * 0.55
+			items.append([q, d, "tall" if k % 2 == 0 else "low", col])
+			seats.append([q, (p - q).normalized(), 0.42 if k % 2 == 0 else 0.27])
 	# Ghế đẩu thấp, ghế cao, bàn (props3d.gd): mỗi loại một MultiMesh, màu từng cái là màu instance.
 	var m := StandardMaterial3D.new()
 	m.vertex_color_use_as_albedo = true

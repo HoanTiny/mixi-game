@@ -404,6 +404,11 @@ var _trees: Array = []
 var _flame := {}
 
 
+## Gốc các cây đã trồng (đám đông đi tránh).
+func tree_spots() -> Array:
+	return _trees
+
+
 func _trees_in(poly: PackedVector2Array) -> void:
 	var r := Geo.bounds(poly)
 	_rng.seed = hash(r.position)
