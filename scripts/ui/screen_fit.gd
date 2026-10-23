@@ -87,10 +87,16 @@ func _update_rotate(win: Vector2) -> void:
 		var v := VBoxContainer.new()
 		v.add_theme_constant_override("separation", 18)
 		center.add_child(v)
-		var icon := Label.new()
-		icon.text = "↻"
-		icon.add_theme_font_size_override("font_size", 64)
-		icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		# Hình chiếc điện thoại nằm ngang vẽ bằng khung (font chữ không có ký tự mũi tên xoay).
+		var icon := Panel.new()
+		var frame := StyleBoxFlat.new()
+		frame.bg_color = Color(0, 0, 0, 0)
+		frame.border_color = Color(0.92, 0.93, 0.96)
+		frame.set_border_width_all(4)
+		frame.set_corner_radius_all(10)
+		icon.add_theme_stylebox_override("panel", frame)
+		icon.custom_minimum_size = Vector2(96, 56)
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(icon)
 		var msg := Label.new()
 		msg.text = "Xoay ngang điện thoại để chơi\ncho dễ nhìn phố và bấm nút."

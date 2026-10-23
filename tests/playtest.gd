@@ -142,6 +142,12 @@ func _play_day() -> void:
 		for npc in _talk_plan():
 			if game.day() == d:
 				await _talk(npc)
+		# Ai nhờ việc thì nhận (như người chơi thấy dấu ! trên phố); các bước đi tới nơi do _quests() lo.
+		for q in game.quest_offers():
+			if game.day() == d and game.s.queue.is_empty():
+				game.quest_offer(str(q.id))
+				_day_log.append("nhận việc nhờ %s" % q.id)
+				await _events()
 	await _quests()
 	for id in _plan():
 		if game.day() != d or game.is_over():
