@@ -245,6 +245,8 @@ Chơi tiếp chương 5 (ngày 121–150) từ màn kết chương 4; kết chư
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --full --route=B --talk
 ```
 
+**Phụ đề hội thoại:** cảnh truyện, hội thoại với nhân vật và màn kết chương không còn là khung chữ dài: lời kể và lời thoại chạy thành phụ đề ở cuối màn hình, mỗi lần một câu, có tên người nói, chữ chạy dần (chạm, bấm chuột hay Space để sang câu sau, "Bỏ qua" để tới lựa chọn ngay), hết lời mới hiện lựa chọn (bấm số 1–9 để chọn nhanh). Màn kết chỉ đọc tên kết, lời kết, câu nói và "về sau"; thẻ hậu truyện, người ở phố, sổ tay mở ở nút "Xem thêm". Cắt câu ở `scripts/ui/subtitle_text.gd`.
+
 **Chạy thử nhanh** (thêm vào sau lệnh chạy game, không ghi đè bản lưu thật):
 
 - `-- --demo --demo-full`: vào thẳng ngày 1 của bản 30 ngày.

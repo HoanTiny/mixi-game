@@ -1,10 +1,14 @@
 extends Control
-## Lớp hộp thoại ở giữa màn hình: mở đầu, sự kiện, buổi tối, màn kết 30 ngày (có nút chơi tiếp chương 2),
-## màn kết chương 2 và tổng kết lát cắt.
+## Lớp hộp thoại: mở đầu, buổi tối, tổng kết lát cắt ở khung giữa màn hình; cảnh truyện, hội thoại và màn kết chương
+## chạy thành phụ đề ở cuối màn hình (từng câu, có tên người nói, chạm để sang câu sau), hết lời mới hiện lựa chọn.
+## Màn kết chỉ đọc vài câu chính; thẻ hậu truyện, sổ tay mở ở nút "Xem thêm".
 ## Tự hiện khi trạng thái game cần người chơi chọn, tự ẩn khi không.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
+const Sub := preload("res://scripts/ui/subtitle_text.gd")
+## Tốc độ chữ chạy (ký tự mỗi giây).
+const TYPE_SPEED := 55.0
 
 signal closed
 
@@ -12,15 +16,33 @@ var game
 var night_open := false
 var _box: VBoxContainer
 var _diary_open := false
+var _scrim: ColorRect
+var _panel_root: ScrollContainer
+# Phụ đề: khóa của cảnh đang chạy, các dòng {who, text, big}, dòng đang hiện, số chữ đã hiện, hàm dựng lựa chọn.
+var _sub_root: Control
+var _sub_head: Label
+var _sub_who: Label
+var _sub_line: Label
+var _sub_hint: Label
+var _sub_skip: Button
+var _sub_choices: VBoxContainer
+var _sub_key := ""
+var _sub_lines: Array = []
+var _sub_i := 0
+var _sub_chars := -1.0
+var _sub_build := Callable()
+## Màn kết: đã đọc xong phần phụ đề và bấm xem thẻ hậu truyện, sổ tay.
+var _ending_full := false
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var scrim := ColorRect.new()
-	scrim.color = Color(0.05, 0.06, 0.12, 0.6)
-	add_child(scrim)
-	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_scrim = ColorRect.new()
+	_scrim.color = Color(0.05, 0.06, 0.12, 0.6)
+	add_child(_scrim)
+	_scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var scroll := ScrollContainer.new()
+	_panel_root = scroll
 	add_child(scroll)
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -35,6 +57,7 @@ func _ready() -> void:
 	_box = VBoxContainer.new()
 	_box.add_theme_constant_override("separation", 10)
 	panel.add_child(_box)
+	_build_subtitles()
 	game.changed.connect(refresh)
 	refresh()
 
@@ -48,31 +71,246 @@ func refresh() -> void:
 	for child in _box.get_children():
 		child.queue_free()
 	var show := true
+	var sub := false
+	if not game.is_over():
+		_ending_full = false
 	if not game.is_started():
 		_start()
 	elif game.is_over():
-		match str(game.s.over.get("kind", "")):
-			"full":
-				_ending()
-			"full2":
-				_ending2()
-			"full3":
-				_ending3()
-			"full4":
-				_ending4()
-			"full5":
-				_ending5()
-			_:
-				_report()
+		var kind := str(game.s.over.get("kind", ""))
+		if kind.begins_with("full") and not _ending_full:
+			sub = true
+			_sub_ending()
+		else:
+			match kind:
+				"full":
+					_ending()
+				"full2":
+					_ending2()
+				"full3":
+					_ending3()
+				"full4":
+					_ending4()
+				"full5":
+					_ending5()
+				_:
+					_report()
 	elif not game.s.queue.is_empty():
-		_event()
+		sub = true
+		_sub_event()
 	elif night_open:
 		_night()
 	else:
 		show = false
+	if not sub:
+		_sub_key = ""
+	_panel_root.visible = not sub
+	_sub_root.visible = sub
+	_scrim.color.a = 0.18 if sub else 0.6
 	if visible and not show:
 		closed.emit()
 	visible = show
+
+
+# ---------------------------------------------------------------- phụ đề
+
+func _build_subtitles() -> void:
+	_sub_root = Control.new()
+	add_child(_sub_root)
+	_sub_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_sub_root.gui_input.connect(_on_sub_input)
+	var margin := MarginContainer.new()
+	_sub_root.add_child(margin)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["left", "right"]:
+		margin.add_theme_constant_override("margin_" + side, 40)
+	# Chừa chỗ cho thanh nút ở đáy màn phố.
+	margin.add_theme_constant_override("margin_bottom", 96)
+	margin.add_theme_constant_override("margin_top", 20)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.alignment = BoxContainer.ALIGNMENT_END
+	col.add_theme_constant_override("separation", 12)
+	margin.add_child(col)
+	_sub_choices = VBoxContainer.new()
+	_sub_choices.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_sub_choices.custom_minimum_size = Vector2(560, 0)
+	_sub_choices.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_sub_choices.add_theme_constant_override("separation", 8)
+	col.add_child(_sub_choices)
+	var bar := PanelContainer.new()
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_theme_stylebox_override("panel", UI.box(Color(0.06, 0.07, 0.12, 0.9), Color(1, 1, 1, 0.14), 14, 20))
+	col.add_child(bar)
+	var v := VBoxContainer.new()
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_theme_constant_override("separation", 6)
+	bar.add_child(v)
+	var top := HBoxContainer.new()
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(top)
+	_sub_head = UI.label("", 12, UI.HUD_SOFT)
+	_sub_head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_sub_head.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	top.add_child(_sub_head)
+	_sub_skip = Button.new()
+	_sub_skip.text = "Bỏ qua  ▸▸"
+	_sub_skip.flat = true
+	_sub_skip.add_theme_color_override("font_color", UI.HUD_SOFT)
+	_sub_skip.add_theme_font_size_override("font_size", 13)
+	_sub_skip.pressed.connect(_sub_skip_all)
+	top.add_child(_sub_skip)
+	_sub_who = UI.label("", 18, UI.GOLD)
+	v.add_child(_sub_who)
+	_sub_line = UI.label("", 21, UI.HUD_TEXT)
+	_sub_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sub_line.custom_minimum_size = Vector2(200, 58)
+	v.add_child(_sub_line)
+	_sub_hint = UI.label("Chạm hay nhấn Space để tiếp  ▸", 12, UI.HUD_SOFT)
+	_sub_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	v.add_child(_sub_hint)
+
+
+## Cảnh truyện, đoạn hội thoại, tin nhắn: lời kể rồi lời thoại, hết thì hiện lựa chọn.
+func _sub_event() -> void:
+	var e: Dictionary = game.current_event()
+	if e.is_empty():
+		return
+	var key := "%s|%d|%d" % [str(game.s.queue[0].id), game.s.queue.size(), game.day()]
+	if key == _sub_key:
+		return
+	var lines := Sub.narration(game.fill(str(e.get("text", ""))))
+	lines.append_array(Sub.quote(game.fill(str(e.get("quote", "")))))
+	var head: String = "%s  ·  %s" % [str(e.eyebrow), game.fill(str(e.title))] if str(e.get("eyebrow", "")) != "" else game.fill(str(e.title))
+	var choices: Array = e.choices
+	_sub_start(key, head, lines, func() -> void:
+		var i := 0
+		for c in choices:
+			_sub_choices.add_child(UI.choice("%d · %s" % [i + 1, game.fill(c.label)], game.fill(c.get("hint", "")), game.choice_lock(c), game.resolve_choice.bind(i)))
+			i += 1)
+
+
+## Màn kết chương: tên kết, lời kết, câu nói, "nếu câu chuyện dừng ở đây"; rồi nút chơi tiếp, xem thêm, chơi lại.
+func _sub_ending() -> void:
+	var over: Dictionary = game.s.over
+	var key := "end|%s|%s" % [str(over.get("kind", "")), str(over.get("key", ""))]
+	if key == _sub_key:
+		return
+	var st: Dictionary = game.chapter_story()
+	var e: Dictionary = game._merge_variants(st.endings[over.key])
+	var head := "Kết chương %d  ·  %s  ·  %s" % [game.chapter(), str(over.key), str(e.tag)]
+	var lines := [{"who": "", "text": game.fill(str(e.title)), "big": true}]
+	lines.append_array(Sub.narration(game.fill(str(e.text))))
+	lines.append_array(Sub.quote(game.fill(str(e.get("quote", "")))))
+	lines.append_array(Sub.narration(game.fill(str(e.get("epilogue", ""))), "Nếu câu chuyện dừng ở đây" if game.can_continue() else "Về sau"))
+	_sub_start(key, head, lines, func() -> void:
+		if game.can_continue():
+			var nxt: Dictionary = game.next_story()
+			_sub_choices.add_child(UI.choice("Chơi tiếp: " + str(nxt.get("title", "Chương %d" % (game.chapter() + 1))), str(nxt.get("continue", "")), "",
+				game.continue_chapter))
+		_sub_choices.add_child(UI.choice("Xem thêm: thẻ hậu truyện, người ở phố, sổ tay", "Đọc khi muốn, không bắt buộc", "", func() -> void:
+			_ending_full = true
+			refresh()))
+		_sub_choices.add_child(UI.choice("Chơi lại từ ngày 1", "", "", GameState.restart)))
+
+
+func _sub_start(key: String, head: String, lines: Array, build: Callable) -> void:
+	_sub_key = key
+	_sub_head.text = head.to_upper() if head.length() < 40 else head
+	_sub_lines = lines.filter(func(l) -> bool: return str(l.text).strip_edges() != "")
+	_sub_i = 0
+	_sub_build = build
+	for c in _sub_choices.get_children():
+		c.queue_free()
+	_sub_show()
+
+
+func _sub_show() -> void:
+	if _sub_i >= _sub_lines.size():
+		_sub_finish()
+		return
+	var l: Dictionary = _sub_lines[_sub_i]
+	var who := str(l.get("who", ""))
+	_sub_who.text = who
+	_sub_who.visible = who != ""
+	var big: bool = l.get("big", false)
+	_sub_line.add_theme_font_size_override("font_size", 30 if big else 21)
+	_sub_line.add_theme_color_override("font_color", UI.GOLD if big else (UI.HUD_TEXT if who != "" else Color("d9dbe6")))
+	_sub_line.text = ("“%s”" % str(l.text).trim_prefix("\"").trim_suffix("\"")) if who != "" and not who.begins_with("Nếu") and who != "Về sau" else str(l.text)
+	_sub_line.visible_characters = 0
+	_sub_chars = 0.0
+	_sub_hint.text = "Chạm hay nhấn Space để tiếp  ▸   %d/%d" % [_sub_i + 1, _sub_lines.size()]
+	_sub_hint.visible = true
+	_sub_skip.visible = true
+
+
+## Hết lời: giữ câu cuối trên màn hình, hiện lựa chọn (bấm số 1–9 để chọn nhanh).
+func _sub_finish() -> void:
+	_sub_chars = -1.0
+	_sub_line.visible_characters = -1
+	_sub_hint.visible = false
+	_sub_skip.visible = false
+	if _sub_lines.is_empty():
+		_sub_who.visible = false
+		_sub_line.text = ""
+	if _sub_choices.get_child_count() == 0 and _sub_build.is_valid():
+		_sub_build.call()
+
+
+func _process(delta: float) -> void:
+	if _sub_chars < 0.0 or not _sub_root.visible:
+		return
+	_sub_chars += delta * TYPE_SPEED
+	var total := _sub_line.get_total_character_count()
+	if _sub_chars >= total:
+		_sub_chars = -1.0
+		_sub_line.visible_characters = -1
+	else:
+		_sub_line.visible_characters = int(_sub_chars)
+
+
+## Chạm khi chữ đang chạy thì hiện hết câu; chạm lần nữa sang câu sau.
+func _sub_advance() -> void:
+	if _sub_i >= _sub_lines.size():
+		return
+	if _sub_chars >= 0.0:
+		_sub_chars = -1.0
+		_sub_line.visible_characters = -1
+		return
+	_sub_i += 1
+	_sub_show()
+
+
+func _sub_skip_all() -> void:
+	_sub_i = _sub_lines.size()
+	if not _sub_lines.is_empty():
+		_sub_i = _sub_lines.size() - 1
+		_sub_show()
+		_sub_i = _sub_lines.size()
+	_sub_finish()
+
+
+func _on_sub_input(event: InputEvent) -> void:
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) \
+			or (event is InputEventScreenTouch and event.pressed):
+		_sub_advance()
+		accept_event()
+
+
+func _input(event: InputEvent) -> void:
+	if not visible or not _sub_root.visible or not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+		if _sub_i < _sub_lines.size():
+			_sub_advance()
+			get_viewport().set_input_as_handled()
+	elif event.keycode >= KEY_1 and event.keycode <= KEY_9 and _sub_i >= _sub_lines.size():
+		var idx: int = event.keycode - KEY_1
+		var btns := _sub_choices.get_children().filter(func(b) -> bool: return not b.is_queued_for_deletion())
+		if idx < btns.size() and not btns[idx].disabled:
+			get_viewport().set_input_as_handled()
+			btns[idx].pressed.emit()
 
 
 func _start() -> void:
