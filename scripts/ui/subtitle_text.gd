@@ -20,7 +20,7 @@ static func narration(text: String, who := "") -> Array:
 static func quote(text: String) -> Array:
 	var out := []
 	var re := RegEx.new()
-	re.compile("([^\"]+?):\\s*\"([^\"]*)\"")
+	re.compile("([^\"“”]+?):\\s*[\"“]([^\"”]*)[\"”]")
 	var found := re.search_all(text)
 	if found.is_empty():
 		return narration(text)
@@ -30,7 +30,7 @@ static func quote(text: String) -> Array:
 		if who.ends_with(")") and who.contains(" ("):
 			who = who.trim_suffix(")").replace(" (", " · ")
 		for s in _sentences(m.get_string(2).strip_edges()):
-			out.append({"who": who, "text": s})
+			out.append({"who": who, "text": s, "say": true})
 	return out
 
 
@@ -45,7 +45,12 @@ static func _sentences(p: String) -> Array:
 		cur += c
 		if c == "\"":
 			inside = not inside
-		var end_mark := c in [".", "!", "?", "…"] or (c == "\"" and not inside and i > 0 and p[i - 1] in [".", "!", "?", "…"])
+		elif c == "“":
+			inside = true
+		elif c == "”":
+			inside = false
+		var closing := c == "\"" or c == "”"
+		var end_mark := c in [".", "!", "?", "…"] or (closing and not inside and i > 0 and p[i - 1] in [".", "!", "?", "…"])
 		if end_mark and not inside and i + 1 < n and p[i + 1] == " " and (i + 2 >= n or _starts_upper(p[i + 2])):
 			raw.append(cur.strip_edges())
 			cur = ""

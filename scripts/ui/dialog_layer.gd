@@ -31,6 +31,8 @@ var _sub_lines: Array = []
 var _sub_i := 0
 var _sub_chars := -1.0
 var _sub_build := Callable()
+## Nút lấy ra từ _box chờ hiện thành lựa chọn khi hết lời.
+var _sub_pending: Array = []
 ## Màn kết: đã đọc xong phần phụ đề và bấm xem thẻ hậu truyện, sổ tay.
 var _ending_full := false
 
@@ -69,50 +71,123 @@ func open_night() -> void:
 
 func refresh() -> void:
 	for child in _box.get_children():
+		_box.remove_child(child)
 		child.queue_free()
 	var show := true
-	var sub := false
+	var sub := true
+	# Màn dựng bằng nhãn và nút (mở đầu, buổi tối, tổng kết, phần "xem thêm" của màn kết) cũng chạy thành phụ đề:
+	# dựng như cũ vào _box rồi đổi sang các dòng phụ đề (_box_to_sub).
+	var builder := Callable()
+	var key := ""
 	if not game.is_over():
 		_ending_full = false
 	if not game.is_started():
-		_start()
+		builder = _start
+		key = "start"
 	elif game.is_over():
 		var kind := str(game.s.over.get("kind", ""))
+		key = "over|%s|%s|%s" % [kind, str(game.s.over.get("key", "")), str(_diary_open)]
 		if kind.begins_with("full") and not _ending_full:
-			sub = true
 			_sub_ending()
 		else:
 			match kind:
 				"full":
-					_ending()
+					builder = _ending
 				"full2":
-					_ending2()
+					builder = _ending2
 				"full3":
-					_ending3()
+					builder = _ending3
 				"full4":
-					_ending4()
+					builder = _ending4
 				"full5":
-					_ending5()
+					builder = _ending5
 				_:
-					_report()
+					builder = _report
 	elif not game.s.queue.is_empty():
-		sub = true
 		_sub_event()
 	elif night_open:
-		_night()
+		builder = _night
+		key = "night|%d" % game.day()
 	else:
 		show = false
+		sub = false
+	if builder.is_valid() and key != _sub_key:
+		builder.call()
+		_box_to_sub(key)
 	if not sub:
 		_sub_key = ""
-	_panel_root.visible = not sub
+	_panel_root.visible = false
 	_sub_root.visible = sub
-	_scrim.color.a = 0.18 if sub else 0.6
+	_scrim.color.a = 0.18
 	if visible and not show:
 		closed.emit()
 	visible = show
 
 
 # ---------------------------------------------------------------- phụ đề
+
+## Đổi các nhãn, nút vừa dựng trong _box thành phụ đề: nhãn mục nhỏ (chữ in) là tên người nói của các dòng sau, tiêu
+## đề lớn là dòng to, câu thoại màu tím cắt theo người nói, chữ còn lại là lời kể; nút thành lựa chọn sau khi hết lời.
+func _box_to_sub(key: String) -> void:
+	for b in _sub_pending:
+		if is_instance_valid(b) and b.get_parent() == null:
+			b.queue_free()
+	_sub_pending = []
+	var lines := []
+	var head := ""
+	var who := ""
+	var kids := _box.get_children()
+	for idx in kids.size():
+		var c = kids[idx]
+		# Nhãn đứng ngay trên nút (tên nhóm nút, "Chế độ riêng:") thì bỏ, nút đã tự nói.
+		var before_button: bool = idx + 1 < kids.size() and kids[idx + 1] is Button
+		if c is Button:
+			_box.remove_child(c)
+			_sub_pending.append(c)
+			continue
+		if not (c is Label):
+			continue
+		var text := str(c.text).strip_edges()
+		if text == "":
+			continue
+		var size: int = c.get_theme_font_size("font_size")
+		var color: Color = c.get_theme_color("font_color")
+		if before_button and c is Label and (text.ends_with(":") or (size <= 12 and text == text.to_upper())):
+			continue
+		if size <= 12 and text == text.to_upper():
+			if lines.is_empty() and head == "":
+				head = text
+			else:
+				who = _title_case(text)
+		elif size >= 24:
+			lines.append({"who": "", "text": text, "big": true})
+		elif size == 14 and color == UI.TIM and c.autowrap_mode == TextServer.AUTOWRAP_OFF:
+			who = text
+		elif size >= 17 and color == UI.TIM:
+			lines.append_array(Sub.quote(text))
+		else:
+			for l in Sub.narration(text, who):
+				# Dòng "Chị Hạnh · ..." ở phần người ở phố: tên đó là người nói của dòng.
+				for nm in game.story.reps.values():
+					if str(l.text).begins_with(str(nm) + " · "):
+						l["who"] = str(nm)
+						l["text"] = str(l.text).substr(str(nm).length() + 3)
+						break
+				lines.append(l)
+	var buttons := _sub_pending
+	_sub_start(key, head, lines, func() -> void:
+		for b in buttons:
+			if is_instance_valid(b):
+				_sub_choices.add_child(b))
+
+
+## "SỔ TAY CỦA AN" thành "Sổ Tay Của An" (giữ nguyên chữ số, khác String.capitalize chèn khoảng trắng trước số).
+static func _title_case(s: String) -> String:
+	var words := []
+	for wd in s.to_lower().split(" ", false):
+		words.append(wd.substr(0, 1).to_upper() + wd.substr(1))
+	return " ".join(words)
+
 
 func _build_subtitles() -> void:
 	_sub_root = Control.new()
@@ -222,6 +297,7 @@ func _sub_start(key: String, head: String, lines: Array, build: Callable) -> voi
 	_sub_i = 0
 	_sub_build = build
 	for c in _sub_choices.get_children():
+		_sub_choices.remove_child(c)
 		c.queue_free()
 	_sub_show()
 
@@ -236,8 +312,9 @@ func _sub_show() -> void:
 	_sub_who.visible = who != ""
 	var big: bool = l.get("big", false)
 	_sub_line.add_theme_font_size_override("font_size", 30 if big else 21)
-	_sub_line.add_theme_color_override("font_color", UI.GOLD if big else (UI.HUD_TEXT if who != "" else Color("d9dbe6")))
-	_sub_line.text = ("“%s”" % str(l.text).trim_prefix("\"").trim_suffix("\"")) if who != "" and not who.begins_with("Nếu") and who != "Về sau" else str(l.text)
+	_sub_line.add_theme_color_override("font_color", UI.GOLD if big else (UI.HUD_TEXT if l.get("say", false) else Color("d9dbe6")))
+	# Lời thoại (dòng có "say") để trong ngoặc kép; lời kể, mục của màn kết, sổ tay để nguyên.
+	_sub_line.text = ("“%s”" % str(l.text).trim_prefix("\"").trim_suffix("\"").trim_prefix("“").trim_suffix("”")) if l.get("say", false) else str(l.text)
 	_sub_line.visible_characters = 0
 	_sub_chars = 0.0
 	_sub_hint.text = "Chạm hay nhấn Space để tiếp  ▸   %d/%d" % [_sub_i + 1, _sub_lines.size()]
@@ -419,7 +496,9 @@ func _ending() -> void:
 	var over: Dictionary = game.s.over
 	var e: Dictionary = game.story.endings[over.key]
 	_box.add_child(UI.label("%s · %s" % [str(over.key), str(e.tag).to_upper()], 12, UI.TIM))
-	_head("", e.title, "", e.text, e.quote)
+	# Phần "xem thêm" sau phụ đề kết: lời kết đã đọc rồi, chỉ còn nút chơi tiếp và các thẻ.
+	if not _ending_full:
+		_head("", e.title, "", e.text, e.quote)
 	_epilogue_or_continue(e)
 	var codas: Array = game.codas()
 	if not codas.is_empty():
@@ -515,7 +594,8 @@ func _ending_chapter(cards: Array, keep_label: String, diary_label: String) -> v
 	# Kết có thể có biến thể (K3 ở sạp chung với Kha hay trước hiên nhà, L3 theo người góp tiệm).
 	var e: Dictionary = game._merge_variants(st.endings[over.key])
 	_box.add_child(UI.label("CHƯƠNG %d · %s · %s" % [ch, str(over.key), str(e.tag).to_upper()], 12, UI.TIM))
-	_head("", game.fill(str(e.title)), "", game.fill(str(e.text)), game.fill(str(e.quote)))
+	if not _ending_full:
+		_head("", game.fill(str(e.title)), "", game.fill(str(e.text)), game.fill(str(e.quote)))
 	_epilogue_or_continue(e)
 	var codas: Array = game.codas()
 	if not codas.is_empty():
@@ -575,11 +655,12 @@ func _ending_chapter(cards: Array, keep_label: String, diary_label: String) -> v
 func _epilogue_or_continue(e: Dictionary) -> void:
 	if game.can_continue():
 		var nxt: Dictionary = game.next_story()
-		_box.add_child(UI.label("NẾU CÂU CHUYỆN DỪNG Ở ĐÂY", 11, UI.INK_SOFT))
-		_box.add_child(UI.wrap(game.fill(str(e.epilogue)), 14, UI.INK_SOFT))
+		if not _ending_full:
+			_box.add_child(UI.label("NẾU CÂU CHUYỆN DỪNG Ở ĐÂY", 11, UI.INK_SOFT))
+			_box.add_child(UI.wrap(game.fill(str(e.epilogue)), 14, UI.INK_SOFT))
 		_box.add_child(UI.choice("Chơi tiếp: " + str(nxt.get("title", "Chương %d" % (game.chapter() + 1))), str(nxt.get("continue", "")), "",
 			game.continue_chapter))
-	else:
+	elif not _ending_full:
 		_box.add_child(UI.wrap(game.fill(str(e.epilogue)), 14, UI.INK_SOFT))
 
 
