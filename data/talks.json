@@ -133,7 +133,7 @@
           { "label": "\"Lớn rồi, đo gì nữa em.\"", "hint": "Linh +1",
             "effects": {"rep.LINH": 1, "log": "Linh vẫn ghi ngày hôm nay bên cạnh cột của anh, bỏ trống chỗ vạch."} }
         ] },
-      { "id": "li_chia_khoa", "when": {"from_day": 27, "linh_decision": "xa"},
+      { "id": "li_chia_khoa", "when": {"from_day": 27, "to_day": 81, "linh_decision": "xa"},
         "title": "Cái chìa móc con cá",
         "text": "Linh đưa An một chiếc chìa khóa có cái móc hình con cá. \"Chìa phòng trọ thực tập của em. Em làm hai cái. Anh giữ một cái, lỡ có chuyện thì anh có chỗ tới.\" Em nói như chuyện thường.",
         "choices": [
@@ -268,7 +268,7 @@
           { "label": "\"Dạ.\"", "hint": "Chú Sáu +1",
             "effects": {"rep.SAU": 1} }
         ] },
-      { "id": "sa_tay_run", "when": { "from_day": 18 },
+      { "id": "sa_tay_run", "when": { "from_day": 18, "to_day": 62 },
         "title": "Cái tua vít rơi",
         "text": "Chú Sáu làm rơi cái tua vít lần thứ hai. Chú cười gượng. \"Tay chú dạo này hay run. Cái bàn sửa đồ này, chú cũng chưa biết giao cho ai.\"",
         "choices": [

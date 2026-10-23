@@ -1,5 +1,6 @@
 extends SceneTree
-## Tự chơi lát cắt ngày 18–22, cả 30 ngày, và 60 ngày (chơi tiếp chương 2) cho ba tuyến × các cách đối xử với gia đình, in bảng kết quả.
+## Tự chơi lát cắt ngày 18–22, cả 30 ngày, 60 ngày (chơi tiếp chương 2) và 90 ngày (chơi tiếp chương 3) cho ba tuyến × các
+## cách đối xử với gia đình, in bảng kết quả.
 ## Bản 30 ngày bỏ qua đường đi bộ: tới giờ là mở cảnh chính, làm việc nhờ, đi làm, ăn, tắm, giặt.
 ## Chạy: Godot_v4.7.2-stable_win64_console.exe --headless --path . -s res://tests/sim.gd
 
@@ -9,10 +10,19 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 ## Bản 30 ngày có thêm hai cách chơi: "giấu" (làm việc đàng hoàng nhưng giấu chuyện và ép người nhà ở các cảnh gia đình)
 ## và "ít việc" (chọn như lắng nghe nhưng mỗi ngày chỉ làm một việc ngắn), để thử kết E5 và E7.
 const HIDE_PICKS := {"ngay1": 1, "ngay9": 2, "ngay12_bc": 2, "ngay12_a": 2, "ngay19": 2, "ngay22": 2, "ngay25": 2,
-	"ngay33": 1, "ngay36": 2, "ngay40": 1, "ngay44_linh": 1, "ngay47": 2, "ngay49": 2, "ngay50_kham": 1, "ngay52": 1, "ngay55": 1, "ngay56": 2}
+	"ngay33": 1, "ngay36": 2, "ngay40": 1, "ngay44_linh": 1, "ngay47": 2, "ngay49": 2, "ngay50_kham": 1, "ngay52": 1, "ngay55": 1, "ngay56": 2,
+	"ngay68": 1, "ngay69": 1, "ngay72": 1, "ngay74": 1, "ngay76": 2, "ngay77": 1, "ngay82": 1, "ngay85": 1}
 const FULL_POLICIES := ["lắng nghe", "giữ tiếp", "áp đặt", "gồng", "giấu", "ít việc", "để má chọn"]
-## "để má chọn" (pick 6): như lắng nghe, nhưng ngày 53 không giữ chỗ cho máy may của má (thử kết K2, K1 ở chương 2).
-const LET_GO_PICKS := {"ngay53": 1}
+## "để má chọn" (pick 6): như lắng nghe, nhưng ngày 53 không giữ chỗ cho máy may của má (thử kết K2, K1 ở chương 2),
+## ngày 80 không nhận tiệm, để chú Sáu tự chọn người (lựa chọn cuối, thử kết L1 ở chương 3). Số âm: đếm từ cuối.
+const LET_GO_PICKS := {"ngay53": 1, "ngay80": -1}
+## Chương 3, cách chơi lắng nghe và để má chọn: ghé nói chuyện với những người này khi họ có đoạn mạch chuyện đang mở.
+const TALK3 := ["KHA", "TRAM", "MA", "LINH", "SAU", "TIN", "LUA", "ONG_BA", "BA_TU"]
+
+## Bảng 90 ngày có thêm cách chơi "một mình": như lắng nghe nhưng chương 3 không ghé nói chuyện với ai (thử kết L2).
+var _talk3 := true
+## Lựa chọn ép riêng cho một lượt thử {id cảnh: lựa chọn thứ mấy}, số âm đếm từ cuối.
+var _override := {}
 const POLICIES := {
 	"lắng nghe": {"ngay18_bc": 0, "ngay18_a": 0, "ngay19": 0, "ngay20_bc": 0, "ngay20_a": 0, "ngay21": 0, "ngay22": 0},
 	"giữ tiếp": {"ngay18_bc": 1, "ngay18_a": 1, "ngay19": 1, "ngay20_bc": 1, "ngay20_a": 1, "ngay21": 1, "ngay22": 1},
@@ -24,7 +34,13 @@ func _init() -> void:
 	# -- trace <tuyến> <cách chơi 0..6>: in các lựa chọn và sổ tay chương 2 của một lượt chơi.
 	var args := OS.get_cmdline_user_args()
 	if args.size() >= 3 and args[0] == "trace":
-		_trace(str(args[1]), int(args[2]))
+		_trace(str(args[1]), int(args[2]), int(args[3]) if args.size() >= 4 else 2)
+		quit()
+		return
+	# -- di_nam: chỉ chạy phần vào chương 3 khi còn ở nhờ nhà dì Năm.
+	if args.size() >= 1 and args[0] == "di_nam":
+		for case in ["o_nho", "da_tra", "con_no"]:
+			_from_di_nam("A", case)
 		quit()
 		return
 	print("Tuyến  Cách chơi   Tiền cuối    Dự kiến ngày 26  Đủ cho        Phải thu sau 30  Mệt  Cảnh báo  Linh       Bà Tư  Lời hứa quá hạn")
@@ -85,7 +101,66 @@ func _init() -> void:
 				over.get("ba_tu", "?"), over.get("linh", "?"), int(g.s.fatigue),
 				"%d/%d" % [int(g.s.warn_days), int(g.s.rest_skips)], g.hidden_marks(31), done, missed])
 	print("Phân bố kết chương 2: ", tally2)
+	print("\n90 NGÀY (chơi tiếp chương 3 từ màn kết ngày 60)")
+	print("Tuyến  Cách chơi   Kết 1  Kết 2  Kết 3  Chỗ ở      Tiền cuối    Tiền nhà  Cọc tiệm  Linh      Ông Ba    Tín       Mệt  Cảnh báo/bỏ nghỉ  Giấu/ép  Việc nhờ  Bỏ lỡ")
+	var tally3 := {}
+	for route in GameLogic.ROUTES:
+		for i in FULL_POLICIES.size() + 1:
+			var pi := i if i < FULL_POLICIES.size() else 0
+			_talk3 = i < FULL_POLICIES.size()
+			var g := GameLogic.new()
+			g.load_data()
+			_full(g, route, pi)
+			var key1 := str(g.s.over.get("key", "?"))
+			g.start_chapter2()
+			_days(g, route, pi)
+			var key2 := str(g.s.over.get("key", "?"))
+			g.start_chapter3()
+			var missed := _days(g, route, pi)
+			var over: Dictionary = g.s.over
+			var cards: Dictionary = over.get("cards", {})
+			var done := 0
+			for q in g.s.quests:
+				if g.s.quests[q].state == "done" and int(g.quest_def(q).get("days", [0])[0]) >= 61:
+					done += 1
+			var rent = g._find(g.s.payables, "tien_nha_t3")
+			var shop = g._find(g.s.payables, "coc_tiem")
+			tally3[over.get("key", "?")] = int(tally3.get(over.get("key", "?"), 0)) + 1
+			print("%-6s %-11s %-6s %-6s %-6s %-10s %-12s %-9s %-9s %-9s %-9s %-9s %-4d %-17s %-8d %-9d %d" % [
+				route, FULL_POLICIES[pi] if _talk3 else "một mình", key1, key2, over.get("key", "?"), str(g.home_info().get("place", g.housing().place)),
+				GameLogic.fmt_money(int(g.s.cash)), "-" if rent == null else str(rent.status), "-" if shop == null else str(shop.status),
+				cards.get("linh", "?"), cards.get("ong_ba", "?"), cards.get("tin", "?"), int(g.s.fatigue),
+				"%d/%d" % [int(g.s.warn_days), int(g.s.rest_skips)], g.hidden_marks(61), done, missed])
+	print("Phân bố kết chương 3: ", tally3)
+	_talk3 = true
+	print("\nCHƯƠNG 3 KHI CÒN Ở NHỜ NHÀ DÌ NĂM (tuyến A, lắng nghe)")
+	for case in ["o_nho", "da_tra", "con_no"]:
+		_from_di_nam("A", case)
 	quit()
+
+
+## Vào chương 3 khi còn ở nhờ nhà dì Năm (hết chương 1 cho ở dì Năm): "o_nho" ngày 40 xin ở thêm, chưa giữ phòng nào (đặt
+## cọc trong tháng Bảy), "da_tra" ngày 40 đặt cọc phòng Cầu Tre, ngày 58 trả đủ (dọn ngày 61), "con_no" đặt cọc mà ngày 58
+## xin giấy hẹn (trả nốt trước tối ngày 70, dọn mùng một tháng Tám).
+func _from_di_nam(route: String, case: String) -> void:
+	_override = {"o_nho": {"ngay40_di_nam": 2}, "da_tra": {"ngay40_di_nam": 1}, "con_no": {"ngay40_di_nam": 1, "ngay58": -1}}[case]
+	var g := GameLogic.new()
+	g.load_data()
+	_full(g, route, 0)
+	g.s["housing"] = {"state": "signed", "place": "di_nam", "paid": 500000, "seen": []}
+	g.start_chapter2()
+	_days(g, route, 0)
+	var key2 := str(g.s.over.get("key", "?"))
+	g.start_chapter3()
+	var home := g.home_loc()
+	_days(g, route, 0)
+	var debts := []
+	for x in g.s.payables:
+		if int(x.due) >= 61:
+			debts.append("%s %s" % [x.id, x.status])
+	print("%-7s kết 2 %s · ở %s · nhà lúc kết %s %s · kết 3 %s · tiền %s · %s" % [case, key2, home, g.housing().place, g.housing().state,
+		g.s.over.get("key", "?"), GameLogic.fmt_money(int(g.s.cash)), ", ".join(debts)])
+	_override = {}
 
 
 ## Chơi đủ 30 ngày. pick: 0 lắng nghe, 1 giữ tiếp, 2 áp đặt (lựa chọn thứ mấy trong mỗi cảnh); ngày 11 chọn theo tuyến.
@@ -113,6 +188,16 @@ func _days(g, route: String, pick: int) -> int:
 			else:
 				missed += _scene(g, id, route, pick)
 		_quests(g)
+		if g.chapter() == 3 and pick in [0, 6]:
+			# Chương 3: ai có chuyện để kể (hỏi góp tiệm ngày 67–80, nói thật với người nhà) thì ghé nói, để thấy kết L3, L1;
+			# ai nhờ việc thì nhận. Cách chơi "một mình" không hỏi ai, để thấy kết L2.
+			for npc in TALK3 if _talk3 else []:
+				if _has_beat(g, npc):
+					g.talk(npc)
+					_answer_full(g, route, pick)
+			for q in g.quest_offers():
+				g.quest_offer(str(q.id))
+				_answer_full(g, route, pick)
 		for id in _plan_full(g, pick):
 			_care(g)
 			if g.get_action(id).has("minigame"):
@@ -133,6 +218,14 @@ func _days(g, route: String, pick: int) -> int:
 		if not g.is_over():
 			g.finish_day()
 	return missed
+
+
+## Nhân vật còn đoạn mạch chuyện chưa kể mà đã mở (nói chuyện lúc này là nghe chuyện, không phải tán gẫu).
+func _has_beat(g, npc: String) -> bool:
+	for b in g.talks.get(npc, {}).get("story", []):
+		if not g.s.get("talks_done", []).has(b.id) and g.check(b.get("when", {})) == "":
+			return true
+	return false
 
 
 func _start_of(g, id: String) -> float:
@@ -170,6 +263,9 @@ func _answer_full(g, route: String, pick: int) -> void:
 		elif str(e.id) in ["ngay26", "missed:ngay26", "ngay30"]:
 			# Chỗ ở: lấy chỗ tốt nhất đủ tiền. Ngày 30: không tự sửa sai để thấy hậu quả của cách chơi.
 			want = 0
+		want = int(_override.get(str(e.id), want))
+		if want < 0:
+			want += e.choices.size()
 		var before: int = g.s.queue.size()
 		if want < e.choices.size() and g.choice_lock(e.choices[want]) == "":
 			g.resolve_choice(want)
@@ -205,6 +301,11 @@ func _plan_full(g, pick: int) -> Array:
 		p.append("ca_phu_quan")
 	if pick == 5:
 		return p + ["sua_do_le", "com_voi_ba"]
+	if g.chapter() == 3 and pick in [0, 4, 6]:
+		# Chương 3, các cách chơi có nghỉ: làm ở tiệm Sáu là chính (sửa đồ lẻ buổi sáng, trông tiệm buổi chiều), thêm một
+		# nhà người già với tổ của Trâm, tối ăn cơm với bà, với má.
+		# Còn ở nhờ dì Năm thì đặt cọc phòng Cầu Tre, hẹn dọn mùng một tháng Tám (ẩn nếu đã có chỗ).
+		return p + ["sua_do_le", "trong_tiem_chieu", "kiem_tra_dien_nguoi_gia", "com_voi_ba", "com_ma_nau", "coc_cau_tre_t8"]
 	match str(g.s.route):
 		"B":
 			if not g.progress_ready():
@@ -216,14 +317,17 @@ func _plan_full(g, pick: int) -> Array:
 			p.append_array(["sua_do_le", "ca_phu_quan"])
 		_:
 			p.append_array(["ca_kho", "sua_do_le"])
-	if g.chapter() == 2:
+	if g.chapter() >= 2:
 		# Chương 2: hợp đồng Bến Cạn đã xong; thêm bảo trì sau mưa, sửa máy bơm ngày ngập, chạy ứng dụng nếu đã đăng ký.
 		p.append_array(["bao_tri_ben_can", "sua_may_bom"])
 		if pick in [1, 2, 3]:
 			p.append_array(["app_tho", "app_tho_cuoi_tuan"])
+	if g.chapter() == 3:
+		# Chương 3, các cách chơi không nghỉ: làm như chương 2 rồi nhận thêm việc ở tiệm và với tổ của Trâm nếu còn giờ.
+		p.append_array(["trong_tiem_chieu", "kiem_tra_dien_nguoi_gia"])
 	if pick in [0, 4, 6]:
 		p.append("com_voi_ba")
-		if g.chapter() == 2:
+		if g.chapter() >= 2:
 			p.append("com_ma_nau")
 	return p
 
@@ -291,19 +395,37 @@ func _plan(g) -> Array:
 	return p
 
 
-func _trace(route: String, pick: int) -> void:
+## chapter 2: in chương 2; chapter 3: chơi tiếp tới hết chương 3 rồi in chương 3.
+func _trace(route: String, pick: int, chapter := 2) -> void:
 	var g := GameLogic.new()
 	g.load_data()
 	_full(g, route, pick)
 	print("Kết 1: ", g.s.over.get("key", "?"), " · tiền ", GameLogic.fmt_money(int(g.s.cash)), " · chỗ ở ", g.housing().place)
 	g.start_chapter2()
 	_days(g, route, pick)
+	if chapter == 3:
+		print("Kết 2: ", g.s.over.get("key", "?"), " · tiền ", GameLogic.fmt_money(int(g.s.cash)), " · chỗ ở ", g.housing().place, " ", g.housing().state)
+		g.start_chapter3()
+		_days(g, route, pick)
+	var first := 30 * (chapter - 1) + 1
 	for c in g.s.choices:
-		if int(c.day) >= 31:
+		if int(c.day) >= first:
 			print("%d  %-14s %s" % [int(c.day), str(c.event), str(c.choice)])
 	print("\nSỔ TAY")
-	for d in range(31, 61):
+	for d in range(first, first + 30):
 		for line in g.diary_of(d):
 			print("%d  %s" % [d, line])
-	print("\nKết 2: ", g.s.over, " · tiền ", GameLogic.fmt_money(int(g.s.cash)), " · điểm ", g.s.get("scores", {}), " · việc nhờ ", g.s.get("quests", {}).keys())
+	print("\nKết %d: " % chapter, g.s.over, " · tiền ", GameLogic.fmt_money(int(g.s.cash)), " · điểm ", g.s.get("scores", {}), " · việc nhờ ", g.s.get("quests", {}).keys())
+	if chapter == 3:
+		for h in g.s.history:
+			if int(h.day) >= first:
+				print("  ngày %d  tiền %s  Mệt %d  %s" % [int(h.day), GameLogic.fmt_money(int(h.cash)), int(h.fatigue), ", ".join(h.actions)])
+		for x in g.s.payables:
+			if int(x.due) >= 61:
+				print("  phải trả ", x.id, " ", GameLogic.fmt_money(int(x.amount)), " hạn ", x.due, " ", x.status)
+		var fl := []
+		for k in g.s.flags:
+			if g.s.flags[k]:
+				fl.append(k)
+		print("  cờ: ", ", ".join(fl))
 

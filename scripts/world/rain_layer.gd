@@ -404,7 +404,7 @@ func _build_yard(l: int, flags: Dictionary) -> void:
 	add_child(_yard)
 	var home: Node3D = world._frame_node(p)
 	_yard.add_child(home)
-	if world.game.chapter() == 2:
+	if world.game.chapter() >= 2:
 		_build_sandbags(home, p, flags)
 		return
 	var state := _prep_state(l, flags)

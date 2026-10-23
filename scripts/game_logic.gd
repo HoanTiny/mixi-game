@@ -1,8 +1,9 @@
 extends RefCounted
 ## Luật chơi "Trước mùa mưa": tiền mặt tách khỏi tiền phải thu và phải trả, Mệt, tuyến nghề,
 ## sổ lời hứa, sổ gia đình, sự kiện theo ngày và lát cắt ngày 18–22.
-## Chương 2 · Mùa mưa (ngày 31–60) chơi tiếp sau màn kết chương 1, giữ mọi thứ đã chọn: nội dung nằm ở
-## events2.json, story2.json, talks2.json, quests2.json; số liệu ở chapter2 trong config.json.
+## Chương 2 · Mùa mưa (ngày 31–60) chơi tiếp sau màn kết chương 1, chương 3 · Tháng Bảy mưa ngâu (ngày 61–90) chơi
+## tiếp sau màn kết chương 2, giữ mọi thứ đã chọn: nội dung nằm ở events2.json, story2.json, talks2.json, quests2.json,
+## config2.json (chương 3: các file *3.json); số liệu ở chapter2, chapter3 trong config.json.
 ## Thêm các cơ chế kiểu Nobody: nhu cầu cơ thể và Phong độ, trò chơi nhỏ khi làm, app giao hàng,
 ## lục ve chai, nói chuyện với nhân vật, việc nhờ nhiều bước.
 ## Không phụ thuộc giao diện, nên chạy được cả trong bản mô phỏng headless (tests/sim.gd).
@@ -27,6 +28,8 @@ var quests: Array = []
 var quest_items: Dictionary = {}
 ## Chương 2: kết thúc, thẻ hậu truyện, đồ giữ lại, đoạn "sau đó", nhân vật mới (data/story2.json).
 var story2: Dictionary = {}
+## Chương 3: như story2 (data/story3.json); thẻ hậu truyện chọn theo điều kiện trong story3.cards.
+var story3: Dictionary = {}
 ## Trạng thái ván chơi. Rỗng nghĩa là chưa bắt đầu (đang ở màn chọn tuyến).
 var s: Dictionary = {}
 ## Ghi chú giữ lại qua các lượt (chưa dùng trong lát cắt, để dành cho Sổ tay).
@@ -46,28 +49,34 @@ func load_data(dir := "res://data") -> void:
 		var q: Dictionary = _read_json(dir + "/quests.json")
 		quests = q.get("quests", [])
 		quest_items = q.get("items", {})
-	# Chương 2 nằm ở file riêng: gộp sự kiện, hội thoại, việc nhờ; lời hé lộ ngày mai và tên nhân vật mới
+	# Chương 2, chương 3 nằm ở file riêng: gộp sự kiện, hội thoại, việc nhờ; lời hé lộ ngày mai và tên nhân vật mới
 	# đi chung với chương 1.
-	if FileAccess.file_exists(dir + "/events2.json"):
-		events.append_array(_read_json(dir + "/events2.json"))
-	if FileAccess.file_exists(dir + "/config2.json"):
-		cfg.actions.append_array(_read_json(dir + "/config2.json").get("actions", []))
-	if FileAccess.file_exists(dir + "/story2.json"):
-		story2 = _read_json(dir + "/story2.json")
-		story.teasers.merge(story2.get("teasers", {}))
-		story.reps.merge(story2.get("reps", {}))
-	if FileAccess.file_exists(dir + "/talks2.json"):
-		var t2: Dictionary = _read_json(dir + "/talks2.json")
-		t2.erase("_ghi_chu")
-		for npc in t2:
-			if not talks.has(npc):
-				talks[npc] = {"story": [], "chat": []}
-			talks[npc].story.append_array(t2[npc].get("story", []))
-			talks[npc].chat.append_array(t2[npc].get("chat", []))
-	if FileAccess.file_exists(dir + "/quests2.json"):
-		var q2: Dictionary = _read_json(dir + "/quests2.json")
-		quests.append_array(q2.get("quests", []))
-		quest_items.merge(q2.get("items", {}))
+	for n in [2, 3]:
+		var suffix := str(n) + ".json"
+		if FileAccess.file_exists(dir + "/events" + suffix):
+			events.append_array(_read_json(dir + "/events" + suffix))
+		if FileAccess.file_exists(dir + "/config" + suffix):
+			cfg.actions.append_array(_read_json(dir + "/config" + suffix).get("actions", []))
+		if FileAccess.file_exists(dir + "/story" + suffix):
+			var st: Dictionary = _read_json(dir + "/story" + suffix)
+			if n == 2:
+				story2 = st
+			else:
+				story3 = st
+			story.teasers.merge(st.get("teasers", {}))
+			story.reps.merge(st.get("reps", {}))
+		if FileAccess.file_exists(dir + "/talks" + suffix):
+			var t: Dictionary = _read_json(dir + "/talks" + suffix)
+			t.erase("_ghi_chu")
+			for npc in t:
+				if not talks.has(npc):
+					talks[npc] = {"story": [], "chat": []}
+				talks[npc].story.append_array(t[npc].get("story", []))
+				talks[npc].chat.append_array(t[npc].get("chat", []))
+		if FileAccess.file_exists(dir + "/quests" + suffix):
+			var q: Dictionary = _read_json(dir + "/quests" + suffix)
+			quests.append_array(q.get("quests", []))
+			quest_items.merge(q.get("items", {}))
 
 
 static func _read_json(path: String) -> Variant:
@@ -141,25 +150,59 @@ func is_full() -> bool:
 func last_day() -> int:
 	if not is_full():
 		return int(cfg.sliceEndDay)
-	return 60 if chapter() == 2 else 30
+	return 30 * chapter()
 
 
-## 1: ba mươi ngày trước mùa mưa; 2: mùa mưa ở chỗ mới (ngày 31–60).
+## 1: ba mươi ngày trước mùa mưa; 2: mùa mưa ở chỗ mới (ngày 31–60); 3: tháng Bảy mưa ngâu (ngày 61–90).
 func chapter() -> int:
 	return int(s.get("chapter", 1)) if is_started() else 1
 
 
-## Màn kết chương 1 có thể chơi tiếp sang chương 2 (đã có nội dung chương 2).
+## Màn kết chương 1 (chương 2) có thể chơi tiếp sang chương sau (đã có nội dung chương đó).
 func can_continue() -> bool:
-	return is_over() and str(s.over.get("kind", "")) == "full" and chapter() == 1 and not story2.is_empty()
+	if not is_over():
+		return false
+	var kind := str(s.over.get("kind", ""))
+	return (kind == "full" and chapter() == 1 and not story2.is_empty()) or (kind == "full2" and chapter() == 2 and not story3.is_empty())
 
 
-## Địa điểm An ngủ và sinh hoạt: xóm trọ Bờ Me ở chương 1, chỗ ở lúc vào chương 2 (giữ nguyên suốt chương;
-## ở nhờ dì Năm mà đặt cọc phòng mới thì dọn sau giỗ, sau ngày 60).
+## Nút Chơi tiếp ở màn kết: sang chương sau.
+func continue_chapter() -> void:
+	if chapter() == 1:
+		start_chapter2()
+	else:
+		start_chapter3()
+
+
+## Dữ liệu truyện của chương sau (tên chương, lời mời chơi tiếp).
+func next_story() -> Dictionary:
+	return story2 if chapter() == 1 else story3
+
+
+## Dữ liệu truyện của chương đang chơi: kết thúc, thẻ hậu truyện, đồ giữ lại, đoạn "sau đó", nhân vật mới.
+func chapter_story() -> Dictionary:
+	match chapter():
+		2:
+			return story2
+		3:
+			return story3
+	return story
+
+
+## Chỗ ở của chương đang chơi {place, loc}: lúc vào chương 2, lúc vào chương 3 (rỗng ở chương 1).
+func home_info() -> Dictionary:
+	if chapter() >= 3 and s.has("home3"):
+		return s.home3
+	if chapter() >= 2 and s.has("home2"):
+		return s.home2
+	return {}
+
+
+## Địa điểm An ngủ và sinh hoạt: xóm trọ Bờ Me ở chương 1, chỗ ở lúc vào chương 2, chương 3 (giữ nguyên suốt chương;
+## ở nhờ dì Năm mà đặt cọc, trả đủ phòng mới thì dọn sau giỗ, vào chương 3 là ở phòng mới).
 func home_loc() -> String:
-	if chapter() == 2 and s.has("home2"):
-		return str(s.home2.loc)
-	return "xom_bo_me"
+	var h := home_info()
+	return str(h.loc) if not h.is_empty() else "xom_bo_me"
 
 
 ## Đổi chỗ "home" trong dữ liệu (cảnh, việc nhờ, hành động sinh hoạt) thành địa điểm thật.
@@ -563,14 +606,65 @@ func _special(name: String) -> void:
 					p["status"] = "renegotiated"
 			add_log("Thu hẹp hợp đồng: đợt cuối còn 1.000.000đ, công đội giảm 400.000đ", "event")
 		"rent_next":
-			# Chuyển vào chỗ thuê dài hạn ở chương 2: tiền nhà tháng sau tính theo chỗ mới, hạn tối ngày 60.
-			var rent := int(cfg.get("chapter2", {}).get("rent", {}).get(str(housing().place), 0))
-			var old = _find(s.payables, "tien_nha_t2")
+			# Chỗ thuê dài hạn: tiền nhà tháng sau tính theo chỗ đang ở, hạn tối ngày 60 (chương 2), ngày 90 (chương 3).
+			var c: Dictionary = cfg.get("chapter3" if chapter() == 3 else "chapter2", {})
+			var id := "tien_nha_t3" if chapter() == 3 else "tien_nha_t2"
+			var rent := int(c.get("rent", {}).get(str(housing().place), 0))
+			var old = _find(s.payables, id)
 			if old != null:
 				s.payables.erase(old)
 			if rent > 0:
-				_add_payable({"id": "tien_nha_t2", "to": "", "label": "Tiền nhà tháng sau · " + str(cfg.housing[housing().place].name),
-					"amount": rent, "due": int(cfg.chapter2.rentDue)})
+				_add_payable({"id": id, "to": "", "label": "Tiền nhà tháng sau · " + str(cfg.housing[housing().place].name),
+					"amount": rent, "due": int(c.rentDue)})
+		"tiem_nhan":
+			# Nhận sang tiệm Sáu: cọc mặt bằng (hạn tối ngày 89) và đợt đầu tiền đồ nghề trả chú Sáu (tối ngày 90), chia đều
+			# cho những người đã nhận góp (cờ gopKha, gopTram, gopMa); phần của An là khoản phải trả.
+			var c3: Dictionary = cfg.chapter3
+			var n := 1
+			for k in ["gopKha", "gopTram", "gopMa"]:
+				if s.flags.get(k, false):
+					n += 1
+			s.flags["tiemChung"] = n > 1
+			s.flags["tiemMotMinh"] = n == 1
+			_add_payable({"id": "coc_tiem", "to": "", "label": "Cọc mặt bằng tiệm Sáu cho cô Tám" + (" (phần của An)" if n > 1 else ""),
+				"amount": round_k(float(c3.shopDeposit) / n), "due": int(c3.shopDepositDue)})
+			_add_payable({"id": "do_nghe_sau", "to": "SAU", "label": "Đợt đầu tiền đồ nghề trả chú Sáu" + (" (phần của An)" if n > 1 else ""),
+				"amount": round_k(float(c3.toolsFirst) / n), "due": int(c3.toolsFirstDue)})
+			add_log("Nhận sang tiệm Sáu" + (" chung với %d người" % (n - 1) if n > 1 else " một mình"), "event")
+		"linh_decides3":
+			# Linh tự chọn chỗ làm sau thực tập. Biết An lén đóng học phí giùm mà hai anh em chưa nói lại được với nhau thì em
+			# ở lại công ty cho đủ tiền trả lại; tiền học bậc hai đã xoay được (em tự làm thêm, hay An góp mà em đồng ý) thì em
+			# vừa học vừa làm gần nhà; Trâm mời về tổ thì em về tổ của Trâm; còn lại em ở lại công ty.
+			var f: Dictionary = s.flags
+			var d := "o_xa"
+			if f.get("linhBietGiau", false) and not f.get("suaGiauLinh", false):
+				d = "o_xa"
+			elif f.get("gopHocLinh", false) or f.get("linhLamDem", false) or f.get("suaGiauLinh", false):
+				d = "hoc_tiep"
+			elif f.get("tramMoiLinh", false):
+				d = "ve_gan"
+			s["linh3"] = d
+			s.flags["linhOXa"] = d == "o_xa"
+			s.flags["linhHocTiep"] = d == "hoc_tiep"
+			s.flags["linhVeGan"] = d == "ve_gan"
+			s.queue.push_front({"id": "linh_quyet3", "data": {}})
+		"ong_ba_decides":
+			# Ông Ba tự quyết chuyện nhà. Có giấy tờ cái hiên và có người nói giùm ở buổi họp (hay có đơn cho nhà người già) thì
+			# phường tính cái hiên, ông chịu ký sau tháng cô hồn, xin căn tầng trệt gần mé kênh; bị ép ký thì ông thôi, lên ở với
+			# anh Tài; còn lại ông giữ nhà chờ đợt sau. Ông đã lên chung cư từ chương 2 thì anh Tài lo giấy tờ.
+			var f: Dictionary = s.flags
+			var d := "giu_nha"
+			if f.get("ongBaDi", false):
+				d = "da_di"
+			elif f.get("epOngBaKy", false):
+				d = "len_tai"
+			elif f.get("giayToOngBa", false) and (f.get("hopDanNoiGiup", false) or f.get("donNguoiGia", false)):
+				d = "ky_sau"
+			s["ong_ba3"] = d
+			s.flags["ongBaKy"] = d == "ky_sau"
+			s.flags["ongBaLenTai"] = d == "len_tai"
+			s.flags["ongBaGiuNha"] = d == "giu_nha"
+			s.queue.push_front({"id": "ong_ba_quyet", "data": {}})
 		"ma_decides":
 			# Má tự chọn đi hay ở. Má đi lặng lẽ khi thấy mình chỉ là khách hay người trả tiền trong nhà (điểm maO âm,
 			# hoặc chưa từng có cuộc nói thật mà điểm còn thấp, hoặc An giấu, ép người nhà nhiều ngày).
@@ -753,7 +847,7 @@ func check(req: Dictionary) -> String:
 			if chapter() != int(v):
 				fail = "-"
 		elif key == "home":
-			var place: String = str(s.get("home2", {}).get("place", housing().place))
+			var place: String = str(home_info().get("place", housing().place))
 			if not (place in v if v is Array else place == v):
 				fail = "-"
 		elif key == "weekend":
@@ -771,8 +865,9 @@ func check(req: Dictionary) -> String:
 				if count(k) < int(v[k]):
 					fail = "-"
 		elif key == "linh_away":
-			# Linh đi thực tập xa: chỉ có ở nhà ngày thứ Bảy, Chủ Nhật.
-			var away: bool = s.linh.decision == "xa" and not (day() % 7 in [0, 6])
+			# Linh đi thực tập xa (chương 3, sau khi em chọn: ở lại công ty): chỉ có ở nhà ngày thứ Bảy, Chủ Nhật.
+			var far: bool = str(s.linh3) == "o_xa" if s.has("linh3") else s.linh.decision == "xa"
+			var away: bool = far and not (day() % 7 in [0, 6])
 			if away != bool(v):
 				fail = "-"
 		else:
@@ -1073,26 +1168,51 @@ func fill(text: String) -> String:
 		"cost_hem_dua": fmt_money(housing_cost("hem_dua")) if is_started() else "",
 		"cost_cau_tre": fmt_money(housing_cost("cau_tre")) if is_started() else "",
 		"rent": fmt_money(_rent_due()),
+		"coc_tiem": fmt_money(_pending_amount("coc_tiem")),
+		"gop_list": _partners_text(),
+		"do_nghe": fmt_money(_pending_amount("do_nghe_sau")),
 	}
 	for k in vals:
 		text = text.replace("{" + k + "}", vals[k])
 	return text
 
 
-## Tiền sinh hoạt mỗi tối; chương 2 nhà đông hơn (má về) và giá chợ mùa mưa lên.
+## Tiền sinh hoạt mỗi tối; chương 2 nhà đông hơn (má về) và giá chợ mùa mưa lên; chương 3 má còn ở nhà thì như
+## chương 2, má đi thì bớt một phần.
 func living_cost() -> int:
-	if chapter() == 2:
-		return int(cfg.get("chapter2", {}).get("livingCostPerDay", cfg.livingCostPerDay))
+	match chapter():
+		2:
+			return int(cfg.get("chapter2", {}).get("livingCostPerDay", cfg.livingCostPerDay))
+		3:
+			var c3: Dictionary = cfg.get("chapter3", {})
+			var ma_here: bool = s.flags.get("maVe", false) and not s.flags.get("maDaDi", false)
+			return int(c3.get("livingCostPerDay" if ma_here else "livingCostAlone", cfg.livingCostPerDay))
 	return int(cfg.livingCostPerDay)
 
 
-## Tiền nhà chương 2 còn phải đóng tối ngày 60: tiền nhà tháng sau, hay phần còn lại của phòng đã đặt cọc.
+## Tiền nhà còn phải đóng: chương 2 tối ngày 60 (tiền nhà tháng sau, hay phần còn lại của phòng đã đặt cọc), chương 3
+## tối ngày 90.
 func _rent_due() -> int:
-	for id in ["tien_nha_t2", "phong_moi"]:
+	for id in (["tien_nha_t3"] if chapter() == 3 else ["tien_nha_t2", "phong_moi"]):
 		var x = _find(s.get("payables", []), id)
 		if x != null and x.status == "pending":
 			return int(x.amount)
 	return 0
+
+
+## Những người đã nhận lời góp tiệm Sáu (cờ gopKha, gopTram, gopMa), để ghi trong cảnh.
+func _partners_text() -> String:
+	var names := []
+	for pair in [["gopKha", "Kha"], ["gopTram", "Trâm"], ["gopMa", "má"]]:
+		if s.get("flags", {}).get(pair[0], false):
+			names.append(pair[1])
+	return "chưa có ai" if names.is_empty() else ", ".join(names)
+
+
+## Số tiền một khoản phải trả còn chờ (0 nếu không có hay đã trả).
+func _pending_amount(id: String) -> int:
+	var x = _find(s.get("payables", []), id)
+	return int(x.amount) if x != null and x.status == "pending" else 0
 
 
 ## Sự kiện cố định của ngày d. Sự kiện có "loc" là cảnh chính ở một địa điểm: không bật lên buổi sáng
@@ -1283,7 +1403,9 @@ func finish_day() -> void:
 
 	if day() >= last_day():
 		s["queue"] = tonight
-		if is_full() and chapter() == 2:
+		if is_full() and chapter() == 3:
+			_end_chapter3()
+		elif is_full() and chapter() == 2:
 			_end_chapter2()
 		elif is_full():
 			_end_full()
@@ -1359,6 +1481,113 @@ func start_chapter2() -> void:
 	s["queue"] = [{"id": "c2_mo_dau", "data": {}}]
 	_morning()
 	_commit()
+
+
+## Chơi tiếp chương 3 từ màn kết chương 2: giữ mọi thứ. Ở nhờ dì Năm mà đã đặt cọc, trả đủ phòng mới thì dọn vào phòng
+## đó sau giỗ; tiền nhà chương 2 còn hẹn thì trả nốt trước tối ngày oldRentDue; thêm tiền nhà tháng sau (hạn tối ngày 90),
+## điện nước tháng này; má đi xa có hẹn thì đi từ sáng thứ Hai sau giỗ; đếm Mệt lại từ đầu cho kết chương 3.
+func start_chapter3() -> void:
+	if not can_continue() or chapter() != 2:
+		return
+	var c3: Dictionary = cfg.get("chapter3", {})
+	s["ch2"] = {"key": str(s.over.get("key", "")), "warn_days": int(s.warn_days), "rest_skips": int(s.rest_skips), "cash": int(s.cash)}
+	var h := housing()
+	var next_room = _find(s.payables, "phong_moi")
+	if h.state == "reserved" and next_room != null and next_room.status == "paid":
+		h["state"] = "signed"
+		s["home3"] = {"place": str(h.place), "loc": str(cfg.housing[h.place].loc)}
+		s.flags["donPhongMoi"] = true
+		add_log("Dọn về phòng mới: " + str(cfg.housing[h.place].name), "event")
+	else:
+		s["home3"] = s.get("home2", {"place": str(h.place), "loc": home_loc()}).duplicate()
+	s["chapter"] = 3
+	s["over"] = {}
+	s["day"] = int(c3.get("startDay", 61))
+	s["used"] = 0.0
+	s["warn_days"] = 0
+	s["rest_skips"] = 0
+	s.erase("fatigue_end")
+	s["yesterday"] = s.today
+	s["today"] = {"list": []}
+	s["missed"] = []
+	if s.flags.get("maDiXa", false):
+		s.flags["maDaDi"] = true
+	for k in c3.get("rep", {}):
+		if not s.rep.has(k):
+			s.rep[k] = int(c3.rep[k])
+	for id in ["tien_nha_t2", "phong_moi", "gop_di_nam_3"]:
+		var x = _find(s.payables, id)
+		if x != null and x.status in ["unpaid", "renegotiated"]:
+			x["status"] = "pending"
+			x["due"] = int(c3.get("oldRentDue", 70))
+			x["label"] = str(x.label) + " (trả nốt theo giấy hẹn)"
+			add_log("Còn nợ từ tháng trước: %s %s, hạn ngày %d" % [x.label, fmt_money(int(x.amount)), int(x.due)], "warn")
+	if has_long_home():
+		_special("rent_next")
+		var util := int(c3.get("utilities", 0))
+		if util > 0:
+			_add_payable({"id": "dien_nuoc_t3", "to": "", "label": "Điện nước tháng này", "amount": util, "due": int(c3.get("utilitiesDue", 75))})
+	else:
+		_add_payable({"id": "gop_di_nam_4", "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Năm tháng này", "amount": int(c3.get("stayShare", 600000)), "due": int(c3.rentDue)})
+	if has_needs():
+		s["needs_t"] = float(cfg.dayStart)
+	add_log(str(story3.get("title", "Chương 3")), "event")
+	s["queue"] = [{"id": "c3_mo_dau", "data": {}}]
+	_morning()
+	_commit()
+
+
+## Hết ngày 90: chọn kết chương 3 và các thẻ hậu truyện (chọn theo điều kiện trong story3.cards).
+func _end_chapter3() -> void:
+	var key := ending3_key()
+	s["over"] = {"kind": "full3", "key": key, "cards": pick_cards(story3)}
+	add_log("Kết chương 3: " + str(story3.endings[key].title), "event")
+
+
+## Thứ tự xét L6 → L5 → L4 → L3 → L2 → L1 (ngưỡng Mệt dùng chung với hai chương trước).
+## L5: lòng tốt An giấu đi bị người được giúp tự phát hiện mà An chưa sửa lại, hay chương 3 giấu, ép người nhà nhiều
+## ngày mà chưa có lần nói thật nào. L4: còn nợ tiền nhà, chưa đủ cọc mặt bằng, hay chưa có chỗ thuê lâu dài.
+func ending3_key() -> String:
+	var f: Dictionary = s.flags
+	var e: Dictionary = cfg.endings
+	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
+			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+		return "L6"
+	var exposed: bool = (f.get("linhBietGiau", false) and not f.get("suaGiauLinh", false)) \
+		or (f.get("luaBietGiau", false) and not f.get("suaGiauLua", false))
+	if exposed or (hidden_marks(61) >= int(cfg.chapter3.distantMarks) and not f.get("noiThatC3", false)):
+		return "L5"
+	# Ở nhờ dì Năm mà đã đặt cọc, trả đủ phòng mới (giấy hẹn từ tháng trước, hay cọc trong tháng Bảy) thì dọn mùng một
+	# tháng Tám: coi như có chỗ thuê lâu dài.
+	var moving := false
+	for id in ["phong_moi", "phong_moi_t8"]:
+		var room = _find(s.payables, id)
+		if housing().state == "reserved" and room != null and room.status == "paid":
+			moving = true
+	var broke := not (has_long_home() or moving)
+	for id in ["tien_nha_t3", "coc_tiem", "do_nghe_sau", "tien_nha_t2", "phong_moi", "gop_di_nam_3", "gop_di_nam_4", "phong_moi_t8"]:
+		var x = _find(s.payables, id)
+		if x != null and x.status in ["unpaid", "renegotiated"]:
+			broke = true
+	if broke:
+		return "L4"
+	if f.get("tiemChung", false):
+		return "L3"
+	if f.get("tiemMotMinh", false):
+		return "L2"
+	return "L1"
+
+
+## Thẻ hậu truyện chọn theo điều kiện: mỗi thẻ {id, title, pick: [{when, key}], items: {key: {title, text}}}, lấy dòng
+## pick đầu tiên thỏa (thẻ không có dòng nào thỏa thì bỏ).
+func pick_cards(st: Dictionary) -> Dictionary:
+	var out := {}
+	for c in st.get("cards", []):
+		for p in c.get("pick", []):
+			if check(p.get("when", {})) == "":
+				out[str(c.id)] = str(p.key)
+				break
+	return out
 
 
 ## Hết ngày 60: chọn kết chương 2 và các thẻ hậu truyện.
@@ -1474,7 +1703,7 @@ func teaser(d: int) -> String:
 ## Những món An giữ được trong tháng (mỗi món gắn với một việc đã làm).
 func keepsakes() -> Array:
 	var out := []
-	for k in (story2 if chapter() == 2 else story).get("keepsakes", []):
+	for k in chapter_story().get("keepsakes", []):
 		if check(k.get("when", {})) == "":
 			out.append(k)
 	return out
@@ -1483,7 +1712,7 @@ func keepsakes() -> Array:
 ## Đoạn kết cho từng người ở xóm và ở phố, không chỉ một người nổi bật nhất.
 func npc_lines() -> Array:
 	var out := []
-	var cards: Dictionary = (story2 if chapter() == 2 else story).get("npcCards", {})
+	var cards: Dictionary = chapter_story().get("npcCards", {})
 	for k in cards:
 		var card: Dictionary = cards[k]
 		var good: bool = int(s.rep.get(k, 50)) >= 50
@@ -1501,7 +1730,7 @@ func npc_lines() -> Array:
 ## Những dòng "sau đó" của các mạch riêng (cánh tủ, cuộc gọi cho má…), dòng nào thỏa thì hiện.
 func codas() -> Array:
 	var out := []
-	for x in (story2 if chapter() == 2 else story).get("codas", []):
+	for x in chapter_story().get("codas", []):
 		if check(x.get("when", {})) == "":
 			out.append(fill(str(x.text)))
 	return out

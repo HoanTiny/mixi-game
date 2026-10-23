@@ -1987,10 +1987,10 @@ func _on_changed() -> void:
 		_clear_ending_home()
 		return
 	_sync_home()
-	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2"] and _ending_home == null:
+	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3"] and _ending_home == null:
 		_show_ending_home()
 	elif not game.is_over() and _ending_home != null:
-		# Chơi tiếp chương 2 từ màn kết: dọn hình ảnh khép lại của chương 1.
+		# Chơi tiếp chương sau từ màn kết: dọn hình ảnh khép lại của chương trước.
 		_clear_ending_home()
 	var money := int(game.s.cash)
 	if _last_money >= 0 and money != _last_money:
@@ -2104,10 +2104,13 @@ func location_info(id: String) -> Dictionary:
 	if real and city.story.get("descriptions", {}).has(id):
 		d = d.duplicate()
 		d["desc"] = str(city.story.descriptions[id])
-	# Chương 2: xóm cũ đang dỡ làm kho, các chỗ khác có thể đổi lời tả (story2.locations).
-	if game.is_started() and game.chapter() == 2 and game.story2.get("locations", {}).has(id):
-		d = d.duplicate()
-		d.merge(game.story2.locations[id], true)
+	# Chương 2: xóm cũ đang dỡ làm kho, các chỗ khác có thể đổi lời tả (story2.locations); chương 3 đổi tiếp trên đó
+	# (story3.locations).
+	if game.is_started():
+		for st in [game.story2, game.story3].slice(0, game.chapter() - 1):
+			if st.get("locations", {}).has(id):
+				d = d.duplicate()
+				d.merge(st.locations[id], true)
 	return d
 
 
@@ -2296,18 +2299,20 @@ const HOME_NPCS := ["BA_TU", "LINH", "MA", "ONG_BA"]
 const HOME_ALONG := -3.2
 const HOME_STEP := -1.1
 var _npc_home := HOME
-var _ch2_spawned := false
+## Chương đã thêm nhân vật mới (story2.npcs, story3.npcs) tới đâu.
+var _spawned_chapter := 1
 
 
-## Chỗ ở đổi (chương 2, hay dọn khỏi nhà dì Năm) thì người nhà dời theo; vào chương 2 thì thêm nhân vật mới.
+## Chỗ ở đổi (chương 2, chương 3, hay dọn khỏi nhà dì Năm) thì người nhà dời theo; vào chương mới thì thêm nhân vật mới
+## của chương đó (vào thẳng chương 3 thì thêm luôn nhân vật của chương 2).
 func _sync_home() -> void:
 	var h: String = game.home_loc()
 	if not LOCATIONS.has(h):
 		h = HOME
 	home = h
-	if game.chapter() == 2 and not _ch2_spawned:
-		_ch2_spawned = true
-		for e in game.story2.get("npcs", []):
+	while _spawned_chapter < game.chapter():
+		_spawned_chapter += 1
+		for e in (game.story2 if _spawned_chapter == 2 else game.story3).get("npcs", []):
 			_spawn_npc(e)
 	if _npc_home == home:
 		return
@@ -2388,8 +2393,8 @@ func _show_ending_home() -> void:
 	var family := ["BA_TU"]
 	if str(game.s.linh.decision) != "xa":
 		family.append("LINH")
-	if game.chapter() == 2:
-		# Chương 2: người nhà đã đứng sẵn trước chỗ ở (má thì tùy má đi hay ở), chỉ thêm chậu húng.
+	if game.chapter() >= 2:
+		# Chương 2, chương 3: người nhà đã đứng sẵn trước chỗ ở (má thì tùy má đi hay ở), chỉ thêm chậu húng.
 		loc = home
 		family = []
 	var i := 0

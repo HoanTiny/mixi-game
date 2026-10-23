@@ -60,8 +60,8 @@
   },
   "_map": "Map của màn phố: q8_tau_hu (khu thật Quận 8 ven kênh Tàu Hủ, data/maps/) hay an_hoa (phường vẽ tay, data/map.json).",
   "map": "q8_tau_hu",
-  "rainDays": [15, 29, 35, 41, 45, 52, 57],
-  "rainFlood": {"15": 1, "29": 2, "35": 1, "41": 1, "45": 2, "52": 2, "57": 1},
+  "rainDays": [15, 29, 35, 41, 45, 52, 57, 64, 67, 71, 75, 80, 86],
+  "rainFlood": {"15": 1, "29": 2, "35": 1, "41": 1, "45": 2, "52": 2, "57": 1, "64": 1, "67": 1, "71": 1, "75": 2, "80": 1, "86": 1},
   "_chapter2": "Chương 2 · Mùa mưa (ngày 31–60): tiền nhà tháng sau đến hạn tối ngày rentDue theo chỗ thuê dài hạn; độ thân thiết ban đầu của nhân vật mới; chênh lệch mổ mắt sớm cho bà; tiền riêng bà tự quyết góp; distantMarks: số ngày giấu hay ép người nhà trong chương 2 mà chưa nói thật với má thì má đi lặng lẽ (K5); livingCostPerDay: tiền sinh hoạt mỗi tối ở chương 2 (má về, nhà năm người); utilities: điện nước tháng đầu ở chỗ thuê mới, hạn ngày utilitiesDue.",
   "chapter2": {
     "startDay": 31,
@@ -74,6 +74,24 @@
     "livingCostPerDay": 140000,
     "utilities": 450000,
     "utilitiesDue": 45
+  },
+  "_chapter3": "Chương 3 · Tháng Bảy mưa ngâu (ngày 61–90): tiền nhà tháng sau hạn tối ngày rentDue; tiền nhà chương 2 còn giấy hẹn thì trả nốt trước tối ngày oldRentDue; ở nhờ dì Năm thì góp stayShare; độ thân thiết ban đầu của nhân vật mới; livingCostPerDay khi má còn ở nhà, livingCostAlone khi má đi; utilities: điện nước tháng này, hạn ngày utilitiesDue; sang tiệm Sáu: cọc mặt bằng shopDeposit hạn tối ngày shopDepositDue, đợt đầu tiền đồ nghề toolsFirst hạn tối ngày toolsFirstDue (chia đều cho người góp); distantMarks: số ngày giấu hay ép người nhà trong chương 3 mà chưa có lần nói thật nào thì ra kết L5.",
+  "chapter3": {
+    "startDay": 61,
+    "rentDue": 90,
+    "rent": {"hem_dua": 2500000, "cau_tre": 2000000},
+    "oldRentDue": 70,
+    "stayShare": 600000,
+    "rep": {"TIN": 40, "LUA": 40},
+    "livingCostPerDay": 140000,
+    "livingCostAlone": 120000,
+    "utilities": 450000,
+    "utilitiesDue": 75,
+    "shopDeposit": 3000000,
+    "shopDepositDue": 89,
+    "toolsFirst": 1000000,
+    "toolsFirstDue": 90,
+    "distantMarks": 4
   },
   "endings": { "exhaustWarnDays": 4, "exhaustSkips": 3, "exhaustFatigue": 60, "distantMarks": 3, "ownTableCash": 600000 },
   "full": {

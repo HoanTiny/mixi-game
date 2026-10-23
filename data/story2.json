@@ -1,5 +1,6 @@
 {
  "_ghi_chu": "Chương 2 · Mùa mưa (ngày 31–60). reps: tên nhân vật mới; npcs: nhân vật mới đứng trước cửa (loc 'home' là chỗ ở hiện tại, when là lúc có mặt); locations: lời tả địa điểm đổi ở chương 2; endings K1–K6 xét theo thứ tự K6 → K5 → K4 → K3 → K2 → K1 (game_logic.ending2_key); maCards, baTuCards, linhCards: thẻ hậu truyện; npcCards: một dòng cho từng người ở phố mới và phố cũ; keepsakes, codas, teasers như story.json.",
+ "title": "Chương 2 · Mùa mưa",
  "continue": "Ngày 31–60 ở chỗ mới: mùa mưa, đôi mắt của bà, và má về nhà sau mười sáu năm",
  "reps": {
   "MA": "Má",
