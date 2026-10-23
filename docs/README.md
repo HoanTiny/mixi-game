@@ -2,7 +2,7 @@
 
 "Trước mùa mưa" là cốt truyện chính mới của game, thay cho cốt truyện "Lên Phố" cũ (Minh trả nợ nặng lãi, lo học phí cho Lan). Bộ tài liệu này viết lại hồ sơ cốt truyện bản 1.0 thành từng phần để đội làm game tra cứu và chuyển dần vào code.
 
-Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát cắt ngày 18–22 để thử nhanh. Màn kết ngày 30 có nút **Chơi tiếp** sang **Chương 2 · Mùa mưa** (ngày 31–60, 6 kết thúc), mọi lựa chọn của chương 1 đi tiếp; màn kết ngày 60 chơi tiếp **Chương 3 · Tháng Bảy mưa ngâu** (ngày 61–90, 6 kết thúc). Tiến độ chi tiết và việc còn lại nằm ở [08-chuyen-sang-game.md](cot-truyen/08-chuyen-sang-game.md).
+Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát cắt ngày 18–22 để thử nhanh. Màn kết ngày 30 có nút **Chơi tiếp** sang **Chương 2 · Mùa mưa** (ngày 31–60, 6 kết thúc), mọi lựa chọn của chương 1 đi tiếp; màn kết ngày 60 chơi tiếp **Chương 3 · Tháng Bảy mưa ngâu** (ngày 61–90, 6 kết thúc), màn kết ngày 90 chơi tiếp **Chương 4 · Tháng Tám trăng tròn** (ngày 91–120, 6 kết thúc). Tiến độ chi tiết và việc còn lại nằm ở [08-chuyen-sang-game.md](cot-truyen/08-chuyen-sang-game.md).
 
 ## Đọc theo thứ tự
 
@@ -18,6 +18,7 @@ Trạng thái: **chơi được đủ 30 ngày và 8 kết thúc**, kèm lát c�
 | [08 · Chuyển sang game](cot-truyen/08-chuyen-sang-game.md) | So với game hiện tại, việc cần đổi trong data và code, thứ tự làm |
 | [09 · Chương 2 · Mùa mưa](cot-truyen/09-chuong-2-mua-mua.md) | Ngày 31–60 ở chỗ mới: má về, đôi mắt của bà, mùa mưa và đêm triều cường, bí mật cái mỏ lết, ông Ba và Kha, giỗ ông; 6 kết thúc K1–K6 |
 | [10 · Chương 3 · Tháng Bảy mưa ngâu](cot-truyen/10-chuong-3-thang-bay.md) | Ngày 61–90, tháng cô hồn: tiệm Sáu sang tay, thằng Tín và chị Lụa, kè kênh và cái hiên của ông Ba, Linh hết thực tập, má, bà về quê; 6 kết thúc L1–L6 |
+| [11 · Chương 4 · Tháng Tám trăng tròn](cot-truyen/11-chuong-4-thang-tam.md) | Ngày 91–120: tháng đầu của tiệm, đơn quạt của trường, lời mời của anh Quân, Tín đòi nghỉ học, rằm Trung thu, chú Sáu về Bến Tre; 6 kết thúc M1–M6 |
 
 Dữ liệu gốc dạng JSON (nhân vật, 30 ngày, kết thúc, nhánh) nằm ở [data/narrative_design.json](data/narrative_design.json), dùng làm nguồn khi chuyển nội dung sang `data/events.json`.
 
@@ -26,6 +27,7 @@ Dữ liệu gốc dạng JSON (nhân vật, 30 ngày, kết thúc, nhánh) nằm
 - **Quy mô:** 9 nhân vật · 30 ngày · 90 lựa chọn · 8 kết thúc chính · 4 hậu truyện của Linh · 3 hậu truyện của bà Tư.
 - **Chương 2:** thêm 3 nhân vật (má, ông Ba, Kha) · 30 ngày · 38 cảnh chính · 133 lựa chọn · 20 việc mới · 5 việc nhờ · 32 đoạn thoại · 6 kết thúc · thẻ hậu truyện của má, bà, Linh.
 - **Chương 3:** thêm 2 nhân vật (Tín, chị Lụa) · 30 ngày · 35 cảnh chính · 140 lựa chọn · 6 việc mới · 5 việc nhờ · 28 đoạn thoại · 6 kết thúc · sáu thẻ hậu truyện (Tín, ông Ba, Linh, bà Tư, má, chú Sáu).
+- **Chương 4:** thêm 2 nhân vật (anh Quân, cô Mai) · 30 ngày · 37 cảnh chính · 119 lựa chọn · 6 việc mới · 4 việc nhờ · 21 đoạn thoại · 6 kết thúc · bảy thẻ hậu truyện.
 - **Mốc cố định:** mưa sớm ngày 15, mưa lớn ngày 29, trả chìa khóa ngày 30.
 - **Tiền khởi đầu:** 1,2 triệu tiền mặt, cộng 3,6 triệu lương cũ còn phải thu.
 

@@ -65,6 +65,7 @@ Tài liệu này so "Trước mùa mưa" với game cũ trong project Godot, li�
   - Màn kết chương 2 và 3 dùng chung một hàm (`_ending_chapter`); bảng mục tiêu chương 3 có từng khoản phải trả kèm số tiền còn phải kiếm (đã trừ tiền sinh hoạt), chuyện tiệm Sáu, Vu Lan, Linh, ông Ba, chuyến về quê.
   - Trên phố: Tín đứng ở tiệm net đầu chợ (khi chị Lụa chưa cấm), chị Lụa ở chợ từ ngày 68; lịch đi lại tháng Bảy trong `schedules.json` (Tín đi học hè rồi chiều ghé tiệm Sáu, Linh theo chỗ thực tập rồi theo chỗ làm em chọn ngày 82, má đi làm xưởng may hẻm 88).
   - `tests/sim.gd` chạy thêm 90 ngày (3 tuyến × 8 cách chơi, ra đủ L1–L6) và ba lối vào chương 3 từ nhà dì Năm (`-- di_nam`); `tests/playtest.gd -- --demo --ch3 --talk` cho người chơi máy đi hết tháng Bảy trên phố thật.
+- **Chương 4 · Tháng Tám trăng tròn** (ngày 91–120, thiết kế ở [11-chuong-4-thang-tam.md](11-chuong-4-thang-tam.md)): dữ liệu `events4.json`, `story4.json`, `talks4.json`, `quests4.json`, `config4.json`, mục `chapter4` của `config.json`. Code chương 3 viết lại cho chung mọi chương (`story_n()`, nút Chơi tiếp, màn kết, tiền nhà tháng sau, tiền sinh hoạt); `start_chapter4()`, `ending4_key()`; bảng mục tiêu chương 4 dùng chung phần khoản phải trả với chương 3; đơn quạt của trường là việc nhờ có hạn (bước làm việc đủ số buổi). `tests/sim.gd` chạy thêm 120 ngày, `tests/playtest.gd -- --ch4` chơi tháng Tám trên phố.
 - **Còn lại:** chỉnh cân bằng thêm sau khi người thật chơi thử.
 
 ## Câu hỏi đã chốt

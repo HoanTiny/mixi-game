@@ -11,7 +11,7 @@
    "perDay": 2,
    "days": [
     65,
-    90
+    120
    ],
    "dirty": {
     "clean": -6,
@@ -63,7 +63,7 @@
    "perDay": 1,
    "days": [
     66,
-    90
+    120
    ],
    "showIfFlag": "tinOTiem",
    "hideIfFlag": "luaCam",
@@ -88,7 +88,7 @@
    "perDay": 1,
    "days": [
     61,
-    90
+    120
    ],
    "showIf": {
     "flag_any": [

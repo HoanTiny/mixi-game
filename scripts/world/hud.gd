@@ -748,6 +748,9 @@ func _fill_objectives(s: Dictionary) -> void:
 	if game.chapter() == 2:
 		_refresh_objectives2(s)
 		return
+	if game.chapter() == 4:
+		_refresh_objectives4(s)
+		return
 	if game.chapter() == 3:
 		_refresh_objectives3(s)
 		return
@@ -872,25 +875,7 @@ func _refresh_objectives3(s: Dictionary) -> void:
 	if game.check({"home": "di_nam", "housing_state": "signed"}) == "" and game.day() <= 86:
 		_objective("Đặt cọc phòng mới trong tháng Bảy", "Ở nhờ dì Năm tới hết tháng · cọc Hẻm Dừa hay Cầu Tre, dọn mùng một tháng Tám",
 			"current" if game.day() >= 80 else "normal")
-	for row in rows:
-		var x = null
-		for p in s.payables:
-			if p.id == row[0]:
-				x = p
-		if x == null:
-			continue
-		var due := int(x.due)
-		if x.status == "pending":
-			# Dự kiến đã trừ tiền sinh hoạt mỗi tối và các khoản phải trả khác tới ngày đóng.
-			var proj: int = game.projected_cash(due)
-			var sub := "%s · " % GameLogic.fmt_money(int(x.amount))
-			if proj >= int(x.amount):
-				sub += "không kiếm thêm vẫn đủ"
-			else:
-				sub += "từ giờ tới tối ngày %d cần kiếm thêm %s (đã tính tiền sinh hoạt)" % [due, GameLogic.fmt_money(int(x.amount) - proj)]
-			_objective("%s (tối ngày %d)" % [row[1], due], sub, "current" if game.day() >= int(row[2]) else "normal")
-		else:
-			_objective(str(row[1]), "Đã đóng" if x.status == "paid" else "Chưa đủ, phải hẹn lại", "done" if x.status == "paid" else "failed")
+	_payable_objectives(s, rows)
 	if f.get("tiemKhongNhan", false):
 		_objective("Tiệm Sáu: không nhận", "Tiệm về tay người khác, mình giữ nhịp làm cũ", "done")
 	elif not (f.get("tiemChung", false) or f.get("tiemMotMinh", false)) and f.get("henTinhTiem", false):
@@ -911,6 +896,62 @@ func _refresh_objectives3(s: Dictionary) -> void:
 	if due_today > 0:
 		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
 	_objective("Đêm cuối tháng Bảy (tối ngày 90)", "Sáng mùng một tháng Tám chú Sáu giao chìa khóa tiệm", "current" if game.day() >= 88 else "normal")
+	_quest_objectives()
+
+
+## Từng khoản phải trả trong danh sách [id, tên, ngày bắt đầu nhắc gấp]: còn chờ thì ghi số tiền và phần còn phải kiếm,
+## đã đóng hay phải hẹn lại thì ghi kết quả.
+func _payable_objectives(s: Dictionary, rows: Array) -> void:
+	for row in rows:
+		var x = null
+		for p in s.payables:
+			if p.id == row[0]:
+				x = p
+		if x == null:
+			continue
+		var due := int(x.due)
+		if x.status == "pending":
+			# Dự kiến đã trừ tiền sinh hoạt mỗi tối và các khoản phải trả khác tới ngày đóng.
+			var proj: int = game.projected_cash(due)
+			var sub := "%s · " % GameLogic.fmt_money(int(x.amount))
+			if proj >= int(x.amount):
+				sub += "không kiếm thêm vẫn đủ"
+			else:
+				sub += "từ giờ tới tối ngày %d cần kiếm thêm %s (đã tính tiền sinh hoạt)" % [due, GameLogic.fmt_money(int(x.amount) - proj)]
+			_objective("%s (tối ngày %d)" % [row[1], due], sub, "current" if game.day() >= int(row[2]) else "normal")
+		else:
+			_objective(str(row[1]), "Đã đóng" if x.status == "paid" else "Chưa đủ, phải hẹn lại", "done" if x.status == "paid" else "failed")
+
+
+## Chương 4: tiền nhà, tiền mặt bằng, đồ nghề tháng sau, nợ còn lại của tháng Bảy, đơn quạt của trường, lời mời của anh Quân,
+## Trung thu, chú Sáu về quê.
+func _refresh_objectives4(s: Dictionary) -> void:
+	var f: Dictionary = s.flags
+	_payable_objectives(s, [["tien_nha_t4", "Tiền nhà tháng sau", 114], ["mat_bang_t9", "Tiền mặt bằng tiệm tháng sau", 114],
+		["do_nghe_sau_2", "Đợt hai tiền đồ nghề trả chú Sáu", 114], ["dien_nuoc_t4", "Điện nước tháng này", 103],
+		["tien_nha_t3", "Tiền nhà tháng trước còn hẹn", 94], ["coc_tiem", "Cọc mặt bằng tiệm Sáu còn hẹn", 94],
+		["do_nghe_sau", "Đợt đầu tiền đồ nghề còn hẹn", 94], ["gop_di_nam_4", "Góp tiền chợ nhà dì Năm còn hẹn", 94],
+		["gop_di_nam_5", "Góp tiền chợ ở nhờ nhà dì Năm", 114], ["phong_moi_t9", "Phần còn lại phòng mới, dọn mùng 1 tháng Chín", 114]])
+	if game.check({"home": "di_nam", "housing_state": "signed"}) == "" and game.day() <= 116:
+		_objective("Đặt cọc phòng mới trong tháng Tám", "Ở nhờ dì Năm tới hết tháng · cọc Hẻm Dừa hay Cầu Tre, dọn mùng một tháng Chín",
+			"current" if game.day() >= 110 else "normal")
+	if f.get("treDonTruong", false):
+		_objective("Đơn quạt của trường: trễ", "Ba phòng chưa có quạt sáng khai giảng", "failed")
+	elif f.get("donTruongXong", false):
+		_objective("Đơn quạt của trường", "Đã nghiệm thu", "done")
+	if not f.get("tuChoiQuan", false) and not f.get("vaoTrungTam", false) and f.get("loiMoiQuan", false) and game.day() <= 116:
+		_objective("Trả lời anh Quân (ngày 116)", "Thợ chính trung tâm bảo hành · 9 triệu, giờ hành chính", "current" if game.day() >= 114 else "normal")
+	if game.day() <= 105:
+		_objective("Rằm tháng Tám · Trung thu (tối ngày 105)", "Sân kho trên nền xóm cũ", "current" if game.day() >= 103 else "normal")
+	if f.get("chuSauVeQue", false) and game.day() <= 119:
+		_objective("Chú Sáu về Bến Tre (sáng ngày 119)", "Chuyến xe sáu giờ ở bến xe số 6", "current" if game.day() >= 118 else "normal")
+	var due_today := 0
+	for p in s.promises:
+		if p.status == "open" and int(p.due) == game.day():
+			due_today += 1
+	if due_today > 0:
+		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
+	_objective("Đêm cuối tháng Tám (tối ngày 120)", "Tiền nhà tháng sau, sổ tiệm tháng đầu", "current" if game.day() >= 118 else "normal")
 	_quest_objectives()
 
 

@@ -9,7 +9,7 @@ var game: GameLogic
 ## Chạy với "-- --demo" để vào thẳng ngày 18 tuyến B mà không ghi đè bản lưu thật;
 ## thêm "--demo-route=A" hoặc "=C" để đổi tuyến, "--demo-full" để chơi từ ngày 1,
 ## "--demo-ch2" (hay "?ch2" trên địa chỉ bản web) để vào thẳng sáng ngày 31 của chương 2, "--demo-ch3" (hay "?ch3")
-## để vào thẳng sáng ngày 61 của chương 3.
+## để vào thẳng sáng ngày 61 của chương 3, "--demo-ch4" (hay "?ch4") vào sáng ngày 91 của chương 4.
 var _persist := true
 ## Chỗ An hiện ra khi về lại phố từ màn khác (để dành cho các màn ngoài phố sau này).
 var spawn_at := ""
@@ -20,6 +20,10 @@ func _ready() -> void:
 	game.load_data()
 	var args := OS.get_cmdline_user_args()
 	var query := str(JavaScriptBridge.eval("window.location.search", true)) if OS.has_feature("web") else ""
+	if args.has("--demo-ch4") or query.contains("ch4"):
+		_persist = false
+		_demo_chapter(4)
+		return
 	if args.has("--demo-ch3") or query.contains("ch3"):
 		_persist = false
 		_demo_chapter(3)
