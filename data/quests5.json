@@ -1,0 +1,65 @@
+{
+ "_ghi_chu": "Việc nhờ của chương 5, cùng cú pháp với quests.json. \"home\" là chỗ ở hiện tại.",
+ "items": {},
+ "quests": [
+  {
+   "id": "khoa_dien_lanh",
+   "title": "Lớp điện lạnh buổi tối",
+   "who": "Thầy Phong",
+   "giver": "ben_xe_6",
+   "offer": false,
+   "deadline_day": 148,
+   "deadline_hour": 17,
+   "intro": "",
+   "reward_hint": "Giấy chứng nhận · Thầy Phong +4",
+   "reward": {
+    "flag.hocXong": true,
+    "rep.PHONG": 4,
+    "diary": "Học đủ sáu buổi thực hành lớp điện lạnh, được thầy Phong cho thi. Hàn ống đồng, nạp ga, đo áp. Thầy đứng sau lưng, không nói gì, chỉ coi đồng hồ áp suất. Thi xong thầy nói: \"Tay cậu giờ ký được giấy rồi.\""
+   },
+   "reward_text": "Buổi thực hành thứ sáu, thầy Phong cho thi luôn: hàn nối ống đồng, thử xì, nạp ga, đo áp. An làm xong trước giờ. Thầy ký vô cuốn sổ học trò, dòng cuối: \"Đạt. Tay tốt, đầu tốt. Lần sau đừng đợi năm sau.\"",
+   "fail": {
+    "flag.hocDo": true,
+    "rep.PHONG": -2
+   },
+   "fail_text": "Chiều ngày 148, lớp điện lạnh thi lấy giấy. An chưa học đủ sáu buổi thực hành. Thầy Phong ghi tên vô danh sách học lại khóa sau, không thu thêm tiền: \"Học dở dang thì học tiếp. Đừng bỏ.\"",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "hoc_dien_lanh",
+     "count": 6,
+     "text": "Đi học sáu buổi tối lớp điện lạnh ở trung tâm nghề cạnh bến xe số 6 (thứ Hai đến thứ Sáu, 18:00–21:00), trước chiều ngày 148"
+    }
+   ]
+  },
+  {
+   "id": "truc_dem_ong_ba",
+   "title": "Trực đêm cho ông Ba",
+   "who": "Anh Tài",
+   "giver": "ben_xe_6",
+   "offer": false,
+   "deadline_days": 6,
+   "deadline_hour": 23,
+   "intro": "",
+   "reward_hint": "Ông Ba +4",
+   "reward": {
+    "rep.ONG_BA": 4,
+    "flag.trucDemXong": true,
+    "diary": "Trực xong hai đêm cho ông Ba ở bệnh viện quận. Đêm thứ hai ông kể chuyện năm 1976 lần thứ bảy, tới đoạn chiếc đò thì ngủ quên giữa câu. Anh Tài tới thay ca lúc sáu giờ, mang theo hộp cháo có mùi khói."
+   },
+   "reward_text": "Hai đêm trực ở phòng chung tầng ba. Ông Ba hết sốt, ăn được nửa hộp cháo có mùi khói anh Tài nấu bằng bếp củi trên sân thượng. Bác sĩ hẹn tuần sau cho về.",
+   "fail": {
+    "rep.ONG_BA": -2
+   },
+   "fail_text": "Lịch trực dán đầu giường còn hai ô trống tên An. Anh Tài thức thay, sáng đi làm ca ngủ gục trên xe nâng.",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "truc_dem_benh_vien",
+     "count": 2,
+     "text": "Trực hai đêm ở bệnh viện quận (đi xe buýt từ bến xe số 6, 20:00–22:00 rồi ngủ lại)"
+    }
+   ]
+  }
+ ]
+}

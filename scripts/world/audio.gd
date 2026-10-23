@@ -60,9 +60,9 @@ func _process(delta: float) -> void:
 	if _horn_t <= 0.0:
 		var h: Dictionary = cfg.get("horn", {})
 		_horn_t = _rand(h.get("every", [8, 16]))
-		if _in_hours(h, hour) and not world.bikes.is_empty():
-			var bike: Node3D = world.bikes.pick_random().node
-			_play_at(_load(str(h.get("path", "")), false), bike.position, float(h.get("volume_db", 0)))
+		var spot = world.horn_spot() if _in_hours(h, hour) else null
+		if spot != null:
+			_play_at(_load(str(h.get("path", "")), false), spot, float(h.get("volume_db", 0)))
 
 
 ## Dừng âm nền khi rời màn phố, để máy âm thanh không giữ lại luồng phát đang lặp.
@@ -88,10 +88,16 @@ func play(key: String, pitch := 1.0) -> void:
 
 func _call(c: Dictionary) -> void:
 	var e: Dictionary = c.cfg
-	var pos := Vector3(float(e.get("x", world.player.position.x)), 0, float(e.get("z", 3.6)))
+	var pos := Vector3(float(e.get("x", world.player.position.x)), 0, float(e.get("z", world.player.position.z)))
+	# Tiếng rao gắn với xe bán rong thì phát ra từ chính chiếc xe; xe chưa ra phố thì im.
+	if e.has("vendor"):
+		var vp = world.life.vendor_pos(str(e.vendor))
+		if vp == null:
+			return
+		pos = vp
 	if c.stream:
 		_play_at(c.stream, pos, float(e.get("volume_db", 0)))
-	if e.has("text"):
+	if e.has("text") and pos.distance_to(world.player.position) < 40.0:
 		var label: Label3D = world._label3d("♪ " + str(e.text), pos + Vector3(0, 2.6, 0), 30)
 		label.modulate = Color("ffe7a8")
 		world.add_child(label)

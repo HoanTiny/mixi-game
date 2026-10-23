@@ -1,0 +1,30 @@
+{
+  "_ghi_chu": "Bản đồ phường An Hòa (thành phố Bình Giang, hư cấu), dựng theo kiểu khu ven kênh ở Sài Gòn: một đường lớn, đường chợ chạy xuống cầu, đường bờ kè ven rạch, hẻm chính, hẻm nhánh, hẻm cụt, hai cây cầu và dãy nhà lưng quay ra kênh ở bờ nam. Đơn vị mét. x tăng về phía đông, z tăng về phía nam (camera nhìn từ phía nam lên). streets: đoạn đường thẳng, a và b là hai đầu đường tim, w là bề ngang đi được (gồm vỉa hè), road là phần lòng đường. houses: phía có nhà mặt tiền (n, s, e, w). name để trống thì đặt theo số nhà ở đầu hẻm, kiểu Hẻm 42, Hẻm 42/7.",
+  "bounds": [-106, -64, 110, 62],
+  "streets": [
+    {"id": "an_hoa", "name": "Đường An Hòa", "kind": "duong", "a": [-106, -40], "b": [110, -40], "w": 12, "road": 7, "houses": ["n", "s"], "number": "an_hoa"},
+    {"id": "vao_kcn", "name": "Đường vào khu công nghiệp", "kind": "duong", "a": [-92, -62], "b": [-92, -46], "w": 9, "road": 6, "houses": []},
+    {"id": "duong_cho", "name": "Đường Chợ Cầu Nhỏ", "kind": "cho", "a": [-48, -34], "b": [-48, 12], "w": 9, "road": 4, "houses": ["w", "e"], "number": "duong_cho"},
+    {"id": "bo_me", "name": "Đường Bờ Me", "kind": "bo_ke", "a": [-106, 16], "b": [104, 16], "w": 8, "road": 5, "houses": ["n"], "number": "bo_me"},
+    {"id": "hem_42", "name": "", "kind": "hem", "a": [0, -34], "b": [0, 12], "w": 5, "houses": ["w", "e"], "parent": "an_hoa", "gate": "KHU PHỐ 3 · PHƯỜNG AN HÒA"},
+    {"id": "hem_42_7", "name": "", "kind": "hem_nho", "a": [2.5, -10], "b": [52.9, -10], "w": 3.2, "houses": ["n", "s"], "parent": "hem_42"},
+    {"id": "hem_88", "name": "", "kind": "hem", "a": [55, -34], "b": [55, 12], "w": 4.2, "houses": ["w", "e"], "parent": "an_hoa", "gate": "KHU PHỐ 4 · PHƯỜNG AN HÒA"},
+    {"id": "hem_dua", "name": "Hẻm Dừa", "kind": "hem_nho", "a": [-84, -14], "b": [-52.5, -14], "w": 3.0, "houses": ["n", "s"], "parent": "duong_cho", "dead_end": "a"},
+    {"id": "cau_nho", "name": "Cầu Nhỏ", "kind": "cau", "a": [-48, 20], "b": [-48, 43.75], "w": 6, "houses": []},
+    {"id": "bo_nam", "name": "Hẻm Bờ Nam", "kind": "hem", "a": [-72, 46], "b": [104, 46], "w": 4.5, "houses": ["n"], "number": "bo_nam"},
+    {"id": "cau_tre", "name": "Cầu Tre", "kind": "cau_nho", "a": [92, 20], "b": [92, 43.75], "w": 3.2, "houses": []}
+  ],
+  "canal": {"name": "Rạch Bờ Me", "w": 9.5, "points": [[-106, 29.5], [-70, 30.6], [-30, 29.2], [10, 30.2], [50, 29.0], [80, 30.4], [110, 29.6]]},
+  "kcn_gate": {"pos": [-92, -62], "text": "KHU CÔNG NGHIỆP AN HÒA"},
+  "locations": {
+    "ben_xe_6": {"street": "an_hoa", "side": "n", "at": -80, "w": 7, "d": 3},
+    "nha_di_nam": {"street": "an_hoa", "side": "n", "at": -64, "w": 7, "d": 10},
+    "com_hanh": {"street": "an_hoa", "side": "n", "at": -30, "w": 8, "d": 11},
+    "tiem_sau": {"street": "an_hoa", "side": "n", "at": 18, "w": 8, "d": 11},
+    "hem_dua": {"street": "hem_dua", "side": "n", "at": -77, "w": 5.5, "d": 8},
+    "cho_cau_nho": {"street": "bo_me", "side": "n", "at": -34, "w": 14, "d": 10},
+    "xom_bo_me": {"street": "bo_me", "side": "n", "at": 28, "w": 16, "d": 11},
+    "ben_can": {"street": "bo_me", "side": "n", "at": 79, "w": 22, "d": 8},
+    "cau_tre": {"street": "bo_nam", "side": "n", "at": 79, "w": 9, "d": 9}
+  }
+}

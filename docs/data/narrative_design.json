@@ -1,0 +1,1266 @@
+{
+  "world": {
+    "title": "TRƯỚC MÙA MƯA",
+    "subtitle": "Kịch bản thiết kế 30 ngày — bản 1.0",
+    "premise": "An, 27 tuổi, mất việc ở một tiệm điện máy và quay về xóm trọ Bờ Me. Trên cửa phòng bà ngoại là thông báo: cuối tháng, mọi người phải dọn đi để chủ đất sửa lại nền và dựng kho. An có một triệu hai trăm nghìn đồng, một túi đồ nghề và khoản lương chưa nhận. Trong ba mươi ngày, anh phải tìm chỗ ở cho gia đình, dựng lại sinh kế và học cách giúp người thân mà không quyết định thay họ.",
+    "setting": "Phường An Hòa thuộc thành phố công nghiệp hư cấu Bình Giang, miền Nam. Thời gian là cuối tháng Tư của một năm không ghi rõ. Một con rạch, khu công nghiệp, chợ nhỏ và những dãy nhà trọ nằm trong quãng đường có thể đi bằng chiếc xe số cũ. Tháng mở đầu nóng hầm hập; vài cơn mưa chuyển mùa báo trước những trận mưa dài. Đây là một địa phương cụ thể trong thế giới truyện, không đại diện cho mọi nơi ở Việt Nam.",
+    "core_question": "Muốn lo được cho người khác, An có cần trở thành người gánh hết mọi chuyện không?",
+    "tone": "Đời thường, có hài hước và những khoảng lặng. Khó khăn có nguyên nhân và đường xử lý. Nhân vật có sở thích, sự tự ái và những tính toán riêng; họ không tồn tại chỉ để ban nhiệm vụ hoặc kể khổ.",
+    "opening": "Xe khách thả An ở đầu đường. Anh đi bộ qua quán cơm đang kéo mái bạt, trong túi có cái quạt bàn bị hỏng mà khách cũ cho. Bà Tư hỏi anh đã ăn chưa, rồi mới hỏi nghỉ phép mấy ngày. An nhìn thông báo trên cửa, chưa biết nên nói chuyện mất việc hay chuyện phải chuyển nhà trước. Linh đang đo cái kệ bếp bằng sợi dây, bảo: ‘Nếu kiếm phòng khác thì mình phải biết cái nào mang theo được chứ.’",
+    "ending_image": "Ngày 30, một chậu húng quế được đặt dưới mái hiên mới. Người đặt chậu, người có mặt và âm thanh trong căn nhà thay đổi theo lựa chọn. Trận mưa đi qua tất cả các kết thúc; khác nhau là họ đã chuẩn bị cho nhau được đến đâu.",
+    "acts": [
+      {
+        "days": "1–5",
+        "title": "Những thứ đem về",
+        "beat": "An giấu chuyện mất việc, học lại nhịp sống xóm trọ và biết mình không thể giải quyết mọi thứ bằng một khoản tiền lương còn treo."
+      },
+      {
+        "days": "6–10",
+        "title": "Người ta gọi tên mình",
+        "beat": "Những việc nhỏ tạo quan hệ. Cơ hội hợp đồng đến từ cách An đã làm việc, không xuất hiện như phần thưởng ngẫu nhiên."
+      },
+      {
+        "days": "11–15",
+        "title": "Nhận lời",
+        "beat": "Chọn đường kiếm sống và chỗ ở. Một cơn mưa sớm làm lộ cái giá của lời hứa quá khả năng."
+      },
+      {
+        "days": "16–20",
+        "title": "Tiền chưa tới tay",
+        "beat": "Khối lượng công việc, khoản phải thu và sức khỏe xung đột. An phải nói rõ ai đang gánh phần rủi ro nào."
+      },
+      {
+        "days": "21–25",
+        "title": "Ai được quyết định",
+        "beat": "Linh có cơ hội đi học nghề xa. Bà Tư thú nhận điều bà sợ khi dọn đi. Những người được An ‘lo cho’ bắt đầu tự chọn."
+      },
+      {
+        "days": "26–30",
+        "title": "Một chỗ để về",
+        "beat": "Dọn nhà, xử lý cam kết còn lại và ứng phó mưa lớn. Kết thúc phản ánh cả những gì An giữ được lẫn những điều anh phải buông."
+      }
+    ],
+    "locations": [
+      {
+        "name": "Xóm trọ Bờ Me",
+        "details": "Tám phòng quanh một khoảng sân, vòi nước chung, dây phơi chằng dưới mái tôn. Trung tâm quan hệ gia đình, họp xóm và chuyển nhà."
+      },
+      {
+        "name": "Cơm Hạnh",
+        "details": "Quán cơm phần phục vụ người làm ca. Tờ giấy ghi ai ăn nợ nằm dưới hũ tăm. Nơi nhận ca phụ, giao cơm và biết chuyện dãy quán cần sửa điện."
+      },
+      {
+        "name": "Tiệm Sáu Sửa",
+        "details": "Tiệm sửa xe xen một bàn sửa đồ gia dụng. Chú Sáu muốn bớt việc nặng nhưng chưa biết giao chiếc bàn cho ai."
+      },
+      {
+        "name": "Chợ Cầu Nhỏ",
+        "details": "Sạp vật tư, hàng đồ cũ, quán nước có bảng tin thuê phòng. Giá rẻ thường đi cùng điều kiện phải hỏi rõ, không phải món nào cũng là bẫy."
+      },
+      {
+        "name": "Dãy quán Bến Cạn",
+        "details": "Năm hộ kinh doanh chung lối đi và hạ tầng cũ. Hợp đồng ở đây đòi hỏi hỏi lịch từng quán, ghi việc rõ và có người đủ tay nghề giám sát phần chuyên môn."
+      },
+      {
+        "name": "Bến xe số 6 và trung tâm nghề",
+        "details": "Không gian riêng của Linh: bảng tuyển thực tập, giờ xe, bạn cùng lớp và những lựa chọn không xoay quanh An."
+      },
+      {
+        "name": "Ba chỗ ở có thể chuyển tới",
+        "details": "Phòng trong hẻm gần việc; phòng xa hơn nhưng thoáng; chỗ ở tạm nhà dì Năm. Mỗi nơi có ưu nhược đã được báo trước."
+      }
+    ],
+    "characters": [
+      {
+        "id": "AN",
+        "name": "An — 27 tuổi",
+        "role": "Nhân vật chính; thợ sửa điện máy",
+        "want": "Một căn phòng ổn định và công việc khiến anh không phải nhờ vả ai.",
+        "need": "Biết hỏi giúp đỡ, giới hạn lời hứa và công khai tình hình tiền bạc.",
+        "history": "Bà Tư nuôi An trong nhiều năm mẹ làm xa. Anh từng kiếm khá, quen gửi tiền về thay cho những cuộc gọi. Tiệm cũ thu hẹp, An bị cho nghỉ và còn 3,6 triệu tiền công chưa nhận.",
+        "flaw": "Dễ nói ‘để anh lo’ trước khi biết phải làm thế nào. Bị hỏi kỹ thì tưởng người khác coi thường mình.",
+        "arc": "Từ người mang tiền về thành một thành viên biết cùng gia đình quyết định. Hướng thất bại là tiếp tục giấu việc, giấu nợ, giấu mệt.",
+        "voice": "Nói ngắn, hay đùa để tránh chuyện khó. ‘Cái quạt này còn cứu được. Còn anh thì để tính.’",
+        "autonomy": "Ngoại hình và một số ký ức có thể tùy chỉnh; nghề nền cố định để phục vụ cấu trúc truyện."
+      },
+      {
+        "id": "LINH",
+        "name": "Linh — 20 tuổi",
+        "role": "Em họ An; đang học nghề điện lạnh",
+        "want": "Một chỗ thực tập có người hướng dẫn và cơ hội thành thợ chính.",
+        "need": "Được xem như người trưởng thành, có quyền quyết định việc học, việc làm và tiền tiết kiệm của mình.",
+        "history": "Linh sống với bà để thuận đường học nghề. Cha mẹ làm việc theo mùa ở quê vẫn gửi phần sinh hoạt đã tính trong ngân sách; không có khoản cứu viện bất ngờ ở hồi cuối.",
+        "flaw": "Tự ái, đôi khi nhận việc quá tay để chứng minh mình không phải gánh nặng.",
+        "arc": "Từ người tự lén xoay xở sang người nói rõ kế hoạch. Có thể đi thực tập xa, chọn cơ sở gần hoặc trì hoãn vì chính cô cân nhắc; không phải lựa chọn nào cũng là thất bại.",
+        "voice": "Thẳng, ít dùng lời lớn. ‘Anh hỏi em có đi được không, hay hỏi em có được đi không?’",
+        "autonomy": "An chỉ quyết định mình hỗ trợ thế nào. Không có nút ‘cấm Linh đi’. Sự phản đối có thể làm cô giấu lịch, không tước quyền lựa chọn."
+      },
+      {
+        "id": "BA_TU",
+        "name": "Bà Tư — 70 tuổi",
+        "role": "Bà ngoại; giữ ký ức của xóm trọ",
+        "want": "Ở gần người quen và mang được vài thứ quan trọng sang nhà mới.",
+        "need": "Được tham gia lựa chọn, không chỉ được thông báo ngày dọn.",
+        "history": "Bà từng bán bánh buổi sáng. Chân đau khiến bà ít đi xa; ở xóm cũ, người bán rau, hàng xóm và bác xe ôm đều biết bà.",
+        "flaw": "Nói ‘bà sao cũng được’ rồi lặng lẽ thu lại đồ đã xếp, vì không muốn làm phiền con cháu.",
+        "arc": "Chịu nói điều mình cần: ít bậc thềm, có người trò chuyện, giữ ảnh gia đình và chậu húng. Có thể giúp gây dựng nhóm hàng xóm ở nơi mới.",
+        "voice": "Nhắc chuyện ăn uống trước chuyện tiền. ‘Nhà nào cũng được. Mà bên đó sáng có ai ngồi ngoài cửa không con?’",
+        "autonomy": "Bà có khoản tiền riêng; người chơi không được tự lấy. Bà tự chọn có góp một phần hay giữ làm dự phòng."
+      },
+      {
+        "id": "HANH",
+        "name": "Chị Hạnh — 38 tuổi",
+        "role": "Chủ quán cơm",
+        "want": "Giữ khách ăn ca và có người giao cơm đáng tin để chị được về với con đúng giờ.",
+        "need": "Một đối tác dám báo sớm khi không làm kịp, thay vì im lặng nhận hết.",
+        "history": "Quán sống nhờ các đơn nhỏ đều đặn. Một lời xin lỗi không thay thế được những suất cơm khách phải bỏ ca chờ.",
+        "flaw": "Nóng miệng, có lúc lấy sự quen thân làm lý do nhờ thêm việc.",
+        "arc": "Học trả công rõ ràng và không mặc định lòng tốt của An là miễn phí. Có thể trở thành khách dài hạn hoặc giữ khoảng cách lịch sự.",
+        "voice": "‘Chị trả tiền giao cơm, chớ đâu trả tiền em chạy liều.’",
+        "autonomy": "Nếu An thất hẹn, chị thuê người khác. Người thay không bị viết thành kẻ cướp cơ hội."
+      },
+      {
+        "id": "SAU",
+        "name": "Chú Sáu — 59 tuổi",
+        "role": "Thợ sửa xe, chủ bàn sửa đồ nhỏ",
+        "want": "Giảm việc nặng mà không thấy mình bị gạt ra ngoài.",
+        "need": "Truyền được cách làm việc, không chỉ giữ khách bằng kinh nghiệm riêng.",
+        "history": "Chú biết sửa đồ gia dụng cơ bản và quen nhiều thợ chuyên môn. Tay bắt đầu run khi cầm lâu; chú chủ động tìm cách nghỉ từng phần.",
+        "flaw": "Gắt khi người trẻ làm khác mình, ngại thừa nhận không theo kịp đồ mới.",
+        "arc": "Có thể giao bàn cho An, hợp tác bình đẳng hoặc chỉ làm người giới thiệu khách. Không phải người thầy luôn đúng.",
+        "voice": "‘Không sửa được thì nói không sửa được. Cái tiếng nhận rồi bỏ mới khó sửa.’",
+        "autonomy": "Chú không phụ trách phần điện công trình; sẽ giới thiệu Trâm và từ chối công việc vượt chuyên môn."
+      },
+      {
+        "id": "MINH",
+        "name": "Minh — 31 tuổi",
+        "role": "Tài xế giao hàng, bố của bé Bắp",
+        "want": "Giữ thu nhập nhưng không liên tục đến đón con trễ.",
+        "need": "Một người chia ca có lịch rõ, không phải lời hứa ‘lát nữa tao tới’.",
+        "history": "Minh và vợ làm lệch ca. Việc đón con là trách nhiệm thật, không phải cái cớ để nhiệm vụ phát sinh.",
+        "flaw": "Đôi lúc nhận đơn sát giờ vì tiếc tiền rồi tự làm khó mình.",
+        "arc": "Xây lịch đổi ca có qua có lại. Cuối game Minh có thể lái xe chở đồ, hoặc vẫn thương An nhưng không thể bỏ lịch gia đình.",
+        "voice": "‘Tao tới được. Nhưng tới mấy giờ thì mày phải nói thiệt.’",
+        "autonomy": "Một lần giúp không tạo quyền gọi Minh bất cứ lúc nào. Mỗi lần hỗ trợ cần đúng lịch."
+      },
+      {
+        "id": "DUYEN",
+        "name": "Cô Duyên — 54 tuổi",
+        "role": "Người quản lý xóm trọ Bờ Me",
+        "want": "Bàn giao mặt bằng đúng hẹn và trả các khoản cọc còn giữ cho rõ ràng.",
+        "need": "Được nghe yêu cầu cụ thể thay vì bị mặc định là người có thể thay đổi mọi quyết định.",
+        "history": "Đất do anh em cô cùng sở hữu; kế hoạch sửa nền, làm kho đã được thống nhất. Cô không có quyền cho cả xóm ở vô hạn nhưng có thể giúp lịch chuyển, xe chở và phương án tạm.",
+        "flaw": "Thích nói lấp lửng để tránh cãi nhau, làm mọi người tưởng còn cơ hội ở lại lâu.",
+        "arc": "Học nói giới hạn rõ; có thể đứng ra điều phối việc dọn thay vì chỉ dán thông báo.",
+        "voice": "‘Cô hứa cái nào làm được thì cô hứa. Chuyện hết tháng phải dọn, cô không nói khác được.’",
+        "autonomy": "Chuyển nhà vẫn là mốc cố định. Quan hệ tốt mở hỗ trợ, không xóa toàn bộ tiền đề truyện."
+      },
+      {
+        "id": "TRAM",
+        "name": "Trâm — 33 tuổi",
+        "role": "Thợ điện có kinh nghiệm, người nghiệm thu chuyên môn của nhóm",
+        "want": "Nhận công việc đúng phạm vi, làm đủ kiểm tra và được trả công đầy đủ.",
+        "need": "Đồng đội xem quy trình và thời gian của cô là phần thật của công việc.",
+        "history": "Trâm tự gây dựng nhóm nhỏ, thường phải từ chối yêu cầu ‘tiện tay làm thêm’. Cô nhận cộng tác với An nếu kế hoạch minh bạch.",
+        "flaw": "Nói cứng, đôi khi khiến người mới tưởng cô không muốn giúp.",
+        "arc": "Có thể thành cộng sự tin cậy, người giới thiệu việc, hoặc người từ chối đứng tên cho một việc chưa đạt.",
+        "voice": "‘Chưa xong thì ghi chưa xong. Mình còn làm tiếp được. Ghi xong rồi mới khó.’",
+        "autonomy": "Không thể mua sự chấp thuận bằng điểm quan hệ. Cô có quyền dừng phần việc không đạt."
+      },
+      {
+        "id": "PHUC",
+        "name": "Anh Phúc — 43 tuổi",
+        "role": "Đại diện năm quán ở Bến Cạn",
+        "want": "Dãy quán hoạt động ổn định, hạn chế ngừng bán.",
+        "need": "Thỏa thuận rõ giữa nhiều hộ trả tiền, thay vì dùng uy tín cá nhân thay cho giấy tờ.",
+        "history": "Anh là người gom yêu cầu, không nắm một túi tiền chung vô hạn. Có hộ bán tốt, có hộ đang thiếu tiền.",
+        "flaw": "Hay gộp ‘việc nhỏ’ vào việc đã báo giá và nói ‘cuối tuần anh gom đủ’.",
+        "arc": "Có thể thành khách hàng biết tôn trọng hợp đồng, hoặc mối quan hệ được kết thúc đúng mực. Không có cú lật bí mật rằng anh là kẻ lừa đảo.",
+        "voice": "‘Anh tưởng có một chút xíu.’ — ‘Một chút của năm quán là cả ngày của em, anh Phúc.’",
+        "autonomy": "Có thể chấp nhận phạm vi nhỏ hơn, chia việc hoặc thuê đội khác nếu An từ chối."
+      }
+    ],
+    "rules": {
+      "time": "Mỗi ngày có bốn ô: sáng, chiều, đầu tối, cuối tối. Cảnh truyện chính thường tốn tối đa một ô; ngày 15, 22, 29 và 30 có thể tốn hai ô, báo trước. Bữa cơm ngắn và đọc tin nhắn không mất ô. Một ca kiếm tiền dài tốn hai ô; việc ngắn, học nghề hoặc hỗ trợ hàng xóm tốn một ô. Làm việc vào ô cuối tối thay cho nghỉ tăng mệt; không tự động bắt người chơi phải làm việc mỗi ngày.",
+      "money": "Tiền mặt ban đầu 1,2 triệu; lương còn phải thu 3,6 triệu. Chi phí sinh hoạt bình quân của hộ là 120.000/ngày sau phần đóng góp đã cố định của gia đình Linh; phòng cũ đã trả đến cuối tháng. Ca thường khoảng 300.000–360.000, việc ngắn 100.000–180.000. Đây là số cân bằng hư cấu, không phải khảo sát thu nhập hiện hành.",
+      "housing": "Phòng Hẻm Dừa gần việc: cọc 2,2 triệu + tháng đầu 2,2 triệu + chuyển đồ 600.000 = 5 triệu. Phòng Cầu Tre xa hơn: cọc 1,8 triệu + tháng đầu 1,8 triệu + chuyển đồ 600.000 = 4,2 triệu; đi lại tăng. Dì Năm có chỗ tạm bảy ngày, gia đình góp 500.000 và gửi bớt đồ; không mất quyền tìm phòng tiếp. Khoản tiền bà cho chỉ xảy ra khi bà chủ động đề nghị và được ghi rõ.",
+      "contract": "Hợp đồng toàn phần dự kiến 8,4 triệu. Vật tư 4 triệu, vận chuyển/kiểm tra/dự phòng 600.000, công người hỗ trợ 1,8 triệu: chi dự kiến 6,4 triệu; phần còn lại 2 triệu cho công và rủi ro của An. Mốc thanh toán mặc định 40% khi ký, 30% sau nghiệm thu giữa kỳ, 30% ở ngày 32; 2,52 triệu cuối chưa phải tiền có thể tiêu ngày 30. Đàm phán có thể đổi sang khách tự mua vật tư hoặc chia từng quán, với lịch và tổng lợi nhuận thay đổi rõ.",
+      "contract_routes": "A: không nhận gói lớn, giữ việc trả ngay. B: nhận cùng nhóm, Trâm chịu phần chuyên môn, Minh phụ trách vận chuyển theo lịch, Sáu góp chỗ và dụng cụ theo thỏa thuận. C: An nhận vai trò điều phối dịch vụ riêng, vẫn thuê người đủ chuyên môn cho phần vượt khả năng; lợi nhuận cao hơn chỉ khi tiết kiệm được chi phí bằng chuẩn bị tốt, không bằng bỏ kiểm tra.",
+      "state": "Theo dõi tiền mặt và khoản phải thu riêng; trạng thái chỗ ở; mức mệt; độ tin cậy nghề nghiệp; tin cậy gia đình; sự chuẩn bị cho bà; mức An tôn trọng quyền lựa chọn của Linh. Mỗi lời hứa có người nhận, nội dung, hạn và trạng thái. Không cộng tất cả thành một điểm đạo đức.",
+      "visibility": "Trước khi chọn, hiển thị thời gian, khoản chi chắc chắn và người sẽ chịu ảnh hưởng. Những điều chưa rõ được ghi là chưa rõ. Không giấu một khoản phạt lớn sau một câu nói tưởng chỉ có tính cách.",
+      "missed_day": "Nhiệm vụ bỏ lỡ không tự hoàn thành. Tin nhắn hôm sau cho biết người khác đã xử lý thế nào, có đường bù đắp tương xứng. Chỉ những việc có thời hạn thật mới mất cơ hội; nội dung thiết yếu để hiểu truyện luôn có bản tóm tắt qua điện thoại hoặc đối thoại khác.",
+      "family": "Linh tự quyết định nơi thực tập. Bà tự quyết định về tiền riêng và đồ lưu niệm. Người chơi chọn thái độ, thời gian và nguồn lực hỗ trợ; kết quả quan hệ phản ánh một chuỗi hành vi, không một câu trả lời duy nhất.",
+      "rain": "Ngày 15 là mưa sớm, ngày 29 mưa lớn. Dự báo được nhắc từ trước. Không tạo hỏng hóc ngẫu nhiên để trừng phạt người chơi; thiệt hại và khả năng ứng phó xuất phát từ các việc chuẩn bị đã thấy được."
+    }
+  },
+  "days": [
+    {
+      "day": 1,
+      "title": "Tờ giấy trên cánh cửa",
+      "scene": "An về Bờ Me, thấy thông báo dọn trước cuối tháng. Bà Tư vẫn để phần cá kho trong lồng bàn. Linh đã gạch danh sách đồ đạc vào mặt sau một tờ lịch.",
+      "objective": "Đọc thông báo cùng cô Duyên; kiểm kê tiền, đồ và ba nhu cầu chỗ ở của mỗi người. Hoàn thành một cuộc nói chuyện gia đình, không phải kiếm đủ tiền ngay.",
+      "choices": [
+        {
+          "choice": "Nói ngay mình mất việc và chỉ còn 1,2 triệu.",
+          "now": "Không có tiền thưởng; gia đình biết ngân sách thật, mở sổ thu chi chung.",
+          "later": "Ngày 5 Linh có thể chủ động đi xem phòng với bà; ngày 25 không cần thú nhận lại việc mất việc."
+        },
+        {
+          "choice": "Nói mình về nghỉ vài hôm, hẹn cuối tuần bàn kỹ.",
+          "now": "Giữ được bữa cơm nhẹ nhàng nhưng tạo lời hứa nói rõ vào ngày 5.",
+          "later": "Nếu tự nói đúng hẹn, gần như không mất lòng tin; nếu tiếp tục giấu, Linh phải lập kế hoạch dựa trên thông tin sai."
+        },
+        {
+          "choice": "Xin một buổi để bình tâm, nói rõ tối mai sẽ bàn.",
+          "now": "Bà đồng ý, cuộc kiểm kê vẫn diễn ra; không bị coi là nói dối.",
+          "later": "Giữ hẹn ngày 2 giúp gia đình quen với cách An đặt giới hạn thay vì ôm hết."
+        }
+      ],
+      "optional": "Sửa chiếc quạt mang về cùng Linh: một đoạn làm quen thao tác, không nhận tiền, để lại đồ dùng cho phòng mới.",
+      "missed": "Cảnh kiểm kê tự chuyển sang sáng ngày 2; không khóa trò chơi vì bỏ một cuộc nói chuyện.",
+      "line": "Bà Tư: ‘Cơm còn nóng. Chuyện nào khó thì ăn xong rồi nói, đừng để nguội cả hai.’"
+    },
+    {
+      "day": 2,
+      "title": "Cái quạt không còn quay",
+      "scene": "Một cô bán trái cây mang quạt tới tiệm Sáu. Cô cần nó trước ca bán trưa, nhưng chiếc quạt đã được sửa chắp vá nhiều lần.",
+      "objective": "Kiểm tra tình trạng và thống nhất phí trước khi nhận. Chú Sáu quan sát cách An nói chuyện với khách, không chỉ tốc độ thao tác.",
+      "choices": [
+        {
+          "choice": "Báo rõ giới hạn sửa, nhận phí kiểm tra thấp và đề xuất phương án phù hợp.",
+          "now": "Kiếm ít hơn, không hứa chắc điều chưa biết.",
+          "later": "Khách có thể giới thiệu người khác ngày 13; Sáu nhớ rằng An không giữ khách bằng lời quá đà."
+        },
+        {
+          "choice": "Nhận sửa trong một ô thời gian, mua đúng bộ phận cần thay.",
+          "now": "Có thu nhập khá hơn nếu đủ vật tư và tay nghề; báo trước khả năng chậm.",
+          "later": "Nếu xong đúng hẹn, mở khách sửa đồ đều; nếu trễ nhưng báo sớm, vẫn còn đường giữ quan hệ."
+        },
+        {
+          "choice": "Hứa chắc sẽ xong trước trưa dù chưa kiểm tra đủ.",
+          "now": "Giữ được khách ngay nhưng phát sinh lời hứa có hạn, hiện rõ trong sổ.",
+          "later": "Nếu không kịp, khách cần mượn quạt khác; An phải chọn bù thời gian hoặc chi phí, không được xóa hậu quả bằng một câu xin lỗi."
+        }
+      ],
+      "optional": "Mượn quạt dự phòng của quán Hạnh nếu đã hỏi chủ quán; phải hoàn lại tối cùng ngày.",
+      "missed": "Sáu tự xử lý và vẫn cho An nhận việc khác. Bỏ nhiệm vụ không tự mang tiếng thất hứa nếu chưa nhận.",
+      "line": "Chú Sáu: ‘Người ta cần cái quạt chạy. Không cần nghe mình nói hay.’"
+    },
+    {
+      "day": 3,
+      "title": "Phòng ở cuối hẻm",
+      "scene": "Linh đưa An ba mẩu tin thuê phòng. Bà Tư chỉ hỏi nơi nào buổi sáng có người ngồi trước cửa.",
+      "objective": "Đi xem ít nhất một chỗ, ghi đủ chi phí vào ở, đường đi và điều bà cần. Các khuyết điểm được thấy trực tiếp, không xuất hiện bất ngờ sau khi đặt cọc.",
+      "choices": [
+        {
+          "choice": "Xem Hẻm Dừa gần chợ và công việc.",
+          "now": "Tổng vào ở 5 triệu; phòng nhỏ, ít khoảng phơi, thuận tiện sinh hoạt của bà.",
+          "later": "Giảm thời gian đi làm, hỗ trợ kết ổn định; việc chứa đồ phải xử lý ngày 28."
+        },
+        {
+          "choice": "Xem Cầu Tre xa hơn nhưng thoáng.",
+          "now": "Tổng vào ở 4,2 triệu; cần tính tiền xăng và đường xe buýt.",
+          "later": "An mất thêm thời gian đi lại; bà thích khoảng hiên nhưng phải xây lại quan hệ hàng xóm."
+        },
+        {
+          "choice": "Đến nhà dì Năm để hỏi phương án ở tạm.",
+          "now": "Có lựa chọn bảy ngày, góp 500.000; không phải ký ở lâu.",
+          "later": "Mở đường chuyển tiếp nếu thiếu tiền ngày 30. Cần báo trước và giải quyết chỗ gửi đồ."
+        }
+      ],
+      "optional": "Chụp ảnh bậc cửa, chỗ phơi và ghi tiếng ồn để bà cùng xem; không biến quyết định thành so giá đơn thuần.",
+      "missed": "Tin vẫn còn đến ngày 12; về sau có phòng tương đương nhưng phải đi xem lại, không ép mất toàn bộ cơ hội vì bỏ một ngày.",
+      "line": "Linh: ‘Rẻ hơn tám trăm, nhưng mỗi ngày anh chạy xa hơn. Mình tính cả cái đó nữa.’"
+    },
+    {
+      "day": 4,
+      "title": "Ba triệu sáu trên tờ giấy",
+      "scene": "Chủ tiệm cũ nhắn chưa gom đủ tiền. An nhìn số tiền công còn thiếu, nhớ lần mình từng gọi người khác là làm ăn không đàng hoàng.",
+      "objective": "Xác nhận tiền công và thời điểm trả với tiệm cũ; ghi đó là khoản phải thu, không cộng vào số dư hiện tại.",
+      "choices": [
+        {
+          "choice": "Thỏa thuận nhận 1,8 triệu ngày 17, phần còn lại ngày 24.",
+          "now": "Không nhận ngay; hai mốc được đưa vào lịch, cần xác nhận qua tin nhắn.",
+          "later": "Có kế hoạch để tính nhưng vẫn phải kiểm tra trước ngày tới hạn. Nếu tiệm chậm, An được báo và có nhiệm vụ theo dõi."
+        },
+        {
+          "choice": "Nhận 2,8 triệu ngay để khép lại khoản tiền công theo đề nghị của chủ tiệm.",
+          "now": "Có tiền mặt, nhưng người chơi phải xác nhận rõ đang chấp nhận giảm 800.000; không đánh lừa bằng nút ‘nhận tiền’.",
+          "later": "Dễ đặt phòng sớm hơn, mất phần tiền còn lại; không còn chuỗi đòi khoản lương này ngày 17 và 24."
+        },
+        {
+          "choice": "Chưa đồng ý, thu lại thông tin ca làm và hẹn trao đổi lần nữa.",
+          "now": "Mất một ô để sắp giấy tờ, giữ nguyên yêu cầu 3,6 triệu.",
+          "later": "Ngày 17 có cuộc trao đổi rõ hơn; thời gian theo đuổi khoản tiền này cạnh tranh với việc mới."
+        }
+      ],
+      "optional": "Gọi một đồng nghiệp cũ để đối chiếu lịch làm, chỉ chia sẻ thông tin An có quyền chia sẻ.",
+      "missed": "Khoản phải thu vẫn tồn tại. Tiệm nhắn lại ngày 7; tiền không tự biến mất vì người chơi chưa tới.",
+      "line": "An: ‘Em không tính anh có tiền hay chưa. Em cần biết ngày nào thì em có thể tính vào tiền nhà.’"
+    },
+    {
+      "day": 5,
+      "title": "Hai cuộc hẹn lúc ba giờ",
+      "scene": "Quán Hạnh cần người phụ đột xuất, đúng lúc hẹn xem phòng cùng bà. Linh đã biết đường tới đó nhưng An chưa quen giao việc gia đình cho em.",
+      "objective": "Giải quyết xung đột lịch; nếu đã hẹn nói rõ chuyện mất việc ngày 1 thì hoàn thành tối nay.",
+      "choices": [
+        {
+          "choice": "Đi xem phòng với bà, từ chối ca trước khi nhận.",
+          "now": "Mất cơ hội 160.000, không mất uy tín với Hạnh vì chưa hứa.",
+          "later": "Hiểu thêm nhu cầu của bà; ngày 21 bà dễ nói thật điều mình sợ."
+        },
+        {
+          "choice": "Hỏi Linh có thể đi cùng bà không, đưa đủ thông tin và tiền xe.",
+          "now": "Nếu Linh rảnh, An nhận ca; đây là nhờ giúp chứ không tự giao việc.",
+          "later": "Hai người mang về nhận xét An chưa nghĩ tới. Nếu sau đó An gạt hết ý kiến, lợi ích quan hệ bị đảo ngược."
+        },
+        {
+          "choice": "Nhận cả hai, định chạy cho kịp.",
+          "now": "Hiện cảnh báo hai lịch trùng; có thể tới trễ một bên và phải gọi báo.",
+          "later": "Cách An xử lý trễ quan trọng hơn chuyện tối ưu thời gian. Im lặng khiến một người phải chờ và giảm tin cậy."
+        }
+      ],
+      "optional": "Tối cả nhà đánh dấu ba món chắc chắn mang theo. Mỗi người được chọn một món không cần giải thích giá trị tiền bạc.",
+      "missed": "Nếu bỏ cuộc xem phòng, chủ nhà gửi lịch khác; bà thất vọng vì đã chuẩn bị chứ không mất tình cảm vĩnh viễn.",
+      "line": "Bà Tư: ‘Bà đi với con Linh được. Con đừng làm như chỉ mình con biết đường.’"
+    },
+    {
+      "day": 6,
+      "title": "Mười hai suất cơm cuối",
+      "scene": "Công nhân tăng ca đặt thêm cơm lúc trời chuyển gió. Minh còn bốn mươi phút trước giờ đón Bắp. Hạnh chỉ có một người đứng quán.",
+      "objective": "Chọn phương án giao mười hai suất trong thời gian đã thống nhất, hoặc thương lượng lại trước khi nhận.",
+      "choices": [
+        {
+          "choice": "Chia tuyến với Minh, chia công rõ và giữ phần gần trường cho anh ấy.",
+          "now": "Tiền ít hơn mỗi người, lịch khả thi nếu xe đã sẵn sàng.",
+          "later": "Minh tin An biết tôn trọng giờ đón con; mở việc đổi ca ngày 9 và hỗ trợ chuyển đồ ngày 28."
+        },
+        {
+          "choice": "Tự giao toàn bộ, báo đúng giờ dự kiến thay vì hứa sớm.",
+          "now": "Thu nhập cao hơn, tốn thêm một ô nếu tuyến xa; Hạnh hỏi khách có chấp nhận không.",
+          "later": "Làm được mở khách đều. Không nhận được giờ mới thì đơn bị giảm, không có phạt bí mật."
+        },
+        {
+          "choice": "Xin giảm đơn hoặc dời một phần, nhận phần mình chắc làm được.",
+          "now": "Ít tiền hơn nhưng giữ giờ, Hạnh phải gọi người khác cho phần còn lại.",
+          "later": "Hạnh ghi nhận sự rõ ràng; vẫn có thể giới thiệu An với Phúc."
+        }
+      ],
+      "optional": "Mang hộp và túi giữ nhiệt trở lại quán. Hạnh để riêng một phần cơm, không trừ ngầm vào tiền công.",
+      "missed": "Đơn được người khác nhận. Chỉ tính thất hẹn nếu An đã bấm nhận mà không báo lại.",
+      "line": "Hạnh: ‘Cơm nguội hâm được. Người ta trễ ca thì chị không hâm lại giùm được.’"
+    },
+    {
+      "day": 7,
+      "title": "Chiếc mỏ lết có khắc tên",
+      "scene": "An tìm thấy dấu tên mình khắc vụng trên một dụng cụ cũ ở tiệm Sáu. Chú vẫn giữ nó từ hồi anh phụ việc sau giờ học.",
+      "objective": "Chọn cách tiếp cận dụng cụ cho các công việc sắp tới và làm rõ trách nhiệm bảo quản.",
+      "choices": [
+        {
+          "choice": "Mượn theo từng buổi, ghi lịch hoàn.",
+          "now": "Không tốn vốn lớn; mỗi lần cần đặt trước.",
+          "later": "Hợp với hướng việc nhỏ. Trả đúng hẹn mở quyền dùng bàn sửa; giữ quá hạn ảnh hưởng công việc của Sáu."
+        },
+        {
+          "choice": "Mua bộ đồ cũ sau khi kiểm tra, chi 450.000.",
+          "now": "Giảm tiền mặt, tăng tính chủ động; dụng cụ không thay thế năng lực chuyên môn.",
+          "later": "Hỗ trợ hướng dịch vụ riêng, có giá trị khi chọn kết ‘Một chiếc bàn riêng’."
+        },
+        {
+          "choice": "Thỏa thuận dùng bàn và dụng cụ, chia một phần công theo từng việc.",
+          "now": "Ít vốn ban đầu, lợi nhuận từng đơn thấp hơn.",
+          "later": "Mở hướng cộng tác; ngày 20 phải cùng xem khoản chia có còn hợp lý không."
+        }
+      ],
+      "optional": "Linh chỉ cho Sáu cách tra mã máy. Chú đáp lại bằng mẹo ghi phiếu khách; cả hai đều có thứ để học.",
+      "missed": "Có thể quay lại sau. Dụng cụ cho việc bắt buộc vẫn có phương án thuê để tránh khóa tiến trình.",
+      "line": "Chú Sáu: ‘Tên con khắc đó. Đồ thì của chú. Đừng thấy tên mà ôm về nghen.’"
+    },
+    {
+      "day": 8,
+      "title": "Cuốn sổ tiền cọc",
+      "scene": "Cả xóm tập trung dưới mái hiên. Có người bảo cô Duyên sắp giữ hết tiền cọc; có người đã gọi xe dọn. Cô Duyên mang sổ ra nhưng nói vòng vo.",
+      "objective": "Cùng ghi lịch chuyển và đối chiếu từng khoản; An chỉ hỏi phần của nhà mình, không mặc định được xem thông tin riêng của mọi phòng.",
+      "choices": [
+        {
+          "choice": "Đề nghị một lịch rõ cho từng hộ, ai muốn thì tự xác nhận phần mình.",
+          "now": "Tốn một ô, giảm tin đồn; cô Duyên nói rõ hạn cuối không đổi.",
+          "later": "Mở chuyến xe ghép ngày 28 và chỗ tập kết đồ ngày 29."
+        },
+        {
+          "choice": "Chỉ giải quyết phần gia đình, xin xác nhận chi phí và giờ bàn giao.",
+          "now": "Nhanh hơn, vẫn có thông tin đủ để lập kế hoạch.",
+          "later": "Không có vai trò điều phối xóm nhưng vẫn được tham gia hỗ trợ chung nếu báo đúng lịch."
+        },
+        {
+          "choice": "Đòi cô Duyên hứa cho ở thêm cả tháng.",
+          "now": "Cô không thể đồng ý; người chơi có thể chuyển sang hỏi giải pháp tạm.",
+          "later": "Nếu tiếp tục rêu rao lời hứa cô chưa đưa ra, các hộ khác chuẩn bị trễ; ngày 25 phải đính chính."
+        }
+      ],
+      "optional": "Ghi số xe chở đồ lên bảng chung sau khi chủ xe đồng ý. Một việc nhỏ mở lựa chọn cho nhiều người.",
+      "missed": "Cô gửi thông báo tóm tắt; An không mất quyền nhận lại khoản đã thống nhất vì vắng họp.",
+      "line": "Cô Duyên: ‘Cô nói trước để tụi con còn xoay. Không phải dán giấy rồi coi như không quen nhau nữa.’"
+    },
+    {
+      "day": 9,
+      "title": "Giờ đón Bắp",
+      "scene": "Minh kẹt một đơn xa, Linh phải tới trung tâm nghề nộp hồ sơ. An được nhờ giữ giúp một khoảng giờ, nhưng lịch sửa đồ của anh cũng sắp tới hạn.",
+      "objective": "Giữ một cam kết về thời gian bằng cách đổi ca hoặc tìm người hỗ trợ được gia đình Minh chấp thuận.",
+      "choices": [
+        {
+          "choice": "Nhận đổi ca với Minh, dời việc sửa sau khi khách đồng ý.",
+          "now": "Có thể mất một phần công, nhưng không để người khác chờ không rõ lý do.",
+          "later": "Minh ưu tiên bàn lịch chuyển nhà với An; quan hệ được xây bằng việc cụ thể."
+        },
+        {
+          "choice": "Không nhận vì đã có hẹn, giúp Minh gọi người quen được phép đón.",
+          "now": "Không được điểm ‘cứu giúp’ nhưng không bị phạt quan hệ vô lý.",
+          "later": "Minh hiểu giới hạn; vẫn có thể hợp tác nếu An không chế giễu việc đón con."
+        },
+        {
+          "choice": "Nhận rồi bảo Linh bỏ buổi hồ sơ để thay mình.",
+          "now": "Linh có quyền từ chối; nếu anh ép, cô mất lòng tin dù việc đón có được giải quyết.",
+          "later": "Ngày 22 cô có xu hướng báo quyết định sau khi đã chốt, thay vì hỏi ý kiến anh."
+        }
+      ],
+      "optional": "Bắp vẽ cái xe chở cả xóm, đưa An giữ. Tờ vẽ có thể xuất hiện trên tủ ở kết thúc cộng đồng.",
+      "missed": "Minh tìm phương án khác. Nếu An đã nhận rồi biến mất, phát sinh cuộc nói chuyện sửa sai ngày 10.",
+      "line": "Minh: ‘Tiền đơn mất thì kiếm lại. Nó đứng chờ mà không biết ba có tới không, cái đó tao chịu không nổi.’"
+    },
+    {
+      "day": 10,
+      "title": "Một việc lớn hơn cái bàn sửa",
+      "scene": "Phúc tìm An qua lời giới thiệu của Hạnh hoặc tờ rao ở chợ. Năm quán Bến Cạn cần sửa lại một phần hạ tầng trước mùa mưa. Anh Phúc nói đó là việc ‘làm vài bữa’. Trâm nhìn danh sách và xin khảo sát trước.",
+      "objective": "Khảo sát phạm vi, lịch ngừng bán từng quán và khả năng thanh toán. Hôm nay chỉ tìm hiểu, chưa khóa hướng chơi.",
+      "choices": [
+        {
+          "choice": "Mời Trâm cùng xem, trả phí khảo sát đã báo trước.",
+          "now": "Chi 150.000; có danh sách việc và giới hạn chuyên môn rõ.",
+          "later": "Mở thương lượng thực tế ngày 11. Khoản phí được tính vào chi dự kiến, không thu hai lần."
+        },
+        {
+          "choice": "Xin tài liệu và một ngày để hỏi người có kinh nghiệm.",
+          "now": "Chưa nhận tiền, không mất cơ hội ngay; An có thể hỏi Sáu và Linh về lịch, vật tư.",
+          "later": "Vẫn mở đủ ba hướng, nhưng phải sắp một buổi khảo sát chuyên môn trước khi thi công."
+        },
+        {
+          "choice": "Nói rõ chỉ nhận các việc nhỏ đúng tay nghề.",
+          "now": "Không nhận toàn hợp đồng, Phúc tìm đội khác cho phần còn lại.",
+          "later": "Mở hướng A; các ngày hợp đồng sau có nhiệm vụ tương đương về khách lẻ và lịch làm, không trở thành ngày trống."
+        }
+      ],
+      "optional": "Tối kể với gia đình cả khoản lãi dự kiến lẫn ngày tiền về. Linh hỏi: ‘Ngày ba mươi hai thì mình đang ở đâu?’",
+      "missed": "Phúc để số liên lạc; đến hết ngày 12 mới chốt người làm. Nếu bỏ hẳn, hướng việc nhỏ vẫn hoàn chỉnh.",
+      "line": "Trâm: ‘Em nghe chữ “vài bữa” rồi. Giờ cho chị coi cụ thể là những bữa nào.’"
+    },
+    {
+      "day": 11,
+      "title": "Ba cách nhận lời",
+      "scene": "Phúc đặt ba lịch thanh toán lên bàn cùng danh sách năm quán. Tiếng quạt và máy xay khiến mọi người phải nhắc lại vài lần; Trâm yêu cầu ghi điều đã thống nhất.",
+      "objective": "Chọn hướng sinh kế chính. Giao diện tách tổng doanh thu, chi phí, tiền được nhận trước ngày 30 và tiền về sau đó.",
+      "choices": [
+        {
+          "choice": "A — Không nhận gói lớn, giữ lịch việc trả ngay.",
+          "now": "Không có khoản ứng; nhận được vài việc độc lập nếu phù hợp. Phúc không giận chỉ vì bị từ chối.",
+          "later": "Ngày 12–27 chuyển sang khách lẻ, việc quán cơm và cơ hội làm ổn định. Vẫn có thể đạt kết tốt mà không khởi nghiệp."
+        },
+        {
+          "choice": "B — Nhận cùng nhóm, chia rõ phần việc và tiền công.",
+          "now": "Có lịch của Trâm, Minh và chỗ dụng cụ của Sáu; An không tự ý cam kết thời gian thay họ.",
+          "later": "Giảm rủi ro và phần tiền riêng, mở kết ‘Chung một bảng hiệu’. Ai không rảnh được thay bằng người thuê, có chi phí hiện rõ."
+        },
+        {
+          "choice": "C — An điều phối dịch vụ riêng, ký theo từng phần có thể bàn giao.",
+          "now": "Tự chịu việc tìm khách, ứng vật tư và đòi tiền; vẫn thuê Trâm cho phần chuyên môn.",
+          "later": "Có khả năng tạo nguồn việc riêng nhưng cần dành thời gian quản lý. Mở kết ‘Một chiếc bàn riêng’, không bảo đảm giàu nhanh."
+        }
+      ],
+      "optional": "Xin Phúc cho từng chủ quán xác nhận lịch ngừng bán. Lời đồng ý của người đại diện không thay thế việc hỏi người sẽ chịu ảnh hưởng.",
+      "missed": "Nếu chưa quyết định, hợp đồng được giữ đến ngày 12. Sau đó đội khác nhận, An theo hướng A mà không có cảnh sỉ nhục.",
+      "line": "An: ‘Em nhận được việc này. Nhưng em không nhận được cái hạn đó với từng ấy tiền ứng.’"
+    },
+    {
+      "day": 12,
+      "title": "Tiền nào là tiền của mình",
+      "scene": "Một khoản chuyển vào điện thoại khiến An nhẹ người. Linh nhìn sổ: phần lớn số đó là tiền mua vật tư và trả công người khác. Ở hướng A, tình huống tương đương là khách gửi tiền mua linh kiện.",
+      "objective": "Tách tiền khách ứng, tiền sinh hoạt và tiền nhà; chọn cách tài trợ phần mua vật tư còn thiếu.",
+      "choices": [
+        {
+          "choice": "Đề nghị khách mua vật tư theo danh sách đã thống nhất.",
+          "now": "Giảm áp lực vốn; An nhận phí công thấp hơn và phải dành thời gian đối chiếu.",
+          "later": "Dễ giữ tiền cọc nhà. Nếu khách đổi vật tư, phải làm rõ trước khi dùng; không tự chịu sai lệch thay khách."
+        },
+        {
+          "choice": "Giữ cơ chế ứng theo mốc, dùng một phần tiền riêng sau khi gia đình đồng ý.",
+          "now": "Sổ ghi rõ số tiền nhà bị giảm, ngày dự kiến bù và phương án nếu tiền về chậm.",
+          "later": "Có lợi nhuận kỳ vọng cao hơn nhưng ngày 20 có thể thiếu thanh khoản. Gia đình tin hơn nếu An báo sớm rủi ro."
+        },
+        {
+          "choice": "Dùng tiền ứng việc để đặt phòng rồi hy vọng xoay kịp.",
+          "now": "Có thể giữ được phòng nhưng báo rõ đây là tiền đã có mục đích khác; phát sinh thiếu vật tư/công, không tự tạo thêm tiền.",
+          "later": "Nếu không bù trước hạn, phải xin sửa lịch hoặc hoàn ứng. Che giấu liên tiếp có thể dẫn đến kết về trách nhiệm nghề nghiệp."
+        }
+      ],
+      "optional": "Hướng A có thể từ chối giữ tiền linh kiện, dẫn khách mua cùng. Đây là cách chơi hợp lệ, không bị khóa vật phẩm.",
+      "missed": "Không tự tiêu tiền khi người chơi vắng. Khoản ứng được giữ nguyên; công việc chờ quyết định và người liên quan được thông báo.",
+      "line": "Linh: ‘Trong tài khoản anh thì đúng. Nhưng trong đó có tiền của mấy người nữa.’"
+    },
+    {
+      "day": 13,
+      "title": "Người khách quay lại",
+      "scene": "Cô bán trái cây ngày 2 ghé tiệm. Nếu quạt tốt, cô giới thiệu người quen. Nếu quạt trục trặc, cô mang lại và cần một câu trả lời rõ. Nếu chưa gặp, Sáu giới thiệu một ca bảo hành tương đương.",
+      "objective": "Xử lý phản hồi khách mà không để nó âm thầm chen vào toàn bộ lịch công trình hoặc ca làm.",
+      "choices": [
+        {
+          "choice": "Kiểm tra lại theo điều đã hẹn, nhận phần trách nhiệm thuộc mình.",
+          "now": "Tốn một ô và có thể phải đổi linh kiện trong phạm vi đã báo; tiền bảo hành được ghi vào chi.",
+          "later": "Khách tin hơn khi có lỗi được xử lý minh bạch; không cần kết quả hoàn hảo lần đầu để giữ quan hệ."
+        },
+        {
+          "choice": "Hẹn giờ khác, cho mượn phương án thay thế nếu có.",
+          "now": "Giữ được lịch hôm nay; tạo lời hứa mới có hạn.",
+          "later": "Hoàn đúng hẹn giữ khách. Dời nhiều lần mà không hỏi khách sẽ mất giới thiệu ngày 23."
+        },
+        {
+          "choice": "Gạt đi vì việc lớn đang quan trọng hơn.",
+          "now": "Tiết kiệm thời gian nhưng khách phải tìm người khác; nếu từ chối cả nghĩa vụ đã nhận, còn khoản hoàn trả cần giải quyết.",
+          "later": "Hạnh hoặc Sáu nghe phản hồi đúng sự việc. An vẫn có thể sửa sai bằng hoàn phí, không cần khách phải tha thứ ngay."
+        }
+      ],
+      "optional": "Linh viết mẫu phiếu gồm tình trạng, phí và hạn nhận. Nếu An đồng ý, việc ghi lời hứa về sau nhanh hơn.",
+      "missed": "Khách để lại lời nhắn. Chỉ mất tin cậy khi An bỏ qua sau thời hạn đã nhận, không vì không có mặt lúc khách ghé.",
+      "line": "Cô bán trái cây: ‘Cô không bắt nó mới lại. Cô cần biết giờ cô đem về có dùng được không thôi.’"
+    },
+    {
+      "day": 14,
+      "title": "Mái bạt trước cơn mưa",
+      "scene": "Thông báo thời tiết trong game nhắc chiều mai có mưa. Cô Duyên kê gạch dưới vài thùng đồ. Hạnh đang buộc lại mép bạt, còn Phúc hỏi có thể làm nhanh một chút trước mưa không.",
+      "objective": "Chọn ưu tiên chuẩn bị: che đồ gia đình, bảo quản vật tư, hoặc giúp không gian chung. Một người không thể tự làm mọi việc trong một ô.",
+      "choices": [
+        {
+          "choice": "Lo đồ gia đình trước, nhờ người khác phụ phần chung bằng việc đổi công.",
+          "now": "Một ô, tiền vật tư che khoảng 80.000 nếu thiếu; xác nhận người giúp có rảnh.",
+          "later": "Giấy tờ và đồ của bà an toàn ngày 15. Quan hệ cộng đồng không giảm chỉ vì ưu tiên gia đình."
+        },
+        {
+          "choice": "Lập lịch chia việc, tự làm một phần và nhắc từng người xác nhận.",
+          "now": "Tốn thêm thời gian phối hợp nhưng không cần An làm tất cả.",
+          "later": "Ngày 15 nhóm ứng phó nhanh hơn; mở cảnh hàng xóm tự giúp nhau, không chờ An xuất hiện."
+        },
+        {
+          "choice": "Làm thêm ca vì cần tiền, chấp nhận bỏ khâu chuẩn bị.",
+          "now": "Có thêm thu nhập; màn hình chỉ rõ đồ nào còn ở chỗ dễ ướt.",
+          "later": "Mưa có thể gây hư bao bì hoặc phải hong đồ, mất thời gian và tối đa khoản chi đã báo; không tự gây tai nạn chết người."
+        }
+      ],
+      "optional": "Bà chỉ cách chọn những giấy tờ cần để riêng. Giữ lời kể ngắn, không biến cảnh thành hướng dẫn kỹ thuật nguy hiểm.",
+      "missed": "Linh tự che phần đồ của mình và bà trong khả năng; cô không tự biết chỗ An để vật tư nếu anh chưa nói.",
+      "line": "Bà Tư: ‘Mưa đâu có biết mình mới lãnh tiền hay chưa. Thấy mây vậy thì cất đồ trước con.’"
+    },
+    {
+      "day": 15,
+      "title": "Mưa qua mái tôn",
+      "scene": "Cơn mưa đến sớm hơn một ít, đủ làm cả xóm chạy gom đồ. Ở Bến Cạn, một quán muốn mở bán dù phần việc còn dở. Hướng A phải chọn giữa ca tăng thêm và về xử lý đồ nhà.",
+      "objective": "Giữ an toàn và xử lý đúng một vấn đề ưu tiên; tốn hai ô nhưng mở các phương án ủy thác đã chuẩn bị.",
+      "choices": [
+        {
+          "choice": "Giữ công việc chưa đạt ở trạng thái chưa bàn giao, cùng Trâm báo lại khách.",
+          "now": "Khách có thể mất một buổi bán; An bỏ một khoản thưởng nhanh nhưng không phải nhận trách nhiệm cho việc chưa xong.",
+          "later": "Ngày 20 vẫn có thể được thanh toán phần đã nghiệm thu. Phúc hiểu cần lịch thật, không chỉ lời trấn an."
+        },
+        {
+          "choice": "Giao người đã xác nhận trông phần việc, về giúp gia đình.",
+          "now": "Chỉ khả dụng nếu có người nhận cụ thể; có thể tốn thêm công hỗ trợ.",
+          "later": "Gia đình và khách đều được phục vụ. Đây là phần thưởng cho việc phối hợp, không phải nút tối ưu luôn sẵn."
+        },
+        {
+          "choice": "Cố giữ cả hai đầu, không nói bên nào mình đang ở đâu.",
+          "now": "Thời gian không đủ; một nơi phải tự xử lý. Trâm vẫn từ chối bàn giao phần chưa đạt.",
+          "later": "Phát sinh ca làm lại hoặc đồ ướt theo chuẩn bị ngày 14. Lỗi là sự thiếu thông tin, không phải lựa chọn một người để ‘cứu’."
+        }
+      ],
+      "optional": "Sau mưa, mọi người chia nhau nồi cháo ở quán. Chỗ An ngồi và người để phần phản ánh quan hệ đã có.",
+      "missed": "Trâm dừng phần việc cần kiểm tra; Linh và cô Duyên lo nhà trong khả năng. An nhận đầy đủ thông tin hậu quả, không bị tự gán quyết định nguy hiểm.",
+      "line": "Trâm: ‘Khách có thể bực. Nhưng họ phải biết hôm nay dùng được phần nào.’"
+    },
+    {
+      "day": 16,
+      "title": "Một bữa không mở sổ",
+      "scene": "Sau mưa, An ăn mà mắt cứ nhìn điện thoại. Bà hỏi một chuyện nhỏ về chiếc kệ, anh gắt lên rồi nhận ra mình không nghe câu hỏi.",
+      "objective": "Xử lý mệt và nói về việc đang quá tải. Nếu đã nghỉ đủ, cảnh trở thành chủ động lập lịch bền hơn, không ép nhân vật phải kiệt sức.",
+      "choices": [
+        {
+          "choice": "Nghỉ một ô, xin lỗi về hành vi cụ thể và nói việc nào đang vượt sức.",
+          "now": "Bỏ một cơ hội kiếm tiền; mức mệt giảm rõ, gia đình có thông tin để hỗ trợ.",
+          "later": "Mở phân công ngày 21. Một lời xin lỗi không tự xóa các lời hứa đang trễ."
+        },
+        {
+          "choice": "Giữ ca đã nhận nhưng bỏ việc thêm, hẹn nghỉ tối.",
+          "now": "Vẫn có thu nhập và giới hạn rõ; nếu thực hiện thì hồi phục ít hơn nhưng đủ tránh tích lũy quá mức.",
+          "later": "Hình thành thói quen bền; Trâm dễ nhận cộng tác khi lịch có khoảng nghỉ thật."
+        },
+        {
+          "choice": "Nói mình ổn và làm tiếp cả đêm.",
+          "now": "Có tiền ngay, mệt tăng và thời gian thao tác hôm sau dài hơn.",
+          "later": "Chỉ nhiều lần bỏ nghỉ mới dẫn đến kết kiệt sức; một đêm làm muộn không quyết định số phận."
+        }
+      ],
+      "optional": "Nếu đã giữ chiếc quạt ngày 1, nó xuất hiện trong cảnh An nằm nghe tiếng hàng xóm, một đoạn yên lặng không có lựa chọn.",
+      "missed": "Nhân vật gửi lời hỏi thăm; người chơi vẫn có thể chọn nghỉ trong hệ thống, không cần đúng câu thoại mới được hồi phục.",
+      "line": "Bà Tư: ‘Bà hỏi cái kệ thôi. Con đang giận cái kệ hay đang mệt?’"
+    },
+    {
+      "day": 17,
+      "title": "Khoản tiền hẹn hôm nay",
+      "scene": "Tiệm cũ gửi tin về tiền lương. Nếu An đã nhận phương án giảm ở ngày 4, hôm nay là một việc khác: đồng nghiệp cũ hỏi có chỗ nhận sửa đồ hoặc cần người phụ không.",
+      "objective": "Theo dõi khoản phải thu hoặc duy trì quan hệ cũ, không tự nhận tiền hai lần.",
+      "choices": [
+        {
+          "choice": "Nhận phần đã hẹn, xác nhận rõ số còn lại và hạn ngày 24.",
+          "now": "Nếu đã thỏa thuận, nhận 1,8 triệu; tiền còn lại vẫn nằm ở cột phải thu.",
+          "later": "Có thể giữ được lịch mua vật tư hoặc tiền nhà mà không tính nhầm đã đủ cả khoản."
+        },
+        {
+          "choice": "Đến trao đổi trực tiếp, dành một ô để chốt lịch thực tế.",
+          "now": "Có thể lấy được một phần hoặc xác nhận chưa có; không bảo đảm thêm tiền chỉ vì chọn đối thoại cứng.",
+          "later": "Có thông tin sớm để đổi kế hoạch ngày 20; giữ quyền yêu cầu phần còn thiếu trong thế giới truyện."
+        },
+        {
+          "choice": "Nhờ một người liên hệ hộ sau khi chia sẻ đúng phần thông tin cần thiết.",
+          "now": "Giữ được ca làm; người được nhờ có thể từ chối hoặc cần đổi giờ.",
+          "later": "Kết quả được báo lại bằng tin nhắn, An vẫn chịu trách nhiệm xác nhận khoản tiền của mình."
+        }
+      ],
+      "optional": "Nếu khoản lương đã khép lại: giới thiệu đồng nghiệp tới việc phù hợp, hoặc nói thật chưa có chỗ; không thu phí giới thiệu ngầm.",
+      "missed": "Tiền không biến mất; nhiệm vụ theo dõi tồn tại. Việc bỏ theo dõi chỉ làm An không chắc nguồn tiền cho các quyết định kế tiếp.",
+      "line": "Đồng nghiệp cũ: ‘Có nhận được thì nhắn tao biết. Tao hỏi để mừng, không phải hỏi mượn.’"
+    },
+    {
+      "day": 18,
+      "title": "Một chút của năm quán",
+      "scene": "Mỗi chủ quán ở Bến Cạn xin thêm ‘một việc nhỏ’. Cộng lại thành cả ngày. Hướng A gặp khách muốn thêm việc ngoài phiếu, với cùng mâu thuẫn về phạm vi.",
+      "objective": "Cập nhật khối lượng và lịch trước khi làm thêm; cho người chơi thấy ai được lợi, ai phải chờ.",
+      "choices": [
+        {
+          "choice": "Báo phần phát sinh và giá/lịch riêng, để khách quyết định.",
+          "now": "Có người đồng ý, có người bỏ bớt; không tự tăng doanh thu trước khi được chấp thuận.",
+          "later": "Giữ được ngày bàn giao và công cho đồng đội. Có thể mở khách trả tiền tốt hơn ngày 23."
+        },
+        {
+          "choice": "Tặng một việc nhỏ trong giới hạn, ghi rõ chỉ lần này.",
+          "now": "Tốn một ô hoặc một khoản nhỏ đã báo; tăng thiện cảm với người nhận.",
+          "later": "Không tự mở quyền yêu cầu vô hạn. Nếu An giải thích rõ, Phúc có thể giúp ngăn các yêu cầu khác."
+        },
+        {
+          "choice": "Nhận tất cả miễn phí để giữ tiếng dễ thương.",
+          "now": "Khách vui, lịch đội bị chật; hiển thị việc hoặc thời gian gia đình sẽ phải bỏ.",
+          "later": "Ngày 20 và 27 phải xử lý chậm. Không được tính là ‘tốt bụng’ nếu bắt người cộng tác làm thêm không trả công."
+        }
+      ],
+      "optional": "Trâm nhắc An tập nói một câu ngắn: ‘Việc này em làm được, mình tính thành phần riêng nhé.’",
+      "missed": "Phạm vi cũ giữ nguyên. Khách không được tự thêm công việc chỉ vì người chơi chưa tới.",
+      "line": "Phúc: ‘Anh tưởng thêm có chút.’ An: ‘Dạ. Nhưng mỗi quán thêm chút là hết buổi chiều của cả nhóm.’"
+    },
+    {
+      "day": 19,
+      "title": "Cái tên trên phiếu thực tập",
+      "scene": "Linh nhờ An xem hồ sơ và xin nửa buổi tới cơ sở thực tập thử. Cô muốn được đánh giá bằng việc của mình, không chỉ mang danh ‘em của anh An’.",
+      "objective": "Hỗ trợ Linh chuẩn bị mà không làm hoặc trả lời thay. Đây là bước dẫn đến đề nghị ngày 22.",
+      "choices": [
+        {
+          "choice": "Đọc hồ sơ theo đề nghị, hỏi Linh muốn mình góp ý phần nào.",
+          "now": "Một ô nếu đi cùng; cô tự trao đổi với cơ sở.",
+          "later": "Nếu được nhận, cô muốn cùng gia đình bàn phương án. Cơ hội vẫn dựa vào quá trình học của cô, không được mua bằng điểm quan hệ."
+        },
+        {
+          "choice": "Không đi được, báo trước và giúp kiểm tra đường xe, chi phí.",
+          "now": "Giữ ca làm, Linh đi với bạn hoặc một mình theo lựa chọn của cô.",
+          "later": "Không mất tin cậy chỉ vì An bận; lời hỗ trợ thực tế có giá trị ngang một buổi có mặt."
+        },
+        {
+          "choice": "Gọi trước nhờ người quen ‘lo giùm’, dù Linh chưa đồng ý.",
+          "now": "Linh khó chịu vì bị nói thay; cuộc gặp có thể vẫn diễn ra.",
+          "later": "Cô đặt ranh giới rõ ngày 22. An có thể xin lỗi và dừng, không bị khóa quan hệ mãi."
+        }
+      ],
+      "optional": "Linh chỉ An một tính năng mới trên máy chẩn đoán mô phỏng. Cảnh nhấn vào trao đổi kiến thức, không hướng dẫn làm điện thực tế.",
+      "missed": "Linh tự nộp hồ sơ. Không làm nhiệm vụ của An không đồng nghĩa Linh mất tương lai.",
+      "line": "Linh: ‘Em muốn người ta biết em làm được gì trước khi biết anh quen ai.’"
+    },
+    {
+      "day": 20,
+      "title": "Lãi trên giấy",
+      "scene": "Đến mốc giữa kỳ, tiền nhìn trên bảng rất đẹp nhưng khoản cuối chỉ về ngày 32. Một chủ quán xin lùi phần đóng; An còn ngày đặt phòng trước mặt. Hướng A được mời làm công việc trả theo nửa tháng.",
+      "objective": "Ra quyết định dựa trên tiền về trước ngày 30. Giao diện cho xem dòng tiền và hạn phải trả, không chỉ tổng lợi nhuận.",
+      "choices": [
+        {
+          "choice": "B/C: nhận tiền cho phần đã nghiệm thu, thu hẹp phần chưa chắc được trả. A: giữ các ca trả ngay.",
+          "now": "Thu nhập tương lai thấp hơn, tiền mặt và lịch chắc hơn.",
+          "later": "Dễ bảo vệ tiền nhà; khách có thể thuê người khác làm phần còn lại mà không phá quan hệ."
+        },
+        {
+          "choice": "B/C: tiếp tục theo mốc đã xác nhận và chọn phương án nhà tạm nếu cần. A: nhận việc trả chậm sau khi đã dành đủ tiền chuyển nhà.",
+          "now": "Không biến khoản phải thu thành tiền mặt; cần kế hoạch dự phòng cụ thể.",
+          "later": "Có thể kết thúc với chỗ ở tạm nhưng nguồn việc tốt; đây là đánh đổi hợp lệ, không mặc định thất bại."
+        },
+        {
+          "choice": "Tính cả tiền chưa nhận để hứa đặt phòng hoặc trả công ngay.",
+          "now": "Màn hình cảnh báo thiếu tiền thực; nếu vẫn chọn, tạo lời hứa có rủi ro rõ.",
+          "later": "Ngày 25 phải công khai và thương lượng lại. Không có nguồn tiền cứu đột ngột để xóa quyết định."
+        }
+      ],
+      "optional": "Cùng Sáu và Trâm đối chiếu phần đã chia, ghi ai đã nhận gì. Không mặc định người lớn tuổi có thể đợi tiền lâu hơn.",
+      "missed": "Phần đã xác nhận vẫn phải được thu; An được tin nhắn nhắc trước khi tiếp tục chi cho giai đoạn sau.",
+      "line": "Linh: ‘Anh đang lời. Nhưng hôm nay mình còn bao nhiêu để cầm đi đặt phòng?’"
+    },
+    {
+      "day": 21,
+      "title": "Bậc cửa của bà",
+      "scene": "Cả nhà trở lại chỗ định thuê. Bà Tư khen mọi thứ, nhưng đứng khá lâu trước bậc cửa. Tối về, bà lén lấy chậu húng ra khỏi thùng đồ.",
+      "objective": "Hỏi điều bà thật sự cần và để bà tham gia chốt chỗ ở. Ba nhu cầu được ghi từ ngày 1 có thể được điều chỉnh sau khi đi xem thực tế.",
+      "choices": [
+        {
+          "choice": "Dành một ô đi thử đường chợ và sinh hoạt cùng bà.",
+          "now": "Mất một ca ngắn, hiểu rõ hạn chế đi lại và khả năng tự sinh hoạt.",
+          "later": "Chốt được phòng phù hợp hoặc tìm điều chỉnh nhỏ; bà chủ động xếp đồ từ ngày 28."
+        },
+        {
+          "choice": "Hỏi bà chọn hai ưu tiên cần giữ trong ngân sách hiện có.",
+          "now": "Không hứa đáp ứng tất cả; có thể chọn hiên thoáng thay gần chợ hoặc ngược lại.",
+          "later": "Bà cảm thấy quyết định có phần của mình. Kết thúc vẫn ấm nếu nhà nhỏ nhưng đáp ứng điều đã chọn."
+        },
+        {
+          "choice": "Giữ phương án tiện cho công việc, giải thích giới hạn và thống nhất hỗ trợ cụ thể.",
+          "now": "Bà có thể chưa vui; An cần hứa giờ đưa đi chợ hoặc nhờ người đã đồng ý, không nói chung ‘con lo hết’.",
+          "later": "Nếu giữ lịch, bà thích nghi. Nếu bỏ cả sự tham gia lẫn hỗ trợ, kết phụ của bà là thu mình trong phòng."
+        }
+      ],
+      "optional": "Bà kể cái chậu húng là nhánh xin của một người bạn cũ. Không cần nó quý hiếm hay liên quan một bí mật lớn.",
+      "missed": "Linh hỏi bà và ghi lại hai ưu tiên. An được nghe lại, nhưng quyết định chốt vẫn phải hỏi bà.",
+      "line": "Bà Tư: ‘Bà không tiếc cái phòng. Bà tiếc sáng ra mở cửa là có người gọi tên mình.’"
+    },
+    {
+      "day": 22,
+      "title": "Linh được nhận",
+      "scene": "Cơ sở ở thị xã bên cạnh mời Linh thực tập. Có người hướng dẫn, hỗ trợ chỗ ở và phụ cấp, nhưng cô chỉ về được cuối tuần. Một cơ sở gần nhà cũng nhận, công việc quen hơn nhưng cơ hội học sâu ít hơn.",
+      "objective": "Nghe Linh trình bày hai lựa chọn, cùng kiểm tra điều kiện, chi phí và mong muốn. Quyết định cuối là của cô.",
+      "choices": [
+        {
+          "choice": "Ủng hộ phương án xa nếu đó là điều Linh muốn, cùng lập kế hoạch ở và đi lại.",
+          "now": "Tốn một hoặc hai ô; nếu cô cần hỗ trợ tiền, hỏi rõ khoản nào là góp, khoản nào là mượn.",
+          "later": "Linh có thể đi; quan hệ tốt mở những cuộc gọi chia sẻ thật và cảnh cô tự trở về thăm ở đoạn sau."
+        },
+        {
+          "choice": "Nói rõ lo lắng về bà và chi phí, cùng so sánh phương án gần.",
+          "now": "Cuộc trao đổi khó nhưng không bị phạt nếu An nghe câu trả lời. Cô có thể chọn gần vì mục tiêu riêng.",
+          "later": "Mở kết Linh làm nghề tại địa phương; vẫn tích cực nếu đây là quyết định tự nguyện, không vì bị gây tội lỗi."
+        },
+        {
+          "choice": "Chỉ muốn em ở lại, dùng chuyện mình đã hy sinh để gây áp lực.",
+          "now": "Linh phản đối hoặc khép lại cuộc nói chuyện; cô vẫn giữ quyền nhận chỗ xa.",
+          "later": "Nếu An lặp lại việc nói thay và giấu thông tin, cô thu xếp đi riêng. Ngày 25 và 30 còn cơ hội xin lỗi nhưng không đảo ngược ngay mọi tổn thương."
+        }
+      ],
+      "optional": "Cuộc gọi từ mẹ Linh: bà hỏi con muốn học gì trước khi hỏi phụ cấp. Gia đình ngoài khung hình có đời sống và sự quan tâm thật.",
+      "missed": "Linh tự trả lời trước hạn của cơ sở. An nhận thông báo quyết định, không khiến cô trượt cơ hội chỉ vì mình vắng.",
+      "line": "Linh: ‘Em đi để sau này có nghề đàng hoàng. Không phải em đi vì không thương bà.’"
+    },
+    {
+      "day": 23,
+      "title": "Một khách quen, một việc chung",
+      "scene": "Một khách được giới thiệu từ các việc trước đề nghị lịch sửa đồ đều mỗi tuần. Cùng lúc, xóm trọ cần người phân loại đồ cho chuyến xe ghép. Nếu An chưa có uy tín, cơ hội là một ca thử có trả công thay vì hợp đồng dài.",
+      "objective": "Chọn cách dành nguồn lực cuối tháng: việc dài hạn, giúp cộng đồng hoặc chia thời gian có thỏa thuận.",
+      "choices": [
+        {
+          "choice": "Nhận ca thử, báo rõ ngày chuyển nhà và thời gian mình không nhận việc.",
+          "now": "Có thu nhập và triển vọng sau ngày 30, nhưng ít thời gian giúp xóm.",
+          "later": "Hỗ trợ kết căn phòng ổn định hoặc dịch vụ riêng. Hàng xóm không mặc định ai bận là vô tình."
+        },
+        {
+          "choice": "Phụ xóm một ô, hẹn khách sang buổi khác nếu họ đồng ý.",
+          "now": "Ít tiền hôm nay; lịch xe, chỗ gửi đồ rõ hơn.",
+          "later": "Ngày 29 có người đã biết đồ nào cần giữ khô và ai cần hỗ trợ; không có quà tiền bất ngờ."
+        },
+        {
+          "choice": "Giới thiệu khách cho Trâm/Sáu, nhận phần việc phù hợp sau khi mọi người đồng ý.",
+          "now": "Chia doanh thu, giữ một phần thời gian cho xóm.",
+          "later": "Mở hướng mạng lưới nghề nghiệp. Quan hệ không tăng nếu An tự hứa giá hoặc lịch thay người nhận."
+        }
+      ],
+      "optional": "Hạnh nhờ An chọn ngày trả lại các hộp cơm dùng chung. Trả đủ đồ là một chi tiết nhỏ về uy tín.",
+      "missed": "Khách chọn người khác nhưng có thể quay lại sau; kế hoạch xe ghép được các hộ tiếp tục làm.",
+      "line": "Hạnh: ‘Khách chị giới thiệu vì em làm được. Không phải để em nhận hết rồi mất ngủ.’"
+    },
+    {
+      "day": 24,
+      "title": "Đồng cuối cùng của việc cũ",
+      "scene": "Đến mốc lương còn lại. Tiệm cũ có thể trả theo lịch đã xác nhận; nếu trước đó chưa chốt được, An phải lựa chọn thời gian theo đuổi khoản còn thiếu. Không dùng may rủi giấu kín để thay đổi kết quả.",
+      "objective": "Đối chiếu số đã nhận, số còn thiếu và cập nhật ngân sách chuyển nhà; khép lại hoặc ghi rõ phần còn phải theo dõi.",
+      "choices": [
+        {
+          "choice": "Đến nhận theo hẹn, dành đủ thời gian và xác nhận đúng khoản đã nhận.",
+          "now": "Nếu đã chốt hai mốc ở ngày 4/17, nhận 1,8 triệu còn lại. Nếu đã nhận 2,8 triệu khép lại ngày 4, cảnh này không trả thêm.",
+          "later": "Có thể dùng tiền cho chỗ ở hoặc dự phòng; không còn nhầm giữa thu nhập cũ và tiền ứng khách."
+        },
+        {
+          "choice": "Xin chuyển khoản, kiểm tra đã nhận rồi mới cam kết chi.",
+          "now": "Giữ được một phần thời gian; nếu chưa nhận, số dư vẫn không đổi.",
+          "later": "Tránh lời hứa dựa trên ảnh biên lai hoặc câu ‘anh đang chuyển’. Đây là nguyên tắc trong hệ thống, không một câu đố lừa người chơi."
+        },
+        {
+          "choice": "Chấp nhận để phần chưa chốt được sang sau ngày 30, giữ lịch việc mới.",
+          "now": "Không bị xóa khoản phải thu; tiền mặt thấp hơn trong tuần cuối.",
+          "later": "Có thể phải ở tạm nhưng giữ công việc. Đoạn sau nhắc tiếp việc thu khoản cũ, không coi là bỏ cuộc hoàn toàn."
+        }
+      ],
+      "optional": "Nếu việc lương đã xong: An được lựa chọn nhắn cảm ơn đồng nghiệp hoặc chào tiệm cũ rồi rời đi; không bắt tha thứ cho mọi chuyện để nhận điểm tốt.",
+      "missed": "Khoản đã xác nhận vẫn có thể nhận sau. Hạn trả tiền nhà ngày 26 không tự dời theo.",
+      "line": "An: ‘Em xác nhận phần này đã nhận. Còn phần nào chưa thì mình ghi đúng phần đó.’"
+    },
+    {
+      "day": 25,
+      "title": "Đặt cuốn sổ giữa mâm cơm",
+      "scene": "Đồ đạc đã chiếm gần hết phòng. Linh hỏi nên đóng thùng nào trước. An có thể đã đủ tiền, hoặc vẫn thiếu một khoản và chưa nói ai biết.",
+      "objective": "Công khai kế hoạch thực tế đến ngày 30: tiền đang có, nghĩa vụ đến hạn, chỗ ở và ai sẽ làm việc gì.",
+      "choices": [
+        {
+          "choice": "Đưa cả số thật và điều chưa chắc ra bàn.",
+          "now": "Có thể khiến bà lo hoặc Linh giận vì trước đó bị giấu, nhưng mở các phương án hợp tác.",
+          "later": "Giữ đúng kế hoạch sau hôm nay mới phục hồi lòng tin. Không tăng mạnh chỉ nhờ một bài nói hay."
+        },
+        {
+          "choice": "Đề nghị đổi sang chỗ tạm để giữ vốn và trả công đúng hẹn.",
+          "now": "Cần sự đồng ý của người sẽ ở tạm; bà và Linh được xem nơi, lịch và hạn cụ thể.",
+          "later": "Mở kết chuyển tiếp có phẩm giá. Một phương án ít đẹp vẫn có thể là quyết định cả nhà chấp nhận."
+        },
+        {
+          "choice": "Tiếp tục nói đã lo xong dù chưa đủ tiền hoặc chưa có chỗ.",
+          "now": "Tránh cuộc tranh luận hôm nay, nhưng ghi nhận thông tin sai ảnh hưởng việc người khác chuẩn bị.",
+          "later": "Nếu đến ngày 28 mới vỡ ra, gia đình có thể tự thu xếp. Đây là một trong nhiều điều kiện của kết mất lòng tin, không đủ để kích hoạt một mình."
+        }
+      ],
+      "optional": "Bà có thể chủ động đề nghị góp tối đa 500.000 từ tiền riêng nếu thấy cần. An được hỏi bà còn dự phòng không, nhận hoặc từ chối; khoản này không bắt buộc để đạt kết tốt.",
+      "missed": "Linh gửi bảng câu hỏi qua tin nhắn. Không trả lời được tính là chưa thống nhất, không tự coi mọi người đã đồng ý.",
+      "line": "Linh: ‘Thiếu thì mình tính cái thiếu. Anh nói đủ rồi, em đâu biết còn chỗ nào để phụ.’"
+    },
+    {
+      "day": 26,
+      "title": "Giữ một cánh cửa",
+      "scene": "Hai chủ nhà mới hỏi giờ chốt. Cô Duyên cần lịch chuyển để ghép xe. Dì Năm cũng cần biết có phải dọn chỗ ngủ không.",
+      "objective": "Xác nhận một phương án ở thật, với chi phí và sự đồng ý của hộ gia đình; không được bấm ‘có nhà’ chỉ bằng một lời hứa miệng chưa rõ.",
+      "choices": [
+        {
+          "choice": "Đặt Hẻm Dừa nếu đã đủ tổng vào ở 5 triệu và gia đình đồng ý.",
+          "now": "Tiền được chuyển sang khoản đã chi/đã đặt, hiện số còn lại để ăn và làm việc.",
+          "later": "Gần việc, thuận cho bà gặp hàng xóm mới; cần giải quyết đồ vượt diện tích ngày 28."
+        },
+        {
+          "choice": "Chọn Cầu Tre với tổng vào ở 4,2 triệu sau khi tính lại đi lại.",
+          "now": "Giữ thêm 800.000 so với Hẻm Dừa, chấp nhận quãng đường xa.",
+          "later": "Khoản tiết kiệm có thể làm quỹ đệm; các cảnh sau thể hiện việc đi sớm hơn, không coi phòng rẻ là lựa chọn kém giá trị."
+        },
+        {
+          "choice": "Xác nhận bảy ngày ở dì Năm, hẹn ngày tìm tiếp.",
+          "now": "Góp 500.000 nếu có thể; nếu chưa có, dì cho ghi lại thời điểm góp, không tạo một món quà tiền mặt.",
+          "later": "Chuyển sang trạng thái tạm có kế hoạch, mở kết ‘Chìa khóa mượn’. Phải gửi bớt đồ và cùng giữ nề nếp nhà dì."
+        }
+      ],
+      "optional": "Nếu đủ tiền và có thiện chí hai bên, có thể chốt phòng bằng cách khác đã thỏa thuận trước, nhưng không dùng giấy tờ cá nhân làm vật phẩm cầm cố trong cốt truyện.",
+      "missed": "Chỗ dự định có thể được người khác nhận; luôn còn phương án tạm đã giới thiệu từ ngày 3. Không đẩy gia đình ra đường vì bỏ một ô thao tác.",
+      "line": "Cô Duyên: ‘Cô cần biết xe chở tới đâu. “Tới đâu tính tới đó” thì chú tài xế cũng chịu.’"
+    },
+    {
+      "day": 27,
+      "title": "Chỗ phải làm lại",
+      "scene": "Trâm phát hiện một phần việc chưa đạt ở giai đoạn kiểm tra cuối. Hướng A là ca sửa đồ phải trả lại vì chưa hết lỗi. Nhân vật được cho biết rõ vấn đề tồn tại; không cần kiến thức nghề ngoài game để nhận ra.",
+      "objective": "Quyết định cách chịu trách nhiệm, sửa kế hoạch và báo khách; không có thao tác hướng dẫn đấu nối hay làm điện nguy hiểm.",
+      "choices": [
+        {
+          "choice": "Báo thật, dành một ô và chi phí đã báo để làm lại cùng người phù hợp.",
+          "now": "Có thể mất 400.000 từ khoản dự phòng; Trâm chỉ xác nhận khi đạt.",
+          "later": "Giữ uy tín và điều kiện bàn giao. Có thể phải ở tạm nếu dùng quỹ nhà, nhưng công việc khép đúng."
+        },
+        {
+          "choice": "Không đủ sức hoặc tiền: bàn giao phần đã đạt, hoàn/đối chiếu phần chưa làm rồi thu hẹp.",
+          "now": "Thu nhập giảm, nghĩa vụ được ghi rõ. Có thể cần trả dần một khoản được các bên thống nhất.",
+          "later": "Mở kết ‘Làm lại từ đơn nhỏ’; người chơi được giữ cơ hội nghề nghiệp vì không che giấu."
+        },
+        {
+          "choice": "Báo với khách là đã xong dù đã được nhắc chưa đạt.",
+          "now": "Trâm không ký xác nhận và giữ phần chưa đạt ngoài sử dụng; không có cảnh người vô tội bị thương để gây sốc.",
+          "later": "Nếu An tiếp tục không sửa lời nói đến ngày 30, mở kết ‘Dòng tên trên biên bản’. Chủ yếu là hoàn trả, mất tin cậy và học lại trách nhiệm."
+        }
+      ],
+      "optional": "Sáu đề nghị nhận giúp một khách lẻ để An có thời gian xử lý, nếu lịch và quan hệ cho phép; trợ giúp là thời gian, không phép màu xóa chi phí.",
+      "missed": "Báo cáo chưa đạt vẫn tồn tại; không nhận khoản cuối của phần đó. Im lặng không tự được tính như đã chọn gian dối, nhưng công việc chưa khép.",
+      "line": "Trâm: ‘Làm lại còn là công việc. Giấu đi rồi thì nó thành chuyện khác.’"
+    },
+    {
+      "day": 28,
+      "title": "Một căn phòng trong mấy cái thùng",
+      "scene": "Lối đi hẹp vì thùng giấy. Bà muốn giữ cái tủ cũ; Linh cần một chỗ cho sách nghề; An nhìn túi dụng cụ rồi nhìn tiền thuê xe.",
+      "objective": "Chốt đồ mang, đồ gửi, đồ bán với sự đồng ý của chủ đồ; đặt lịch vận chuyển và các phương án nếu mưa.",
+      "choices": [
+        {
+          "choice": "Ghép xe cùng xóm theo lịch đã thống nhất.",
+          "now": "Chi phí thấp hơn nhưng giờ ít linh hoạt; mỗi nhà tự xác nhận đồ và người nhận.",
+          "later": "Ngày 29 có nhóm hỗ trợ, mở các cảnh kết cộng đồng. Nếu trước đó không tham gia, vẫn có thể xin ghép khi còn chỗ."
+        },
+        {
+          "choice": "Thuê chuyến riêng, dùng tiền để giữ thời gian làm việc hoặc thuận cho bà.",
+          "now": "Chi cao hơn, chủ động giờ; không bị chê là sống tách biệt.",
+          "later": "Giảm xung đột lịch ngày 30, có thể còn ít quỹ đệm. Hợp với một đường chơi chăm gia đình bằng nguồn lực mình có."
+        },
+        {
+          "choice": "Chia thành hai đợt, gửi một phần ở chỗ đã được cho phép.",
+          "now": "Giảm tải hôm nay, tạo lịch lấy đồ sau; có thể giữ dụng cụ làm ăn thay vì bán vội.",
+          "later": "Mở cảnh trở lại lấy đồ trong đoạn kết. Đồ không tự mất nếu người chơi đã báo và giữ hẹn."
+        }
+      ],
+      "optional": "Nếu cần bán đồ, mỗi người được quyết phần của mình. Bà có thể tự bỏ cái tủ nhưng giữ cánh cửa có vạch đo chiều cao của hai đứa — chỉ khi có chỗ chứa phù hợp, không ép chi tiết cảm động.",
+      "missed": "Chưa đặt xe thì phương án mặc định là đi từng đợt với xe còn trống, tốn thời gian hơn; không có xe miễn phí đột ngột.",
+      "line": "Bà Tư: ‘Cái tủ bà bỏ được. Mấy cái vạch trên đó… thôi, để bà coi lại một chút.’"
+    },
+    {
+      "day": 29,
+      "title": "Mưa lớn trước chuyến dọn",
+      "scene": "Mưa dài, sân Bờ Me đọng nước, khách gọi hỏi phần đã làm có ổn không. Người chơi thấy rõ kết quả của chuẩn bị ngày 14, phối hợp ngày 15 và kiểm tra ngày 27.",
+      "objective": "Trong hai ô, chọn hai việc ưu tiên hoặc phân công cho người đã đồng ý: bảo vệ đồ, giữ lịch vận chuyển, hỗ trợ khách. Không thể một mình có mặt ở ba nơi.",
+      "choices": [
+        {
+          "choice": "Ở cùng gia đình, bàn giao việc khách cho Trâm/người đủ chuyên môn nếu họ nhận.",
+          "now": "Tốn công hỗ trợ, giữ sự có mặt với bà; nếu không có người nhận thì thông báo khách dời giờ, phần chưa an toàn tiếp tục không dùng.",
+          "later": "Quan hệ gia đình được củng cố; tiền hoặc thời gian bàn giao có thể giảm nhưng không tự thành thất bại nghề nghiệp."
+        },
+        {
+          "choice": "Giữ lịch công việc, nhờ người đã xác nhận lo vận chuyển và báo bà rõ.",
+          "now": "Chỉ thành công nếu có người và lịch thật. Linh không tự bỏ chuyến chuẩn bị thực tập nếu chưa đồng ý.",
+          "later": "Thể hiện lòng tin có qua có lại. Người chơi không bị phạt vì không trực tiếp làm mọi việc."
+        },
+        {
+          "choice": "Tạm dừng một cam kết, gọi xin thay đổi và nhận phần chi phí phát sinh hợp lý.",
+          "now": "Mất một khoản hoặc lùi một việc, giảm áp lực; người bị ảnh hưởng có thể không vui.",
+          "later": "Giữ được khả năng chịu trách nhiệm. Hướng công trình thu hẹp hoặc nhà tạm vẫn có đoạn kết ấm áp."
+        }
+      ],
+      "optional": "Nếu mọi việc đã chuẩn bị tốt, cho phép An có một khoảng rảnh nghe mưa, không tự sinh thêm biến cố để phá thành quả.",
+      "missed": "Gia đình tự làm phần có thể; công việc chưa kiểm tra không được bàn giao. Hậu quả dựa trên trạng thái đã có, không chọn hộ một hành vi vô trách nhiệm.",
+      "line": "Minh: ‘Mày nói địa chỉ đi. Lần này tao còn đủ giờ.’ Hoặc: ‘Tao không bỏ giờ đón Bắp được. Tao hỏi giùm chuyến khác cho.’"
+    },
+    {
+      "day": 30,
+      "title": "Trước khi trả chìa khóa",
+      "scene": "Căn phòng cũ vang tiếng hơn khi đã trống. Trên tường còn ô sáng nơi từng treo lịch. Gia đình chờ An bàn giao chìa khóa, hoặc đã đi trước theo kế hoạch thống nhất.",
+      "objective": "Bàn giao chỗ cũ, xác nhận nơi đến và các nghĩa vụ còn lại. Kết thúc được tính từ cả tháng; hôm nay không có một câu thoại biến mọi lựa chọn trước đó thành vô nghĩa.",
+      "choices": [
+        {
+          "choice": "Đi cùng gia đình, để phần việc còn lại ở lịch đã thống nhất.",
+          "now": "Có cảnh An mang chậu húng lên xe; không tự bỏ qua tiền hay công còn nợ.",
+          "later": "Đoạn kết nhấn vào căn nhà và cách mọi người chia việc."
+        },
+        {
+          "choice": "Ở lại hoàn một cuộc bàn giao đã hẹn, để gia đình đi trước nếu họ đồng ý.",
+          "now": "Có cảnh chào từng người ở xóm; An tới chỗ mới sau.",
+          "later": "Nếu lịch minh bạch, đây là trách nhiệm chứ không bỏ rơi. Nếu lại dùng nó để né lời nói thật, cảnh gia đình thay đổi."
+        },
+        {
+          "choice": "Dành thời gian sửa một lời hứa đã đổ vỡ: hoàn tiền, xin lỗi hoặc chốt lịch trả phần còn lại.",
+          "now": "Không bảo đảm được tha thứ, nhưng cho người bị ảnh hưởng một kế hoạch cụ thể.",
+          "later": "Có thể thoát điều kiện ‘tiếp tục che giấu’, vẫn giữ dấu vết tổn thất và một đoạn kết phải làm lại."
+        }
+      ],
+      "optional": "Chọn thứ An cầm trên tay khi bước khỏi phòng: đồ nghề, nồi cơm, chậu cây hoặc tập hồ sơ của Linh nếu cô nhờ cầm. Chỉ đổi hình ảnh, không lén cộng điểm đạo đức.",
+      "missed": "Nếu người chơi kết thúc ngày mà chưa chọn, gia đình tới phương án ở đã xác nhận hoặc chỗ tạm được giới thiệu trước. Các việc chưa giải quyết được ghi vào hậu truyện, không tự hoàn thành.",
+      "line": "Cô Duyên nhận chìa khóa, hỏi: ‘Qua bển tới chưa thì nhắn cô một tiếng.’ An lần này trả lời bằng một giờ cụ thể."
+    }
+  ],
+  "endings": [
+    {
+      "id": "E1",
+      "title": "Căn phòng có ánh đèn",
+      "condition": "Có chỗ thuê dài hạn; không rơi vào các kết thúc ưu tiên phía trước; chọn làm công hoặc sửa đồ theo đơn nhỏ.",
+      "scene": "An kê chiếc bàn gấp cạnh cửa. Anh chưa có tiệm riêng. Sáng mai anh nhận ca ở kho, chiều trả chiếc nồi cơm đã sửa cho khách. Bà Tư tìm được chỗ ngồi nhặt rau; Linh dán lịch của mình lên tủ. Trong bảng chi tiêu, dòng tiền dư không lớn nhưng không có khoản nào phải giấu.",
+      "dialogue": "Bà Tư: “Mai mấy giờ con đi?” An: “Bảy giờ. Chiều con về nấu. Bữa nào tăng ca con báo trước.”",
+      "epilogue": "Sau ba tháng, An có một công việc đều và vài khách quen. Căn phòng vẫn chật; lịch sinh hoạt đã bớt chồng chéo. Thành công là một nhịp sống có thể tiếp tục.",
+      "recovery": "Đường này luôn mở nếu An thu hẹp cam kết, có phương án nhà ở và hoàn thành hoặc thỏa thuận lại nghĩa vụ. Không cần nhận hợp đồng lớn."
+    },
+    {
+      "id": "E2",
+      "title": "Chung một bảng hiệu",
+      "condition": "Có chỗ thuê dài hạn; tuyến tổ đội B hoạt động; đã thống nhất tiền công, phạm vi và lịch với từng người; các khoản đến hạn đã trả hoặc được đồng ý gia hạn.",
+      "scene": "Sáu treo tấm bảng nhỏ “Sáu Sửa — nhận lịch điện gia dụng”. Trâm sửa lại dòng mô tả để khách không hiểu là ai cũng làm được mọi việc. Minh ghi giờ cuối nhận chuyến trước giờ đón Bắp. An định nhận thêm một khách rồi nhìn lịch, hẹn sang hôm sau.",
+      "dialogue": "Sáu: “Bảng có tên tao, chớ đừng để việc gì cũng tới tao.” An: “Dạ. Ai nhận việc nào, ghi tên người đó.”",
+      "epilogue": "Ba tháng sau, nhóm vẫn có hôm cãi nhau về lịch và phí. Họ giữ một buổi đối soát mỗi tuần; Sáu có một chiều nghỉ. Không ai phải góp vốn ngoài phần đã tự nguyện nhận.",
+      "recovery": "Ngày 18–27 có thể sửa thỏa thuận, trả tiền công thiếu và bỏ bớt việc. Một lời xin lỗi không thay cho khoản thanh toán hoặc lịch trả đã được chấp thuận."
+    },
+    {
+      "id": "E3",
+      "title": "Một chiếc bàn riêng",
+      "condition": "Có chỗ thuê dài hạn; tuyến dịch vụ C; công việc đã được bàn giao đúng phạm vi; vốn còn đủ cho một chu kỳ đơn nhỏ sau chi phí sinh hoạt đã dự trù; không lấy khoản phải trả người khác làm vốn.",
+      "scene": "An thuê được một góc phía trước tiệm Sáu theo giờ, đặt hộp đồ nghề lên bàn. Tấm biển chỉ ghi tên, số điện thoại và những việc anh thật sự nhận. Anh trả lời cuộc gọi đầu tiên bằng một câu hỏi về tình trạng món đồ, không bằng lời hứa sửa được hết.",
+      "dialogue": "Khách: “Hôm nay xong hông?” An: “Để tôi xem rồi báo giờ chắc cho anh. Anh cần gấp thì tôi giới thiệu chỗ khác.”",
+      "epilogue": "Ba tháng sau, An có khách quay lại và vẫn nhận ca phụ khi vắng việc. Bàn riêng là quyền chọn nhịp làm, chưa phải cảnh giàu lên sau một tháng.",
+      "recovery": "Có thể chuyển từ hợp đồng tổng sang các hạng mục đã thống nhất. Tiền cuối hợp đồng ngày 32 là khoản phải thu, không được dùng để giả lập việc đã đủ tiền ngày 30."
+    },
+    {
+      "id": "E4",
+      "title": "Làm lại từ đơn nhỏ",
+      "condition": "Có chỗ thuê dài hạn; chủ động thu hẹp hoặc dừng hợp đồng, còn khoản hoàn trả/chi phí phát sinh có lịch giải quyết được các bên chấp thuận; không còn tuyên bố bàn giao sai chưa sửa.",
+      "scene": "Trong sổ còn một trang gạch đỏ. An ghi ngày trả từng khoản, bên cạnh lịch nhận ca và ba đơn sửa nhỏ. Anh mang trả chiếc dụng cụ đã mượn, nhận lại một cái gật đầu dè dặt. Bữa cơm tối không biến thành lễ ăn mừng, nhưng anh ngồi xuống kể đúng chuyện đã xảy ra.",
+      "dialogue": "An: “Con tính hụt. Phần còn thiếu con đã hẹn lại, đây là lịch.” Bà Tư: “Ừ. Ăn đi rồi mình coi tháng tới.”",
+      "epilogue": "Sau ba tháng, vài khoản đã được gạch đi. Một khách chưa quay lại. An biết giới hạn của mình hơn và có thể tạo lại uy tín bằng việc nhỏ.",
+      "recovery": "Có thể chọn nhận lỗi và thỏa thuận sửa ở ngày 27–30. Chủ nợ/khách không mặc nhiên phải đồng ý; cần một phương án thực hiện được, thu hẹp phạm vi hoặc trung gian đã có mặt trong truyện."
+    },
+    {
+      "id": "E5",
+      "title": "Có tiền nhưng vắng tiếng",
+      "condition": "Đã bảo đảm chỗ thuê và tài chính ngắn hạn, nhưng có chuỗi ít nhất ba lần che giấu/ép quyết định ảnh hưởng gia đình ở những ngày khác nhau; đã được nói rõ tác động mà vẫn không sửa; ngày 25 hoặc 30 còn một mâu thuẫn gia đình quan trọng chưa được thừa nhận.",
+      "scene": "Phòng mới có chiếc quạt chạy êm và cái kệ vừa kích thước. Linh gửi tiền phần mình bằng chuyển khoản rồi đi thực tập; tin nhắn chỉ có một dòng. Bà Tư trả lời mọi câu bằng “sao cũng được”. An đặt chậu húng xuống đúng nơi anh đã chọn, rồi nhận ra mình chưa hỏi bà có muốn đặt ở đó không.",
+      "dialogue": "An: “Phòng này được hơn phòng cũ mà bà.” Bà Tư: “Ừ, phòng được.”",
+      "epilogue": "Một tháng sau, An gửi Linh lời xin lỗi không kèm yêu cầu em quay về. Có thể bắt đầu nối lại quan hệ, nhưng đoạn kết không cho sự tha thứ tức thì.",
+      "recovery": "Những lần bất đồng đơn lẻ không mở kết thúc này. Ngày 22–30 có cơ hội ngừng áp đặt, cung cấp thông tin thật và thực hiện một thay đổi cụ thể. Linh chọn thực tập xa không tự động có nghĩa là gia đình rạn nứt."
+    },
+    {
+      "id": "E6",
+      "title": "Tiếng mưa ngoài phòng nghỉ",
+      "condition": "Mệt mỏi đã ở mức cảnh báo trong ít nhất ba ngày; An liên tiếp bỏ các cửa sổ hồi phục dù có lựa chọn khả thi; đến ngày 30 phải tạm ngừng nhận việc vì không thể duy trì lịch. Không kích hoạt bởi một đêm thức muộn.",
+      "scene": "An ngồi trong phòng, ngoài hiên là đồ vừa chuyển. Anh không nhận thêm ca. Trâm báo đã sắp lại một phần công việc; phần còn lại phải gọi từng khách xin hẹn. An đưa cuốn lịch cho người nhà, nói mình cần nghỉ. Cảnh không dùng tai nạn nghiêm trọng để trừng phạt người chơi.",
+      "dialogue": "An: “Hôm nay con không làm nổi.” Linh: “Vậy nói khách hôm nay. Đừng hẹn đại tới chiều.”",
+      "epilogue": "Hai tuần sau, An trở lại bằng lịch ngắn hơn. Thu nhập hụt, một vài khách đã chuyển chỗ. Chỗ ở và quan hệ phản ánh lựa chọn trước đó qua thẻ hậu truyện, không tự nhiên được giải quyết hết.",
+      "recovery": "Nghỉ, bớt việc hoặc nhờ người đã xác nhận nhận thay ở ngày 16, 20, 25, 29 có thể ngăn kết thúc. Tình trạng này là quy tắc hư cấu của trò chơi, không phải mô hình chẩn đoán sức khỏe."
+    },
+    {
+      "id": "E7",
+      "title": "Chìa khóa mượn",
+      "condition": "Ngày 30 chưa vào được phòng thuê dài hạn; chuyển đến chỗ dì Năm đã được giới thiệu từ ngày 3 và xác nhận lại, hoặc chỗ tạm khác đã thỏa thuận trong truyện.",
+      "scene": "Dì Năm chỉ chỗ để dép và ngăn tủ trống. An nói rõ ở nhờ một tuần, đưa lịch đi xem phòng và lịch nhận tiền. Bà Tư chia rau vào rổ nhà dì. Linh nhắn giờ mình về, hoặc địa chỉ chỗ thực tập. Cả nhà chưa có chìa khóa riêng, nhưng không phải đứng ngoài mưa chờ một phép màu.",
+      "dialogue": "Dì Năm: “Ở thì ở. Có đổi ngày đi, nói dì sớm.” An: “Dạ. Tối thứ tư con báo lại, kể cả chưa tìm được phòng.”",
+      "epilogue": "Ngày 37 là một cuộc hẹn cập nhật kế hoạch, không tự động là cảnh tìm được nhà. Nếu thu nhập và khoản phải thu đã chắc, có thể chuyển tiếp; nếu chưa, họ bàn gia hạn hoặc chỗ khác theo sự đồng ý của chủ nhà.",
+      "recovery": "Đây là phương án có giá về riêng tư, quãng đường và thời hạn; không bị ghi là thất bại đạo đức. Có thể nhận đóng góp tự nguyện của bà tối đa 500.000 đồng, không tự động trừ tiền của bà."
+    },
+    {
+      "id": "E8",
+      "title": "Dòng tên trên biên bản",
+      "condition": "An biết một phần việc chưa đạt hoặc chưa làm nhưng vẫn xác nhận hoàn thành để lấy tiền; sau khi khách được thông tin và có cơ hội sửa/thu hẹp ở ngày 27–30, tuyên bố sai và nghĩa vụ vẫn chưa được giải quyết. Lỡ hẹn hoặc thiếu kỹ năng đơn thuần không đủ kích hoạt.",
+      "scene": "An gặp Phúc và Trâm tại quán đã dọn bàn. Họ ghi rõ phần đã làm, phần chưa làm, số tiền cần đối soát và bước tiếp theo. Trâm không ký thay anh. Điện thoại hiện một cuộc gọi hỏi việc mới; An để máy nằm yên rồi tiếp tục đọc bản ghi.",
+      "dialogue": "Phúc: “Tôi cần biết phần nào dùng được, phần nào chưa.” An: “Tôi sẽ ghi đúng từng phần. Chỗ tôi đã báo sai, tôi nhận.”",
+      "epilogue": "Ba tháng sau, An còn thực hiện phương án khắc phục được thống nhất sau buổi gặp. Nhóm không giới thiệu việc mới khi vấn đề chưa rõ. Gia đình có thể vẫn ở bên, tùy cách anh đối xử với họ; truyện không biến mọi người thành tòa án.",
+      "recovery": "Có thể tránh bằng việc thông báo đúng tình trạng, dừng sử dụng phần chưa được kiểm tra và đạt thỏa thuận khắc phục trước khi chốt ngày 30. Nếu mới bắt đầu nhận trách nhiệm ở cảnh kết, đó là bước đầu chứ chưa xóa hậu quả."
+    }
+  ],
+  "branches": {
+    "selection": "Chọn một kết thúc chính theo thứ tự E8 → E6 → E7 → E5 → E4 → E2 → E3 → E1. Kiểm tra từ trái sang phải và dừng ở điều kiện đầu tiên đúng. E1 là nhánh mặc định khi đã có chỗ thuê; các tình huống thiếu chỗ thuê được E7 bao phủ bằng phương án tạm đã gieo từ đầu. Sau đó ghép thẻ hậu truyện. Đây là đặc tả để triển khai, chưa phải hệ thống đã chạy thử.",
+    "priority": [
+      "E8",
+      "E6",
+      "E7",
+      "E5",
+      "E4",
+      "E2",
+      "E3",
+      "E1"
+    ],
+    "state": [
+      "Tiền mặt và tiền phải thu là hai biến riêng; tiền cọc đã nộp không còn là tiền tiêu được. Mỗi khoản ghi người sở hữu và ngày đến hạn.",
+      "Nhà ở: chưa chọn / đã giữ / đã ký và đủ điều kiện vào / tạm trú có thời hạn. Phân biệt đặt cọc với thật sự có thể chuyển đến.",
+      "Tuyến nghề: A làm công và đơn nhỏ / B tổ đội / C dịch vụ riêng. Cho đổi tuyến sau khi xử lý cam kết cũ.",
+      "Nghĩa vụ: chưa nhận / đã nhận / hoàn thành / báo trễ / thỏa thuận lại / vi phạm chưa xử lý. Không tự nhận nhiệm vụ khi người chơi bỏ qua.",
+      "Gia đình: lưu từng sự kiện có tác động, người bị ảnh hưởng, đã nói chuyện chưa và hành động sửa. Không chỉ cộng một thanh thiện cảm.",
+      "Linh: nguyện vọng hiện tại, hồ sơ đã nộp, nơi em tự chọn, hỗ trợ em đã đồng ý nhận. Tiền của An không mua được suất thực tập.",
+      "Bà Tư: hai nhu cầu nhà ở do bà nói ra, đồ bà chọn giữ, người liên hệ sau chuyển nhà. Không mặc định tuổi cao là không có khả năng quyết định.",
+      "Mệt mỏi: mức hiện tại, số ngày cảnh báo, cửa sổ nghỉ đã được cung cấp và đã chọn; cảnh báo hiện trước lựa chọn tăng ca.",
+      "Chuyên môn: hạng mục trong năng lực, kiểm tra của người có chuyên môn, lỗi còn mở. Thiện cảm không thay thế kiểm tra.",
+      "Mưa: việc bảo quản đã làm, người nhận thay đã xác nhận, nơi cất đồ được đồng ý. Không tung xúc xắc gây mất hết tài sản.",
+      "Sổ lời hứa: nội dung, người hứa, người nhận, hạn, chi phí dự kiến, trạng thái. Một cuộc gọi báo đổi hẹn có tác dụng khác với im lặng."
+    ],
+    "linh": [
+      {
+        "title": "Đi xa, vẫn có đường về",
+        "when": "Linh tự chọn nơi xa; An tôn trọng và hỗ trợ đúng phần em đề nghị.",
+        "text": "Ảnh cuối tuần là chiếc bàn thực hành và hộp cơm em tự nấu. Em gọi về hỏi bà đặt cây ở đâu. Đi xa là bước trưởng thành, không phải mất gia đình."
+      },
+      {
+        "title": "Ở gần theo ý mình",
+        "when": "Linh tự chọn nơi gần sau khi cân nhắc học nghề, chi phí và sinh hoạt; không bị ép.",
+        "text": "Em đặt mốc ba tháng để xem lại cơ hội. Buổi tối có hôm em ăn ở nhà, có hôm học thêm. Việc nhà chia theo lịch, không mặc định em ở gần thì phải chăm tất cả."
+      },
+      {
+        "title": "Tin nhắn chỉ đủ việc",
+        "when": "An liên tục dùng nghĩa vụ gia đình gây áp lực và chưa nhận sai.",
+        "text": "Em vẫn báo mình an toàn, nhưng không kể chuyện ở xưởng. Có thể khôi phục liên hệ về sau bằng tôn trọng ranh giới; gửi tiền không tự sửa được khoảng cách."
+      },
+      {
+        "title": "Một ngày bắt đầu khác",
+        "when": "Linh tự hoãn đợt này vì hoàn cảnh, có ngày nộp lại và kế hoạch học/nghề được em chấp thuận.",
+        "text": "Lịch mới do chính em viết. Đoạn kết ghi rõ đây là chậm một bước; không tuyên bố em mãi từ bỏ nghề để phục vụ gia đình."
+      }
+    ],
+    "ba_tu": [
+      {
+        "title": "Một người quen ở cửa bên",
+        "when": "Gia đình đáp ứng hoặc cùng bà tìm cách bù các nhu cầu đã thống nhất.",
+        "text": "Bà hỏi tên người bán rau gần nhà và mang qua một nhánh húng. Quan hệ mới bắt đầu bằng một chuyện rất nhỏ."
+      },
+      {
+        "title": "Cái ghế chưa có chỗ",
+        "when": "Những nhu cầu bà nêu bị bỏ qua, chưa có cách khắc phục đã thống nhất.",
+        "text": "Chiếc ghế kê sát thùng đồ, bà ít ra ngoài. Cảnh dừng ở câu An hỏi bà muốn kê lại đâu, để mở một việc anh còn phải làm."
+      },
+      {
+        "title": "Cây húng trong rổ nhựa",
+        "when": "Đang ở tạm nhưng bà được tham gia sắp xếp và duy trì liên lạc với xóm cũ.",
+        "text": "Chưa có hiên riêng, bà đặt chậu trong chiếc rổ dễ mang. Bà hẹn cô Duyên buổi chợ tuần sau; sự gắn bó không đợi có một căn nhà đủ đẹp."
+      }
+    ],
+    "npc_cards": [
+      "Hạnh: nếu lịch giao hàng rõ và được giữ, thêm một dòng đặt cơm cố định; nếu không, chị thuê người khác nhưng vẫn bán cho An một suất cơm bình thường.",
+      "Minh: nếu giờ đón Bắp được tôn trọng, anh có thể nhận chuyến chuyển nhà đúng lịch đã hẹn; nếu từng bị bỏ mặc, anh từ chối và báo trước để An tìm phương án khác.",
+      "Sáu: nếu dụng cụ và tiền bàn sửa được đối soát, giữ một chỗ cộng tác; nếu chưa, yêu cầu trả đồ trước khi nói chuyện mới.",
+      "Trâm: tiếp tục hợp tác khi phạm vi, kiểm tra và công trả rõ; giữ khoảng cách nghề nghiệp nếu từng bị ép ký. Không cần biến thành bạn thân để hợp tác tốt.",
+      "Duyên: gửi ảnh cây trước dãy trọ đã dỡ. Có thể còn một khoản đối soát phải hẹn lại; lời hẹn và số tiền phải hiện rõ, không tự biến mất trong kết truyện.",
+      "Phúc: hợp tác tiếp nếu bàn giao đúng; hoặc chốt hợp đồng nhỏ hơn một cách bình thường. Không phải mọi lần mất cơ hội đều cần một kẻ phản diện."
+    ],
+    "presentation": "Màn kết hiển thị một cảnh chính, một thẻ của Linh, một thẻ của bà Tư và tối đa một thẻ quan hệ nghề nổi bật. Các khoản còn phải xử lý vẫn hiện trong sổ. Không hiển thị huy chương tốt/xấu hoặc điểm đạo đức."
+  },
+  "scenes": [
+    {
+      "day": 1,
+      "title": "Về tới phòng",
+      "stage": "Cuối chiều. Tiếng máy xay sinh tố ngoài đầu hẻm. An để túi đồ nghề xuống, tránh nhìn tờ thông báo.",
+      "dialogue": [
+        "Bà Tư: Ăn chưa con?",
+        "An: Dạ trên xe có ăn bánh mì.",
+        "Bà Tư: Vậy là chưa ăn cơm. Linh, lấy thêm cái chén.",
+        "Linh: Anh né cái kệ, em đang đo.",
+        "An: Đo chi?",
+        "Linh: Để biết phòng mới có chỗ để không. Anh đọc tờ giấy chưa?",
+        "An: Rồi. Để anh lo.",
+        "Linh: Lo phần nào?",
+        "An: Thì… kiếm phòng.",
+        "Bà Tư: Kiếm chỗ nào bước ra ngoài đỡ cao. Bữa nay đầu gối bà hơi khó chịu.",
+        "An: Dạ.",
+        "Linh: Mai anh đi làm lại mấy giờ?",
+        "An im lặng. Tiếng nắp nồi chạm vào thành bếp."
+      ],
+      "branches": [
+        "Nói thật: “Anh nghỉ ở tiệm rồi. Còn lương chưa lấy được.” Linh kéo ghế: “Vậy mình tính bằng tiền đang có trước.” Không ai lập tức trách; cảnh mở sổ chung.",
+        "Xin một ngày: “Mai anh kể cho rõ. Giờ anh chưa nói được.” Linh: “Ừ. Nhưng mai nói thiệt nha.” Tạo lời hứa cụ thể ngày 2.",
+        "Giấu: “Tiệm đang đổi ca.” Bà hỏi có cần để cơm không; An phải chọn có nhận thêm lời hứa về giờ về hay không. Không tự trừ lòng tin ngay khi chưa ai biết."
+      ]
+    },
+    {
+      "day": 20,
+      "title": "Hai cột tiền",
+      "stage": "Sau giờ cơm. An đặt bản thanh toán cạnh cuốn sổ nhà trọ. Trâm chỉ vào ngày nhận đợt cuối.",
+      "dialogue": [
+        "An: Xong việc là còn hai triệu.",
+        "Trâm: Đúng, nếu không phát sinh. Em đang hỏi trước ngày dọn mình có bao nhiêu.",
+        "An: Đợt đầu ba triệu ba sáu. Đợt giữa hai triệu năm hai.",
+        "Trâm: Cộng lại năm triệu tám tám. Chi dự kiến sáu triệu tư.",
+        "An: Còn đợt cuối.",
+        "Trâm: Ngày ba mươi hai.",
+        "An kéo tờ thông báo trả phòng tới gần.",
+        "An: Nhà là ngày ba mươi.",
+        "Trâm: Ừ. Việc có lời, nhưng tiền chưa về kịp.",
+        "An: Chị nghĩ em nên bỏ?",
+        "Trâm: Chị chưa nói vậy. Chị cần biết em định lấy tiền nào trả phần còn lại, và người có tiền đó đã đồng ý chưa.",
+        "An: Để em tách lại. Tiền nhà, tiền việc. Không ghi chung nữa."
+      ],
+      "branches": [
+        "Thu hẹp: An đề nghị chốt phần đã đủ vật tư và công. Phúc hỏi thời điểm hoàn thành phần còn lại; chỉ đổi hợp đồng khi cả hai xác nhận.",
+        "Giữ việc với nguồn bù chắc: An trình khoản dự trữ hoặc lịch làm công khả thi, giữ riêng chi phí nhà. Không coi lời hẹn lương chưa xác nhận là tiền chắc.",
+        "Cố bằng tiền chưa có: An nói “rồi sẽ xoay được”. Trâm yêu cầu ghi thiếu bao nhiêu và hạn phải có. Trò chơi hiện rủi ro; không tự cho vay."
+      ]
+    },
+    {
+      "day": 22,
+      "title": "Linh chọn đường",
+      "stage": "Linh ngồi trên bậc cửa, điện thoại hiện thư nhận thực tập. Em đã xem hai tuyến xe trước khi gọi An.",
+      "dialogue": [
+        "Linh: Chỗ xa nhận em rồi. Có người hướng dẫn riêng.",
+        "An: Xa vậy tối đi về sao?",
+        "Linh: Em ở chỗ họ giới thiệu, cuối tuần về. Em đã hỏi tiền phòng, chưa đặt.",
+        "An: Còn bà?",
+        "Linh: Em muốn bàn lịch với anh và bà. Chớ em chưa nói em mặc kệ.",
+        "An: Anh không có ý đó.",
+        "Linh: Em biết anh đang lo nhiều. Nhưng cái này em cũng lo mấy tháng rồi.",
+        "Bà Tư từ trong phòng: Hỏi coi cửa sổ phòng có khóa đàng hoàng không.",
+        "Linh bật cười: Dạ, con có hỏi.",
+        "Bà Tư: Vậy kể tiếp đi."
+      ],
+      "branches": [
+        "Tôn trọng: An hỏi “Em muốn anh phụ phần nào?” Linh nhờ đi xem phòng cùng nếu anh rảnh; nếu không, em đi với bạn. Em tự xác nhận nơi thực tập.",
+        "Nêu khó khăn cụ thể: An trình lịch đang trùng chăm bà/chuyển nhà, hỏi có thể đổi buổi nào. Linh cân nhắc và có thể giúp một phần, không tự động bỏ cơ hội.",
+        "Gây áp lực: “Anh làm vậy cũng vì nhà mình, em đi lúc này sao được?” Linh đáp “Vì nhà mình đâu có nghĩa em không được có kế hoạch.” Cảnh dừng để người chơi có thể nhận lại lời hoặc giữ ý; không cấm em bấm gửi thư nhận việc."
+      ]
+    },
+    {
+      "day": 30,
+      "title": "Trả chìa khóa",
+      "stage": "Phòng trống nghe tiếng mưa rõ hơn. Vệt cao thấp Linh và An từng đánh dấu trên cạnh tủ đã được chụp lại nếu bà chọn giữ ảnh.",
+      "dialogue": [
+        "Duyên: Còn đồ gì trên gác không?",
+        "An: Con coi lại một lượt.",
+        "Bà Tư: Cái chậu ngoài cửa.",
+        "Linh: Em mang rồi.",
+        "Duyên xoay chùm chìa khóa, chưa cất ngay.",
+        "Duyên: Qua chỗ mới nhắn địa chỉ cho cô.",
+        "An: Dạ. Có khoản nào còn đối soát, cô ghi giúp con vào đây.",
+        "Duyên: Ừ, để rõ cho khỏi nhớ lộn.",
+        "Bà Tư nhìn gian bếp: Hồi mới tới, cái nền thấp hơn ngoài đường.",
+        "An: Bà có muốn chụp một tấm không?",
+        "Bà Tư: Có người thì chụp. Phòng không thôi chụp làm gì."
+      ],
+      "branches": [
+        "Gia đình gần gũi: họ đứng vào khung ảnh; Linh đặt hẹn giờ. Tiếng cười đến từ việc không tìm được chỗ dựng điện thoại.",
+        "Đang rạn nứt: Linh vẫn giúp bà, nhưng đứng ngoài khung. An có thể mời một lần và tôn trọng câu trả lời; không khóa cảnh bằng ép chụp chung.",
+        "Đang ở tạm hoặc còn nợ: bức ảnh vẫn được chụp nếu mọi người muốn. Sau ảnh là lịch phải làm tiếp, không có lời kể tuyên bố mọi khó khăn đã hết."
+      ]
+    }
+  ],
+  "notes": {
+    "synopsis": [
+      "An về nhà với ý định ở vài hôm rồi tìm việc khác trước khi người nhà biết mình thất nghiệp. Thông báo trả phòng khiến kế hoạch ấy không còn chỗ trú. Những ngày đầu, anh vẫn tìm một cách kiếm đủ tiền để khỏi phải nói chuyện khó. Nhưng bà muốn biết chỗ ngồi mới có gần hàng xóm không; Linh muốn biết có phải bỏ cơ hội thực tập để ở nhà phụ anh không. Mỗi người đang giải một bài toán khác nhau.",
+      "Một chiếc quạt sửa đúng hẹn, chuyến giao cơm và lần giữ lời với Minh khiến tên An được nhắc tới ở dãy quán Bến Cạn. Hợp đồng của Phúc đủ lớn để An tưởng mình có thể giải quyết cả tháng. Khi cộng chi phí và lịch thanh toán, anh phát hiện phần tiền công đáng kể chỉ về sau ngày trả phòng. Từ đây, truyện chia thành đường làm công trả ngay, đường làm cùng tổ đội hoặc đường tự điều phối dịch vụ. Cả ba đều có phẩm giá và trở ngại riêng.",
+      "Cơn mưa đầu tháng không phá hủy cuộc sống; nó làm lộ những việc bị trì hoãn. Đồ chưa bọc, lịch chưa xác nhận, lời hứa chưa nói thật đều thành việc cụ thể phải giải quyết. Khi Linh nhận tin thực tập, An phải đối diện thói quen coi sự hy sinh của mình là lý do để chọn thay người khác. Trong bữa cơm ngày 25, cuốn sổ được đặt giữa mâm: ai có bao nhiêu, khoản nào chắc, ai thật sự đồng ý làm gì.",
+      "Tuần cuối không còn một món tiền thần kỳ để tìm. An phải chọn một phương án nhà ở, hoàn tất hoặc thỏa thuận lại công việc và chấp nhận giới hạn của lịch. Ngày trả chìa khóa, người chơi thấy kết quả trong cách mọi người nói với nhau và những món đồ họ tự chọn mang theo. Câu chuyện có thể khép bằng một căn phòng thuê, một tổ sửa chữa, chiếc bàn nghề riêng hoặc một chỗ ở nhờ có hẹn ngày cập nhật. Điều quan trọng là những gì họ có thể tiếp tục sau khi trò chơi dừng."
+    ],
+    "cashflow": [
+      "Ví dụ kiểm tra số học cho tuyến A: 1,2 triệu ban đầu + 20 ca × 320.000 + 3,6 triệu lương cũ = 11,2 triệu. Trừ 30 ngày × 120.000 sinh hoạt và 5 triệu chuyển vào Hẻm Dừa, còn 2,6 triệu trước chi phí dụng cụ, đi lại và phát sinh. Đây là ví dụ dự toán, chưa chứng minh cân bằng qua chơi thử.",
+      "Với hợp đồng gốc: doanh thu 8,4 triệu, chi phí dự kiến 6,4 triệu, phần còn lại 2 triệu bao gồm công An và rủi ro. Trước ngày 30 chỉ thu 3,36 + 2,52 = 5,88 triệu nếu đủ điều kiện. Khi toàn bộ chi phí đã trả, dòng tiền hợp đồng tới ngày 30 là âm 520.000 đồng. Khoản 2,52 triệu ngày 32 chưa dùng được cho hạn chuyển nhà. Đó là nút thắt có chủ ý, phải thông báo trước khi nhận.",
+      "Nếu khách tự mua vật tư 4 triệu, phải lập lại giá trị dịch vụ và lịch trả tương ứng; không giữ nguyên phần trăm trên 8,4 triệu rồi tính thêm vật tư khách mua. Bảng giá hạng mục mới phải hiện trước khi ký.",
+      "Lương cũ: nhận 2,8 triệu ngay là đóng khoản nợ lương theo thỏa thuận giảm 800.000; không nhận thêm hai đợt 1,8 triệu về sau. Nếu chọn giữ nguyên quyền đòi 3,6 triệu, chỉ nhập tiền mặt khi khoản tiền thực sự được xác nhận.",
+      "Số ca khả dụng phải kiểm tra với lịch 120 ô thời gian, cảnh bắt buộc, di chuyển và nghỉ trước khi khóa cân bằng. Không yêu cầu người chơi làm đủ 20 ca mọi lượt. Cho xem dự báo thiếu tiền sớm và đổi phương án nhà/việc.",
+      "Tiền bạc là thông số hư cấu để thiết kế. Khi sản xuất, cần khảo sát địa bàn lấy cảm hứng và thử cân bằng; không trình bày các mức này như giá thuê hoặc lương phổ biến ở Việt Nam."
+    ],
+    "callbacks": [
+      "Ngày 2 → 13 → 23: phạm vi sửa và lời hẹn ban đầu quyết định tranh chấp bảo hành, rồi khả năng khách quay lại.",
+      "Ngày 5 → 21 → 26 → thẻ bà Tư: biết nhu cầu nhà ở, thử đường đi, thống nhất phương án và thực hiện sau chuyển.",
+      "Ngày 6/9 → 23/28/29: tôn trọng giờ và tiền công của Minh tạo khả năng cộng tác; vẫn phải hỏi và nhận xác nhận, không coi như có một lượt giúp miễn phí.",
+      "Ngày 10/11 → 18/20 → 27: nhận đúng phạm vi, báo giá phần thêm, nhìn đúng dòng tiền, bàn giao đúng tình trạng.",
+      "Ngày 14 → 15 → 29: biết điểm dễ ướt và tổ chức bảo quản giúp tiết kiệm thời gian ở cơn mưa sau.",
+      "Ngày 19 → 22 → 25/30: hỗ trợ hồ sơ theo yêu cầu, nghe quyết định của Linh, thống nhất sinh hoạt khi em đi. Không khóa kết thúc tốt vào việc em ở gần.",
+      "Ngày 4 → 17 → 24: lịch lương cũ nhất quán; các cảnh thay thế không sinh thêm tiền.",
+      "Ngày 8 → 28 → 30: lịch xe chung và người giữ chìa khóa được xác nhận, biến cuộc họp xóm thành kết quả nhìn thấy được."
+    ],
+    "route_A": "Ngày 12 quản lý tiền ứng mua linh kiện đơn nhỏ; ngày 15 bảo vệ đồ khách gửi và báo lịch; ngày 18 xử lý việc khách nhờ thêm; ngày 20 cân nhắc ca trả cuối tháng so với ca trả ngay; ngày 27 giải quyết bảo hành của đơn nhỏ. Các cảnh này giữ câu hỏi về lời hứa và tiền mặt mà không ép người chơi nhận hợp đồng Bến Cạn.",
+    "editorial": [
+      "Không dùng sự nghèo khó như chuỗi cảnh gây sốc. Xen niềm vui bình thường: ly trà đá, hộp cơm có thêm miếng trứng, trận cầu lông ngoài sân, tấm hình Bắp vẽ, một cái quạt chạy lại.",
+      "Mâm cơm, xe máy, nhóm tin nhắn xóm, giờ đón trẻ, đặt cọc phòng, tiền công và lịch thực tập phải ảnh hưởng lịch và quan hệ; không chỉ là vật trang trí để báo bối cảnh Việt Nam.",
+      "Đối thoại miền Nam vừa phải, khác nhau theo người. Bà Tư nói ngắn và cụ thể; Trâm nói rõ phạm vi; Hạnh nhanh và tính theo bữa; Linh có chính kiến nhưng vẫn có lúc do dự. Tránh mỗi câu đều dùng tiếng lóng.",
+      "Không cần tuyến tình cảm lãng mạn trong mùa đầu. Quan hệ gia đình, hàng xóm và đồng nghiệp đã đủ chiều sâu; tình cảm không là phần thưởng cho tiền hoặc quà.",
+      "Cô Duyên có giới hạn thật và có trách nhiệm về thông tin. Phúc có áp lực riêng nhưng phải chịu trách nhiệm việc mình hứa. Không giải thích mọi khó khăn bằng một người giàu độc ác.",
+      "Việc chăm người thân được thương lượng giữa những người có khả năng tham gia. Không tự giao hết cho Linh vì em là phụ nữ, hoặc cho An vì anh là đàn ông.",
+      "Giữ kỹ thuật điện ở mức nhiệm vụ và kiểm tra chuyên môn, không đưa thao tác nguy hiểm thành hướng dẫn đời thực. Tiền, quan hệ và tốc độ không thay thế nghiệm thu."
+    ],
+    "implementation": [
+      "Mỗi ngày có một cảnh chính và một việc tùy chọn, không phải danh sách bắt buộc hoàn thành 100%. Nhắc rõ những ngày tốn hai ô và những hạn không thể lùi.",
+      "Hiện thời gian, tiền chắc chắn, điều còn chưa rõ và ai cần đồng ý trước lựa chọn. Giữ bất ngờ ở phản ứng nhân vật, không giấu chi phí mà nhân vật chính lẽ ra đã biết.",
+      "Lựa chọn “nói chuyện trước” vẫn có giá thời gian và có thể không được chấp thuận. Tránh biến nó thành nút thắng mọi tình huống.",
+      "Nếu bỏ lỡ cảnh, dùng mục missed của ngày để nối truyện; không tự ký hợp đồng, tiêu tiền, nhận việc hoặc quyết định thay người chơi.",
+      "Trước sản xuất toàn bộ, dựng lát cắt ngày 18–22 cùng ba tuyến nghề để thử nút thắt dòng tiền và quyền tự quyết của Linh. Sau đó thử một lượt thường, một lượt thiếu tiền, một lượt bỏ nhiệm vụ và một lượt đổi tuyến.",
+      "Đây là hồ sơ cốt truyện và thiết kế nhiệm vụ phiên bản đầu. Các lời thoại mẫu chưa thay thế kịch bản hội thoại đầy đủ từng nhánh; con số và điều kiện cần được cân bằng trong prototype."
+    ]
+  }
+}

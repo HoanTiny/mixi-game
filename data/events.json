@@ -1,278 +1,2646 @@
 [
-  {
-    "id": "xe_om", "day": 1,
-    "title": "Bến xe Miền Đông, 5 giờ sáng", "who": "Chú xe ôm",
-    "text": "\"Về Bình Thạnh hả con? Ba trăm nghìn, chú chở liền.\"",
+ {
+  "id": "ngay1",
+  "day": 1,
+  "mode": "full",
+  "title": "Tờ giấy trên cánh cửa",
+  "who": "Bà Tư",
+  "text": "Chuyến xe đêm thả An ở đầu đường lúc trời vừa sáng. Anh về tới xóm trọ Bờ Me. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Tư nhờ An đọc to lên, \"chữ in nhỏ quá\", rồi đi lấy phần cá kho để trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn 1.200.000đ. Tiệm cũ còn nợ 3.600.000đ tiền công.",
+  "quote": "Bà Tư: \"Cơm còn nóng. Chuyện nào khó thì ăn xong rồi nói, đừng để nguội cả hai.\"",
+  "choices": [
+   {
+    "label": "Nói thật: anh nghỉ ở tiệm rồi, chỉ còn 1,2 triệu",
+    "hint": "Không có tiền thưởng. Cả nhà biết số thật, mở sổ thu chi chung",
+    "effects": {
+     "flag.daNoiThat": true,
+     "rep.LINH": 4,
+     "rep.BA_TU": 3,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Nói thật chuyện mất việc ngay ngày đầu"
+     },
+     "log": "Linh kéo ghế: \"Vậy mình tính bằng tiền đang có trước.\"",
+     "diary": "Nói thật rồi: mất việc, còn 1,2 triệu. Bà múc thêm cá kho. Linh lật mặt sau tờ lịch, ghi số tiền lên đầu trang."
+    }
+   },
+   {
+    "label": "Nói mình về nghỉ vài hôm, hẹn cuối tuần bàn kỹ",
+    "hint": "Bữa cơm nhẹ nhàng. Sinh ra lời hứa nói rõ trước tối ngày 5",
+    "effects": {
+     "promise": {
+      "id": "noi_ro_ngay5",
+      "text": "Nói rõ chuyện việc làm với cả nhà",
+      "to": "LINH",
+      "due": 5,
+      "onOverdue": {
+       "flag.giauMatViec": true,
+       "family": {
+        "who": "LINH",
+        "kind": "conceal",
+        "text": "Giấu chuyện mất việc quá ngày đã hẹn"
+       }
+      }
+     },
+     "diary": "Nói là về nghỉ vài hôm. Bà tin. Linh nhìn cái túi đồ nghề hơi lâu. Ngày 5 phải nói cho rõ."
+    }
+   },
+   {
+    "label": "Xin một buổi để bình tâm, hẹn tối mai cả nhà ngồi bàn",
+    "hint": "Bà đồng ý. Sinh ra lời hứa bàn chuyện nhà tối ngày 2",
+    "effects": {
+     "rep.BA_TU": 1,
+     "promise": {
+      "id": "ban_toi_mai",
+      "text": "Tối ngày 2 ngồi lại bàn chuyện nhà",
+      "to": "BA_TU",
+      "due": 2,
+      "onOverdue": {
+       "family": {
+        "who": "BA_TU",
+        "kind": "conceal",
+        "text": "Hẹn bàn chuyện nhà rồi không ngồi lại"
+       }
+      }
+     },
+     "diary": "Xin một buổi để thở. Bà gật: \"Ăn đi đã.\" Tối mai ngồi lại với cả nhà, không trốn được nữa."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay2",
+  "day": 2,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   7,
+   11
+  ],
+  "title": "Cái quạt không còn quay",
+  "who": "Chú Sáu",
+  "text": "Cô bán trái cây ngoài chợ mang cái quạt đứng tới tiệm Sáu. Cô cần nó trước ca bán trưa. Cái quạt đã sửa chắp vá nhiều lần, dây quấn băng keo ba chỗ.\nChú Sáu đứng sau lưng, không nói gì, chỉ nghe An nói chuyện với khách.",
+  "quote": "Chú Sáu: \"Người ta cần cái quạt chạy. Không cần nghe mình nói hay.\"",
+  "missed": "Chú Sáu tự sửa cái quạt cho cô bán trái cây rồi nhắn An mai ghé phụ bàn sửa. Không ai trách vì An chưa nhận việc.",
+  "missed_effects": {
+   "flag.quatSauLam": true
+  },
+  "choices": [
+   {
+    "label": "Báo rõ giới hạn sửa, lấy phí kiểm tra thấp và đề xuất phương án",
+    "hint": "Mất 1 giờ, +60.000đ phí kiểm tra. Không hứa điều chưa biết",
+    "effects": {
+     "hours": 1,
+     "cash": 60000,
+     "cash_label": "Phí kiểm tra cái quạt",
+     "rep.SAU": 5,
+     "flag.quatRoRang": true,
+     "diary": "Nói trước với cô bán trái cây là cái quạt cứu được tới đâu, lấy sáu chục phí kiểm tra. Chú Sáu không khen, mà cũng không la."
+    }
+   },
+   {
+    "label": "Nhận sửa trong buổi, mua đúng bộ phận, báo trước có thể chậm",
+    "hint": "Mở việc nhờ: sửa xong, đem ra chợ trả trước 15:00",
+    "effects": {
+     "quest_start": {
+      "id": "quat_trai_cay",
+      "deadline_hour": 15
+     },
+     "rep.SAU": 2,
+     "diary": "Nhận sửa cái quạt trong buổi. Nó ù ù mà không quay. Hồi học nghề gặp đúng bệnh này một lần, giờ phải nhớ lại cho ra."
+    }
+   },
+   {
+    "label": "Hứa chắc xong trước 12 giờ trưa dù chưa kiểm tra đủ",
+    "hint": "Mở việc nhờ, hạn 12:00. Sinh ra lời hứa trong sổ",
+    "effects": {
+     "quest_start": {
+      "id": "quat_trai_cay",
+      "deadline_hour": 12
+     },
+     "promise": {
+      "id": "quat_truoc_trua",
+      "text": "Trả quạt cho cô bán trái cây trước 12 giờ",
+      "to": "SAU",
+      "due": 2
+     },
+     "diary": "Hứa chắc trước mười hai giờ. Nói xong mới thấy lạnh gáy: chưa mở nắp quạt ra coi lần nào."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay3",
+  "day": 3,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "title": "Phòng ở cuối hẻm",
+  "who": "Linh",
+  "text": "Linh gỡ ba mẩu tin cho thuê ở bảng tin chợ. Bà Tư không hỏi giá, chỉ hỏi nơi nào buổi sáng có người ngồi trước cửa.\n• Phòng Hẻm Dừa: hẻm nhỏ ngay cạnh chợ, gần việc, phòng nhỏ. Vào ở 5.000.000đ (cọc, tháng đầu, chuyển đồ).\n• Phòng Cầu Tre: bên kia rạch Bờ Me, phải đi vòng qua cầu. Thoáng, có hiên. Vào ở 4.200.000đ, đi làm xa hơn.\n• Nhà dì Năm: đầu đường An Hòa, gần trạm xe. Ở tạm 7 ngày, góp 500.000đ, phải gửi bớt đồ.",
+  "quote": "Linh: \"Rẻ hơn tám trăm, nhưng mỗi ngày anh chạy xa hơn. Mình tính cả cái đó nữa.\"",
+  "missed": "Mấy mẩu tin vẫn dán trên bảng tin ở chợ Cầu Nhỏ. Muốn xem phòng thì tự tới Hẻm Dừa (cạnh chợ) hay Cầu Tre (bên kia rạch).",
+  "choices": [
+   {
+    "label": "Hẹn đi xem Hẻm Dừa ngay sáng nay",
+    "hint": "Mất 1,5 giờ. Thấy tận mắt bậc cửa, chỗ phơi, tiếng ồn",
+    "effects": {
+     "hours": 1.5,
+     "fatigue": 3,
+     "housing_seen": "hem_dua",
+     "log": "Hẻm Dừa: phòng nhỏ, cửa sát mặt hẻm, bước ra là có người bán rau. Chỗ phơi chỉ đủ hai sào.",
+     "diary": "Đi xem Hẻm Dừa. Bước ra là có người bán rau. Bà chắc thích tiếng rao, mà chỗ phơi chỉ đủ hai sào."
+    }
+   },
+   {
+    "label": "Hẹn đi xem Cầu Tre",
+    "hint": "Mất 2,5 giờ vì phải đi vòng qua cầu. Xa hơn nhưng có hiên",
+    "effects": {
+     "hours": 2.5,
+     "fatigue": 4,
+     "housing_seen": "cau_tre",
+     "log": "Cầu Tre: hiên rộng, gió mát. Đường ra chợ phải qua cầu, bà đi bộ sẽ mệt.",
+     "diary": "Đi xem Cầu Tre. Hiên rộng, gió lùa. Ra chợ phải qua cầu. Bà đi nổi không thì phải hỏi bà, không tự đoán."
+    }
+   },
+   {
+    "label": "Ghé nhà dì Năm hỏi phương án ở tạm",
+    "hint": "Mất 2 giờ. Có đường lui nếu thiếu tiền ngày 30",
+    "effects": {
+     "hours": 2,
+     "fatigue": 2,
+     "housing_seen": "di_nam",
+     "flag.hoiDiNam": true,
+     "log": "Dì Năm: \"Ở thì ở, bảy ngày. Đồ đạc gửi bớt, nhà dì chật.\"",
+     "diary": "Ghé dì Năm. Dì cho ở bảy ngày, nói trước nhà chật. Có đường lui rồi, mà không ai muốn bước lui."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay4",
+  "day": 4,
+  "mode": "full",
+  "title": "Ba triệu sáu trên tờ giấy",
+  "who": "Chủ tiệm cũ (tin nhắn)",
+  "text": "Chủ tiệm cũ nhắn: chưa gom đủ tiền. Anh đề nghị hai cách: trả 1,8 triệu ngày 17 và 1,8 triệu ngày 24, hoặc trả luôn 2,8 triệu hôm nay để khép lại khoản lương.\nAn nhìn con số 3.600.000đ, nhớ lần mình từng nói người ta làm ăn không đàng hoàng.",
+  "quote": "An: \"Em không tính anh có tiền hay chưa. Em cần biết ngày nào thì em có thể tính vào tiền nhà.\"",
+  "choices": [
+   {
+    "label": "Thỏa thuận nhận 1,8 triệu ngày 17, phần còn lại ngày 24",
+    "hint": "Chưa có tiền ngay. Hai khoản phải thu có ngày rõ ràng",
+    "effects": {
+     "receivable_remove": "luong_cu",
+     "flag.luongHaiMoc": true,
+     "receivables": [
+      {
+       "id": "luong_cu_1",
+       "from": "Tiệm cũ",
+       "label": "Lương cũ đợt 1",
+       "amount": 1800000,
+       "due": 17
+      },
+      {
+       "id": "luong_cu_2",
+       "from": "Tiệm cũ",
+       "label": "Lương cũ đợt 2",
+       "amount": 1800000,
+       "due": 24
+      }
+     ],
+     "diary": "Chốt với tiệm cũ: 1,8 triệu ngày 17, 1,8 triệu ngày 24. Ghi vô cột \"phải thu\", không phải cột \"đang có\"."
+    }
+   },
+   {
+    "label": "Nhận 2,8 triệu ngay, chấp nhận bớt 800.000đ để khép lại",
+    "hint": "+2.800.000đ tiền mặt. Mất 800.000đ, không còn đợt nào ngày 17, 24",
+    "effects": {
+     "receivable_remove": "luong_cu",
+     "cash": 2800000,
+     "cash_label": "Tiệm cũ trả lương (khép lại, bớt 800k)",
+     "flag.luongKhep": true,
+     "diary": "Nhận 2,8 triệu, bỏ 800 nghìn. Tiền cầm tay thì nhẹ người. Tám trăm nghìn đó là hai tuần cơm của bà."
+    }
+   },
+   {
+    "label": "Chưa đồng ý, gom giấy tờ ca làm, hẹn nói lại",
+    "hint": "Mất 2 giờ. Giữ nguyên yêu cầu 3,6 triệu, chưa có ngày trả",
+    "effects": {
+     "hours": 2,
+     "flag.luongChuaChot": true,
+     "diary": "Chưa chịu. Ngồi gom bảng chấm công tới tối. Ba triệu sáu là công mình làm, không phải ơn ai."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay5",
+  "day": 5,
+  "mode": "full",
+  "loc": "com_hanh",
+  "window": [
+   8,
+   15
+  ],
+  "title": "Hai cuộc hẹn trùng giờ",
+  "who": "Chị Hạnh",
+  "text": "Chị Hạnh cần người phụ quán đột xuất mấy tiếng, đúng lúc An hẹn đưa bà Tư đi xem phòng. Linh đã biết đường tới đó, nhưng An chưa quen giao việc nhà cho em.",
+  "quote": "Bà Tư: \"Bà đi với con Linh được. Con đừng làm như chỉ mình con biết đường.\"",
+  "missed": "Chủ nhà gửi lịch xem phòng khác. Bà Tư đã thay áo chờ cả buổi, không trách gì, chỉ cất lại cái nón.",
+  "missed_effects": {
+   "rep.BA_TU": -3
+  },
+  "choices": [
+   {
+    "label": "Đi xem phòng với bà, từ chối ca trước khi nhận",
+    "hint": "Mất 3 giờ, không có tiền ca. Biết thêm điều bà cần",
+    "effects": {
+     "hours": 3,
+     "fatigue": 3,
+     "rep.BA_TU": 6,
+     "rep.HANH": 1,
+     "flag.xemPhongVoiBa": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Đi xem phòng cùng bà"
+     },
+     "diary": "Đi xem phòng với bà. Bà đứng trước bậc cửa, đếm từng bậc thành tiếng. Mất một ca phụ quán, mà biết bà sợ bậc thứ ba."
+    }
+   },
+   {
+    "label": "Hỏi Linh đi cùng bà được không, đưa đủ thông tin và tiền xe",
+    "hint": "Nhận ca, mất 4 giờ, Mệt +10. +130.000đ sau khi đưa Linh tiền xe",
+    "effects": {
+     "hours": 4,
+     "fatigue": 10,
+     "cash": 130000,
+     "cash_label": "Ca phụ quán đột xuất (đã đưa Linh tiền xe)",
+     "rep.LINH": 4,
+     "rep.HANH": 3,
+     "respect": 1,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Hỏi Linh đi cùng bà, đưa đủ thông tin"
+     },
+     "diary": "Nhờ Linh dẫn bà đi xem phòng, đưa đủ tiền xe. Tối về hai bà cháu kể toàn chuyện mình không nghĩ tới: chỗ đó không có cái ghế nào ngoài cửa."
+    }
+   },
+   {
+    "label": "Nhận cả hai, định chạy cho kịp",
+    "hint": "Mất 5 giờ, Mệt +14, +160.000đ. Hai lịch trùng: sẽ trễ một bên",
+    "effects": {
+     "hours": 5,
+     "fatigue": 14,
+     "cash": 160000,
+     "cash_label": "Ca phụ quán đột xuất",
+     "rep.BA_TU": -4,
+     "rep.HANH": 1,
+     "family": {
+      "who": "BA_TU",
+      "kind": "time_lost",
+      "text": "Để bà chờ vì nhận hai lịch trùng"
+     },
+     "diary": "Chạy cả hai đầu. Tới chỗ xem phòng trễ bốn chục phút, bà ngồi chờ trên bậc thềm, không trách câu nào. Vậy mới khó chịu."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay6",
+  "day": 6,
+  "mode": "full",
+  "loc": "com_hanh",
+  "window": [
+   14,
+   17.5
+  ],
+  "title": "Mười hai suất cơm cuối",
+  "who": "Chị Hạnh",
+  "text": "Công nhân tăng ca ở khu công nghiệp đặt thêm 12 suất cơm lúc trời chuyển gió. Minh còn bốn mươi phút nữa là tới giờ đón bé Bắp. Chị Hạnh chỉ có một mình đứng quán.",
+  "quote": "Chị Hạnh: \"Cơm nguội hâm được. Người ta trễ ca thì chị không hâm lại giùm được.\"",
+  "missed": "Đơn cơm tăng ca có người khác nhận. Chị Hạnh không trách vì An chưa nhận.",
+  "choices": [
+   {
+    "label": "Chia tuyến với Minh, chia công rõ, giữ phần gần trường cho Minh",
+    "hint": "Mất 1,5 giờ, +70.000đ. Minh kịp đón con",
+    "effects": {
+     "hours": 1.5,
+     "fatigue": 5,
+     "cash": 70000,
+     "cash_label": "Chia công giao cơm với Minh",
+     "rep.MINH": 8,
+     "rep.HANH": 3,
+     "flag.chiaTuyenMinh": true,
+     "diary": "Chia tuyến cơm với Minh. Minh kịp đón Bắp, còn gửi cái hình con mèo chắp tay cảm ơn."
+    }
+   },
+   {
+    "label": "Tự giao hết, báo đúng giờ dự kiến thay vì hứa sớm",
+    "hint": "Mở việc nhờ: chở 12 suất ra bến xe số 6 trong 40 phút",
+    "effects": {
+     "quest_start": "giao_12_suat",
+     "rep.HANH": 2,
+     "diary": "Nhận chở hết mười hai suất. Không hứa sớm, chỉ báo đúng giờ. Chị Hạnh nhìn mình kiểu khác."
+    }
+   },
+   {
+    "label": "Xin nhận phần mình chắc làm được, chị gọi người khác phần còn lại",
+    "hint": "Mất 1 giờ, +60.000đ, giữ đúng giờ",
+    "effects": {
+     "hours": 1,
+     "fatigue": 3,
+     "cash": 60000,
+     "cash_label": "Giao một phần cơm tăng ca",
+     "rep.HANH": 4,
+     "diary": "Chỉ nhận phần chắc làm được, chị Hạnh gọi thêm người. Hóa ra nói \"phần này em không kịp\" cũng không chết ai."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay7",
+  "day": 7,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "title": "Chiếc mỏ lết có khắc tên",
+  "who": "Chú Sáu",
+  "text": "Trong thùng đồ nghề của tiệm, An thấy cái mỏ lết có tên mình khắc vụng ở cán, từ hồi anh phụ việc sau giờ học. Chú Sáu vẫn giữ. Lạ một điều: cả thùng đồ nghề, không món nào khác có khắc tên ai. Sắp tới có việc, An cần dụng cụ.",
+  "quote": "Chú Sáu: \"Tên con khắc đó. Đồ thì của chú. Đừng thấy tên mà ôm về nghen.\"",
+  "missed": "Chú Sáu nhắn: lúc nào cần dụng cụ thì ghé thuê theo buổi, không sao.",
+  "choices": [
+   {
+    "label": "Mượn theo từng buổi, ghi lịch trả",
+    "hint": "Không tốn vốn. Hứa trả dụng cụ trước ngày 14",
+    "effects": {
+     "rep.SAU": 4,
+     "flag.muonDoNghe": true,
+     "promise": {
+      "id": "tra_do_nghe",
+      "text": "Trả dụng cụ mượn của chú Sáu",
+      "to": "SAU",
+      "due": 14
+     },
+     "diary": "Mượn đồ nghề của chú Sáu theo buổi, ghi ngày trả. Cái mỏ lết có tên mình, chú vẫn để lại trong thùng."
+    }
+   },
+   {
+    "label": "Mua bộ đồ nghề cũ sau khi kiểm tra",
+    "hint": "−450.000đ. Chủ động hơn, hợp với tuyến dịch vụ riêng",
+    "require": {
+     "cash_min": 450000
+    },
+    "effects": {
+     "cash": -450000,
+     "cash_label": "Mua bộ đồ nghề cũ",
+     "flag.coDoNghe": true,
+     "rep.SAU": 1,
+     "diary": "Mua bộ đồ nghề cũ, 450 nghìn. Tiền đi một khúc, nhưng cái túi đồ nghề nặng tay trở lại."
+    }
+   },
+   {
+    "label": "Thỏa thuận dùng bàn và dụng cụ, chia một phần công theo từng việc",
+    "hint": "Ít vốn, mỗi đơn lời ít hơn. Ngày 20 cùng xem lại phần chia",
+    "effects": {
+     "rep.SAU": 6,
+     "flag.chiaBanSau": true,
+     "diary": "Thỏa thuận dùng bàn của chú Sáu, chia công theo việc. Lần đầu chú nói \"mình\" thay vì \"chú với con\"."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay8",
+  "day": 8,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "window": [
+   17,
+   21.5
+  ],
+  "title": "Cuốn sổ tiền cọc",
+  "who": "Cô Duyên",
+  "text": "Cả xóm tụ dưới mái hiên. Có người bảo cô Duyên sắp giữ hết tiền cọc, có người đã gọi xe dọn. Cô Duyên mang cuốn sổ ra nhưng nói vòng vo.",
+  "quote": "Cô Duyên: \"Cô nói trước để tụi con còn xoay. Không phải dán giấy rồi coi như không quen nhau nữa.\"",
+  "missed": "Cô Duyên gửi bản tóm tắt lịch dọn vào nhóm tin nhắn của xóm. Phần cọc của nhà An vẫn ghi đủ.",
+  "choices": [
+   {
+    "label": "Đề nghị một lịch rõ cho từng hộ, ai muốn thì tự xác nhận phần mình",
+    "hint": "Mất 1 giờ. Mở chuyến xe ghép ngày 28",
+    "effects": {
+     "hours": 1,
+     "rep.DUYEN": 8,
+     "flag.lichXom": true,
+     "diary": "Đề nghị lịch cho từng hộ. Cô Duyên thở ra như vừa đặt được cái gánh xuống. Cả xóm có chuyến xe ghép ngày 28."
+    }
+   },
+   {
+    "label": "Chỉ hỏi phần nhà mình: tiền cọc và giờ bàn giao",
+    "hint": "Nhanh, đủ thông tin để lập kế hoạch",
+    "effects": {
+     "rep.DUYEN": 3,
+     "flag.hoiPhanNhaMinh": true,
+     "diary": "Chỉ hỏi phần nhà mình: tiền cọc, giờ giao. Gọn. Lúc về vẫn nghe nhà bên cãi nhau về cuốn sổ."
+    }
+   },
+   {
+    "label": "Đòi cô Duyên hứa cho ở thêm cả tháng",
+    "hint": "Cô không đồng ý được",
+    "effects": {
+     "rep.DUYEN": -6,
+     "flag.doiOThem": true,
+     "log": "Cô Duyên lắc đầu: \"Cô không có quyền đó, con. Cô chỉ lo được xe với chỗ gửi đồ tạm.\"",
+     "diary": "Đòi cô Duyên cho ở thêm. Cô lắc đầu. Biết cô không có quyền, mà vẫn muốn có người để trách."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay9",
+  "day": 9,
+  "mode": "full",
+  "loc": "com_hanh",
+  "window": [
+   11,
+   16
+  ],
+  "title": "Giờ đón Bắp",
+  "who": "Minh",
+  "text": "Minh kẹt một đơn xa, nhờ An đón bé Bắp ở trường mẫu giáo cạnh bến xe số 6 lúc năm giờ. Cùng chiều đó Linh phải lên trung tâm nghề nộp hồ sơ, còn An có lịch trả đồ sửa cho khách.",
+  "quote": "Minh: \"Tiền đơn mất thì kiếm lại. Nó đứng chờ mà không biết ba có tới không, cái đó tao chịu không nổi.\"",
+  "missed": "Minh tìm được người khác đón Bắp.",
+  "choices": [
+   {
+    "label": "Nhận đón Bắp, dời lịch trả đồ sau khi khách đồng ý",
+    "hint": "Mở việc nhờ: đón Bắp ở bến xe số 6 (16:30–17:30), đưa về Cơm Hạnh",
+    "effects": {
+     "quest_start": "don_bap",
+     "rep.MINH": 3,
+     "diary": "Nhận đón Bắp, xin khách dời giờ trả đồ. Khách nói: \"Ừ, con nít quan trọng hơn cái quạt.\""
+    }
+   },
+   {
+    "label": "Không nhận vì đã có hẹn, giúp Minh gọi người quen được phép đón",
+    "hint": "Mất 1 giờ. Minh hiểu giới hạn",
+    "effects": {
+     "hours": 1,
+     "rep.MINH": 2,
+     "log": "Minh gọi được chị hàng xóm đón giùm. \"Ừ, mày nói sớm vậy là được rồi.\"",
+     "diary": "Nói thật với Minh là kẹt giờ, gọi giùm người quen. Minh không giận. Từ chối sớm cũng là một cách giúp."
+    }
+   },
+   {
+    "label": "Nhận rồi bảo Linh bỏ buổi nộp hồ sơ đi đón thay",
+    "hint": "Linh có quyền từ chối. Ép thì mất lòng tin",
+    "effects": {
+     "rep.MINH": 4,
+     "rep.LINH": -10,
+     "respect": -2,
+     "flag.linhLoHoSo": true,
+     "family": {
+      "who": "LINH",
+      "kind": "pressure",
+      "text": "Bảo Linh bỏ buổi nộp hồ sơ để đón Bắp thay mình"
+     },
+     "diary": "Bảo Linh bỏ buổi nộp hồ sơ để đón Bắp. Linh đi đón, không nói gì. Tối em đóng cửa phòng sớm."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay10",
+  "day": 10,
+  "mode": "full",
+  "loc": "ben_can",
+  "title": "Một việc lớn hơn cái bàn sửa",
+  "who": "Anh Phúc",
+  "text": "Anh Phúc tìm An qua lời giới thiệu của chị Hạnh. Năm quán ở Bến Cạn cần sửa lại hạ tầng điện cũ trước mùa mưa. Anh nói là việc \"làm vài bữa\". Trâm cầm danh sách, xin khảo sát trước.\nHôm nay chỉ tìm hiểu, chưa phải chọn.",
+  "quote": "Trâm: \"Chị nghe chữ 'vài bữa' rồi. Giờ cho chị coi cụ thể là những bữa nào.\"",
+  "missed": "Anh Phúc để lại số điện thoại. Tới hết ngày 12 anh mới chốt người làm.",
+  "choices": [
+   {
+    "label": "Mời Trâm cùng khảo sát, trả phí khảo sát đã báo trước",
+    "hint": "Mất 2 giờ, −150.000đ. Có danh sách việc và giới hạn chuyên môn rõ",
+    "require": {
+     "cash_min": 150000
+    },
+    "effects": {
+     "hours": 2,
+     "cash": -150000,
+     "cash_label": "Phí khảo sát với Trâm",
+     "rep.TRAM": 8,
+     "rep.PHUC": 3,
+     "flag.khaoSat": true,
+     "diary": "Đi khảo sát Bến Cạn với Trâm, trả phí như đã báo. Trâm ghi kín hai trang. \"Vài bữa\" của anh Phúc thành mười một mục."
+    }
+   },
+   {
+    "label": "Xin tài liệu và một ngày để hỏi người có kinh nghiệm",
+    "hint": "Chưa tốn tiền. Hỏi chú Sáu và Linh về lịch, vật tư",
+    "effects": {
+     "rep.PHUC": 1,
+     "rep.SAU": 2,
+     "rep.TRAM": 5,
+     "flag.hoiThem": true,
+     "diary": "Xin tài liệu về hỏi chú Sáu với Linh. Chú Sáu đọc xong chỉ hỏi một câu: \"Tiền về ngày nào?\""
+    }
+   },
+   {
+    "label": "Nói rõ chỉ nhận các việc nhỏ đúng tay nghề",
+    "hint": "Không nhận gói lớn. Ngày 11 nghiêng về đường làm công",
+    "effects": {
+     "rep.PHUC": 2,
+     "rep.TRAM": 3,
+     "flag.chiNhanViecNho": true,
+     "diary": "Nói rõ chỉ nhận việc nhỏ đúng tay nghề. Anh Phúc hơi tiếc. Mình cũng tiếc, mà ngủ được."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay11",
+  "day": 11,
+  "mode": "full",
+  "loc": "ben_can",
+  "title": "Ba cách nhận lời",
+  "who": "Anh Phúc",
+  "text": "Anh Phúc đặt lên bàn danh sách năm quán và lịch thanh toán: hợp đồng 8.400.000đ. Vật tư khoảng 4 triệu, công người hỗ trợ 1,8 triệu, vận chuyển và dự phòng 600 nghìn. Trả 40% khi ký, 30% sau nghiệm thu giữa kỳ (tối ngày 20), 30% vào ngày 32.\nTrâm ghi lại: tính tới ngày 30, dòng tiền của hợp đồng âm khoảng 520.000đ. Khoản cuối về sau ngày trả phòng.",
+  "quote": "An: \"Em nhận được việc này. Nhưng em không nhận được cái hạn đó với từng ấy tiền ứng.\"",
+  "missed": "Anh Phúc nhắn: hợp đồng còn giữ tới hết hôm nay. Quá ngày 12 anh giao cho đội khác.",
+  "missed_choices": [
+   {
+    "label": "A · Không nhận gói lớn, giữ các việc trả tiền ngay",
+    "hint": "Không có khoản ứng. Sống bằng ca kho, phụ quán, sửa đồ lẻ",
+    "effects": {
+     "route": "A",
+     "rep.PHUC": 1
+    }
+   },
+   {
+    "label": "B · Nhận cùng tổ: Trâm lo chuyên môn, Minh chở vật tư, chú Sáu góp chỗ",
+    "hint": "+3.360.000đ khi ký (tối nay). Trả vật tư, công tổ theo lịch. Cần 3 buổi làm ở Bến Cạn trước ngày 20",
+    "require": {
+     "rep.TRAM": 35
+    },
+    "effects": {
+     "route": "B",
+     "rep.TRAM": 4,
+     "rep.MINH": 2,
+     "rep.SAU": 2
+    }
+   },
+   {
+    "label": "C · Tự điều phối dịch vụ riêng, thuê Trâm phần chuyên môn",
+    "hint": "+3.360.000đ khi ký. Tự ứng vật tư, cần 4 buổi làm trước ngày 20. Lời hơn nếu chuẩn bị tốt",
+    "effects": {
+     "route": "C",
+     "rep.PHUC": 4
+    }
+   }
+  ],
+  "choices": [
+   {
+    "label": "A · Không nhận gói lớn, giữ các việc trả tiền ngay",
+    "hint": "Không có khoản ứng. Sống bằng ca kho, phụ quán, sửa đồ lẻ",
+    "effects": {
+     "route": "A",
+     "rep.PHUC": 1,
+     "diary": "Không nhận gói lớn. Giữ ca kho, ca quán, sửa đồ lẻ. Tiền nhỏ mà về ngay, không phải chờ ngày 32."
+    }
+   },
+   {
+    "label": "B · Nhận cùng tổ: Trâm lo chuyên môn, Minh chở vật tư, chú Sáu góp chỗ",
+    "hint": "+3.360.000đ khi ký (tối nay). Trả vật tư, công tổ theo lịch. Cần 3 buổi làm ở Bến Cạn trước ngày 20",
+    "require": {
+     "rep.TRAM": 35
+    },
+    "effects": {
+     "route": "B",
+     "rep.TRAM": 4,
+     "rep.MINH": 2,
+     "rep.SAU": 2,
+     "diary": "Nhận cùng tổ với Trâm, Minh, chú Sáu. Lần đầu có tên mình trên một tờ hợp đồng mà không phải đứng một mình."
+    }
+   },
+   {
+    "label": "C · Tự điều phối dịch vụ riêng, thuê Trâm phần chuyên môn",
+    "hint": "+3.360.000đ khi ký. Tự ứng vật tư, cần 4 buổi làm trước ngày 20. Lời hơn nếu chuẩn bị tốt",
+    "effects": {
+     "route": "C",
+     "rep.PHUC": 4,
+     "diary": "Nhận làm dịch vụ riêng, thuê Trâm phần chuyên môn. Tên mình to nhất trên tờ giấy. Trách nhiệm cũng to nhất."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay12_bc",
+  "day": 12,
+  "mode": "full",
+  "when": {
+   "route": [
+    "B",
+    "C"
+   ]
+  },
+  "title": "Tiền nào là tiền của mình",
+  "who": "Linh",
+  "text": "Khoản 3.360.000đ anh Phúc chuyển vào điện thoại khiến An nhẹ người. Linh nhìn sổ: phần lớn số đó là tiền mua vật tư và trả công người khác. Tối nay phải trả vật tư đợt 1.\nTiền mặt: {cash}.",
+  "quote": "Linh: \"Trong tài khoản anh thì đúng. Nhưng trong đó có tiền của mấy người nữa.\"",
+  "choices": [
+   {
+    "label": "Đề nghị anh Phúc tự mua vật tư theo danh sách đã thống nhất",
+    "hint": "Bỏ 4 triệu vật tư phải trả. Giá dịch vụ còn 4,4 triệu, hoàn lại phần ứng dư",
+    "effects": {
+     "hours": 1,
+     "special": "client_buys_materials",
+     "rep.PHUC": 2,
+     "rep.TRAM": 2,
+     "diary": "Đề nghị anh Phúc tự mua vật tư. Tiền trong tài khoản ít đi, mà phần nào của mình thì rõ hơn."
+    }
+   },
+   {
+    "label": "Giữ cơ chế ứng theo mốc, bàn với cả nhà phần tiền riêng phải dùng",
+    "hint": "Cả nhà biết tiền nhà bị giảm bao nhiêu, ngày nào bù",
+    "effects": {
+     "rep.LINH": 3,
+     "flag.noiRoTienUng": true,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Bàn với cả nhà phần tiền riêng dùng cho vật tư"
+     },
+     "diary": "Giữ tiền ứng theo mốc, kể với cả nhà phần nào là tiền người khác. Linh gạch một đường đỏ dưới con số."
+    }
+   },
+   {
+    "label": "Dùng tiền ứng đặt cọc giữ chỗ Hẻm Dừa trước, hy vọng xoay kịp",
+    "hint": "−2.200.000đ cọc. Tiền vật tư tối nay có thể thiếu",
+    "require": {
+     "cash_min": 2200000
+    },
+    "effects": {
+     "housing_reserve": "hem_dua",
+     "flag.dungTienUng": true,
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Lấy tiền ứng vật tư đặt cọc phòng"
+     },
+     "diary": "Lấy tiền ứng đặt cọc Hẻm Dừa trước. Đêm nằm tính đi tính lại tiền vật tư. Không ngủ được."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay12_a",
+  "day": 12,
+  "mode": "full",
+  "when": {
+   "route": "A"
+  },
+  "title": "Tiền linh kiện của khách",
+  "who": "Khách sửa máy giặt",
+  "text": "Một khách nhờ An sửa máy giặt, chuyển trước 400.000đ để mua linh kiện. Tiền nằm chung với tiền sinh hoạt trong tài khoản.",
+  "quote": "Linh: \"Trong tài khoản anh thì đúng. Nhưng trong đó có tiền của người ta.\"",
+  "choices": [
+   {
+    "label": "Không giữ tiền, hẹn dẫn khách đi mua linh kiện cùng",
+    "hint": "Mất 1 giờ. Không đụng tới tiền của khách",
+    "effects": {
+     "hours": 1,
+     "rep.SAU": 2,
+     "flag.khongGiuTienKhach": true,
+     "diary": "Không giữ tiền khách, hẹn dẫn khách đi mua linh kiện. Đi thêm một chuyến, mà tối về trong ví không có tiền của ai."
+    }
+   },
+   {
+    "label": "Giữ tiền, ghi riêng vào sổ, mua đúng linh kiện ngày mai",
+    "hint": "+400.000đ tiền của khách, tối mai phải chi 400.000đ linh kiện",
+    "effects": {
+     "cash": 400000,
+     "cash_label": "Tiền khách gửi mua linh kiện",
+     "payable": {
+      "id": "linh_kien_khach",
+      "to": "",
+      "label": "Mua linh kiện cho khách",
+      "amount": 400000,
+      "due": 13
+     },
+     "diary": "Giữ 400 nghìn của khách, ghi riêng một trang. Trang đó không được đụng."
+    }
+   },
+   {
+    "label": "Dùng tạm tiền linh kiện cho việc nhà, tính bù sau",
+    "hint": "Nếu tối mai không đủ tiền, khách phải chờ",
+    "effects": {
+     "cash": 400000,
+     "cash_label": "Tiền khách gửi mua linh kiện",
+     "payable": {
+      "id": "linh_kien_khach",
+      "to": "SAU",
+      "label": "Mua linh kiện cho khách",
+      "amount": 400000,
+      "due": 13
+     },
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Dùng tạm tiền linh kiện của khách"
+     },
+     "diary": "Dùng tạm tiền linh kiện của khách cho việc nhà. Tự nhủ mai bù. Câu \"mai bù\" nghe quen quá."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay13",
+  "day": 13,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "title": "Người khách quay lại",
+  "who": "Chú Sáu",
+  "text": "Chú Sáu giới thiệu một ca bảo hành: cái quạt trần của quán trà đá ở chợ, sửa chỗ khác, chạy được ba bữa lại kêu. Chủ quán cần một câu trả lời rõ.",
+  "quote": "Cô bán trái cây: \"Cô không bắt nó mới lại. Cô cần biết giờ cô đem về có dùng được không thôi.\"",
+  "missed": "Khách để lại lời nhắn ở tiệm chú Sáu, hẹn tuần sau ghé lại.",
+  "variants": [
+   {
+    "when": {
+     "flag.quatTot": true
+    },
+    "who": "Cô bán trái cây",
+    "text": "Cô bán trái cây ghé tiệm, cười: cái quạt chạy êm cả tuần. Cô dắt theo bà hàng xóm có cái nồi cơm điện không chịu nấu chín.",
     "choices": [
-      { "label": "Đồng ý 300 nghìn", "effects": { "money": -300000, "money_label": "Xe ôm từ bến xe" } },
-      { "label": "Mặc cả", "hint": "Còn 120 nghìn", "require": { "skill.giaoTiep": 1 },
-        "effects": { "money": -120000, "money_label": "Xe ôm, sau khi mặc cả" } },
-      { "label": "Gọi Tuấn ra đón", "hint": "Chờ 2 giờ, không mất tiền",
-        "effects": { "hours": 2, "rep.tuan": 10, "log": "Tuấn tới bằng một chiếc tay ga mới cứng. Phụ hồ mà đi xe này sao?" } }
+     {
+      "label": "Kiểm tra nồi cơm, báo phí trước rồi mới sửa",
+      "hint": "Mất 2 giờ, +150.000đ. Có khách giới thiệu",
+      "effects": {
+       "hours": 2,
+       "fatigue": 5,
+       "cash": 150000,
+       "cash_label": "Sửa nồi cơm cho khách quen giới thiệu",
+       "rep.SAU": 3,
+       "flag.khachGioiThieu": true,
+       "diary": "Cô bán trái cây dắt khách tới. Sửa cái nồi cơm, báo phí trước. Bà cụ ôm nồi về như ôm được bữa tối."
+      }
+     },
+     {
+      "label": "Hẹn giờ khác vì đang kẹt việc",
+      "hint": "Sinh ra lời hứa sửa nồi cơm trước ngày 16",
+      "effects": {
+       "promise": {
+        "id": "sua_lai_do",
+        "text": "Sửa nồi cơm cho khách cô bán trái cây giới thiệu",
+        "to": "SAU",
+        "due": 16
+       },
+       "diary": "Hẹn khách giờ khác vì kẹt việc. Cô bán trái cây nói \"không sao\", mà vẫn ghi lại tên mình."
+      }
+     },
+     {
+      "label": "Giới thiệu cho chú Sáu làm",
+      "hint": "Chú Sáu +4",
+      "effects": {
+       "rep.SAU": 4,
+       "diary": "Giới thiệu khách cho chú Sáu, mình phụ đưa đồ. Có những việc không cần tên mình mới làm được."
+      }
+     }
     ]
+   },
+   {
+    "when": {
+     "flag.quatTre": true
+    },
+    "who": "Cô bán trái cây",
+    "text": "Cô bán trái cây mang cái quạt quay lại: nó chạy được hai bữa rồi lại ù ù. Bữa đó trả trễ, giờ lại hư. Cô cần một câu trả lời rõ."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Kiểm tra lại theo điều đã hẹn, nhận phần trách nhiệm của mình",
+    "hint": "Mất 2 giờ, −80.000đ linh kiện bảo hành",
+    "effects": {
+     "hours": 2,
+     "fatigue": 4,
+     "cash": -80000,
+     "cash_label": "Linh kiện bảo hành",
+     "rep.SAU": 4,
+     "flag.baoHanhRo": true,
+     "diary": "Quay lại coi món đồ bảo hành, chịu tiền linh kiện, không đổ cho ai. Người ta cần một câu trả lời rõ, và mình đưa được."
+    }
+   },
+   {
+    "label": "Hẹn giờ khác, cho mượn quạt khác dùng tạm",
+    "hint": "Sinh ra lời hứa sửa lại trước ngày 16",
+    "effects": {
+     "promise": {
+      "id": "sua_lai_do",
+      "text": "Sửa lại món đồ khách mang tới bảo hành",
+      "to": "SAU",
+      "due": 16
+     },
+     "diary": "Hẹn khách giờ khác, cho mượn đồ dùng tạm. Thêm một dòng hứa trong sổ, hạn ngày 16."
+    }
+   },
+   {
+    "label": "Gạt đi vì việc lớn đang quan trọng hơn",
+    "hint": "Khách phải tìm người khác. Chú Sáu nghe hết",
+    "effects": {
+     "rep.SAU": -6,
+     "flag.gatKhach": true,
+     "diary": "Gạt khách bảo hành đi vì việc lớn. Chú Sáu nghe hết, rồi quay lưng lau bàn."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay14",
+  "day": 14,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "title": "Mái bạt trước cơn mưa",
+  "who": "Cô Duyên",
+  "text": "Dự báo: chiều mai mưa lớn sớm. Cô Duyên kê gạch dưới mấy thùng đồ. Chị Hạnh đang buộc lại mép bạt, còn anh Phúc nhắn hỏi làm nhanh thêm chút trước mưa được không.\nMột người không làm hết mọi việc trong một buổi.",
+  "quote": "Bà Tư: \"Mưa đâu có biết mình mới lãnh tiền hay chưa. Thấy mây vậy thì cất đồ trước con.\"",
+  "missed": "Linh tự che phần đồ của em và của bà. Em không biết chỗ An để vật tư nên để nguyên.",
+  "missed_effects": {
+   "flag.linhCheDo": true
   },
-  {
-    "id": "phong_tro", "day": 1,
-    "title": "Tìm phòng trọ",
-    "text": "Trong con hẻm ở Bình Thạnh còn hai chỗ trống. Tiền trọ trả một lần cho cả tháng.",
+  "choices": [
+   {
+    "label": "Lo đồ của nhà trước, đổi công nhờ hàng xóm phụ phần chung",
+    "hint": "Mất 2 giờ, −80.000đ bạt che. Giấy tờ, đồ của bà an toàn",
+    "require": {
+     "cash_min": 80000
+    },
+    "effects": {
+     "hours": 2,
+     "fatigue": 4,
+     "cash": -80000,
+     "cash_label": "Bạt che đồ",
+     "flag.chuanBiNha": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Che đồ của bà trước mưa"
+     },
+     "diary": "Lo đồ nhà trước: bọc giấy tờ, kê cao đồ của bà, đổi công với nhà bên. Bà đưa cái túi ni lông đựng ảnh, dặn để trên cùng."
+    }
+   },
+   {
+    "label": "Lập lịch chia việc cho cả xóm, tự làm một phần, nhắc từng người xác nhận",
+    "hint": "Mất 3 giờ. Ngày mai cả nhóm ứng phó nhanh hơn",
+    "effects": {
+     "hours": 3,
+     "fatigue": 5,
+     "rep.DUYEN": 5,
+     "rep.HANH": 3,
+     "flag.chiaViec14": true,
+     "flag.chuanBiNha": true,
+     "diary": "Lập lịch chia việc cho cả xóm. Ai cũng gật, có người còn xin thêm việc. Cô Duyên cười lần đầu trong tuần."
+    }
+   },
+   {
+    "label": "Làm thêm ca vì cần tiền, bỏ khâu chuẩn bị",
+    "hint": "Không tốn giờ ở đây. Đồ nào dễ ướt vẫn để nguyên",
+    "effects": {
+     "flag.boChuanBi": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "time_lost",
+      "text": "Bỏ việc che đồ để đi làm thêm"
+     },
+     "diary": "Bỏ khâu chuẩn bị, đi làm thêm ca. Mây kéo đen phía rạch. Tự nhủ chắc chưa mưa đâu."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay15_bc",
+  "day": 15,
+  "mode": "full",
+  "when": {
+   "route": [
+    "B",
+    "C"
+   ]
+  },
+  "eyebrow": "Ngày 15 · mưa sớm · tốn nhiều giờ",
+  "title": "Mưa qua mái tôn",
+  "who": "Trâm",
+  "text": "Cơn mưa tới sớm hơn dự báo, cả xóm chạy gom đồ. Ở Bến Cạn, một quán muốn mở bán dù phần việc còn dở.\nĐồ nhà đã che từ hôm qua thì yên; chưa che thì có thùng sẽ ướt.",
+  "quote": "Trâm: \"Khách có thể bực. Nhưng họ phải biết hôm nay dùng được phần nào.\"",
+  "choices": [
+   {
+    "label": "Giữ phần chưa đạt ở trạng thái chưa bàn giao, cùng Trâm báo lại khách",
+    "hint": "Mất 4 giờ. Quán mất một buổi bán, An không nhận trách nhiệm cho việc chưa xong",
+    "effects": {
+     "hours": 4,
+     "fatigue": 6,
+     "rep.TRAM": 6,
+     "rep.PHUC": -2,
+     "flag.giuChuaBanGiao": true,
+     "diary": "Giữ phần chưa đạt ở trạng thái chưa bàn giao, đứng cạnh Trâm báo khách. Quán mất một buổi bán. Không ai bị điện giật vì mình vội."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.linhCheDo": false
+      },
+      "effects": {
+       "cash": -120000,
+       "cash_label": "Đồ ướt phải hong, mua lại bao bì",
+       "log": "Mấy thùng đồ chưa che bị ướt một góc. Giấy tờ của bà còn khô vì để trên kệ cao."
+      }
+     }
+    ]
+   },
+   {
+    "label": "Giao người đã xác nhận trông phần việc, về phụ nhà gom đồ",
+    "hint": "−150.000đ công trông. Cả nhà và khách đều được lo",
+    "require": {
+     "flag_any": [
+      "chiaViec14",
+      "xacNhanTungQuan"
+     ]
+    },
+    "effects": {
+     "hours": 3,
+     "fatigue": 4,
+     "cash": -150000,
+     "cash_label": "Công người trông phần việc trong mưa",
+     "rep.BA_TU": 4,
+     "rep.TRAM": 2,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Về phụ nhà gom đồ trong mưa"
+     },
+     "diary": "Nhờ người đã nhận trông Bến Cạn, chạy về gom đồ với bà. Tốn trăm rưỡi. Bà nắm tay mình lúc mưa dội mái tôn."
+    }
+   },
+   {
+    "label": "Cố giữ cả hai đầu, không báo bên nào mình đang ở đâu",
+    "hint": "Mất 6 giờ, Mệt +15. Một nơi phải tự xử lý",
+    "effects": {
+     "hours": 6,
+     "fatigue": 15,
+     "rep.TRAM": -5,
+     "rep.BA_TU": -3,
+     "flag.giuCaHaiDau": true,
+     "diary": "Chạy giữa hai đầu, không báo ai. Về tới nhà thì Linh đã gom xong. Tới Bến Cạn thì Trâm đã tự xử. Chỗ nào cũng không cần mình nữa."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.linhCheDo": false
+      },
+      "effects": {
+       "cash": -120000,
+       "cash_label": "Đồ ướt phải hong, mua lại bao bì",
+       "log": "Mấy thùng đồ chưa che bị ướt một góc. Giấy tờ của bà còn khô vì để trên kệ cao."
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ngay15_a",
+  "day": 15,
+  "mode": "full",
+  "when": {
+   "route": "A"
+  },
+  "eyebrow": "Ngày 15 · mưa sớm · tốn nhiều giờ",
+  "title": "Mưa qua mái tôn",
+  "who": "Quản lý kho",
+  "text": "Cơn mưa tới sớm hơn dự báo. Quản lý kho gọi: cần thêm người ca chiều chuyển hàng vào trong, trả 200.000đ. Ở nhà, cả xóm đang chạy gom đồ; ở tiệm chú Sáu còn mấy món đồ khách gửi sát cửa.",
+  "quote": "Bà Tư: \"Đồ nào ướt thì phơi lại được. Người ướt thì đừng có ráng.\"",
+  "choices": [
+   {
+    "label": "Nhận ca tăng thêm, nhờ Linh và cô Duyên lo đồ nhà",
+    "hint": "+200.000đ, mất 5 giờ, Mệt +14",
+    "effects": {
+     "hours": 5,
+     "fatigue": 14,
+     "cash": 200000,
+     "cash_label": "Ca tăng thêm ngày mưa",
+     "family": {
+      "who": "BA_TU",
+      "kind": "time_lost",
+      "text": "Đi làm thêm ca giữa trận mưa"
+     },
+     "diary": "Nhận ca tăng ngày mưa, nhờ Linh với cô Duyên lo đồ nhà. Hai trăm nghìn ướt sũng trong túi áo."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.linhCheDo": false
+      },
+      "effects": {
+       "cash": -120000,
+       "cash_label": "Đồ ướt phải hong, mua lại bao bì",
+       "log": "Mấy thùng đồ chưa che bị ướt một góc. Giấy tờ của bà còn khô vì để trên kệ cao."
+      }
+     }
+    ]
+   },
+   {
+    "label": "Về nhà gom đồ, báo kho là không nhận ca",
+    "hint": "Mất 3 giờ. Bà yên tâm",
+    "effects": {
+     "hours": 3,
+     "fatigue": 4,
+     "rep.BA_TU": 4,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Về nhà gom đồ cùng bà trong mưa"
+     },
+     "diary": "Về nhà gom đồ, báo kho không nhận ca. Bà không nói gì, chỉ đưa cái khăn khô."
+    }
+   },
+   {
+    "label": "Giữ đồ khách gửi ở tiệm chú Sáu khỏi ướt, rồi mới về nhà",
+    "hint": "Mất 4 giờ. Chú Sáu +5",
+    "effects": {
+     "hours": 4,
+     "fatigue": 6,
+     "rep.SAU": 5,
+     "diary": "Kê cao đồ khách gửi ở tiệm chú Sáu rồi mới về nhà. Chú Sáu đứng dưới mái hiên, gật một cái."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.linhCheDo": false
+      },
+      "effects": {
+       "cash": -120000,
+       "cash_label": "Đồ ướt phải hong, mua lại bao bì",
+       "log": "Mấy thùng đồ chưa che bị ướt một góc. Giấy tờ của bà còn khô vì để trên kệ cao."
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ngay16",
+  "day": 16,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "window": [
+   16,
+   22
+  ],
+  "title": "Một bữa không mở sổ",
+  "who": "Bà Tư",
+  "text": "Sau mưa, An ăn cơm mà mắt cứ dán vào điện thoại. Bà hỏi một chuyện nhỏ về cái kệ, anh gắt lên, rồi nhận ra mình không nghe câu bà hỏi.",
+  "variants": [
+   {
+    "when": {
+     "fatigue_max": 45
+    },
+    "text": "Bữa cơm sau mưa. Mấy hôm nay An ngủ đủ, đầu óc nhẹ hơn. Bà hỏi chuyện cái kệ, An nghe hết rồi mới trả lời. Còn hai tuần, nên lập lịch làm và nghỉ cho bền."
+   }
+  ],
+  "quote": "Bà Tư: \"Bà hỏi cái kệ thôi. Con đang giận cái kệ hay đang mệt?\"",
+  "missed": "Bà Tư để phần cơm trong lồng bàn, kèm mảnh giấy: \"Ăn rồi ngủ.\"",
+  "choices": [
+   {
+    "label": "Nghỉ tối nay, nói rõ việc nào đang quá sức",
+    "hint": "Mất 2 giờ. Mệt −20, cả nhà biết để phụ",
+    "effects": {
+     "hours": 2,
+     "fatigue": -20,
+     "rested": true,
+     "rep.BA_TU": 5,
+     "flag.noiQuaTai": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Nói với bà mình đang quá tải, nghỉ một tối"
+     },
+     "diary": "Nghỉ tối nay. Nói với bà là mấy bữa nay quá sức. Bà hỏi lại chuyện cái kệ, lần này mình nghe hết."
+    }
+   },
+   {
+    "label": "Giữ ca đã nhận nhưng bỏ việc thêm, hẹn tối mai nghỉ",
+    "hint": "Mệt −8",
+    "effects": {
+     "fatigue": -8,
+     "rested": true,
+     "rep.TRAM": 2,
+     "flag.coLichNghi": true,
+     "diary": "Giữ ca đã nhận, bỏ việc thêm, hẹn tối mai nghỉ thật. Viết chữ NGHỈ to trong sổ để khỏi quên."
+    }
+   },
+   {
+    "label": "Nói mình ổn và làm tiếp cả đêm",
+    "hint": "+180.000đ sửa đồ đêm, mất 2 giờ, Mệt +18",
+    "effects": {
+     "hours": 2,
+     "fatigue": 18,
+     "cash": 180000,
+     "cash_label": "Sửa đồ thâu đêm",
+     "family": {
+      "who": "BA_TU",
+      "kind": "time_lost",
+      "text": "Gắt với bà rồi làm tiếp cả đêm"
+     },
+     "diary": "Nói mình ổn rồi sửa đồ tới gần sáng. Thêm 180 nghìn. Không nhớ bà hỏi gì về cái kệ."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay17",
+  "day": 17,
+  "mode": "full",
+  "title": "Khoản tiền hẹn hôm nay",
+  "who": "Tiệm cũ (tin nhắn)",
+  "text": "Tiệm cũ nhắn: đợt 1.800.000đ hôm nay sẽ chuyển trong ngày, như đã hẹn từ ngày 4. Phần còn lại hẹn ngày 24.",
+  "quote": "Đồng nghiệp cũ: \"Có nhận được thì nhắn tao biết. Tao hỏi để mừng, không phải hỏi mượn.\"",
+  "variants": [
+   {
+    "when": {
+     "flag.luongKhep": true
+    },
+    "title": "Một tin nhắn từ đồng nghiệp cũ",
+    "who": "Đồng nghiệp cũ",
+    "text": "Khoản lương đã khép từ ngày 4. Đồng nghiệp cũ nhắn hỏi An có chỗ nhận sửa đồ hay cần người phụ không.",
     "choices": [
-      { "label": "{room_ghep}: {rent_ghep}", "hint": "Rẻ hơn, nhưng Tinh thần giảm nhanh và dễ mất đồ",
-        "require": { "afford_room": "ghep" }, "effects": { "room": "ghep" } },
-      { "label": "{room_rieng}: {rent_rieng}", "hint": "Mở tuyến cô Sáu và bé Bin",
-        "require": { "afford_room": "rieng" }, "effects": { "room": "rieng", "rep.coSau": 10 } }
+     {
+      "label": "Giới thiệu tới chú Sáu, nói rõ chỉ là giới thiệu",
+      "hint": "Không lấy phí giới thiệu. Chú Sáu +2",
+      "effects": {
+       "rep.SAU": 2,
+       "diary": "Đồng nghiệp cũ hỏi chỗ làm. Giới thiệu qua chú Sáu, nói rõ chỉ giới thiệu. Mình cũng từng cần một câu giới thiệu như vậy."
+      }
+     },
+     {
+      "label": "Nói thật là mình chưa có chỗ",
+      "effects": {
+       "log": "Đồng nghiệp cũ: \"Ừ, có gì nhắn tao.\"",
+       "diary": "Nói thật với đồng nghiệp cũ là mình chưa có chỗ. Nó nói \"có gì nhắn tao\". Nhẹ hơn mình tưởng."
+      }
+     }
     ]
-  },
-  {
-    "id": "chu_bay", "day": 3,
-    "title": "Tiệm chú Bảy đầu hẻm", "who": "Chú Bảy",
-    "text": "Một chiếc máy lạnh đang kêu rè rè. Chú Bảy cau mày, tháo ra lắp vào mãi không xong.",
+   },
+   {
+    "when": {
+     "flag.luongChuaChot": true
+    },
+    "text": "Tiệm cũ nhắn: tuần này gom được một nửa. An chưa chốt lịch từ hôm ngày 4.",
     "choices": [
-      { "label": "Ghé vào góp ý", "hint": "Chú Bảy +20", "require": { "skill.tayNghe": 1 },
-        "effects": { "rep.chuBay": 20, "log": "Minh chỉ đúng bệnh cái tụ điện. Chú Bảy nhìn Minh lâu hơn bình thường." } },
-      { "label": "Hỏi thăm vài câu", "hint": "Chú Bảy +5", "effects": { "rep.chuBay": 5 } },
-      { "label": "Đi tiếp" }
+     {
+      "label": "Đến tận nơi trao đổi, chốt lịch thực tế",
+      "hint": "Mất 3 giờ. Nhận 1.800.000đ ngay, phần còn lại hẹn ngày 24",
+      "effects": {
+       "hours": 3,
+       "fatigue": 4,
+       "receivable_remove": "luong_cu",
+       "cash": 1800000,
+       "cash_label": "Lương cũ đợt 1",
+       "receivables": [
+        {
+         "id": "luong_cu_2",
+         "from": "Tiệm cũ",
+         "label": "Lương cũ đợt 2",
+         "amount": 1800000,
+         "due": 24
+        }
+       ],
+       "diary": "Tới tận tiệm cũ, chốt lịch thật. Nhận 1,8 triệu, phần còn lại ngày 24. Mớ giấy tờ gom bữa trước không phí công."
+      }
+     },
+     {
+      "label": "Đồng ý nhận qua chuyển khoản theo hai mốc",
+      "hint": "1.800.000đ về ngày 19, phần còn lại ngày 24",
+      "effects": {
+       "receivable_remove": "luong_cu",
+       "receivables": [
+        {
+         "id": "luong_cu_1",
+         "from": "Tiệm cũ",
+         "label": "Lương cũ đợt 1",
+         "amount": 1800000,
+         "due": 19
+        },
+        {
+         "id": "luong_cu_2",
+         "from": "Tiệm cũ",
+         "label": "Lương cũ đợt 2",
+         "amount": 1800000,
+         "due": 24
+        }
+       ],
+       "diary": "Đồng ý nhận chuyển khoản hai mốc, ngày 19 và 24. Ghi vô sổ, gạch chân."
+      }
+     },
+     {
+      "label": "Nhờ đồng nghiệp cũ hỏi giùm",
+      "hint": "Giữ được ca làm. Tiền về chậm: 1,8tr ngày 24, 1,8tr sau ngày 30",
+      "effects": {
+       "receivable_remove": "luong_cu",
+       "receivables": [
+        {
+         "id": "luong_cu_1",
+         "from": "Tiệm cũ",
+         "label": "Lương cũ đợt 1",
+         "amount": 1800000,
+         "due": 24
+        },
+        {
+         "id": "luong_cu_2",
+         "from": "Tiệm cũ",
+         "label": "Lương cũ đợt 2",
+         "amount": 1800000,
+         "due": 31
+        }
+       ],
+       "diary": "Nhờ đồng nghiệp cũ hỏi giùm. Tiền về chậm hơn. Giữ được ca làm, mất bớt tuần cuối."
+      }
+     }
     ]
+   }
+  ],
+  "choices": [
+   {
+    "label": "Xác nhận khoản đã nhận và hạn ngày 24 của phần còn lại",
+    "hint": "Nhận 1.800.000đ ngay",
+    "effects": {
+     "collect": "luong_cu_1",
+     "diary": "Đợt lương đầu về, 1,8 triệu. Nhắn đồng nghiệp cũ: \"Nhận rồi.\" Nó gửi lại cái mặt cười, không hỏi mượn."
+    }
+   },
+   {
+    "label": "Đến tận nơi nhận, nói chuyện với chủ tiệm",
+    "hint": "Mất 3 giờ. Nhận 1.800.000đ ngay",
+    "effects": {
+     "hours": 3,
+     "fatigue": 3,
+     "collect": "luong_cu_1",
+     "flag.gapChuTiem": true,
+     "diary": "Tới tận tiệm cũ nhận tiền. Chủ tiệm già đi nhiều. Hai bên bắt tay, không ai nhắc chuyện cũ."
+    }
+   },
+   {
+    "label": "Nhờ người quen hỏi giùm, chờ tin",
+    "hint": "Tiền về tối nay theo lịch",
+    "effects": {
+     "diary": "Nhờ người quen hỏi giùm, chờ tin. Tối điện thoại rung một cái là giật mình."
+    }
+   }
+  ]
+ },
+ {
+  "id": "lat_cat_mo",
+  "day": 18,
+  "eyebrow": "Lát cắt ngày 18–22",
+  "title": "Mười hai ngày trước khi trả chìa khóa",
+  "text": "Đã là ngày 18. Ngày 26 phải chốt chỗ ở, ngày 30 trả chìa khóa phòng cũ cho cô Duyên.\nAn đang đi theo đường làm công: ca kho, ca phụ quán, sửa đồ lẻ. Tiền về ngay, nhưng mỗi ca là một ngày sức.",
+  "variants": [
+   {
+    "when": {
+     "route": "B"
+    },
+    "text": "Đã là ngày 18. Ngày 26 phải chốt chỗ ở, ngày 30 trả chìa khóa phòng cũ cho cô Duyên.\nAn nhận hợp đồng Bến Cạn cùng tổ: Trâm, Minh, chú Sáu. Đợt giữa {hd_giua} chỉ về khi nghiệm thu, cần thêm {need_left} buổi làm trước tối ngày 20. Đợt cuối về ngày 32, sau ngày trả phòng."
+   },
+   {
+    "when": {
+     "route": "C"
+    },
+    "text": "Đã là ngày 18. Ngày 26 phải chốt chỗ ở, ngày 30 trả chìa khóa phòng cũ cho cô Duyên.\nAn tự điều phối hợp đồng Bến Cạn, tự ứng vật tư. Đợt giữa {hd_giua} chỉ về khi nghiệm thu, cần thêm {need_left} buổi làm trước tối ngày 20. Đợt cuối về ngày 32, sau ngày trả phòng."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Bắt đầu ngày 18"
+   }
+  ],
+  "mode": "slice"
+ },
+ {
+  "id": "ngay18_bc",
+  "day": 18,
+  "when": {
+   "route": [
+    "B",
+    "C"
+   ]
   },
-  {
-    "id": "be_bin", "day": 5, "when": { "room": "rieng" },
-    "title": "Bé Bin rớt bài kiểm tra", "who": "Cô Sáu",
-    "text": "Cô Sáu đứng giữa sân mắng con: \"Có mấy bài Toán mà cũng không làm được!\"",
-    "choices": [
-      { "label": "Đề nghị kèm Toán một buổi, không lấy tiền", "hint": "Mất 2 giờ, cô Sáu +20",
-        "require": { "hours_left": 2 },
-        "effects": { "hours": 2, "rep.coSau": 20, "log": "Bé Bin làm được bài. Cô Sáu bớt nghi ngờ cậu thanh niên mới tới." },
-        "bonus": [ { "when": { "flag.sach": true }, "effects": { "rep.coSau": 10 } } ] },
-      { "label": "Không xen vào" }
-    ]
+  "title": "Một chút của năm quán",
+  "who": "Anh Phúc",
+  "text": "Mỗi chủ quán ở Bến Cạn xin thêm \"một việc nhỏ\": thay cái công tắc, kéo thêm ổ cắm, coi lại bóng đèn. Cộng lại thành cả ngày.\n\"Anh tưởng thêm có chút.\"",
+  "quote": "An: \"Dạ. Nhưng mỗi quán thêm chút là hết buổi chiều của cả nhóm.\"",
+  "choices": [
+   {
+    "label": "Báo phần phát sinh kèm giá và lịch riêng, để khách tự quyết",
+    "hint": "Có quán đồng ý, có quán bỏ bớt. +600.000đ phải thu ngày 32",
+    "effects": {
+     "receivable": {
+      "id": "phat_sinh",
+      "from": "Bến Cạn",
+      "label": "Phần phát sinh đã báo giá",
+      "amount": 600000,
+      "due": 32
+     },
+     "rep.PHUC": 2,
+     "rep.TRAM": 3,
+     "flag.baoGia": true,
+     "diary": "Báo giá phần phát sinh, để từng quán tự quyết. Có quán gật, có quán bỏ. Anh Phúc nói: \"Vậy anh dễ ăn nói với mấy bả.\""
+    }
+   },
+   {
+    "label": "Làm miễn phí một việc nhỏ, ghi rõ chỉ lần này",
+    "hint": "Mất 3 giờ, Mệt +8. Anh Phúc giúp chặn các yêu cầu khác",
+    "require": {
+     "hours_left": 3
+    },
+    "effects": {
+     "hours": 3,
+     "fatigue": 8,
+     "rep.PHUC": 6,
+     "flag.tangMotLan": true,
+     "diary": "Làm miễn phí một việc nhỏ, ghi rõ chỉ lần này. Anh Phúc tự đi chặn mấy yêu cầu còn lại giùm."
+    }
+   },
+   {
+    "label": "Nhận tất cả miễn phí để giữ tiếng dễ thương",
+    "hint": "Cần thêm 1 buổi làm trước nghiệm thu. Trâm và Minh phải làm thêm không công",
+    "effects": {
+     "progress_need": 1,
+     "rep.PHUC": 8,
+     "rep.TRAM": -10,
+     "rep.MINH": -5,
+     "promise": {
+      "id": "lam_them_mien_phi",
+      "text": "Làm thêm việc nhỏ miễn phí cho năm quán",
+      "to": "PHUC",
+      "due": 20,
+      "doneIf": "progress_ready"
+     },
+     "family": {
+      "who": "BA_TU",
+      "kind": "time_lost",
+      "text": "Bớt giờ ở nhà để làm thêm không công"
+     },
+     "diary": "Nhận hết miễn phí để giữ tiếng dễ thương. Trâm với Minh không nói gì. Cái im lặng đó mắc hơn tiền."
+    }
+   }
+  ],
+  "loc": "ben_can",
+  "missed": "Phạm vi cũ giữ nguyên. Các quán chưa được tự thêm việc chỉ vì An chưa tới."
+ },
+ {
+  "id": "ngay18_a",
+  "day": 18,
+  "when": {
+   "route": "A"
   },
-  {
-    "id": "lan_goi", "day": 7,
-    "title": "Cuộc gọi của Lan", "who": "Lan",
-    "text": "\"Anh Hai… thôi em không học nữa cũng được. Em đi làm công nhân phụ anh.\"",
-    "choices": [
-      { "label": "\"Không được! Em phải học.\"", "hint": "Tinh thần −10, Tinh thần tối đa +10", "effects": { "mood_max": 10, "mood": -10 } },
-      { "label": "\"Để anh tính…\"", "hint": "Lan đi làm thêm", "effects": { "flag.lanLamThem": true } }
-    ]
+  "title": "Một chút ngoài phiếu",
+  "who": "Khách sửa nồi cơm",
+  "text": "Khách mang nồi cơm tới bàn chú Sáu, xong lại lấy thêm cái quạt, cái ấm siêu tốc: \"Tiện tay coi giùm luôn em.\" Mấy món đó không có trong phiếu đã ghi.",
+  "quote": "Chú Sáu: \"Tiện tay của khách là nguyên buổi của mình đó con.\"",
+  "choices": [
+   {
+    "label": "Báo giá phần thêm, để khách tự quyết",
+    "hint": "Khách đồng ý một món. +150.000đ phải thu ngày 21",
+    "effects": {
+     "receivable": {
+      "id": "phat_sinh_le",
+      "from": "Khách lẻ",
+      "label": "Phần sửa thêm đã báo giá",
+      "amount": 150000,
+      "due": 21
+     },
+     "rep.SAU": 2,
+     "flag.baoGia": true,
+     "diary": "Báo giá món thêm, khách tự chọn một món. Ghi vô phiếu, có chữ ký."
+    }
+   },
+   {
+    "label": "Coi giùm miễn phí một món, nói rõ chỉ lần này",
+    "hint": "Mất 2 giờ, Mệt +5",
+    "require": {
+     "hours_left": 2
+    },
+    "effects": {
+     "hours": 2,
+     "fatigue": 5,
+     "rep.SAU": 3,
+     "flag.tangMotLan": true,
+     "diary": "Coi giùm miễn phí một món, nói rõ chỉ lần này. Khách cảm ơn ba lần."
+    }
+   },
+   {
+    "label": "Nhận sửa hết, không lấy thêm tiền",
+    "hint": "Mất 5 giờ, Mệt +12. Bàn của chú Sáu bị chiếm cả buổi",
+    "require": {
+     "hours_left": 5
+    },
+    "effects": {
+     "hours": 5,
+     "fatigue": 12,
+     "rep.SAU": -3,
+     "family": {
+      "who": "BA_TU",
+      "kind": "time_lost",
+      "text": "Về trễ vì sửa không công"
+     },
+     "diary": "Nhận sửa hết, không lấy thêm. Bàn chú Sáu bị chiếm cả buổi. Chú ngồi uống trà ngoài cửa, không vô."
+    }
+   }
+  ],
+  "loc": "tiem_sau",
+  "missed": "Khách để lại mấy món đồ ở tiệm, chờ An báo giá."
+ },
+ {
+  "id": "ngay19",
+  "day": 19,
+  "title": "Cái tên trên phiếu thực tập",
+  "who": "Linh",
+  "text": "Linh nhờ An xem hồ sơ và xin nửa buổi tới cơ sở thực tập làm thử. Em muốn được đánh giá bằng việc mình làm, không phải mang danh \"em của anh An\".",
+  "quote": "Linh: \"Em muốn người ta biết em làm được gì trước khi biết anh quen ai.\"",
+  "choices": [
+   {
+    "label": "Đọc hồ sơ theo đề nghị, hỏi Linh muốn góp ý phần nào, đi cùng em",
+    "hint": "Mất 3 giờ. Linh tự trao đổi với cơ sở",
+    "require": {
+     "hours_left": 3
+    },
+    "effects": {
+     "hours": 3,
+     "fatigue": 3,
+     "respect": 2,
+     "rep.LINH": 5,
+     "flag.diCungLinh": true,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Đọc hồ sơ theo đề nghị của Linh, đi cùng em"
+     },
+     "diary": "Đi cùng Linh tới cơ sở thực tập, đứng ngoài chờ. Linh tự nói chuyện với thầy. Lần đầu thấy em mình nói chuyện như một người thợ."
+    }
+   },
+   {
+    "label": "Báo trước là không đi được, giúp em tra tuyến xe và chi phí",
+    "hint": "Mất 1 giờ. Giữ được ca làm, Linh đi với bạn",
+    "effects": {
+     "hours": 1,
+     "respect": 1,
+     "rep.LINH": 2,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Giúp Linh tra tuyến xe và chi phí"
+     },
+     "diary": "Báo trước không đi được, tra giùm Linh tuyến xe với giá vé. Linh đi với bạn, tối về kể không dứt."
+    }
+   },
+   {
+    "label": "Gọi trước nhờ người quen \"lo giùm\", dù Linh chưa đồng ý",
+    "hint": "Linh khó chịu vì bị nói thay",
+    "effects": {
+     "respect": -2,
+     "rep.LINH": -8,
+     "flag.noiThayLinh": true,
+     "family": {
+      "who": "LINH",
+      "kind": "pressure",
+      "text": "Nhờ người quen lo hồ sơ thay khi Linh chưa đồng ý"
+     },
+     "diary": "Gọi người quen lo giùm cho Linh. Linh biết. \"Anh có hỏi em muốn vậy không?\" Không trả lời được."
+    }
+   }
+  ],
+  "loc": "xom_bo_me",
+  "missed": "Linh tự nộp hồ sơ. Em nhắn: \"Em nộp rồi nha.\""
+ },
+ {
+  "id": "ngay20_bc",
+  "day": 20,
+  "when": {
+   "route": [
+    "B",
+    "C"
+   ]
   },
-  {
-    "id": "quyt_luong", "day": 8,
-    "title": "Chủ thầu bỏ trốn", "who": "Tuấn",
-    "text": "Nghe nói chủ thầu công trình đã bỏ trốn, quỵt lương anh em. May mà Minh không dính.",
-    "quote": "\"Ở đây vậy đó mày. Muốn có tiền thì phải biết đường.\"",
-    "variants": [
-      { "when": { "held_min": 1 },
-        "text": "Sáng ra công trình, chủ thầu đã biến mất. Minh mất {held} tiền công các ngày 5 đến 7.",
-        "choices": [ { "label": "Tiếp tục", "effects": { "special": "lose_held_wages" } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục" } ]
+  "title": "Lãi trên giấy",
+  "who": "Trâm",
+  "text": "Đến mốc giữa kỳ. Trên bảng, hợp đồng vẫn có lời, nhưng khoản cuối chỉ về ngày 32. Một chủ quán xin lùi phần đóng tiền. Hạn chốt chỗ ở là ngày 26.\nTiến độ: {progress}/{need} buổi. Tiền mặt dự kiến ngày 26: {proj26}.",
+  "quote": "Trâm: \"Việc có lời, nhưng tiền chưa về kịp. Em định lấy tiền nào trả phần còn lại, và người có tiền đó đã đồng ý chưa?\"",
+  "choices": [
+   {
+    "label": "Nhận tiền phần đã nghiệm thu, thu hẹp phần chưa chắc được trả",
+    "hint": "Nhận ngay phần đợt giữa tương ứng tiến độ. Đợt cuối còn 1.000.000đ, công đội giảm 400.000đ",
+    "effects": {
+     "special": "narrow_contract",
+     "rep.PHUC": -3,
+     "rep.TRAM": 3,
+     "diary": "Nhận tiền phần đã nghiệm thu, thu hẹp phần chưa chắc. Lời ít hơn trên giấy, mà tiền thật về tay."
+    }
+   },
+   {
+    "label": "Tiếp tục theo mốc đã xác nhận, chuẩn bị phương án ở tạm nếu thiếu",
+    "hint": "Khoản phải thu không đổi. Ghi kế hoạch dự phòng nhà dì Năm",
+    "effects": {
+     "flag.duPhongNhaTam": true,
+     "rep.TRAM": 2,
+     "diary": "Giữ theo mốc đã ký, ghi kế hoạch dự phòng nhà dì Năm. Có đường lui rồi mới dám bước tới."
+    }
+   },
+   {
+    "label": "Tính cả tiền chưa nhận để hứa đặt cọc Hẻm Dừa ngay",
+    "hint": "Cảnh báo: tiền thật chưa đủ. Sinh ra một lời hứa có rủi ro, ngày 25 phải nói lại",
+    "effects": {
+     "flag.huaBangTienChuaVe": true,
+     "rep.TRAM": -5,
+     "promise": {
+      "id": "dat_coc_hem_dua",
+      "text": "Đặt cọc Hẻm Dừa bằng tiền chưa về",
+      "to": "LINH",
+      "due": 26
+     },
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Hứa đặt phòng bằng tiền hợp đồng chưa về"
+     },
+     "diary": "Hứa đặt cọc Hẻm Dừa bằng tiền chưa về. Trâm nhìn mình rất lâu. Ngày 25 phải nói lại cho đúng."
+    }
+   }
+  ],
+  "loc": "ben_can",
+  "missed": "Phần đã nghiệm thu vẫn phải thu. Trâm nhắn nhắc trước khi chi tiếp cho giai đoạn sau."
+ },
+ {
+  "id": "ngay20_a",
+  "day": 20,
+  "when": {
+   "route": "A"
   },
-  {
-    "id": "loi_re", "day": 11,
-    "title": "Lối rẽ",
-    "text": "Chú Bảy: \"Muốn học nghề thì sáng mai ra đây. Tháng đầu không lương à nghen.\"\nVy ở quán cà phê: \"Bạn nói chuyện dễ thương mà, sao không xin vô đây làm?\"\nMột tờ rơi dán ở cột điện: lớp tiếng Anh buổi tối ở nhà văn hóa phường.\n\nCác lớp học đã mở.",
-    "choices": [ { "label": "Tiếp tục", "effects": { "rep.vy": 10 } } ]
-  },
-  {
-    "id": "vi_ong_tu", "day": 13,
-    "title": "Cái ví rơi trong hẻm",
-    "text": "Minh nhặt được một cái ví sờn. Bên trong có 2 triệu đồng và giấy tờ của một ông lão.",
-    "choices": [
-      { "label": "Giữ lại", "hint": "+2.000.000đ, cô Sáu và chú Bảy −10",
-        "effects": { "money": 2000000, "money_label": "Tiền trong ví nhặt được", "rep.coSau": -10, "rep.chuBay": -10, "flag.keptWallet": true } },
-      { "label": "Tìm người trả lại", "hint": "Ông Tư +30, cô Sáu +10",
-        "effects": { "rep.ongTu": 30, "rep.coSau": 10, "flag.returnedWallet": true,
-          "log": "Ông Tư: \"Mất đồ thì kiếm lại được, mất cái tử tế thì kiếm hoài không ra.\"" } }
-    ]
-  },
-  {
-    "id": "tuan_ru", "day": 15,
-    "title": "Tuấn rủ chạy hàng", "who": "Tuấn",
-    "text": "\"Một chuyến chở đồ từ Củ Chi về. {smuggle_pay}. Không hỏi bên trong là gì.\"",
-    "choices": [
-      { "label": "Đi một chuyến", "hint": "+{smuggle_pay}, mất {smuggle_hours} giờ", "effects": { "special": "smuggle_trip", "rep.tuan": 10 } },
-      { "label": "Từ chối", "hint": "Tuấn giận, mất mối phụ hồ", "effects": { "flag.matViecPhuHo": true, "rep.tuan": -20 } },
-      { "label": "Từ chối và khuyên Tuấn bỏ", "hint": "Mở tuyến cứu Tuấn", "require": { "rep.tuan": 50 },
-        "effects": { "flag.cuuTuan": true, "rep.tuan": 5 } }
-    ]
-  },
-  {
-    "id": "om", "day": 17, "when": { "health_below": 30 },
-    "title": "Minh sốt cao",
-    "text": "Minh sốt li bì. Không ai biết, cả ngày nằm một mình trong phòng.",
-    "variants": [
-      { "when": { "room": "rieng", "rep.coSau": 30 },
-        "text": "Cô Sáu thấy cửa phòng đóng im, gõ cửa rồi mang lên một tô cháo hành nóng.",
-        "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe +30", "effects": { "health": 30 } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true, "special": "count_faint" } } ]
-  },
-  {
-    "id": "tuan_ru_tiep", "days": [17, 19], "when": { "smuggle_min": 1, "smuggle_below_trips": true },
-    "title": "Thêm một chuyến nữa", "who": "Tuấn",
-    "text": "\"Chuyến trước êm mà. Thêm chuyến nữa đi, {smuggle_pay}.\"",
-    "choices": [
-      { "label": "Đi", "hint": "Đã đi {smuggle}/{trips} chuyến", "effects": { "special": "smuggle_trip" } },
-      { "label": "Thôi, không đi nữa" }
-    ]
-  },
-  {
-    "id": "vy_hop_dong", "day": 18,
-    "title": "Một buổi chiều ở quán", "who": "Vy",
-    "text": "Vy hỏi chuyện nhà. Minh ngại, không kể.",
-    "variants": [
-      { "when": { "rep.vy": 40 },
-        "title": "Tờ giấy vay nợ",
-        "text": "Minh kể chuyện nhà. Vy xin xem ảnh tờ giấy vay má gửi lên.\n\"Khoan… lãi này gần 200% một năm. Luật chỉ cho tối đa 20% thôi. Mấy ông này đang phạm luật đó Minh.\"",
-        "choices": [ { "label": "Tiếp tục", "hint": "Mở lớp Đọc sách luật với Vy", "effects": { "flag.phapLyMo": true } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "tang_lai", "day": 21,
-    "title": "Hưng Sẹo đổi luật chơi", "who": "Khoa (qua điện thoại)",
-    "text": "\"Anh Hưng nói tháng này lãi lên. Ngày 30 phải {debt_after_raise}.\"",
-    "variants": [
-      { "when": { "flag.phapLyMo": true },
-        "choices": [
-          { "label": "Ghi âm cuộc gọi", "hint": "Bằng chứng +1", "effects": { "special": "raise_debt", "evidence": 1 } },
-          { "label": "Nghe xong cúp máy", "effects": { "special": "raise_debt" } }
-        ] }
-    ],
-    "choices": [ { "label": "Nghe xong cúp máy", "effects": { "special": "raise_debt" } } ]
-  },
-  {
-    "id": "hop_dong_tin", "day": 22,
-    "title": "Máy lạnh cả dãy trọ",
-    "text": "Cô Sáu cần sửa máy lạnh cả dãy trọ. Chú Bảy nói Minh chưa đủ tay nghề để nhận.",
-    "variants": [
-      { "when": { "skill.tayNghe": 4 },
-        "text": "Chú Bảy giao cho Minh hợp đồng sửa máy lạnh 12 phòng của cô Sáu. Làm trong ngày 22 đến 26." }
-    ],
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "khach_uc_tin", "day": 23, "when": { "skill.ngoaiNgu": 3 },
-    "title": "Nhóm khách Úc", "who": "Vy",
-    "text": "\"Có nhóm khách Úc cần người dẫn đi chợ Bến Thành. Minh nói tiếng Anh được rồi, nhận không?\"",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "livestream_tin", "day": 24, "when": { "skill.tinHoc": 2, "skill.giaoTiep": 2 },
-    "title": "Thùng cá khô của má",
-    "text": "Má gửi lên một thùng cá khô. Minh nghĩ tới chuyện livestream bán thử.",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "tuan_nan", "day": 25, "when": { "flag.cuuTuan": true },
-    "title": "Cuộc gọi lúc nửa đêm", "who": "Tuấn",
-    "text": "\"Lô hàng bể rồi mày ơi. Tụi nó đang tìm tao. Cho tao trốn vài bữa…\"",
-    "choices": [
-      { "label": "Cho Tuấn trốn ở phòng trọ", "hint": "Mất trọn hôm nay, bằng chứng +1",
-        "effects": { "skip_day": true, "evidence": 1, "rep.tuan": 20, "log": "Tuấn khai ra đường dây. Đó cũng chính là đường dây của Hưng Sẹo." } },
-      { "label": "Từ chối", "hint": "Tinh thần −30", "effects": { "mood": -30 } }
-    ]
-  },
-  {
-    "id": "ong_tu", "day": 27, "when": { "flag.returnedWallet": true },
-    "title": "Ông Tư gõ cửa", "who": "Ông Tư",
-    "text": "\"Ông không có nhiều. Năm trăm nghìn, coi như tiền nước. Đừng từ chối, ông giận.\"",
-    "choices": [ { "label": "Nhận", "effects": { "money": 500000, "money_label": "Ông Tư gửi", "rep.ongTu": 10 } } ]
-  },
-
-  {
-    "id": "moc_10_ok", "system": true, "eyebrow": "Tối ngày 10 · Mốc 1",
-    "title": "Khoa đến thu lãi", "who": "Khoa",
-    "text": "Minh đưa {amount}. Khoa đếm từng tờ, liếc quanh căn phòng trọ.",
-    "quote": "\"Mày gan đấy.\"",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "moc_10_fail", "system": true, "eyebrow": "Tối ngày 10 · Mốc 1",
-    "title": "Khoa đến thu lãi", "who": "Khoa",
-    "text": "Minh không có đủ {amount}. Khoa và hai thanh niên ra tay.\nSức khỏe {fail_health}, nợ ngày 30 tăng thêm {fail_debt}.",
-    "quote": "\"Lần sau thì không nhẹ vậy đâu.\"",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "moc_20_ok", "system": true, "eyebrow": "Tối ngày 20 · Mốc 2",
-    "title": "Học phí của Lan",
-    "text": "Cuộc gọi video: Lan mặc áo dài trắng trong ngày nhập học. Má khóc phía sau.",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "moc_20_fail", "system": true, "eyebrow": "Tối ngày 20 · Mốc 2",
-    "title": "Học phí của Lan",
-    "text": "Không đủ tiền học phí. Lan phải bảo lưu một năm.",
-    "choices": [ { "label": "Tiếp tục" } ]
-  },
-  {
-    "id": "ngu_gat", "system": true,
-    "title": "Ngủ gục ngoài đường",
-    "text": "22 giờ, Minh không kịp về phòng trọ. Cả đêm co ro trên ghế đá, muỗi đốt, sáng ra người ê ẩm.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Đã trừ Sức khỏe {sleep_out_health}, Tinh thần {sleep_out_mood}" } ]
-  },
-  {
-    "id": "skip_ngat", "system": true,
-    "title": "Minh ngất vì kiệt sức",
-    "text": "Hàng xóm đưa Minh về phòng. Cả ngày hôm nay mất trắng.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true } } ]
-  },
-  {
-    "id": "skip_chan_nan", "system": true,
-    "title": "Minh không muốn dậy",
-    "text": "Minh nằm nhìn trần nhà. Cả ngày không bước ra khỏi phòng.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Mất trọn ngày hôm nay", "effects": { "skip_day": true } } ]
-  },
-
-  {
-    "id": "mua", "random": true,
-    "title": "Mưa ngập đường",
-    "text": "Nước lên tới bánh xe. Công trình và việc ngoài trời nghỉ hôm nay.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe −5", "effects": { "special": "rain", "health": -5 } } ]
-  },
-  {
-    "id": "moc_tui", "random": true, "when": { "money_min": 500001 },
-    "title": "Bị móc túi",
-    "text": "Trên xe buýt chật cứng, Minh mất {amt}.",
-    "choices": [ { "label": "Tiếp tục", "effects": { "special": "pickpocket" } } ]
-  },
-  {
-    "id": "ca_kho", "random": true,
-    "title": "Má gửi cá khô lên",
-    "text": "Gói cá khô bọc ba lớp ni lông, kèm mảnh giấy: \"Ăn cho có sức nghe con.\"",
-    "choices": [ { "label": "Tiếp tục", "hint": "Tinh thần +20", "effects": { "mood": 20, "flag.hasCaKho": true } } ]
-  },
-  {
-    "id": "nhau", "random": true,
-    "title": "Đồng hương rủ đi nhậu", "who": "Tuấn",
-    "text": "\"Tối nay anh em Hà Tĩnh tụ tập. Đi cho vui mày.\"",
-    "choices": [
-      { "label": "Đi", "hint": "Mất 3 giờ và 150k, Tinh thần +15", "require": { "money_min": 150000 },
-        "effects": { "hours": 3, "money": -150000, "money_label": "Đi nhậu với đồng hương", "mood": 15, "rep.tuan": 5 } },
-      { "label": "Từ chối", "hint": "Tuấn −5", "effects": { "rep.tuan": -5 } }
-    ]
-  },
-  {
-    "id": "dien_thoai", "random": true, "when": { "flag.phoneBroken": false },
-    "title": "Điện thoại hỏng",
-    "text": "Màn hình tối đen. Không nhận được việc online cho tới khi sửa.",
-    "choices": [ { "label": "Tiếp tục", "effects": { "flag.phoneBroken": true } } ]
-  },
-  {
-    "id": "kiem_tra_tam_tru", "random": true, "when": { "flag.tamTru": false },
-    "title": "Kiểm tra tạm trú",
-    "text": "Công an phường kiểm tra. Minh chưa đăng ký tạm trú, bị phạt 500.000đ.",
-    "variants": [
-      { "when": { "room": "rieng", "rep.coSau": 40 },
-        "text": "Công an phường kiểm tra. Cô Sáu ra nói vài câu rồi đăng ký luôn cho Minh.",
-        "choices": [ { "label": "Tiếp tục", "effects": { "flag.tamTru": true } } ] }
-    ],
-    "choices": [ { "label": "Tiếp tục", "effects": { "money": -500000, "money_label": "Phạt chưa đăng ký tạm trú" } } ]
-  },
-  {
-    "id": "tai_nan", "random": true, "when": { "did_yesterday_any": ["phu_ho", "boc_vac"] },
-    "title": "Tai nạn lao động nhỏ",
-    "text": "Hôm qua làm nặng, sáng nay Minh trượt chân ngã. Phải nghỉ cả ngày.",
-    "choices": [ { "label": "Tiếp tục", "hint": "Sức khỏe −20, mất trọn hôm nay", "effects": { "health": -20, "skip_day": true } } ]
+  "title": "Lãi trên giấy",
+  "who": "Quản lý kho",
+  "text": "Quản lý kho mời An làm một việc trả theo nửa tháng, tổng 1.600.000đ, tiền về ngày 31. Hạn chốt chỗ ở là ngày 26.\nTiền mặt dự kiến ngày 26: {proj26}.",
+  "quote": "Linh: \"Anh đang lời. Nhưng hôm nay mình còn bao nhiêu để cầm đi đặt phòng?\"",
+  "choices": [
+   {
+    "label": "Từ chối, giữ các ca trả tiền ngay",
+    "hint": "Không có khoản phải thu mới. Tiền mặt chắc hơn",
+    "effects": {
+     "flag.giuCaTraNgay": true,
+     "diary": "Từ chối việc trả chậm, giữ các ca trả ngay. Tiền ít mà chắc."
+    }
+   },
+   {
+    "label": "Nhận việc trả chậm, sau khi đã để riêng đủ tiền chuyển nhà",
+    "hint": "Chỉ chọn được khi tiền mặt từ 4.200.000đ. +1.600.000đ phải thu ngày 31",
+    "require": {
+     "cash_min": 4200000
+    },
+    "effects": {
+     "receivable": {
+      "id": "kho_nua_thang",
+      "from": "Kho khu công nghiệp",
+      "label": "Việc kho trả theo nửa tháng",
+      "amount": 1600000,
+      "due": 31
+     },
+     "diary": "Nhận việc trả chậm sau khi đã để riêng đủ tiền chuyển nhà. Tiền về ngày 31, không tính vô tiền phòng."
+    }
+   },
+   {
+    "label": "Nhận việc, tính luôn tiền chưa về để hứa đặt cọc ngay",
+    "hint": "Cảnh báo: tiền thật chưa đủ. Sinh ra một lời hứa có rủi ro",
+    "effects": {
+     "receivable": {
+      "id": "kho_nua_thang",
+      "from": "Kho khu công nghiệp",
+      "label": "Việc kho trả theo nửa tháng",
+      "amount": 1600000,
+      "due": 31
+     },
+     "flag.huaBangTienChuaVe": true,
+     "promise": {
+      "id": "dat_coc_hem_dua",
+      "text": "Đặt cọc Hẻm Dừa bằng tiền chưa về",
+      "to": "LINH",
+      "due": 26
+     },
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Hứa đặt phòng bằng tiền chưa về"
+     },
+     "diary": "Nhận việc, tính luôn tiền chưa về để hứa đặt cọc. Lại một con số trong đầu chưa có trong túi."
+    }
+   }
+  ],
+  "loc": "ben_xe_6",
+  "missed": "Quản lý kho giao việc trả theo nửa tháng cho người khác.",
+  "missed_effects": {
+   "flag.giuCaTraNgay": true
   }
+ },
+ {
+  "id": "ngay21",
+  "day": 21,
+  "title": "Bậc cửa của bà",
+  "who": "Bà Tư",
+  "text": "Cả nhà quay lại chỗ định thuê. Bà Tư khen mọi thứ, nhưng đứng khá lâu trước bậc cửa. Tối về, bà lén lấy chậu húng ra khỏi thùng đồ.",
+  "quote": "Bà Tư: \"Bà không tiếc cái phòng. Bà tiếc sáng ra mở cửa là có người gọi tên mình.\"",
+  "choices": [
+   {
+    "label": "Dành một buổi cùng bà đi thử đường ra chợ và sinh hoạt",
+    "hint": "Mất 3 giờ. Biết rõ bà đi lại được tới đâu",
+    "require": {
+     "hours_left": 3
+    },
+    "effects": {
+     "hours": 3,
+     "fatigue": 4,
+     "rep.BA_TU": 8,
+     "flag.baTuThuDuong": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Cùng bà đi thử đường ra chợ"
+     },
+     "diary": "Dắt bà đi thử đường ra chợ. Bà chỉ chỗ nào có ghế đá, chỗ nào có người quen của người quen. Bà đi chậm mà không mệt."
+    }
+   },
+   {
+    "label": "Nhờ bà chọn hai ưu tiên cần giữ trong số tiền đang có",
+    "hint": "Mất 1 giờ. Không hứa đáp ứng tất cả",
+    "effects": {
+     "hours": 1,
+     "rep.BA_TU": 6,
+     "flag.baTuChonUuTien": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Để bà chọn hai ưu tiên về chỗ ở"
+     },
+     "diary": "Nhờ bà chọn hai điều phải giữ. Bà chọn cái chậu húng và một chỗ ngồi được ngoài cửa. Không có cái nào tốn tiền."
+    }
+   },
+   {
+    "label": "Giữ phương án tiện cho công việc, hứa một lịch hỗ trợ cụ thể",
+    "hint": "Bà có thể chưa vui. Sinh ra lời hứa đưa bà đi chợ sáng thứ Bảy",
+    "effects": {
+     "rep.BA_TU": -2,
+     "promise": {
+      "id": "dua_ba_di_cho",
+      "text": "Đưa bà đi chợ sáng thứ Bảy ở chỗ mới",
+      "to": "BA_TU",
+      "due": 27
+     },
+     "diary": "Chọn phương án tiện cho việc, hứa đưa bà đi chợ sáng thứ Bảy. Bà nói \"ừ\". Chữ \"ừ\" của bà có nhiều nghĩa."
+    }
+   }
+  ],
+  "loc": "xom_bo_me",
+  "missed": "Linh hỏi bà và ghi lại hai điều bà cần. Quyết định chốt vẫn phải hỏi bà.",
+  "missed_effects": {
+   "flag.baTuUuTienQuaLinh": true
+  }
+ },
+ {
+  "id": "ngay22",
+  "day": 22,
+  "title": "Linh được nhận",
+  "who": "Linh",
+  "eyebrow": "Ngày 22 · tốn nhiều giờ",
+  "text": "Một cơ sở ở thị xã bên cạnh mời Linh thực tập: có người hướng dẫn riêng, hỗ trợ chỗ ở và phụ cấp, nhưng em chỉ về được cuối tuần. Một cơ sở gần nhà cũng nhận, việc quen hơn nhưng ít cơ hội học sâu.\nLinh: \"Em muốn bàn lịch với anh và bà. Chớ em chưa nói em mặc kệ.\"",
+  "quote": "Quyết định cuối cùng là của Linh.",
+  "choices": [
+   {
+    "label": "Ủng hộ điều Linh muốn, cùng lập kế hoạch ăn ở và đi lại",
+    "hint": "Mất 6 giờ. Hỏi rõ khoản nào là góp, khoản nào là mượn",
+    "require": {
+     "hours_left": 6
+    },
+    "effects": {
+     "hours": 6,
+     "fatigue": 5,
+     "respect": 2,
+     "rep.LINH": 6,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Ủng hộ và cùng Linh lập kế hoạch thực tập"
+     },
+     "special": "linh_decides",
+     "diary": "Linh được nhận. Ngồi cả buổi với em tính tiền xe, tiền ăn. Lúc Linh nói \"em đi nghen anh\", mình chỉ nói \"ừ, đi đi\". Vậy mà khó."
+    }
+   },
+   {
+    "label": "Nói rõ nỗi lo về bà và chi phí, cùng so sánh với chỗ gần",
+    "hint": "Mất 6 giờ. Cuộc nói chuyện khó, không bị phạt nếu lắng nghe",
+    "require": {
+     "hours_left": 6
+    },
+    "effects": {
+     "hours": 6,
+     "fatigue": 6,
+     "respect": 1,
+     "rep.LINH": 2,
+     "special": "linh_decides",
+     "diary": "Nói hết nỗi lo về bà với tiền. Linh nghe, rồi tự so hai chỗ. Quyết định là của em. Mình chỉ giữ được cái lắng nghe."
+    }
+   },
+   {
+    "label": "Muốn em ở lại, nhắc chuyện mình đã hy sinh cho cả nhà",
+    "hint": "Linh vẫn giữ quyền chọn chỗ xa",
+    "effects": {
+     "hours": 2,
+     "respect": -3,
+     "rep.LINH": -12,
+     "family": {
+      "who": "LINH",
+      "kind": "pressure",
+      "text": "Lấy chuyện hy sinh ra ép Linh ở lại"
+     },
+     "special": "linh_decides",
+     "diary": "Nhắc Linh chuyện mình đã hy sinh. Nói xong là biết sai. Linh không cãi, chỉ đứng dậy rửa chén."
+    }
+   }
+  ],
+  "loc": "xom_bo_me",
+  "missed": "Linh tự trả lời cơ sở thực tập trước hạn rồi nhắn tin báo An.",
+  "missed_effects": {
+   "special": "linh_decides"
+  }
+ },
+ {
+  "id": "ngay23",
+  "day": 23,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "title": "Một khách quen, một việc chung",
+  "who": "Chị Hạnh",
+  "text": "Một khách được giới thiệu từ các việc trước muốn hẹn An sửa đồ mỗi tuần. Cùng lúc, xóm trọ cần người phân loại đồ cho chuyến xe ghép.",
+  "quote": "Chị Hạnh: \"Khách chị giới thiệu vì em làm được. Không phải để em nhận hết rồi mất ngủ.\"",
+  "missed": "Khách chọn người khác nhưng để lại số. Xe ghép các hộ tự lo tiếp.",
+  "choices": [
+   {
+    "label": "Nhận ca thử, báo rõ ngày chuyển nhà và những ngày không nhận việc",
+    "hint": "Mất 4 giờ, Mệt +10, +250.000đ. Có khách sau ngày 30",
+    "effects": {
+     "hours": 4,
+     "fatigue": 10,
+     "cash": 250000,
+     "cash_label": "Ca sửa thử cho khách quen",
+     "flag.khachQuen": true,
+     "rep.HANH": 2,
+     "diary": "Nhận ca thử cho khách quen, nói rõ mấy ngày dọn nhà không nhận. Khách nói: \"Vậy tuần sau tính tiếp.\" Có khách sau ngày 30."
+    }
+   },
+   {
+    "label": "Phụ xóm phân loại đồ một buổi, hẹn khách sang buổi khác",
+    "hint": "Mất 3 giờ. Ngày 29 có người biết đồ nào cần giữ khô",
+    "effects": {
+     "hours": 3,
+     "fatigue": 5,
+     "rep.DUYEN": 6,
+     "flag.phuXom23": true,
+     "diary": "Phụ xóm phân loại đồ. Biết thùng nào của ai, cái nào sợ ướt. Cô Duyên ghi tên mình vô danh sách \"người nắm thùng\"."
+    }
+   },
+   {
+    "label": "Giới thiệu khách cho Trâm hoặc chú Sáu, nhận phần việc hợp với mình",
+    "hint": "Mất 2 giờ, +120.000đ",
+    "effects": {
+     "hours": 2,
+     "fatigue": 4,
+     "cash": 120000,
+     "cash_label": "Phần việc chia với chú Sáu",
+     "rep.SAU": 3,
+     "rep.TRAM": 3,
+     "flag.mangLuoi": true,
+     "diary": "Giới thiệu khách qua chú Sáu với Trâm, nhận phần hợp tay. Ba người cùng có việc. Chia ra không làm mình nhỏ đi."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay24",
+  "day": 24,
+  "mode": "full",
+  "title": "Đồng cuối cùng của việc cũ",
+  "who": "Tiệm cũ (tin nhắn)",
+  "text": "Hôm nay không có khoản nào của tiệm cũ đến hạn.",
+  "variants": [
+   {
+    "when": {
+     "flag.luongKhep": true
+    },
+    "text": "Khoản lương cũ đã khép từ ngày 4. Hôm nay An chỉ còn một việc nhỏ với tiệm cũ.",
+    "choices": [
+     {
+      "label": "Nhắn cảm ơn đồng nghiệp cũ",
+      "effects": {
+       "fatigue": -2,
+       "diary": "Nhắn cảm ơn đồng nghiệp cũ. Chuyện tiệm cũ khép lại, nhẹ như một cái tin nhắn."
+      }
+     },
+     {
+      "label": "Ghé chào tiệm cũ rồi đi",
+      "hint": "Mất 1 giờ",
+      "effects": {
+       "hours": 1,
+       "diary": "Ghé chào tiệm cũ. Bàn của mình đã có người khác ngồi. Chào xong đi ra, không ngoái lại."
+      }
+     }
+    ]
+   },
+   {
+    "when": {
+     "receivable_pending": "luong_cu_2"
+    },
+    "text": "Tới mốc lương còn lại 1.800.000đ. Tiệm cũ nhắn sẽ chuyển trong ngày.",
+    "choices": [
+     {
+      "label": "Đến nhận theo hẹn, xác nhận đúng khoản đã nhận",
+      "hint": "Mất 2 giờ. Nhận 1.800.000đ ngay",
+      "effects": {
+       "hours": 2,
+       "collect": "luong_cu_2",
+       "diary": "Tới nhận đợt lương cuối, xác nhận đủ. Ba triệu sáu về đủ. Gạch dòng \"phải thu\" bằng một nét thật dài."
+      }
+     },
+     {
+      "label": "Xin chuyển khoản, thấy tiền vào rồi mới tính chi",
+      "hint": "Tiền về tối nay nếu tiệm chuyển đúng hẹn",
+      "effects": {
+       "receivable_due": {
+        "id": "luong_cu_2",
+        "due": 24
+       },
+       "diary": "Xin chuyển khoản, chờ thấy tiền vào mới tính. Tối điện thoại báo tiền về, ngồi nhìn màn hình một lúc."
+      }
+     },
+     {
+      "label": "Để phần này sang sau ngày 30, giữ lịch việc mới",
+      "hint": "Tiền mặt tuần cuối thấp hơn",
+      "effects": {
+       "receivable_due": {
+        "id": "luong_cu_2",
+        "due": 31
+       },
+       "diary": "Để đợt lương cuối sang sau ngày 30. Tuần cuối ít tiền hơn, mà lịch dọn nhà không bị cắt."
+      }
+     }
+    ]
+   }
+  ],
+  "quote": "An: \"Em xác nhận phần này đã nhận. Còn phần nào chưa thì mình ghi đúng phần đó.\"",
+  "choices": [
+   {
+    "label": "Tiếp tục",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "ngay25",
+  "day": 25,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "window": [
+   16,
+   22
+  ],
+  "title": "Đặt cuốn sổ giữa mâm cơm",
+  "who": "Linh",
+  "text": "Đồ đạc đã chiếm gần hết phòng. Linh hỏi nên đóng thùng nào trước. Bữa cơm tối nay, An có thể đặt cuốn sổ giữa mâm: tiền đang có {cash}, các khoản đến hạn, chỗ ở, ai làm việc gì.",
+  "quote": "Linh: \"Thiếu thì mình tính cái thiếu. Anh nói đủ rồi, em đâu biết còn chỗ nào để phụ.\"",
+  "missed": "Linh gửi bảng câu hỏi qua tin nhắn. Không ai trả lời, nên chưa ai coi là đã thống nhất.",
+  "missed_effects": {
+   "flag.chuaThongNhat25": true
+  },
+  "choices": [
+   {
+    "label": "Đưa cả số thật và điều chưa chắc ra bàn",
+    "hint": "Mất 1 giờ. Bà có thể lo, Linh có thể giận vì trước đó bị giấu. Mở đường cùng lo",
+    "effects": {
+     "hours": 1,
+     "rep.LINH": 4,
+     "rep.BA_TU": 3,
+     "flag.noiThat25": true,
+     "flag.suaSaiGiaDinh": true,
+     "promise_status": {
+      "id": "dat_coc_hem_dua",
+      "status": "renegotiated"
+     },
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Đặt cuốn sổ giữa mâm, nói số thật"
+     },
+     "diary": "Đặt cuốn sổ giữa mâm cơm, đọc hết từng dòng, cả dòng chưa chắc. Bà nghe xong chỉ nói: \"Vậy là biết đường mà lo.\""
+    },
+    "bonus": [
+     {
+      "when": {
+       "rep.BA_TU": 58
+      },
+      "effects": {
+       "queue": "ba_gop"
+      }
+     }
+    ]
+   },
+   {
+    "label": "Đề nghị ở tạm nhà dì Năm để giữ vốn và trả công đúng hẹn",
+    "hint": "Mất 1 giờ. Bà và Linh được xem nơi, lịch và hạn cụ thể",
+    "effects": {
+     "hours": 1,
+     "rep.BA_TU": 1,
+     "flag.chonTam25": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Bàn phương án ở tạm, hỏi ý bà"
+     },
+     "diary": "Đề nghị ở tạm nhà dì Năm để giữ vốn. Bà hỏi dì Năm có cho đem chậu húng không. Hỏi rồi, dì cho."
+    }
+   },
+   {
+    "label": "Tiếp tục nói đã lo xong dù chưa đủ tiền hoặc chưa có chỗ",
+    "hint": "Tránh cãi nhau hôm nay. Người khác chuẩn bị dựa trên thông tin sai",
+    "effects": {
+     "rep.BA_TU": -2,
+     "flag.giauNgay25": true,
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Nói đã lo xong chỗ ở khi chưa xong"
+     },
+     "diary": "Nói là đã lo xong hết. Cả nhà yên tâm đóng thùng. Chỉ có mình biết thùng nào chưa có chỗ để."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay26",
+  "day": 26,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "title": "Giữ một cánh cửa",
+  "who": "Cô Duyên",
+  "text": "Hai chủ nhà mới hỏi giờ chốt. Cô Duyên cần lịch chuyển để ghép xe. Dì Năm cũng cần biết có phải dọn chỗ ngủ không.\nTiền mặt: {cash}. Hẻm Dừa cần {cost_hem_dua}, Cầu Tre cần {cost_cau_tre}.",
+  "quote": "Cô Duyên: \"Cô cần biết xe chở tới đâu. 'Tới đâu tính tới đó' thì chú tài xế cũng chịu.\"",
+  "missed": "Chủ phòng Hẻm Dừa cho người khác giữ chỗ. Cầu Tre và nhà dì Năm vẫn chờ An gọi lại.",
+  "missed_choices": [
+   {
+    "label": "Chọn Cầu Tre",
+    "hint": "Vào ở {cost_cau_tre}. Thoáng, có hiên, đi làm xa hơn",
+    "require": {
+     "afford_housing": "cau_tre"
+    },
+    "effects": {
+     "hours": 1,
+     "housing": "cau_tre"
+    }
+   },
+   {
+    "label": "Xác nhận bảy ngày ở nhà dì Năm, hẹn ngày tìm tiếp",
+    "hint": "Góp 500.000đ (chưa đủ thì ghi góp sau). Phải gửi bớt đồ",
+    "effects": {
+     "hours": 1,
+     "housing_owed": "di_nam"
+    }
+   }
+  ],
+  "choices": [
+   {
+    "label": "Đặt Hẻm Dừa",
+    "hint": "Vào ở {cost_hem_dua}. Gần việc, thuận cho bà gặp hàng xóm mới",
+    "require": {
+     "afford_housing": "hem_dua"
+    },
+    "effects": {
+     "hours": 1,
+     "housing": "hem_dua",
+     "diary": "Chốt Hẻm Dừa. Đếm tiền trước mặt chủ nhà. Bà hỏi người bán rau đầu hẻm tên gì."
+    }
+   },
+   {
+    "label": "Chọn Cầu Tre",
+    "hint": "Vào ở {cost_cau_tre}. Thoáng, có hiên, đi làm xa hơn",
+    "require": {
+     "afford_housing": "cau_tre"
+    },
+    "effects": {
+     "hours": 1,
+     "housing": "cau_tre",
+     "diary": "Chốt Cầu Tre. Còn dư một khoản làm quỹ đệm. Bà đã chọn chỗ đặt ghế ngoài hiên."
+    }
+   },
+   {
+    "label": "Xác nhận bảy ngày ở nhà dì Năm, hẹn ngày tìm tiếp",
+    "hint": "Góp 500.000đ (chưa đủ thì ghi góp sau). Phải gửi bớt đồ",
+    "effects": {
+     "hours": 1,
+     "housing_owed": "di_nam",
+     "diary": "Xác nhận bảy ngày ở nhà dì Năm, hẹn ngày tìm tiếp. Chưa phải nhà, mà là một cánh cửa còn mở."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay27_bc",
+  "day": 27,
+  "mode": "full",
+  "loc": "ben_can",
+  "when": {
+   "route": [
+    "B",
+    "C"
+   ]
+  },
+  "title": "Chỗ phải làm lại",
+  "who": "Trâm",
+  "text": "Kiểm tra cuối, Trâm phát hiện một phần việc chưa đạt ở quán số bốn. Tiến độ giai đoạn cuối: {progress}/{need} buổi. Anh Phúc muốn nghe chữ \"xong\".",
+  "quote": "Trâm: \"Làm lại còn là công việc. Giấu đi rồi thì nó thành chuyện khác.\"",
+  "missed": "Phiếu kiểm tra ghi phần chưa đạt vẫn nằm đó. Phần chưa xong chưa được nhận tiền.",
+  "missed_effects": {
+   "flag.chuaKhep27": true
+  },
+  "choices": [
+   {
+    "label": "Báo thật, dành một buổi và chi phí đã báo để làm lại cùng Trâm",
+    "hint": "Mất 4 giờ, −400.000đ, Mệt +10. Trâm chỉ ký khi đạt",
+    "require": {
+     "cash_min": 400000
+    },
+    "effects": {
+     "hours": 4,
+     "fatigue": 10,
+     "cash": -400000,
+     "cash_label": "Làm lại phần chưa đạt",
+     "progress": 2,
+     "rep.TRAM": 6,
+     "rep.PHUC": 3,
+     "flag.lamLai27": true,
+     "diary": "Báo thật phần chưa đạt, làm lại với Trâm. Tốn bốn trăm nghìn. Trâm ký tên, không nói câu nào. Chữ ký đó đủ rồi."
+    }
+   },
+   {
+    "label": "Bàn giao phần đã đạt, đối chiếu phần chưa làm rồi thu hẹp",
+    "hint": "Đợt cuối giảm theo tiến độ. Phần dở hẹn lịch trả lại",
+    "effects": {
+     "special": "narrow_final",
+     "rep.PHUC": -2,
+     "rep.TRAM": 3,
+     "diary": "Bàn giao phần đạt, đối chiếu phần chưa làm, thu hẹp. Ít tiền hơn. Không có dòng nào phải giấu."
+    }
+   },
+   {
+    "label": "Báo với khách là đã xong dù Trâm nhắc chưa đạt",
+    "hint": "Trâm không ký. Phần chưa đạt vẫn để ngoài sử dụng",
+    "effects": {
+     "flag.falseCompletion": true,
+     "rep.TRAM": -15,
+     "rep.PHUC": 2,
+     "diary": "Nói với khách là xong dù Trâm nói chưa. Trâm cất cây bút vô túi, không ký."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay27_a",
+  "day": 27,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "when": {
+   "route": "A"
+  },
+  "title": "Chỗ phải làm lại",
+  "who": "Chú Sáu",
+  "text": "Khách mang trả cái máy giặt An sửa tuần trước: vẫn còn lỗi xả nước. Chú Sáu đứng cạnh, chờ An nói.",
+  "quote": "Chú Sáu: \"Không sửa được thì nói không sửa được. Cái tiếng nhận rồi bỏ mới khó sửa.\"",
+  "missed": "Khách để cái máy giặt ở tiệm chú Sáu, chờ An trả lời.",
+  "missed_effects": {
+   "flag.chuaKhep27": true
+  },
+  "choices": [
+   {
+    "label": "Báo thật, sửa lại, chịu tiền linh kiện",
+    "hint": "Mất 3 giờ, −150.000đ",
+    "require": {
+     "cash_min": 150000
+    },
+    "effects": {
+     "hours": 3,
+     "fatigue": 6,
+     "cash": -150000,
+     "cash_label": "Linh kiện sửa lại máy giặt",
+     "rep.SAU": 5,
+     "flag.lamLai27": true,
+     "diary": "Báo thật, sửa lại cái máy giặt, chịu tiền linh kiện. Lần này xả nước êm ru. Chú Sáu vỗ vai một cái."
+    }
+   },
+   {
+    "label": "Hoàn lại tiền công, giới thiệu khách chỗ khác",
+    "hint": "−200.000đ",
+    "require": {
+     "cash_min": 200000
+    },
+    "effects": {
+     "cash": -200000,
+     "cash_label": "Hoàn tiền công sửa máy giặt",
+     "flag.thuHepCuoi": true,
+     "rep.SAU": 1,
+     "diary": "Hoàn tiền công, giới thiệu khách chỗ khác. Mất tiền mà không mất mặt."
+    }
+   },
+   {
+    "label": "Nói máy đã xong, lỗi do khách dùng sai",
+    "hint": "Chú Sáu biết rõ máy còn lỗi",
+    "effects": {
+     "flag.falseCompletion": true,
+     "rep.SAU": -12,
+     "diary": "Nói lỗi do khách dùng sai. Chú Sáu biết. Mình cũng biết."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay28",
+  "day": 28,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "title": "Một căn phòng trong mấy cái thùng",
+  "who": "Bà Tư",
+  "text": "Lối đi hẹp vì thùng giấy. Bà muốn giữ cái tủ cũ, Linh cần chỗ cho sách nghề, An nhìn túi đồ nghề rồi nhìn tiền thuê xe.",
+  "quote": "Bà Tư: \"Cái tủ bà bỏ được. Mấy cái vạch trên đó… thôi, để bà coi lại một chút.\"",
+  "missed": "Chưa đặt xe nên phải đi từng đợt với xe còn trống, tốn thêm thời gian.",
+  "missed_effects": {
+   "flag.xeTungDot": true
+  },
+  "choices": [
+   {
+    "label": "Ghép xe cùng xóm theo lịch đã thống nhất",
+    "hint": "Mất 2 giờ. Giờ ít linh hoạt, ngày 29 có người phụ",
+    "effects": {
+     "hours": 2,
+     "fatigue": 4,
+     "rep.DUYEN": 3,
+     "flag.xeGhep": true,
+     "diary": "Ghép xe với cả xóm theo lịch. Thùng nhà nào ghi tên nhà nấy. Một chiếc xe, mười một gia đình, chín cái chậu cây.",
+     "queue": "canh_tu"
+    }
+   },
+   {
+    "label": "Thuê chuyến riêng cho chủ động giờ, thuận cho bà",
+    "hint": "−300.000đ. Ngày 30 ít trùng lịch",
+    "require": {
+     "cash_min": 300000
+    },
+    "effects": {
+     "cash": -300000,
+     "cash_label": "Thuê xe chở đồ riêng",
+     "flag.xeRieng": true,
+     "rep.BA_TU": 3,
+     "diary": "Thuê xe riêng cho bà đi thong thả. Ba trăm nghìn mua được một buổi sáng không ai giục bà.",
+     "queue": "canh_tu"
+    }
+   },
+   {
+    "label": "Chia hai đợt, gửi một phần đồ ở chỗ đã xin phép",
+    "hint": "Mất 3 giờ. Giữ được đồ nghề thay vì bán vội",
+    "effects": {
+     "hours": 3,
+     "fatigue": 5,
+     "flag.haiDot": true,
+     "rep.SAU": 2,
+     "diary": "Chia hai đợt, gửi bớt đồ nghề ở chỗ đã xin. Giữ được đồ nghề, khỏi bán vội.",
+     "queue": "canh_tu"
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay29",
+  "day": 29,
+  "mode": "full",
+  "eyebrow": "Ngày 29 · mưa lớn · tốn nhiều giờ",
+  "title": "Mưa lớn trước chuyến dọn",
+  "who": "Minh",
+  "text": "Mưa dài từ sáng, sân Bờ Me đọng nước tới mắt cá. Khách gọi hỏi phần đã làm có ổn không. Thùng đồ xếp sẵn ngoài hiên.\nNhững gì đã chuẩn bị ngày 14, 23, 28 giờ mới thấy rõ.",
+  "quote": "Minh: \"Tao không bỏ giờ đón Bắp được. Tao hỏi giùm chuyến khác cho.\"",
+  "variants": [
+   {
+    "when": {
+     "rep.MINH": 58
+    },
+    "quote": "Minh: \"Mày nói địa chỉ đi. Lần này tao còn đủ giờ.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Ở cùng gia đình, nhờ người đủ chuyên môn trực việc khách nếu họ nhận",
+    "hint": "Mất 5 giờ. Giữ được sự có mặt với bà",
+    "effects": {
+     "hours": 5,
+     "fatigue": 6,
+     "rep.BA_TU": 5,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Ở nhà cùng bà trong trận mưa lớn"
+     },
+     "diary": "Ở nhà với bà suốt trận mưa, nhờ người đủ nghề trực việc khách. Bà kể chuyện trận lụt năm mình lên mười. Lần đầu nghe."
+    },
+    "bonus": [
+     {
+      "when": {
+       "route": [
+        "B",
+        "C"
+       ],
+       "rep.TRAM": 50
+      },
+      "effects": {
+       "cash": -200000,
+       "cash_label": "Công Trâm trực thay trong mưa",
+       "rep.TRAM": 2
+      }
+     },
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.phuXom23": false,
+       "flag.haiDot": false
+      },
+      "effects": {
+       "cash": -150000,
+       "cash_label": "Đồ ướt trong trận mưa lớn",
+       "log": "Mấy thùng đồ để sát nền ngấm nước. Phải mua thùng mới và hong đồ cả buổi."
+      }
+     }
+    ]
+   },
+   {
+    "label": "Giữ lịch công việc, nhờ người đã hẹn lo chuyến chở đồ, báo bà rõ",
+    "hint": "Chỉ được nếu đã có xe hoặc người hẹn thật. +200.000đ trực sửa cho khách",
+    "require": {
+     "flag_any": [
+      "xeGhep",
+      "xeRieng",
+      "donBapDungGio",
+      "chiaTuyenMinh"
+     ]
+    },
+    "effects": {
+     "hours": 6,
+     "fatigue": 10,
+     "cash": 200000,
+     "cash_label": "Trực sửa cho khách trong mưa",
+     "rep.MINH": 3,
+     "diary": "Giữ lịch việc, nhờ người đã hẹn lo chuyến đồ, báo bà rõ. Xe tới đúng giờ, người chở ướt từ đầu tới chân mà cười toe."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.phuXom23": false,
+       "flag.haiDot": false
+      },
+      "effects": {
+       "cash": -150000,
+       "cash_label": "Đồ ướt trong trận mưa lớn",
+       "log": "Mấy thùng đồ để sát nền ngấm nước. Phải mua thùng mới và hong đồ cả buổi."
+      }
+     }
+    ]
+   },
+   {
+    "label": "Tạm dừng một cam kết, gọi xin đổi lịch, chịu phần phát sinh",
+    "hint": "−150.000đ. Người bị ảnh hưởng có thể không vui",
+    "effects": {
+     "hours": 3,
+     "fatigue": 3,
+     "cash": -150000,
+     "cash_label": "Phát sinh do đổi lịch trong mưa",
+     "rep.PHUC": -2,
+     "flag.dungCamKet29": true,
+     "diary": "Gọi xin đổi một cam kết, chịu tiền phát sinh. Có người không vui. Xin lỗi bằng một ngày cụ thể, không bằng chữ \"để mai\"."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.chuanBiNha": false,
+       "flag.phuXom23": false,
+       "flag.haiDot": false
+      },
+      "effects": {
+       "cash": -150000,
+       "cash_label": "Đồ ướt trong trận mưa lớn",
+       "log": "Mấy thùng đồ để sát nền ngấm nước. Phải mua thùng mới và hong đồ cả buổi."
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ngay30",
+  "day": 30,
+  "mode": "full",
+  "eyebrow": "Ngày 30 · trả chìa khóa",
+  "title": "Trước khi trả chìa khóa",
+  "who": "Cô Duyên",
+  "text": "Căn phòng cũ vang tiếng hơn khi đã trống. Trên tường còn ô sáng chỗ từng treo lịch. Cả nhà chờ An giao chìa khóa cho cô Duyên.",
+  "quote": "Cô Duyên: \"Qua bển tới chưa thì nhắn cô một tiếng.\"",
+  "choices": [
+   {
+    "label": "Đi cùng cả nhà, để phần việc còn lại theo lịch đã thống nhất",
+    "hint": "Kết thúc tháng",
+    "effects": {
+     "rep.BA_TU": 2,
+     "diary": "Giao chìa khóa cho cô Duyên. Cả nhà đi cùng một chuyến.",
+     "queue": "cam_tren_tay"
+    }
+   },
+   {
+    "label": "Ở lại hoàn tất một cuộc bàn giao đã hẹn, để cả nhà đi trước",
+    "hint": "Kết thúc tháng. Chào từng người ở xóm",
+    "effects": {
+     "rep.DUYEN": 4,
+     "diary": "Ở lại bàn giao cho xong, cả nhà đi trước. Đi một vòng chào xóm. Ai cũng dặn một câu.",
+     "queue": "cam_tren_tay"
+    }
+   },
+   {
+    "label": "Dành thời gian sửa một lời hứa đã đổ vỡ: hoàn tiền, xin lỗi, chốt lịch trả",
+    "hint": "Không chắc được tha thứ. Người bị ảnh hưởng có kế hoạch cụ thể",
+    "require": {
+     "broken": true
+    },
+    "effects": {
+     "special": "fix_broken",
+     "diary": "Dành buổi cuối sửa một lời hứa đã đổ: xin lỗi, chốt ngày trả. Chưa chắc được tha, mà có một cái hẹn.",
+     "queue": "cam_tren_tay"
+    }
+   }
+  ]
+ },
+ {
+  "id": "linh_quyet",
+  "system": true,
+  "eyebrow": "Ngày 22",
+  "title": "Linh chọn chỗ xa",
+  "who": "Linh",
+  "text": "Linh nhận chỗ thực tập ở thị xã. Em hẹn cuối tuần về, đã hỏi kỹ tiền phòng và tuyến xe.",
+  "quote": "Linh: \"Em đi để sau này có nghề đàng hoàng. Không phải em đi vì không thương bà.\"",
+  "variants": [
+   {
+    "when": {
+     "pressure_min": 2
+    },
+    "title": "Linh tự thu xếp",
+    "text": "Tối đó Linh nhắn một dòng: em đã nhận chỗ xa, tự hỏi chỗ ở, cuối tuần sẽ báo lịch về. Em không hỏi ý An nữa.",
+    "quote": "Linh: \"Vì nhà mình đâu có nghĩa em không được có kế hoạch.\""
+   },
+   {
+    "when": {
+     "linh_wish": "gan"
+    },
+    "title": "Linh chọn chỗ gần",
+    "text": "Linh chọn cơ sở gần nhà. Em đặt mốc ba tháng để xem lại cơ hội, và nói rõ đây là lựa chọn của em.",
+    "quote": "Linh: \"Em chọn gần vì em muốn học chỗ đó trước. Không phải vì anh bảo.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Tiếp tục"
+   }
+  ]
+ },
+ {
+  "id": "hd_giua_ok",
+  "system": true,
+  "eyebrow": "Tối ngày 20",
+  "title": "Nghiệm thu giai đoạn giữa",
+  "text": "Trâm ký xác nhận phần đã đạt. Anh Phúc chuyển đợt giữa {amount}.",
+  "choices": [
+   {
+    "label": "Tiếp tục"
+   }
+  ]
+ },
+ {
+  "id": "hd_giua_tre",
+  "system": true,
+  "eyebrow": "Tối ngày 20",
+  "title": "Chưa nghiệm thu được",
+  "text": "Mới xong {progress}/{need} buổi. Trâm không ký phần chưa làm. Đợt giữa dời sang ngày 23, anh Phúc phải báo lại các quán.",
+  "quote": "Trâm: \"Chưa xong thì ghi chưa xong. Mình còn làm tiếp được.\"",
+  "choices": [
+   {
+    "label": "Tiếp tục"
+   }
+  ]
+ },
+ {
+  "id": "khong_du_tra",
+  "system": true,
+  "eyebrow": "Sáng nay",
+  "title": "Một khoản chưa trả được",
+  "text": "Tối qua đến hạn trả {amount} cho {label}, nhưng tiền mặt không đủ. Khoản này chuyển sang trạng thái chưa trả, người nhận đã biết.",
+  "choices": [
+   {
+    "label": "Tiếp tục"
+   }
+  ]
+ },
+ {
+  "id": "ngu_gat",
+  "system": true,
+  "title": "Ngủ gục ngoài đường",
+  "text": "22 giờ, An không kịp về xóm trọ. Cả đêm ngồi ngủ gục trên ghế đá cạnh rạch, muỗi đốt, sáng ra người ê ẩm.",
+  "choices": [
+   {
+    "label": "Tiếp tục",
+    "hint": "Đã cộng Mệt +{sleep_out}"
+   }
+  ]
+ },
+ {
+  "id": "mo_dau",
+  "system": true,
+  "eyebrow": "Ngày 1 · cách chơi",
+  "title": "Ba mươi ngày",
+  "who": "",
+  "text": "Mỗi ngày có một cảnh chính ở một nơi trên phố: dấu ◆ vàng trên phố và thẻ ◆ ở địa điểm. Có cảnh chỉ diễn ra trong một khung giờ; tới sớm thì ngồi chờ. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong.\nTiền mặt tách riêng tiền phải thu: tiền chưa về thì chưa tiêu được. Mỗi tối trừ tiền sinh hoạt của cả nhà; cơm của An tự trả ở quán.\nNgày 26 chốt chỗ ở. Ngày 30 trả chìa khóa phòng cũ.",
+  "choices": [
+   {
+    "label": "Bắt đầu",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "ba_gop",
+  "system": true,
+  "eyebrow": "Tối ngày 25",
+  "title": "Tiền riêng của bà",
+  "who": "Bà Tư",
+  "text": "Tối đó bà Tư lấy trong túi áo ra một gói giấy: \"Bà còn năm trăm. Con cần thì bà góp, con không cần thì bà giữ dự phòng.\"",
+  "choices": [
+   {
+    "label": "Hỏi bà còn dự phòng không, rồi nhận và ghi vào sổ",
+    "hint": "+500.000đ, ghi rõ là bà tự góp",
+    "effects": {
+     "cash": 500000,
+     "cash_label": "Bà Tư góp từ tiền riêng",
+     "flag.baGop": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Bà tự đề nghị góp, ghi rõ vào sổ"
+     }
+    }
+   },
+   {
+    "label": "Cảm ơn bà, để bà giữ làm dự phòng",
+    "hint": "Bà Tư +3",
+    "effects": {
+     "rep.BA_TU": 3
+    }
+   }
+  ]
+ },
+ {
+  "id": "canh_tu",
+  "system": true,
+  "eyebrow": "Ngày 28 · Cái tủ cũ",
+  "title": "Cánh tủ có hai cột vạch",
+  "who": "Bà Tư",
+  "text": "Người mua ve chai tới hỏi giá cái tủ. Bà đứng chắn trước cánh tủ có hai cột vạch, tay cầm cái khăn. Hai cột bút bi: \"An\", \"Linh\", Tết nào cũng một vạch.",
+  "quote": "Bà Tư: \"Cái tủ bà bỏ được. Mấy cái vạch trên đó… thôi, để bà coi lại một chút.\"",
+  "variants": [
+   {
+    "when": {
+     "flag.vachMoi": true
+    },
+    "text": "Người mua ve chai tới hỏi giá cái tủ. Bà đứng chắn trước cánh tủ có hai cột vạch. Trên cột của An có thêm một vạch bút bi xanh, mới hơn hết thảy, ghi \"27 tuổi\"."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Tháo riêng cánh tủ, bọc lại mang theo",
+    "hint": "Mất 1 giờ. Phòng mới phải có chỗ dựng",
+    "effects": {
+     "hours": 1,
+     "rep.BA_TU": 5,
+     "flag.giuCanhTu": true,
+     "diary": "Tháo cánh tủ có vạch, bọc ba lớp ni lông. Bà dặn đừng để nằm, để đứng, \"như người\"."
+    }
+   },
+   {
+    "label": "Hỏi bà muốn làm sao, rồi làm theo bà",
+    "hint": "Mất 30 phút. Bà quyết phần đồ của bà",
+    "effects": {
+     "hours": 0.5,
+     "rep.BA_TU": 4,
+     "flag.giuCanhTu": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Để bà tự quyết món đồ của bà"
+     },
+     "diary": "Hỏi bà muốn làm sao với cái tủ. Bà nói bán tủ, giữ cánh. Mình làm theo. Có những việc chỉ cần hỏi."
+    }
+   },
+   {
+    "label": "Chụp hình hai cột vạch, bán cả tủ",
+    "hint": "+60.000đ ve chai. Phòng mới rộng hơn một chút",
+    "effects": {
+     "cash": 60000,
+     "cash_label": "Bán cái tủ cũ cho ve chai",
+     "rep.BA_TU": -1,
+     "flag.chupCanhTu": true,
+     "diary": "Chụp hình hai cột vạch rồi bán cả tủ được sáu chục. Tấm hình rõ từng nét. Chỉ là không sờ được."
+    }
+   }
+  ]
+ },
+ {
+  "id": "cam_tren_tay",
+  "system": true,
+  "eyebrow": "Ngày 30 · Bước ra khỏi cửa",
+  "title": "Món cầm trên tay",
+  "text": "Căn phòng đã trống. Xe chờ ở đầu hẻm, đồ lớn đã lên xe hết. Tay An còn trống. Lúc bước qua bậc cửa lần cuối, anh cầm theo thứ gì?",
+  "quote": "Bà Tư: \"Cầm cái gì nhẹ thôi con. Nặng thì để xe chở.\"",
+  "choices": [
+   {
+    "label": "Chậu húng của bà",
+    "hint": "Bà đi trước, không ngoái lại",
+    "effects": {
+     "special": "end_game",
+     "flag.camHung": true,
+     "diary": "Bước ra khỏi phòng cũ, tay ôm chậu húng. Bà đi trước, không ngoái lại. Mình ngoái giùm bà."
+    }
+   },
+   {
+    "label": "Túi đồ nghề",
+    "hint": "Nặng như ngày đầu về",
+    "effects": {
+     "special": "end_game",
+     "flag.camDoNghe": true,
+     "diary": "Bước ra khỏi phòng cũ, tay xách túi đồ nghề. Nặng như ngày đầu về, mà lần này biết mình sẽ làm gì với nó."
+    }
+   },
+   {
+    "label": "Cánh tủ có hai cột vạch",
+    "hint": "Linh đỡ một đầu",
+    "effects": {
+     "special": "end_game",
+     "flag.camCanhTu": true,
+     "diary": "Bước ra khỏi phòng cũ, vác cánh tủ có hai cột vạch. Linh đi sau đỡ một đầu, như hồi nhỏ đứng sau lưng mình để đo."
+    },
+    "showIf": {
+     "flag.giuCanhTu": true
+    }
+   },
+   {
+    "label": "Tập hồ sơ thực tập của Linh",
+    "hint": "Linh đưa, không phải An giành",
+    "effects": {
+     "special": "end_game",
+     "flag.camHoSo": true,
+     "diary": "Bước ra khỏi phòng cũ, cầm giùm tập hồ sơ thực tập của Linh. Em đưa, không phải mình giành."
+    },
+    "showIf": {
+     "linh_decision": [
+      "xa",
+      "gan"
+     ]
+    }
+   },
+   {
+    "label": "Tấm bảng \"Phòng 4\"",
+    "hint": "Cô Duyên đứng ở đầu hẻm",
+    "effects": {
+     "special": "end_game",
+     "flag.camBang": true,
+     "diary": "Bước ra khỏi phòng cũ, cầm tấm bảng \"Phòng 4\". Cô Duyên đứng ở đầu hẻm vẫy tay tới khi xe quẹo."
+    },
+    "showIf": {
+     "flag.bangPhong4": true
+    }
+   }
+  ]
+ }
 ]

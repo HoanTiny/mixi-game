@@ -1,0 +1,502 @@
+{
+ "_ghi_chu": "Chương 2 · Mùa mưa (ngày 31–60). reps: tên nhân vật mới; npcs: nhân vật mới đứng trước cửa (loc 'home' là chỗ ở hiện tại, when là lúc có mặt); locations: lời tả địa điểm đổi ở chương 2; endings K1–K6 xét theo thứ tự K6 → K5 → K4 → K3 → K2 → K1 (game_logic.ending2_key); maCards, baTuCards, linhCards: thẻ hậu truyện; npcCards: một dòng cho từng người ở phố mới và phố cũ; keepsakes, codas, teasers như story.json.",
+ "title": "Chương 2 · Mùa mưa",
+ "continue": "Ngày 31–60 ở chỗ mới: mùa mưa, đôi mắt của bà, và má về nhà sau mười sáu năm",
+ "reps": {
+  "MA": "Má",
+  "ONG_BA": "Ông Ba",
+  "KHA": "Kha"
+ },
+ "npcs": [
+  {
+   "id": "ONG_BA",
+   "name": "Ông Ba",
+   "loc": "home",
+   "color": "e6e1d3",
+   "when": {
+    "flag.ongBaDi": false
+   }
+  },
+  {
+   "id": "MA",
+   "name": "Má",
+   "loc": "home",
+   "color": "7a8f6a",
+   "when": {
+    "flag.maVe": true,
+    "flag.maDaDi": false
+   }
+  },
+  {
+   "id": "KHA",
+   "name": "Kha",
+   "loc": "cho_cau_nho",
+   "color": "2b2b31",
+   "slot": 1
+  }
+ ],
+ "locations": {
+  "xom_bo_me": {
+   "name": "Xóm cũ Bờ Me",
+   "desc": "Tám phòng trọ cũ đang được dỡ để sửa nền làm kho. Cô Duyên vẫn ghé coi thợ, chừa lại một đống cát ở góc sân và cái cây góc sân chưa ai nỡ chặt."
+  },
+  "hem_dua": {
+   "desc": "Hẻm cụt rẽ ra từ đường Chợ, đầu hẻm có cây dừa. Phòng nhỏ, cửa sát mặt hẻm. Sát vách là nhà ông Ba, sáng nào cũng có radio cải lương."
+  },
+  "cau_tre": {
+   "desc": "Bên kia rạch, qua Cầu Tre. Dãy nhà lưng quay ra kênh, hiên rộng; nước lên thì tới bậc thềm. Sát vách là nhà ông Ba, xưa chèo đò ngang qua khúc kênh này."
+  },
+  "nha_di_nam": {
+   "desc": "Nhà dì Năm ở đầu đường An Hòa, sát trạm xe, nền cao. Ở nhờ có hẹn ngày, đồ gửi bớt. Sát vách là nhà ông Ba, sáng nào cũng có radio cải lương."
+  }
+ },
+ "endings": {
+  "K1": {
+   "tag": "Đủ mặt",
+   "title": "Mâm giỗ đủ chén",
+   "text": "Mâm giỗ dọn trên tấm phản kê sát cửa, vì phòng mới không đủ chỗ cho cái bàn tròn. Bà Tư thắp nhang, khấn ông Tư bằng giọng nói chuyện thường ngày: \"Ông coi nè, nhà mới chật mà đủ người.\" Má xới cơm, Linh xếp chén, ông Ba bên kia vách mang qua dĩa khô cá sặc. An đứng dậy rót trà cho từng người. Lần này không ai phải ngồi chờ anh về.",
+   "quote": "Bà Tư: \"Năm nay đông đủ. Năm sau ông nhớ về nữa nghen.\" Má: \"Năm sau con nấu, má ngồi.\"",
+   "epilogue": "Ba tháng sau, má nhận may sửa đồ ở chợ, tối nào cũng về ăn cơm. Tiền không dư nhiều; cuốn sổ chi tiêu có hai nét chữ. Mùa mưa vẫn còn, nhưng cả hẻm biết nhà nào có người già và cầu dao của từng nhà nằm ở đâu.",
+   "variants": [
+    {
+     "when": {
+      "home": "di_nam"
+     },
+     "text": "Mâm giỗ dọn trên cái bàn tròn dì Năm cho mượn, đêm cuối trước khi dọn về phòng mới. Bà Tư thắp nhang, khấn ông Tư bằng giọng nói chuyện thường ngày: \"Ông coi nè, mai nhà mình có chìa khóa riêng.\" Má xới cơm, Linh xếp chén, dì Năm mang ra dĩa khô cá sặc. An đứng dậy rót trà cho từng người. Lần này không ai phải ngồi chờ anh về."
+    }
+   ]
+  },
+  "K2": {
+   "tag": "Má đi xa, có hẹn về",
+   "title": "Chuyến xe sáng thứ Hai",
+   "text": "Sáng thứ Hai sau giỗ, An chở má ra bến xe số 6. Má nhận lại chân chuyền trưởng ở một xưởng tỉnh khác, có phòng ở. Lần này không ai giấu ai: má biết cuốn sổ tiền nhà của An có những dòng nào, An biết má đi vì má muốn làm cái nghề má giỏi, không phải vì trong nhà không có chỗ cho má.",
+   "quote": "Má: \"Tối Chủ Nhật nào cũng gọi. Gọi video, đừng nhắn chữ không.\" An: \"Dạ. Con gọi trước.\"",
+   "epilogue": "Tối Chủ Nhật nào điện thoại cũng sáng lúc bảy giờ. Má hỏi bà nhỏ thuốc chưa, hỏi Linh thi ra sao, hỏi An tuần này có ai trả tiền trễ. Đi xa lần này là một lịch có hẹn, không phải một khoảng trống được lấp bằng tiền."
+  },
+  "K3": {
+   "tag": "Má ở lại, hai cái bàn",
+   "title": "Hai cái bàn trước hiên",
+   "text": "Trước hiên có hai cái bàn: bàn sửa quạt của An và cái máy may đạp chân má mua lại ở chợ. Tấm bảng viết tay: \"Sửa quạt, nồi cơm · Sửa quần áo, lên lai\". Khách mang cái quạt tới thì tiện tay đưa luôn cái quần tây. Ông Ba ngồi giữa, ôm cái radio, làm như ông là người giữ sạp.",
+   "quote": "Má: \"Má bao lai quần, con bao cái quạt. Tiền ai nấy ghi.\" An: \"Ghi chung một cuốn đi má.\"",
+   "epilogue": "Ba tháng sau, khách quen gọi là \"sạp hai cái bàn\". Có hôm hai má con cãi nhau chuyện ai dọn bàn, có hôm cả ngày không có khách. Bà ngồi trong cửa nhìn ra, thấy rõ mặt từng người.",
+   "variants": [
+    {
+     "when": {
+      "flag.sapChung": true
+     },
+     "title": "Ba góc một sạp",
+     "text": "Ở chợ Cầu Nhỏ có một cái sạp chia ba bằng phấn: góc điện thoại của Kha, góc quạt của An, góc trong cùng là cái máy may đạp chân má mua lại. Tấm bảng viết tay: \"Sửa điện thoại · Sửa quạt, nồi cơm · Sửa quần áo, lên lai\". Khách mang cái quạt tới thì tiện tay đưa luôn cái quần tây. Ông Ba ra chợ uống trà đá, ngồi lì ở sạp như ông là người giữ sạp.",
+     "quote": "Má: \"Má bao lai quần, con bao cái quạt, thằng Kha bao cái điện thoại. Tiền ai nấy ghi.\" Kha: \"Ghi chung một cuốn đi cô.\"",
+     "epilogue": "Ba tháng sau, khách quen gọi là \"sạp ba góc\". Có hôm ba người cãi nhau chuyện ai quét sạp, có hôm cả ngày không có khách. Chiều nào má cũng về trước, nấu cơm, để An với Kha dọn sạp."
+    }
+   ]
+  },
+  "K4": {
+   "tag": "Thiếu tiền nhà, có giấy hẹn",
+   "title": "Chìa khóa mượn lần hai",
+   "text": "Tiền nhà tháng sau còn thiếu, hoặc cả nhà vẫn chưa có chỗ thuê lâu dài. An ngồi với chủ nhà và cả nhà, nói đúng con số, đúng ngày có thể trả. Có lúc chủ nhà đồng ý cho hẹn mười ngày, có lúc cả nhà phải gửi bớt đồ ở nhà dì Năm, chen chúc thêm ít bữa. Mâm giỗ vẫn dọn, nhỏ hơn dự tính, đủ nhang đủ chén.",
+   "quote": "An: \"Con còn thiếu. Ngày mười lăm con trả, có giấy hẹn đàng hoàng.\" Bà Tư: \"Ừ. Thắp nhang cho ông trước đã.\"",
+   "epilogue": "Ba tháng sau, khoản thiếu đã trả xong, nhưng chỗ ở vẫn chưa như ý. Lần này không ai nói \"để con lo\" một mình: lịch trả dán trên tủ, ai cũng đọc được, kể cả bà, giờ đã đọc được chữ nhỏ."
+  },
+  "K5": {
+   "tag": "Xa cách",
+   "title": "Má lại đi, không ai tiễn",
+   "text": "Má đi từ sáng sớm, chỉ để lại tờ giấy dán trên tủ: \"Má đi làm. Tiền điện tháng này má đóng rồi.\" Tháng sau tiền vẫn gửi về đều. An nhìn tờ biên lai, nhận ra nét chữ của má giống hệt nét chữ trên những tờ biên lai bà cất trong hộp thiếc. Cái vòng mười sáu năm lại bắt đầu, lần này An đứng ở phía nhận.",
+   "quote": "Bà Tư: \"Má con đi rồi. Đi sớm, sợ con dậy.\" An: \"...Dạ.\"",
+   "epilogue": "Một tháng sau, lần đầu tiên An gọi cho má mà không phải để báo đã nhận tiền. Má bắt máy ở hồi chuông thứ hai, như thể đã chờ. Chưa ai nói được câu nào cho đàng hoàng, nhưng cuộc gọi kéo dài hơn mười phút."
+  },
+  "K6": {
+   "tag": "Kiệt sức",
+   "title": "Ngủ quên giữa mùa mưa",
+   "text": "Chiều giỗ, An ngủ gục trên chồng bao cát trước cửa sau mấy đêm sửa máy bơm và mấy ngày chạy việc không nghỉ. Trong nhà, mâm giỗ được dọn, nhang được thắp, không ai gọi anh dậy. Lúc An tỉnh, nhang đã tàn, điện thoại có mười hai cuộc gọi khách và một tin nhắn của Linh: \"Anh ăn chưa.\"",
+   "quote": "Bà Tư: \"Con ngủ thì ngủ. Ông ngoại không trách.\" An: \"Con trách con.\"",
+   "epilogue": "Hai tuần sau, An tắt điện thoại hai buổi tối mỗi tuần, nhờ người quen nhận giùm vài khách, nghỉ trọn ngày Chủ Nhật. Thu nhập hụt một khoản, vài khách chuyển sang người khác. Không có tai nạn nào để cảnh báo, chỉ có một cái giỗ anh đã ngủ quên."
+  }
+ },
+ "maCards": {
+  "o_lai": {
+   "title": "Ở lại, theo ý má",
+   "text": "Má thuê một góc ở chợ Cầu Nhỏ nhận sửa quần áo, tối về nấu cơm. Có hôm má vẫn buột miệng \"để má\", rồi tự sửa lại: \"Mà con muốn sao?\""
+  },
+  "di_xa": {
+   "title": "Đi xa, lần này có hẹn",
+   "text": "Má về làm chuyền trưởng ở xưởng tỉnh bên. Tối Chủ Nhật gọi video, hỏi chuyện bà trước, chuyện tiền sau."
+  },
+  "di_im": {
+   "title": "Đi sớm, sợ con dậy",
+   "text": "Má đi mà không ai tiễn. Tiền vẫn gửi đều; biên lai bà cất chung hộp thiếc với những tờ cũ."
+  },
+  "chua": {
+   "title": "Chưa quyết",
+   "text": "Má còn ở thêm ít bữa, chưa nói đi hay ở. Lần này má hỏi An trước khi quyết."
+  }
+ },
+ "baTuCards": {
+  "nhin_ro": {
+   "title": "Thấy rõ mặt từng đứa",
+   "text": "Sau mổ, bà đọc được bảng tên hẻm, xỏ kim một lần là lọt. Bà nói An ốm hơn bà tưởng, rồi bắt An ăn thêm chén cơm."
+  },
+  "cho_tet": {
+   "title": "Để sau Tết, theo ý bà",
+   "text": "Bà chọn chờ. Cả nhà dán nhãn chữ to lên lọ thuốc, thay bóng đèn sáng hơn ở bếp. Lịch khám lại ghi trên tủ, chữ to bằng ngón tay."
+  },
+  "chua_hoi": {
+   "title": "Chưa ai hỏi bà",
+   "text": "Bà vẫn nhìn mờ, chưa ai ngồi lại hỏi bà có muốn mổ không. Bà nói \"sao cũng được\", và giờ An biết câu đó nghĩa là gì."
+  }
+ },
+ "linhCards": {
+  "ky_dung": {
+   "title": "Ký đúng phần mình đã làm",
+   "text": "Linh chỉ ký cho những máy em đã kiểm. Người hướng dẫn cằn nhằn một tuần, rồi giao cho em kiểm luôn đợt máy sau."
+  },
+  "bi_ep": {
+   "title": "Làm theo lời anh, không theo ý mình",
+   "text": "Linh làm đúng như An dặn, nhưng em không kể chuyện chỗ làm nữa. Lần sau có chuyện khó, em hỏi người khác trước."
+  },
+  "tu_di": {
+   "title": "Tự đi thi",
+   "text": "Linh đi thi tay nghề một mình, như em muốn. Tối đó em gửi tấm hình tờ giấy báo điểm, không kèm chữ nào, mà cả nhà hiểu."
+  }
+ },
+ "npcCards": {
+  "ONG_BA": {
+   "good": "Sáng nào ông Ba cũng mở radio cho bà nghe ké. Đêm nước lên, ông gõ vách: \"Thằng nhỏ thợ quạt, coi giùm cái cầu dao.\"",
+   "bad": "Ông Ba vẫn ngồi trước cửa mỗi sáng, gật đầu chào, nhưng không nhờ ai việc gì.",
+   "extra": [
+    {
+     "when": {
+      "flag.keoOngBa": true
+     },
+     "text": "Ông chưa quên đêm bị khiêng ra khỏi nhà như khiêng đồ."
+    },
+    {
+     "when": {
+      "flag.ongBaO": true
+     },
+     "text": "Anh Tài lên thăm ông mỗi tháng, chưa nhắc chuyện chung cư nữa."
+    }
+   ]
+  },
+  "KHA": {
+   "good": "Kha ghi phiếu nhận sửa cho từng máy, dán số điện thoại của An lên sạp: \"Quạt, nồi cơm: hỏi anh này.\"",
+   "bad": "Kha vẫn nhận \"xong liền\", năm sao trên ứng dụng, một sao ngoài chợ.",
+   "extra": [
+    {
+     "when": {
+      "flag.sapChung": true
+     },
+     "text": "Hai đứa chung một sạp, mỗi đứa một ngăn kéo, một cuốn sổ."
+    }
+   ]
+  },
+  "SAU": {
+   "good": "Chú Sáu cất tấm biên lai cũ vào ngăn bàn: \"Má con trả đủ rồi. Giờ tới lượt con dạy lại thằng khác.\"",
+   "bad": "Chú Sáu vẫn sửa đồ, tay run hơn, ít nói chuyện cũ."
+  },
+  "HANH": {
+   "good": "Đêm nước lên, chị Hạnh nấu một nồi cháo cho cả hẻm mới, nhờ Minh chở qua.",
+   "bad": "Chị Hạnh vẫn bán cơm cho An giá thường, hỏi thăm bà qua người khác."
+  },
+  "MINH": {
+   "good": "Minh chở đồ giỗ về giùm, đúng giờ đã hẹn, sau giờ đón Bắp. Bắp vẽ thêm một tấm: \"nhà có hai cái bàn\".",
+   "bad": "Minh kẹt lịch đón Bắp, gửi lời chúc giỗ qua tin nhắn."
+  },
+  "TRAM": {
+   "good": "Trâm giới thiệu An đi lại điện cho hai nhà sau ngập, dặn đúng một câu: \"Chưa xong thì ghi chưa xong.\"",
+   "bad": "Trâm giữ khoảng cách nghề nghiệp, gặp ở sạp vật tư vẫn chào."
+  },
+  "PHUC": {
+   "good": "Anh Phúc mời An bảo trì dãy quán sau mùa mưa, có hợp đồng từng hạng mục.",
+   "bad": "Anh Phúc chốt khoản cuối bằng một tờ giấy hẹn, không mời việc mới."
+  },
+  "DUYEN": {
+   "good": "Cô Duyên gửi tấm hình nền xóm cũ đã đổ bê tông, còn chừa chỗ cái cây góc sân.",
+   "bad": "Cô Duyên nhắn hỏi lại số tài khoản để trả nốt tiền cọc, không kèm chữ nào khác."
+  }
+ },
+ "keepsakes": [
+  {
+   "id": "mo_let_ro",
+   "name": "Cái mỏ lết khắc tên",
+   "when": {
+    "flag.biMat": true
+   },
+   "text": "giờ An biết ai đã ngồi khắc nó bằng cây đinh, và vì sao."
+  },
+  {
+   "id": "radio",
+   "name": "Cái radio của ông Ba",
+   "when": {
+    "quest_done": "radio_ong_ba"
+   },
+   "text": "vẫn rè rè, nhưng bắt được đài cải lương lúc sáu giờ sáng."
+  },
+  {
+   "id": "kinh",
+   "name": "Cặp kính lão năm chục ngàn",
+   "when": {
+    "flag.kinhLao": true
+   },
+   "text": "bà đeo đọc lịch, gác lên đầu khi nhìn ra cửa."
+  },
+  {
+   "id": "phu_cap",
+   "name": "Phụ cấp đầu tiên của Linh",
+   "when": {
+    "flag.linhGopSo": true
+   },
+   "text": "năm trăm nghìn, ghi vào sổ chung bằng nét chữ của em."
+  },
+  {
+   "id": "bao_cat",
+   "name": "Bao cát đầu hẻm",
+   "when": {
+    "flag.baoCat": true
+   },
+   "text": "cát xúc ở xóm cũ, giờ chèn trước cửa nhà mới."
+  },
+  {
+   "id": "may_may",
+   "name": "Cái máy may đạp chân",
+   "when": {
+    "flag.sapCoMa": true
+   },
+   "text": "mua lại ở chợ, má lau dầu ba buổi tối mới chạy êm."
+  },
+  {
+   "id": "bien_lai",
+   "name": "Tờ biên lai gửi Lê Văn Sáu",
+   "when": {
+    "flag.bienLaiSau": true
+   },
+   "text": "ba trăm nghìn, tháng Chín năm An mười ba tuổi."
+  },
+  {
+   "id": "phieu_kha",
+   "name": "Xấp phiếu nhận sửa của Kha",
+   "when": {
+    "flag.khaHocPhieu": true
+   },
+   "text": "chữ xấu, nhưng ô \"tình trạng máy\" không ô nào bỏ trống."
+  },
+  {
+   "id": "so_nha",
+   "name": "Cuốn sổ nhà mình",
+   "when": {
+    "flag.soChung": true
+   },
+   "text": "kẻ cột bằng thước, có thêm cột \"người ghi\", bốn nét chữ."
+  },
+  {
+   "id": "giay_ma",
+   "name": "Tờ giấy má dán trên cánh tủ",
+   "when": {
+    "flag.maDaDi": true
+   },
+   "text": "cạnh hai cột vạch, chưa ai nỡ gỡ."
+  },
+  {
+   "id": "giay_bao_dau",
+   "name": "Tờ giấy báo đậu tay nghề bậc một của Linh",
+   "when": {
+    "flag.linhThiDau": true
+   },
+   "text": "bà dán lên cửa tủ lạnh, chữ in nhỏ mà bà đọc được."
+  }
+ ],
+ "codas": [
+  {
+   "when": {
+    "flag.biMat": true,
+    "flag.maConNoiThat": true
+   },
+   "text": "Tối giỗ, An đặt cái mỏ lết lên bàn thờ cạnh dĩa trái cây. Má nhìn, cười: \"Để đó làm gì, ông ngoại đâu có sửa quạt.\" Bà nói: \"Để ông biết thằng nhỏ có nghề.\""
+  },
+  {
+   "when": {
+    "flag.biMat": true,
+    "flag.maConNoiThat": false
+   },
+   "text": "An giữ cái mỏ lết trong túi đồ nghề. Có những lời cảm ơn anh chưa nói được, nhưng mỗi lần siết một con ốc, anh nhớ ai đã trả tiền cho bàn tay đó."
+  },
+  {
+   "when": {
+    "flag.daMo": true
+   },
+   "text": "Bà đứng trước cánh tủ có hai cột vạch, lần đầu sau nhiều năm đọc được chữ \"An\" và chữ \"Linh\" mà không cần dí sát mắt. Bà lấy bút kẻ thêm một vạch cho bé Bắp, thẳng như thước."
+  },
+  {
+   "when": {
+    "flag.ongBaO": true
+   },
+   "text": "Ông Ba vẫn ở căn nhà ven kênh. Đêm nào nước lên, ông gõ hai tiếng vô vách. An gõ lại một tiếng: \"Con nghe rồi.\""
+  },
+  {
+   "when": {
+    "flag.keoOngBa": true
+   },
+   "text": "Ông Ba về lại nhà sau con nước, không nói với An câu nào suốt một tuần. Tới sáng thứ tám, ông mở radio lớn hơn thường lệ. An hiểu đó là lời chào."
+  },
+  {
+   "when": {
+    "flag.linhKyDung": true
+   },
+   "text": "Cuối tháng Linh gửi về tấm hình sổ bảo trì: mười hai dòng, mười hai chữ ký, đều là chữ của em, ký sau khi đã kiểm."
+  },
+  {
+   "when": {
+    "flag.cuuDien": true
+   },
+   "text": "Cô Bảy tổ trưởng ghi tên An vào danh sách \"người biết điện, gọi được ban đêm\". An xin ghi thêm một dòng: \"Ban ngày thì làm có tính tiền.\" Cô Bảy cười, ghi y vậy."
+  },
+  {
+   "when": {
+    "flag.khaHocPhieu": true
+   },
+   "text": "Kha in xấp phiếu nhận sửa có ô \"tình trạng máy\" và ô \"đã báo khách\". Nó nói học của An. An nói học của chú Sáu. Chú Sáu nói học của một người đã gửi tiền mỗi tháng mà không cần ai biết."
+  },
+  {
+   "when": {
+    "flag.ongBaDi": true
+   },
+   "text": "Bên vách có người thuê mới, một cặp vợ chồng trẻ đi làm từ sáng sớm. Sáng nào bà Tư cũng vẫn kéo ghế ra cửa, nhìn cái ghế đẩu trống bên kia. Tháng sau anh Tài gửi về một đoạn ghi âm: ông Ba hát vọng cổ trong thang máy."
+  },
+  {
+   "when": {
+    "flag.henGoiMa": true
+   },
+   "text": "Tối Chủ Nhật đầu tiên, An gọi cho má lúc bảy giờ kém năm. Má bắt máy liền, như đã cầm điện thoại chờ sẵn."
+  }
+ ],
+ "teasers": {
+  "31": "Sáng đầu tiên ở chỗ mới. Bên vách có tiếng radio cải lương từ năm giờ sáng.",
+  "32": [
+   {
+    "when": {
+     "route": [
+      "B",
+      "C"
+     ]
+    },
+    "text": "Tối mai là ngày nhận đợt cuối Bến Cạn. Mà đêm nay mưa tạt vô quán hủ tiếu của chú Lâm."
+   },
+   {
+    "when": {},
+    "text": "Kho phát phiếu lương nửa tháng. Có một dòng trừ tiền An không nhớ mình đã đồng ý."
+   }
+  ],
+  "33": "Tối mai mở thùng đồ nghề. Bà Tư sẽ cầm một món lên, đưa sát mắt.",
+  "34": "Ở chợ Cầu Nhỏ có một thằng nhỏ sửa điện thoại, năm sao trên ứng dụng, đang tìm thợ sửa quạt.",
+  "35": "Dự báo mai mưa từ trưa. Mưa đầu mùa ở chỗ mới, chưa biết nước vô tới đâu.",
+  "36": "Sáng mai bệnh viện mắt mở cửa lúc bảy giờ. Xe buýt ở bến xe số 6 chạy chuyến sáu giờ.",
+  "37": "Chiều mai lâm râm mưa. Bà quét nhà hai lần, không nói vì sao.",
+  "38": "Ở chợ Cầu Nhỏ, sạp của Kha có khách quay lại. Không phải để khen.",
+  "39": "Bệnh viện dặn mang thẻ bảo hiểm của bà. Thẻ nằm trong cái hộp thiếc đựng bánh, chung với mười mấy năm giấy tờ.",
+  "40": [
+   {
+    "when": {
+     "home": "di_nam"
+    },
+    "text": "Mai là hạn báo dì Năm chuyện ở nhờ. Tối mai cả nhà cũng ngồi lại chuyện mổ mắt của bà."
+   },
+   {
+    "when": {},
+    "text": "Tối mai cả nhà ngồi lại chuyện mổ mắt. Tờ giấy hẹn có hai lịch, bà có một cái khăn tay gói tiền."
+   }
+  ],
+  "41": [
+   {
+    "when": {
+     "route": "A"
+    },
+    "text": "Mai kho có chuyện thay người. Chị quản lý dặn An tới sớm."
+   },
+   {
+    "when": {
+     "route": "B"
+    },
+    "text": "Trâm nhắn: mai ghé Bến Cạn, chị có bản vẽ muốn cho em coi. Đài báo mưa từ sáng."
+   },
+   {
+    "when": {},
+    "text": "Đài báo mưa từ đêm nay. Sáng mai điện thoại An sẽ kêu nhiều hơn mọi bữa."
+   }
+  ],
+  "42": "Chủ Nhật tiệm Sáu vắng. Tấm hình tờ biên lai vẫn nằm trong điện thoại, chưa ai hỏi.",
+  "43": [
+   {
+    "when": {
+     "flag.moSom": true
+    },
+    "text": "Sáng mai bà mổ mắt. Chuyến xe sáu giờ. Má đã ngâm gạo nấu cháo từ tối."
+   },
+   {
+    "when": {},
+    "text": "Tối mai bà sẽ ngồi xỏ kim dưới bóng đèn. Bà không chịu để ai xỏ giùm."
+   }
+  ],
+  "44": "Đài báo tối mốt con nước rằm lên cao nhất tháng. Cô Bảy đã mua thêm pin cho cái loa.",
+  "45": "Tối mai con nước rằm. Ông Ba nói nhà ông không cần bao cát, nhà ông cần cái ghế cao.",
+  "46": [
+   {
+    "when": {
+     "flag.moBhyt": true
+    },
+    "text": "Sáng mai bà mổ, ngay sau đêm nước lên. Chuyến xe sáu giờ có chạy không thì chưa ai biết."
+   },
+   {
+    "when": {},
+    "text": "Nước rút sẽ để lại một vạch bùn trên tường, và cả hẻm sẽ cần một người biết sửa máy bơm."
+   }
+  ],
+  "47": "Má đi chợ sớm, để quên cái giỏ trên ghế. Trong giỏ có một tờ giấy gấp tư.",
+  "48": [
+   {
+    "when": {
+     "flag.moLet": true
+    },
+    "text": "Tối mai Linh về, cả nhà ăn chè. Túi đồ nghề của An để mở ngay giữa chiếu."
+   },
+   {
+    "when": {},
+    "text": "Má nói mai muốn đi cảm ơn chú Sáu một tiếng. Má đã mua sẵn bịch trái cây."
+   }
+  ],
+  "49": "Sáng mai Linh có một phong bì, bên ngoài ghi bằng bút bi.",
+  "50": [
+   {
+    "when": {
+     "flag.daMo": true
+    },
+    "text": "Sáng mai tái khám. Bác sĩ sẽ tháo miếng che mắt của bà."
+   },
+   {
+    "when": {},
+    "text": "Ông Ba khoe mổ mắt năm ngoái giờ đọc báo không cần kính. Bà nghe, không nói gì, mà nghe kỹ."
+   }
+  ],
+  "51": "Tối mai mưa lắc rắc. Má nói có chuyện muốn kể, chuyện từ năm An mười ba tuổi.",
+  "52": "Đài báo mai mưa từ trưa. Điện thoại của má sẽ reo, một số máy ở Long An.",
+  "53": "Ở chợ Cầu Nhỏ, sạp bên cạnh sạp Kha vừa treo bảng cho thuê. Sạp đồ cũ có một cái máy may đạp chân.",
+  "54": "Mai có một chiếc xe bốn chỗ đậu ở đầu hẻm, không vô được. Người lái là con trai ông Ba.",
+  "55": "Sáng mai Linh thi tay nghề. Em dặn trước: đừng đi theo.",
+  "56": "Má mới mua một cuốn sổ, một cây thước kẻ, một cây bút bi xanh.",
+  "57": "Mai mưa nhẹ. Bà đã viết xong danh sách đồ cúng giỗ ông.",
+  "58": "Chủ nhà nhắn mai ghé. Tiền nhà tháng sau hạn tối ngày 60.",
+  "59": [
+   {
+    "when": {
+     "flag.maVe": true,
+     "flag.maDaDi": false
+    },
+    "text": "Sáng mai đèn bếp sẽ sáng sớm hơn mọi bữa. Má đã có câu trả lời cho xưởng ở Long An."
+   },
+   {
+    "when": {},
+    "text": "Giỗ ông tối mốt. Năm nào bà cũng đi mời từ hôm trước."
+   }
+  ],
+  "60": "Tối mai giỗ ông. Bà nói năm nay bà không khấn thay."
+ }
+}
