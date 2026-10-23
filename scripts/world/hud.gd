@@ -748,6 +748,9 @@ func _fill_objectives(s: Dictionary) -> void:
 	if game.chapter() == 2:
 		_refresh_objectives2(s)
 		return
+	if game.chapter() == 5:
+		_refresh_objectives5(s)
+		return
 	if game.chapter() == 4:
 		_refresh_objectives4(s)
 		return
@@ -952,6 +955,41 @@ func _refresh_objectives4(s: Dictionary) -> void:
 	if due_today > 0:
 		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
 	_objective("Đêm cuối tháng Tám (tối ngày 120)", "Tiền nhà tháng sau, sổ tiệm tháng đầu", "current" if game.day() >= 118 else "normal")
+	_quest_objectives()
+
+
+## Chương 5: tiền nhà, mặt bằng, đợt cuối đồ nghề, nợ còn lại của tháng Tám, cái lưng của An, lớp học buổi tối, ông Ba
+## nằm viện, con nước rằm tháng Chín, năm mươi tuổi của má.
+func _refresh_objectives5(s: Dictionary) -> void:
+	var f: Dictionary = s.flags
+	_payable_objectives(s, [["tien_nha_t5", "Tiền nhà tháng sau", 144], ["mat_bang_t10", "Tiền mặt bằng tiệm tháng sau", 144],
+		["mat_bang_tang", "Phần tăng tiền mặt bằng của cô Tám", 144], ["do_nghe_sau_3", "Đợt cuối tiền đồ nghề trả chú Sáu", 144],
+		["dien_nuoc_t5", "Điện nước tháng này", 133], ["tien_nha_t4", "Tiền nhà tháng trước còn hẹn", 124],
+		["mat_bang_t9", "Tiền mặt bằng tháng trước còn hẹn", 124], ["do_nghe_sau_2", "Đợt hai tiền đồ nghề còn hẹn", 124],
+		["gop_di_nam_5", "Góp tiền chợ nhà dì Năm còn hẹn", 124], ["gop_di_nam_6", "Góp tiền chợ ở nhờ nhà dì Năm", 144],
+		["phong_moi_t10", "Phần còn lại phòng mới, dọn mùng 1 tháng Mười", 144]])
+	if game.check({"home": "di_nam", "housing_state": "signed"}) == "" and game.day() <= 146:
+		_objective("Đặt cọc phòng mới trong tháng Chín", "Ở nhờ dì Năm tới hết tháng · cọc Hẻm Dừa hay Cầu Tre, dọn mùng một tháng Mười",
+			"current" if game.day() >= 140 else "normal")
+	if f.get("dauLung", false) and not f.get("khamLung", false):
+		_objective("Cái lưng của An: chưa đi khám", "Phòng khám phường ở chợ Cầu Nhỏ · đau mà gồng thì tới lúc gãy", "current")
+	elif f.get("khamLung", false):
+		_objective("Cái lưng của An: đã khám", "Không khiêng một mình đồ trên hai chục ký", "done")
+	if f.get("hocXong", false):
+		_objective("Lớp điện lạnh buổi tối", "Đã học xong, có giấy chứng nhận", "done")
+	if f.get("ongBaNamVien", false) and not f.get("ongBaXuatVien", false) and game.day() <= 140:
+		_objective("Ông Ba nằm viện", "Phòng chung tầng ba bệnh viện quận · trực đêm chia với anh Tài", "normal")
+	if game.day() <= 136:
+		_objective("Rằm tháng Chín · triều cường (ngày 135–136)", "Kê máy của khách lên kệ, coi nhà người già", "current" if game.day() >= 133 else "normal")
+	if game.day() <= 145:
+		_objective("Má tròn năm mươi tuổi (tối ngày 145)", "Hỏi má muốn gì, hay tự lo một bữa", "current" if game.day() >= 142 else "normal")
+	var due_today := 0
+	for p in s.promises:
+		if p.status == "open" and int(p.due) == game.day():
+			due_today += 1
+	if due_today > 0:
+		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
+	_objective("Đêm cuối tháng Chín (tối ngày 150)", "Tiền nhà tháng sau, tờ giấy ghi điều An muốn", "current" if game.day() >= 148 else "normal")
 	_quest_objectives()
 
 

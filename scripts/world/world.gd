@@ -1987,7 +1987,7 @@ func _on_changed() -> void:
 		_clear_ending_home()
 		return
 	_sync_home()
-	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3", "full4"] and _ending_home == null:
+	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3", "full4", "full5"] and _ending_home == null:
 		_show_ending_home()
 	elif not game.is_over() and _ending_home != null:
 		# Chơi tiếp chương sau từ màn kết: dọn hình ảnh khép lại của chương trước.
@@ -2107,7 +2107,7 @@ func location_info(id: String) -> Dictionary:
 	# Chương 2: xóm cũ đang dỡ làm kho, các chỗ khác có thể đổi lời tả (story2.locations); chương 3 đổi tiếp trên đó
 	# (story3.locations).
 	if game.is_started():
-		for st in [game.story2, game.story3, game.story4].slice(0, game.chapter() - 1):
+		for st in [game.story2, game.story3, game.story4, game.story5].slice(0, game.chapter() - 1):
 			if st.get("locations", {}).has(id):
 				d = d.duplicate()
 				d.merge(st.locations[id], true)

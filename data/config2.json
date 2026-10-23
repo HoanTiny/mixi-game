@@ -12,7 +12,7 @@
    "perDay": 2,
    "days": [
     34,
-    120
+    150
    ],
    "showIfFlag": "appTho",
    "dirty": {
@@ -35,7 +35,7 @@
    "perDay": 1,
    "days": [
     34,
-    120
+    150
    ],
    "showIfFlag": "appHanChe",
    "require": {
@@ -60,7 +60,7 @@
    "perDay": 1,
    "days": [
     35,
-    120
+    150
    ],
    "onlyRain": true,
    "dirty": {
@@ -82,7 +82,7 @@
    "pay": 260000,
    "days": [
     33,
-    120
+    150
    ],
    "require": {
     "route": [
@@ -111,7 +111,7 @@
    ],
    "days": [
     31,
-    120
+    150
    ],
    "perDay": 1,
    "rest": true,
@@ -133,7 +133,7 @@
    ],
    "days": [
     31,
-    120
+    150
    ],
    "perDay": 1,
    "rest": true,
@@ -155,7 +155,7 @@
    ],
    "days": [
     37,
-    120
+    150
    ],
    "showIfFlag": "maVe",
    "hideIfFlag": "maDaDi",
@@ -179,7 +179,7 @@
    ],
    "days": [
     31,
-    120
+    150
    ],
    "perDay": 1,
    "showIf": {
@@ -302,7 +302,7 @@
    ],
    "days": [
     43,
-    120
+    150
    ],
    "showIfFlag": "toTruongCa",
    "hideIfFlag": "toTruongTre",
@@ -329,7 +329,7 @@
    ],
    "days": [
     47,
-    120
+    150
    ],
    "showIfFlag": "toTruongTre",
    "dirty": {
@@ -458,7 +458,7 @@
    "pay": 260000,
    "days": [
     33,
-    120
+    150
    ],
    "showIfFlag": "thuBaySau",
    "require": {

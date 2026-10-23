@@ -60,6 +60,8 @@ func refresh() -> void:
 				_ending3()
 			"full4":
 				_ending4()
+			"full5":
+				_ending5()
 			_:
 				_report()
 	elif not game.s.queue.is_empty():
@@ -84,6 +86,8 @@ func _start() -> void:
 			more += " Hết ngày 60 chơi tiếp %s (ngày 61–90)." % str(game.story3.get("title", "Chương 3"))
 		if not game.story4.is_empty():
 			more += " Hết ngày 90 chơi tiếp %s (ngày 91–120)." % str(game.story4.get("title", "Chương 4"))
+		if not game.story5.is_empty():
+			more += " Hết ngày 120 chơi tiếp %s (ngày 121–150)." % str(game.story5.get("title", "Chương 5"))
 		_box.add_child(UI.wrap(more, 12, UI.INK_SOFT))
 	_box.add_child(UI.label(p.slicePick, 11, UI.INK_SOFT))
 	for k in GameLogic.ROUTES:
@@ -252,6 +256,10 @@ func _ending4() -> void:
 	_ending_chapter(_story_cards(game.story4), "TRONG TIỆM VÀ TRONG NHÀ", "SỔ TAY BỐN THÁNG")
 
 
+func _ending5() -> void:
+	_ending_chapter(_story_cards(game.story5), "TRONG TIỆM VÀ TRONG NHÀ", "SỔ TAY NĂM THÁNG")
+
+
 ## Thẻ hậu truyện chọn theo điều kiện (chương 3 trở đi): [nhãn, bảng thẻ, khóa trong s.over.cards].
 func _story_cards(st: Dictionary) -> Array:
 	var cards := []
@@ -285,7 +293,7 @@ func _ending_chapter(cards: Array, keep_label: String, diary_label: String) -> v
 	var h: Dictionary = game.housing()
 	var place := str(game.cfg.housing.get(h.place, {}).get("name", "chưa rõ"))
 	if h.state == "reserved":
-		place = "%s (đã đặt cọc, %s)" % [place, {2: "dọn sau giỗ", 3: "dọn mùng một tháng Tám"}.get(ch, "dọn mùng một tháng Chín")]
+		place = "%s (đã đặt cọc, %s)" % [place, {2: "dọn sau giỗ", 3: "dọn mùng một tháng Tám", 4: "dọn mùng một tháng Chín"}.get(ch, "dọn mùng một tháng Mười")]
 	elif h.place == "di_nam":
 		place = "Ở nhờ nhà dì Năm"
 	_box.add_child(UI.wrap("Chỗ ở: %s · Tuyến %s · Tiền mặt: %s" % [place, str(game.s.route), GameLogic.fmt_money(int(game.s.cash))], 14, UI.INK))

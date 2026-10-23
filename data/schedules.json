@@ -25,6 +25,10 @@
     {"npc": "DUYEN", "to": "com_hanh", "hours": [17.0, 18.0], "what": "mua cơm tối ở Cơm Hạnh"},
     {"npc": "PHUC", "to": "tiem_sau", "hours": [15.5, 16.5], "what": "qua tiệm Sáu mượn đồ", "weekdays": [2, 4, 6]},
     {"npc": "SAU", "to": "ben_xe_6", "hours": [0.0, 24.0], "what": "về quê Bến Tre ở với con gái", "away": true, "when": {"from_day": 119, "flag.chuSauVeQue": true}},
+    {"npc": "KHA", "to": "ben_xe_6", "hours": [0.0, 24.0], "what": "về Cà Mau lo cho má", "away": true, "when": {"from_day": 129, "flag.khaVeCaMau": true}},
+    {"npc": "BA_TU", "to": "ben_xe_6", "hours": [0.0, 24.0], "what": "xuống Cần Giuộc chăm chị Hai", "away": true, "when": {"from_day": 126, "to_day": 139, "flag.baVeChamHai": true}},
+    {"npc": "ONG_BA", "to": "ben_xe_6", "hours": [0.0, 24.0], "what": "nằm viện quận", "away": true, "when": {"from_day": 134, "to_day": 143, "flag.ongBaNamVien": true}},
+    {"npc": "LUA", "to": "tiem_sau", "hours": [14.0, 21.0], "what": "đổ bánh xèo dưới mái hiên tiệm", "slot": 3, "when": {"chapter": 5, "flag.luaDuoiHien": true}},
     {"npc": "TIN", "to": "ben_xe_6", "hours": [7.5, 11.0], "what": "đi học hè ở trường", "away": true, "weekdays": [1, 2, 3, 4, 5], "when": {"flag.tinDiHoc": true}},
     {"npc": "TIN", "to": "tiem_sau", "hours": [14.0, 18.0], "what": "ghé tiệm Sáu sau giờ học hè", "weekdays": [1, 2, 3, 4, 5, 6], "slot": 1, "when": {"flag.tinOTiem": true, "flag.luaCam": false}}
   ],

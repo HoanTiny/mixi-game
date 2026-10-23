@@ -9,6 +9,7 @@ extends SceneTree
 ##   --fast1: chương 1 chơi nhanh bằng logic (không đi bộ), chỉ chương 2 chơi trên phố
 ##   --ch3: chương 1, chương 2 chơi nhanh bằng logic, rồi chơi tiếp chương 3 (tháng Bảy, ngày 61–90) trên phố
 ##   --ch4: ba chương đầu chơi nhanh bằng logic, rồi chơi tiếp chương 4 (tháng Tám, ngày 91–120) trên phố
+##   --ch5: bốn chương đầu chơi nhanh bằng logic, rồi chơi tiếp chương 5 (tháng Chín, ngày 121–150) trên phố
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 
@@ -16,7 +17,7 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const PICKS := {}
 const NPC_LOC := {"BA_TU": "xom_bo_me", "LINH": "xom_bo_me", "DUYEN": "xom_bo_me", "HANH": "com_hanh", "MINH": "com_hanh",
 	"SAU": "tiem_sau", "TRAM": "ben_can", "PHUC": "ben_can", "MA": "home", "ONG_BA": "home", "KHA": "cho_cau_nho",
-	"TIN": "cho_cau_nho", "LUA": "cho_cau_nho", "QUAN": "ben_xe_6", "MAI": "cho_cau_nho"}
+	"TIN": "cho_cau_nho", "LUA": "cho_cau_nho", "QUAN": "ben_xe_6", "MAI": "cho_cau_nho", "PHONG": "ben_xe_6"}
 
 var w
 var game
@@ -27,6 +28,7 @@ var full := false
 var ch2 := false
 var ch3 := false
 var ch4 := false
+var ch5 := false
 var fast1 := false
 var stats := {"walk": 0.0, "work": 0.0, "talk": 0.0, "sleep_out": 0, "talks": 0, "chats": 0, "stuck": 0}
 var _day_log := []
@@ -51,6 +53,11 @@ func _initialize() -> void:
 			full = true
 			ch3 = true
 			ch4 = true
+		elif a == "--ch5":
+			full = true
+			ch3 = true
+			ch4 = true
+			ch5 = true
 		elif a.begins_with("--route="):
 			route = a.substr(8)
 		elif a.begins_with("--seed="):
@@ -78,8 +85,14 @@ func _run() -> void:
 		if ch4:
 			game.start_chapter3()
 			_fast_chapter()
-			print("\n== Chơi tiếp chương 4 · chỗ ở %s %s" % [game.housing().place, game.housing().state])
-			game.start_chapter4()
+			if ch5:
+				game.start_chapter4()
+				_fast_chapter()
+				print("\n== Chơi tiếp chương 5 · chỗ ở %s %s" % [game.housing().place, game.housing().state])
+				game.continue_chapter()
+			else:
+				print("\n== Chơi tiếp chương 4 · chỗ ở %s %s" % [game.housing().place, game.housing().state])
+				game.start_chapter4()
 		else:
 			print("\n== Chơi tiếp chương 3 · chỗ ở %s %s" % [game.housing().place, game.housing().state])
 			game.start_chapter3()
@@ -247,6 +260,10 @@ func _quests() -> void:
 								await physics_frame
 							w._scavenge(b.id)
 				"action":
+					# Việc buổi tối (lớp học, trực đêm) thì chờ tới gần giờ mới đi, không đứng chờ cả ngày.
+					var act: Dictionary = game.get_action(str(step.action))
+					if act.has("window") and float(act.window[0]) >= 17.0 and game.clock() < float(act.window[0]) - 1.5:
+						continue
 					await _do(str(step.action))
 		await process_frame
 
@@ -319,6 +336,12 @@ func _plan() -> Array:
 			if not game.progress_ready():
 				p.append("ben_can_c")
 			p.append_array(["sua_do_le", "ca_phu_quan"])
+	if game.chapter() == 5:
+		# Chương 5: như chương 4; đau lưng thì đi khám, tối đi học lớp điện lạnh, trực đêm cho ông Ba nếu đã nhận.
+		p = ["nghi"] if game.fatigue_warn() else []
+		p.append_array(["kham_lung", "lam_tiem", "tho_khoan", "kiem_tra_dien_nguoi_gia", "nhan_may_bao_hanh", "hoc_dien_lanh",
+			"truc_dem_benh_vien", "com_ma_nau", "com_voi_ba"])
+		return p
 	if game.chapter() == 4:
 		# Chương 4: mở tiệm (hay làm khoán ở tiệm) là chính, thêm một nhà người già, nhận máy bảo hành nếu đã nhận làm.
 		p = ["nghi"] if game.fatigue_warn() else []
@@ -432,7 +455,7 @@ func _events() -> void:
 
 func _report() -> void:
 	var over: Dictionary = game.s.over
-	if str(over.get("kind", "")) in ["full3", "full4"]:
+	if str(over.get("kind", "")) in ["full3", "full4", "full5"]:
 		var e3: Dictionary = game._merge_variants(game.chapter_story().endings[over.key])
 		print("\nKẾT CHƯƠNG %d %s · %s · thẻ %s · tiền %s" % [game.chapter(), over.key, e3.title, str(over.cards), GameLogic.fmt_money(int(game.s.cash))])
 		var days3: float = maxf(1.0, float(game.day() - 30 * (game.chapter() - 1)))

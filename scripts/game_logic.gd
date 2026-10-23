@@ -32,6 +32,8 @@ var story2: Dictionary = {}
 var story3: Dictionary = {}
 ## Chương 4 · Tháng Tám trăng tròn (data/story4.json), cùng cách với chương 3.
 var story4: Dictionary = {}
+## Chương 5 · Tháng Chín gió chướng (data/story5.json), cùng cách với chương 3, 4.
+var story5: Dictionary = {}
 ## Trạng thái ván chơi. Rỗng nghĩa là chưa bắt đầu (đang ở màn chọn tuyến).
 var s: Dictionary = {}
 ## Ghi chú giữ lại qua các lượt (chưa dùng trong lát cắt, để dành cho Sổ tay).
@@ -53,7 +55,7 @@ func load_data(dir := "res://data") -> void:
 		quest_items = q.get("items", {})
 	# Chương 2, chương 3 nằm ở file riêng: gộp sự kiện, hội thoại, việc nhờ; lời hé lộ ngày mai và tên nhân vật mới
 	# đi chung với chương 1.
-	for n in [2, 3, 4]:
+	for n in [2, 3, 4, 5]:
 		var suffix := str(n) + ".json"
 		if FileAccess.file_exists(dir + "/events" + suffix):
 			events.append_array(_read_json(dir + "/events" + suffix))
@@ -66,8 +68,10 @@ func load_data(dir := "res://data") -> void:
 					story2 = st
 				3:
 					story3 = st
-				_:
+				4:
 					story4 = st
+				_:
+					story5 = st
 			story.teasers.merge(st.get("teasers", {}))
 			story.reps.merge(st.get("reps", {}))
 		if FileAccess.file_exists(dir + "/talks" + suffix):
@@ -179,8 +183,8 @@ func continue_chapter() -> void:
 			start_chapter2()
 		2:
 			start_chapter3()
-		3:
-			start_chapter4()
+		_:
+			start_next_chapter(chapter() + 1)
 
 
 ## Dữ liệu truyện của chương sau (tên chương, lời mời chơi tiếp).
@@ -199,6 +203,8 @@ func story_n(n: int) -> Dictionary:
 			return story3
 		4:
 			return story4
+		5:
+			return story5
 	return {}
 
 
@@ -207,14 +213,11 @@ func chapter_story() -> Dictionary:
 	return story_n(chapter())
 
 
-## Chỗ ở của chương đang chơi {place, loc}: lúc vào chương 2, 3, 4 (rỗng ở chương 1).
+## Chỗ ở của chương đang chơi {place, loc}: ghi lúc vào chương 2, 3, 4, 5 (home2, home3...; rỗng ở chương 1).
 func home_info() -> Dictionary:
-	if chapter() >= 4 and s.has("home4"):
-		return s.home4
-	if chapter() >= 3 and s.has("home3"):
-		return s.home3
-	if chapter() >= 2 and s.has("home2"):
-		return s.home2
+	for n in range(chapter(), 1, -1):
+		if s.has("home%d" % n):
+			return s["home%d" % n]
 	return {}
 
 
@@ -1200,7 +1203,7 @@ func living_cost() -> int:
 	match chapter():
 		2:
 			return int(cfg.get("chapter2", {}).get("livingCostPerDay", cfg.livingCostPerDay))
-		3, 4:
+		3, 4, 5:
 			var cn: Dictionary = cfg.get("chapter%d" % chapter(), {})
 			var ma_here: bool = s.flags.get("maVe", false) and not s.flags.get("maDaDi", false)
 			return int(cn.get("livingCostPerDay" if ma_here else "livingCostAlone", cfg.livingCostPerDay))
@@ -1420,10 +1423,8 @@ func finish_day() -> void:
 
 	if day() >= last_day():
 		s["queue"] = tonight
-		if is_full() and chapter() == 4:
-			_end_chapter4()
-		elif is_full() and chapter() == 3:
-			_end_chapter3()
+		if is_full() and chapter() >= 3:
+			_end_chapter_n(chapter())
 		elif is_full() and chapter() == 2:
 			_end_chapter2()
 		elif is_full():
@@ -1556,11 +1557,20 @@ func start_chapter3() -> void:
 	_commit()
 
 
-## Hết ngày 90: chọn kết chương 3 và các thẻ hậu truyện (chọn theo điều kiện trong story3.cards).
-func _end_chapter3() -> void:
-	var key := ending3_key()
-	s["over"] = {"kind": "full3", "key": key, "cards": pick_cards(story3)}
-	add_log("Kết chương 3: " + str(story3.endings[key].title), "event")
+## Hết ngày cuối chương 3, 4, 5 (90, 120, 150): chọn kết chương và các thẻ hậu truyện (chọn theo điều kiện trong
+## storyN.cards).
+func _end_chapter_n(n: int) -> void:
+	var key := ""
+	match n:
+		3:
+			key = ending3_key()
+		4:
+			key = ending4_key()
+		_:
+			key = ending5_key()
+	var st := story_n(n)
+	s["over"] = {"kind": "full%d" % n, "key": key, "cards": pick_cards(st)}
+	add_log("Kết chương %d: %s" % [n, str(st.endings[key].title)], "event")
 
 
 ## Thứ tự xét L6 → L5 → L4 → L3 → L2 → L1 (ngưỡng Mệt dùng chung với hai chương trước).
@@ -1609,31 +1619,39 @@ func pick_cards(st: Dictionary) -> Dictionary:
 	return out
 
 
-## Chơi tiếp chương 4 từ màn kết chương 3: giữ mọi thứ. Còn ở nhờ dì Năm mà đã trả đủ phòng mới (giấy hẹn hay cọc tháng
-## Bảy) thì dọn vào sáng mùng một tháng Tám; khoản nào của tháng Bảy còn hẹn thì trả nốt trước tối ngày oldDue; thêm
-## tiền nhà tháng sau, điện nước; đã nhận tiệm Sáu thì thêm tiền mặt bằng tháng sau và đợt hai tiền đồ nghề (chia theo
-## số người góp); đếm Mệt lại từ đầu cho kết chương 4.
+## Chơi tiếp chương 4 từ màn kết chương 3 (giữ tên hàm cho kiểm thử).
 func start_chapter4() -> void:
-	if not can_continue() or chapter() != 3:
+	start_next_chapter(4)
+
+
+## Chơi tiếp chương n (từ 4 trở đi) từ màn kết chương trước: giữ mọi thứ, cấu hình trong cfg.chapterN. Còn ở nhờ dì Năm
+## mà đã trả đủ phòng mới (moveIds) thì dọn vào sáng mùng một; khoản nào của tháng trước còn hẹn (oldIds) thì trả nốt
+## trước tối ngày oldDue; thêm tiền nhà tháng sau, điện nước (utilId), hay góp tiền chợ cho dì Năm (stayId); đã nhận tiệm
+## Sáu thì thêm tiền mặt bằng tháng sau (shopRentId) và đợt tiền đồ nghề (toolsId, chia theo số người góp); đếm Mệt lại từ
+## đầu cho kết chương.
+func start_next_chapter(n: int) -> void:
+	if not can_continue() or chapter() != n - 1 or story_n(n).is_empty():
 		return
-	var c4: Dictionary = cfg.get("chapter4", {})
-	s["ch3"] = {"key": str(s.over.get("key", "")), "warn_days": int(s.warn_days), "rest_skips": int(s.rest_skips), "cash": int(s.cash)}
+	var c: Dictionary = cfg.get("chapter%d" % n, {})
+	s["ch%d" % (n - 1)] = {"key": str(s.over.get("key", "")), "warn_days": int(s.warn_days), "rest_skips": int(s.rest_skips), "cash": int(s.cash)}
 	var h := housing()
 	var moving := false
-	for id in ["phong_moi", "phong_moi_t8"]:
+	for id in c.get("moveIds", []):
 		var room = _find(s.payables, id)
 		if h.state == "reserved" and room != null and room.status == "paid":
 			moving = true
+	var home_key := "home%d" % n
 	if moving:
 		h["state"] = "signed"
-		s["home4"] = {"place": str(h.place), "loc": str(cfg.housing[h.place].loc)}
-		s.flags["donPhongMoi4"] = true
+		s[home_key] = {"place": str(h.place), "loc": str(cfg.housing[h.place].loc)}
+		s.flags["donPhongMoi%d" % n] = true
 		add_log("Dọn về phòng mới: " + str(cfg.housing[h.place].name), "event")
 	else:
-		s["home4"] = s.get("home3", {"place": str(h.place), "loc": home_loc()}).duplicate()
-	s["chapter"] = 4
+		var prev := home_info()
+		s[home_key] = (prev if not prev.is_empty() else {"place": str(h.place), "loc": home_loc()}).duplicate()
+	s["chapter"] = n
 	s["over"] = {}
-	s["day"] = int(c4.get("startDay", 91))
+	s["day"] = int(c.get("startDay", 30 * (n - 1) + 1))
 	s["used"] = 0.0
 	s["warn_days"] = 0
 	s["rest_skips"] = 0
@@ -1641,34 +1659,36 @@ func start_chapter4() -> void:
 	s["yesterday"] = s.today
 	s["today"] = {"list": []}
 	s["missed"] = []
-	for k in c4.get("rep", {}):
+	for k in c.get("rep", {}):
 		if not s.rep.has(k):
-			s.rep[k] = int(c4.rep[k])
-	for id in ["tien_nha_t3", "coc_tiem", "do_nghe_sau", "gop_di_nam_4", "phong_moi_t8", "dien_nuoc_t3"]:
+			s.rep[k] = int(c.rep[k])
+	for id in c.get("oldIds", []):
 		var x = _find(s.payables, id)
 		if x != null and x.status in ["unpaid", "renegotiated"]:
 			x["status"] = "pending"
-			x["due"] = int(c4.get("oldDue", 100))
-			x["label"] = str(x.label) + " (trả nốt theo giấy hẹn)"
+			x["due"] = int(c.get("oldDue", int(s.day) + 9))
+			if not str(x.label).ends_with("(trả nốt theo giấy hẹn)"):
+				x["label"] = str(x.label) + " (trả nốt theo giấy hẹn)"
 			add_log("Còn nợ từ tháng trước: %s %s, hạn ngày %d" % [x.label, fmt_money(int(x.amount)), int(x.due)], "warn")
 	if has_long_home():
 		_special("rent_next")
-		var util := int(c4.get("utilities", 0))
+		var util := int(c.get("utilities", 0))
 		if util > 0:
-			_add_payable({"id": "dien_nuoc_t4", "to": "", "label": "Điện nước tháng này", "amount": util, "due": int(c4.get("utilitiesDue", 105))})
+			_add_payable({"id": str(c.utilId), "to": "", "label": "Điện nước tháng này", "amount": util, "due": int(c.get("utilitiesDue", int(s.day) + 14))})
 	else:
-		_add_payable({"id": "gop_di_nam_5", "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Năm tháng này", "amount": int(c4.get("stayShare", 600000)), "due": int(c4.rentDue)})
-	if s.flags.get("tiemChung", false) or s.flags.get("tiemMotMinh", false):
-		var n := tiem_partners()
-		var share := " (phần của An)" if n > 1 else ""
-		_add_payable({"id": "mat_bang_t9", "to": "", "label": "Tiền mặt bằng tiệm tháng sau cho cô Tám" + share,
-			"amount": round_k(float(c4.shopRent) / n), "due": int(c4.rentDue)})
-		_add_payable({"id": "do_nghe_sau_2", "to": "SAU", "label": "Đợt hai tiền đồ nghề trả chú Sáu" + share,
-			"amount": round_k(float(c4.toolsSecond) / n), "due": int(c4.rentDue)})
+		_add_payable({"id": str(c.stayId), "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Năm tháng này", "amount": int(c.get("stayShare", 600000)), "due": int(c.rentDue)})
+	if c.has("shopRentId") and (s.flags.get("tiemChung", false) or s.flags.get("tiemMotMinh", false)):
+		var parts := tiem_partners()
+		var share := " (phần của An)" if parts > 1 else ""
+		_add_payable({"id": str(c.shopRentId), "to": "", "label": "Tiền mặt bằng tiệm tháng sau cho cô Tám" + share,
+			"amount": round_k(float(c.shopRent) / parts), "due": int(c.rentDue)})
+		if int(c.get("tools", 0)) > 0:
+			_add_payable({"id": str(c.toolsId), "to": "SAU", "label": str(c.toolsLabel) + share,
+				"amount": round_k(float(c.tools) / parts), "due": int(c.rentDue)})
 	if has_needs():
 		s["needs_t"] = float(cfg.dayStart)
-	add_log(str(story4.get("title", "Chương 4")), "event")
-	s["queue"] = [{"id": "c4_mo_dau", "data": {}}]
+	add_log(str(story_n(n).get("title", "Chương %d" % n)), "event")
+	s["queue"] = [{"id": "c%d_mo_dau" % n, "data": {}}]
 	_morning()
 	_commit()
 
@@ -1680,13 +1700,6 @@ func tiem_partners() -> int:
 		if s.flags.get(k, false):
 			n += 1
 	return n
-
-
-## Hết ngày 120: chọn kết chương 4 và các thẻ hậu truyện (story4.cards).
-func _end_chapter4() -> void:
-	var key := ending4_key()
-	s["over"] = {"kind": "full4", "key": key, "cards": pick_cards(story4)}
-	add_log("Kết chương 4: " + str(story4.endings[key].title), "event")
 
 
 ## Thứ tự xét M6 → M5 → M4 → M2 → M3 → M1 (ngưỡng Mệt dùng chung với các chương trước).
@@ -1718,11 +1731,45 @@ func ending4_key() -> String:
 	return "M1"
 
 
-## Còn ở nhờ dì Năm mà đã cọc, trả đủ phòng mới trong tháng Tám (phong_moi_t9): dọn mùng một tháng Chín, coi như có chỗ
-## thuê lâu dài.
+## Còn ở nhờ dì Năm mà đã cọc, trả đủ phòng mới trong tháng này (chương 4: phong_moi_t9, chương 5: phong_moi_t10): dọn
+## mùng một tháng sau, coi như có chỗ thuê lâu dài.
 func _moving_next_month() -> bool:
-	var room = _find(s.payables, "phong_moi_t9")
+	var room = _find(s.payables, "phong_moi_t%d" % (chapter() + 5))
 	return housing().state == "reserved" and room != null and room.status == "paid"
+
+
+## Thứ tự xét N6 → N5 → N4 → N3 → N2 → N1 (ngưỡng Mệt dùng chung với các chương trước).
+## N6: kiệt sức, hay đau lưng mà vẫn gồng không đi khám. N5: quyết chuyện tiệm thay người góp mà chưa nhận sai, hay
+## chương 5 giấu, ép người nhà nhiều ngày mà chưa có lần nói thật nào (kể cả chuyện của chính An). N4: còn nợ tiền nhà,
+## mặt bằng, đồ nghề, hay chưa có chỗ thuê lâu dài. N3: học xong lớp điện lạnh buổi tối. N2: tiệm chia mái hiên với
+## sạp bánh xèo của chị Lụa, đã hỏi người góp. N1: giữ nhịp, nói được mình muốn gì.
+func ending5_key() -> String:
+	var f: Dictionary = s.flags
+	var e: Dictionary = cfg.endings
+	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
+			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+		return "N6"
+	if f.get("gongLung", false) and not f.get("khamLung", false):
+		return "N6"
+	var decided_for: bool = f.get("quyetThayTiem", false) and not f.get("suaQuyetThay", false)
+	if decided_for or (hidden_marks(121) >= int(cfg.chapter5.distantMarks) and not f.get("noiThatC5", false)):
+		return "N5"
+	var broke: bool = not (has_long_home() or _moving_next_month())
+	for id in ["tien_nha_t5", "mat_bang_t10", "do_nghe_sau_3", "gop_di_nam_6", "phong_moi_t10", "mat_bang_tang"]:
+		var x = _find(s.payables, id)
+		if x != null and x.status in ["unpaid", "renegotiated"]:
+			broke = true
+	for id in cfg.chapter5.oldIds:
+		var x = _find(s.payables, id)
+		if x != null and x.status in ["unpaid", "renegotiated"]:
+			broke = true
+	if broke:
+		return "N4"
+	if f.get("hocXong", false):
+		return "N3"
+	if f.get("choLuaBan", false):
+		return "N2"
+	return "N1"
 
 
 ## Hết ngày 60: chọn kết chương 2 và các thẻ hậu truyện.
@@ -2306,7 +2353,9 @@ func quest_visit(id: String) -> void:
 
 
 func _quest_deadline(q: Dictionary, from_day: int) -> float:
-	return float(from_day + int(q.get("deadline_days", 0))) * 24.0 + float(q.get("deadline_hour", 22.0))
+	# deadline_day: hạn là một ngày cố định (lớp học bế giảng ngày 148), nhận ngày nào cũng vậy.
+	var d := int(q.deadline_day) if q.has("deadline_day") else from_day + int(q.get("deadline_days", 0))
+	return float(d) * 24.0 + float(q.get("deadline_hour", 22.0))
 
 
 func _abs_text(t: float) -> String:

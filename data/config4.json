@@ -15,7 +15,7 @@
    ],
    "days": [
     91,
-    120
+    150
    ],
    "showIf": {
     "flag_any": [
@@ -46,7 +46,7 @@
    ],
    "days": [
     91,
-    120
+    150
    ],
    "showIfFlag": "tiemKhongNhan",
    "dirty": {
@@ -101,7 +101,7 @@
    "perDay": 2,
    "days": [
     110,
-    120
+    150
    ],
    "showIfFlag": "daiLyBaoHanh",
    "effects": {

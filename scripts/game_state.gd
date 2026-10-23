@@ -20,6 +20,10 @@ func _ready() -> void:
 	game.load_data()
 	var args := OS.get_cmdline_user_args()
 	var query := str(JavaScriptBridge.eval("window.location.search", true)) if OS.has_feature("web") else ""
+	if args.has("--demo-ch5") or query.contains("ch5"):
+		_persist = false
+		_demo_chapter(5)
+		return
 	if args.has("--demo-ch4") or query.contains("ch4"):
 		_persist = false
 		_demo_chapter(4)
