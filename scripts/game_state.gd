@@ -78,8 +78,9 @@ func _demo_chapter(n: int) -> void:
 		game.do_action("ca_kho")
 		game.do_action("sua_do_le")
 		game.finish_day()
+	# Giữ lại cảnh mở đầu của chương (như người chơi vừa bấm Chơi tiếp), chọn giùm những gì còn treo của chương trước.
 	guard = 0
-	while not game.s.queue.is_empty() and guard < 20:
+	while not game.s.queue.is_empty() and str(game.s.queue[0].id) != "c%d_mo_dau" % n and guard < 20:
 		guard += 1
 		game.resolve_first_available()
 	# Vào chương mới tươi tỉnh: máy tự chơi không ăn, không tắm, không nghỉ.

@@ -72,6 +72,9 @@ var _phone_scroll: ScrollContainer
 var _obj_n := 0
 var _obj_hidden := 0
 var _obj_expanded := false
+## Mở hết các mục mà dài quá phần màn còn trống thì cuộn trong khung này; chỗ bắt đầu chạm để phân biệt chạm với vuốt.
+var _obj_scroll: ScrollContainer
+var _obj_press := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -293,13 +296,26 @@ func _build_objectives(parent: Control) -> void:
 	badge.add_child(bang)
 	head.add_child(badge)
 	head.add_child(UI.label("Mục tiêu quan trọng", 18, UI.GOLD))
+	_obj_scroll = ScrollContainer.new()
+	_obj_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_obj_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_obj_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
+	v.add_child(_obj_scroll)
 	_objective_box = VBoxContainer.new()
 	_objective_box.add_theme_constant_override("separation", 2)
-	v.add_child(_objective_box)
-	# Chế độ gọn: chạm vào bảng để xem hết các mục, chạm lần nữa để thu lại.
+	_obj_scroll.add_child(_objective_box)
+	_objective_box.minimum_size_changed.connect(_fit_objectives)
+	# Chế độ gọn: chạm vào bảng để xem hết các mục, chạm lần nữa để thu lại (vuốt để cuộn thì không tính là chạm).
 	_objectives.gui_input.connect(func(e: InputEvent) -> void:
-		if ScreenFit.compact and e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
+		if not (ScreenFit.compact and e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT):
+			return
+		if e.pressed:
+			_obj_press = e.position
+		elif e.position.distance_to(_obj_press) < 12.0:
 			_obj_expanded = not _obj_expanded
+			# Mở hết bảng thì cất ô gợi ý ở góc dưới (coi như đã đọc), khỏi đè lên các mục.
+			if _obj_expanded and _tip.visible:
+				_close_tip()
 			_refresh())
 
 
@@ -705,6 +721,20 @@ func _refresh_objectives(s: Dictionary) -> void:
 		_objective_box.add_child(UI.label("     +%d mục nữa · chạm để xem hết" % _obj_hidden, 12, UI.HUD_SOFT))
 	elif ScreenFit.compact and _obj_expanded:
 		_objective_box.add_child(UI.label("     chạm để thu gọn", 12, UI.HUD_SOFT))
+	_fit_objectives()
+
+
+## Màn thấp, bảng mục tiêu mở hết: khung cuộn cao vừa nội dung, tối đa phần màn còn trống phía trên lời nhắc và thanh
+## công cụ (chương 3 có nhiều khoản phải trả, mở hết là dài hơn màn điện thoại nằm ngang). Các lúc khác bảng cao theo
+## nội dung như cũ.
+func _fit_objectives() -> void:
+	var limit: bool = ScreenFit.compact and _obj_expanded
+	_obj_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if limit else ScrollContainer.SCROLL_MODE_DISABLED
+	var h := 0.0
+	if limit:
+		h = minf(_objective_box.get_combined_minimum_size().y, clampf(ScreenFit.view_size().y - 260.0, 80.0, 600.0))
+	if not is_equal_approx(_obj_scroll.custom_minimum_size.y, h):
+		_obj_scroll.custom_minimum_size.y = h
 
 
 func _fill_objectives(s: Dictionary) -> void:
@@ -1163,7 +1193,8 @@ func _update_tip(dt: float) -> void:
 		if _tip_time > 40.0:
 			_close_tip()
 		return
-	if ScreenFit.compact and _panel_open():
+	# Màn thấp: có bảng mở (hay bảng mục tiêu đang mở hết) thì chờ, khỏi đè ô gợi ý lên bảng.
+	if ScreenFit.compact and (_panel_open() or _obj_expanded):
 		return
 	var seen: Array = game.s.get("tips_seen", [])
 	for tip in game.story.get("tips", []):
