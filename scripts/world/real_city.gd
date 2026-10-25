@@ -61,6 +61,7 @@ func _init(map_id: String) -> void:
 	_index_roads()
 	_place_locations()
 	grid = WalkGrid.new(data, bounds)
+	_block_locations()
 	_place_homes()
 	_place_bins()
 	_place_floods()
@@ -163,6 +164,20 @@ func _place_locations() -> void:
 				if Geometry2D.is_point_in_polygon(v, lot):
 					return false
 			return Geometry2D.intersect_polygons(b.poly, lot).is_empty())
+
+
+## Nhà của các địa điểm dựng trên lô đã dọn nhà thật (_place_locations), nên lưới đi bộ chưa biết: chặn lô đó, chừa
+## mép trước nhà (mái hiên, chỗ đứng trước cửa) để vẫn tới cửa được.
+func _block_locations() -> void:
+	for k in locs:
+		var p: Dictionary = locs[k]
+		var c: Vector2 = p.center
+		var n: Vector2 = p.normal
+		var t := Vector2(n.y, -n.x)
+		var hw := float(p.w) / 2.0
+		var front := c - n * 0.6
+		var back := c - n * float(p.d)
+		grid.block_poly(PackedVector2Array([front - t * hw, front + t * hw, back + t * hw, back - t * hw]))
 
 
 ## Đầu hẻm của con đường địa điểm nằm trên: đầu nào chạm đường lớn hơn thì là đầu hẻm; trả về chỗ ở mép hẻm,

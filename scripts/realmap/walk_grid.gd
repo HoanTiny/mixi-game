@@ -47,6 +47,11 @@ func _init(data, bounds: Rect2) -> void:
 			_block_line(rd.line, float(rd.width) / 2.0, false)
 
 
+## Chặn thêm một đa giác sau khi dựng lưới (nhà của địa điểm trong truyện).
+func block_poly(poly: PackedVector2Array) -> void:
+	_block_poly(poly)
+
+
 ## Tô kín đa giác lên lưới theo từng hàng (quét ngang ở ba độ cao trong ô), nới mỗi đoạn 0,35 m:
 ## ô nào có phần đáng kể nằm trong nhà thì chặn, đường đi không cắt góc nhà. Mỗi khúc một lần tô cả dải ô.
 func _block_poly(poly: PackedVector2Array) -> void:
