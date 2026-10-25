@@ -11,7 +11,7 @@ extends Control
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const Character := preload("res://scripts/world/character.gd")
-const Props3D := preload("res://scripts/world/props3d.gd")
+const WP := preload("res://scripts/work/work_props.gd")
 
 signal finished(result: Dictionary)
 
@@ -128,31 +128,48 @@ func _mat(c: Color) -> StandardMaterial3D:
 	return m
 
 
-## Khối hộp đặt theo tâm đáy (x, z) và độ cao chân y.
-func _box(size: Vector3, c: Color, x: float, z: float, y := 0.0, parent: Node3D = null) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = size
-	mi.mesh = bm
-	mi.material_override = _mat(c)
-	mi.position = Vector3(x, y + size.y / 2.0, z)
-	(parent if parent != null else _world).add_child(mi)
-	return mi
-
-
-## Vật cản: hộp có chặn đường đi.
-func _solid(size: Vector3, c: Color, x: float, z: float) -> MeshInstance3D:
-	_blocks.append(Rect2(x - size.x / 2.0, z - size.z / 2.0, size.x, size.z))
-	return _box(size, c, x, z)
-
-
-func _floor(w: float, d: float, c: Color, wall: Color, wall_h := 1.2) -> void:
+## Sàn và tường phủ vật liệu chụp thật; tường sau cao, hai tường bên thấp dần về phía máy quay (như mô hình cắt nửa).
+func _floor(w: float, d: float, floor_tex: String, wall_tex: String, wall_tint := Color(1, 1, 1), upper_tex := "") -> void:
 	_bounds = Rect2(-w / 2.0, -d / 2.0, w, d)
-	_box(Vector3(w + 2.0, 0.2, d + 2.0), c, 0, 0, -0.2)
-	# Tường thấp ba phía (phía máy quay để trống cho dễ nhìn), như mô hình cắt nửa.
-	_box(Vector3(w + 1.0, wall_h, 0.5), wall, 0, -d / 2.0 - 0.25)
-	_box(Vector3(0.5, wall_h, d + 1.0), wall, -w / 2.0 - 0.25, 0)
-	_box(Vector3(0.5, wall_h, d + 1.0), wall, w / 2.0 + 0.25, 0)
+	WP.box(_world, Vector3(w + 2.0, 0.2, d + 2.0), WP.tex(floor_tex, 0.35), Vector3(0, -0.2, 0))
+	var wall := WP.tex(wall_tex, 0.4, wall_tint)
+	WP.box(_world, Vector3(w + 1.0, 2.6, 0.3), wall, Vector3(0, 0, -d / 2.0 - 0.15))
+	for side in [-1.0, 1.0]:
+		WP.box(_world, Vector3(0.3, 2.6, d * 0.45), wall, Vector3(side * (w / 2.0 + 0.15), 0, -d * 0.275))
+		WP.box(_world, Vector3(0.3, 1.0, d * 0.55 + 0.5), wall, Vector3(side * (w / 2.0 + 0.15), 0, d * 0.225 + 0.25))
+	if upper_tex != "":
+		WP.box(_world, Vector3(w + 1.0, 1.2, 0.32), WP.tex(upper_tex, 0.5), Vector3(0, 2.6, -d / 2.0 - 0.15))
+	# Chân tường sơn sẫm.
+	WP.box(_world, Vector3(w + 0.9, 0.18, 0.06), WP.plain(Color("3a3d42")), Vector3(0, 0, -d / 2.0 + 0.02))
+
+
+## Mô hình đặt ở (x, z), xoay yaw, có chặn đường đi theo khung w × d.
+func _prop(node: Node3D, x: float, z: float, yaw := 0.0, w := 0.0, d := 0.0, y := 0.0) -> Node3D:
+	node.position = Vector3(x, y, z)
+	node.rotation.y = yaw
+	_world.add_child(node)
+	if w > 0.0:
+		_blocks.append(Rect2(x - w / 2.0, z - d / 2.0, w, d))
+	return node
+
+
+## Đèn treo trần (ngoài khung hình): một bóng sáng ấm.
+func _lamp(x: float, z: float) -> void:
+	var l := OmniLight3D.new()
+	l.position = Vector3(x, 2.2, z)
+	l.light_color = Color("ffd9a0")
+	l.light_energy = 0.9
+	l.omni_range = 6.0
+	_world.add_child(l)
+
+
+## Đặt một món (theo khóa) lên chỗ, trả về nút để gỡ sau.
+func _place_item(key: String, pos: Vector3, yaw := 0.0) -> Node3D:
+	var n := WP.item(key)
+	n.position = pos
+	n.rotation.y = yaw
+	_world.add_child(n)
+	return n
 
 
 func _label(text: String, x: float, z: float, y := 2.2) -> Label3D:
@@ -160,13 +177,28 @@ func _label(text: String, x: float, z: float, y := 2.2) -> Label3D:
 	l.text = text
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	l.no_depth_test = true
-	l.font_size = 40
-	l.pixel_size = 0.0075
+	# Cỡ chữ cố định trên màn, gần hay xa máy quay cũng vậy.
+	l.fixed_size = true
+	l.font_size = 30
+	l.pixel_size = 0.0008
 	l.outline_size = 10
 	l.outline_modulate = Color(0.08, 0.09, 0.12, 0.95)
 	l.position = Vector3(x, y, z)
 	_world.add_child(l)
 	return l
+
+
+## Bảng hiệu sơn trên tường sau: tấm tôn màu, chữ trắng.
+func _sign(text: String, x: float, z: float, w: float, bg: Color) -> void:
+	WP.box(_world, Vector3(w, 0.9, 0.04), WP.plain(bg, 0.6), Vector3(x, 1.55, z))
+	var l := Label3D.new()
+	l.text = text
+	l.font_size = 64
+	l.pixel_size = 0.004
+	l.modulate = Color("fdf6e3")
+	l.outline_size = 0
+	l.position = Vector3(x, 2.0, z + 0.03)
+	_world.add_child(l)
 
 
 func _spot(type: String, x: float, z: float, reach: float, text: String) -> Dictionary:
@@ -197,57 +229,57 @@ func _type_name(k: String) -> String:
 
 func _build_carry() -> void:
 	var site := kind == "site"
-	_floor(17.0, 12.0, Color("6f6a60") if site else Color("6c7076"), Color("6d5f4f") if site else Color("7f858d"))
+	if site:
+		_floor(17.0, 12.0, "concrete_floor_02", "rusty_metal_sheet", Color(1, 1, 1), "corrugated_iron")
+	else:
+		_floor(17.0, 12.0, "concrete_floor_worn_001", "painted_plaster_wall", Color(0.92, 0.94, 1.0), "corrugated_iron")
 	var types: Array = cfg.types.keys()
-	# Đống hàng bên trái, mỗi loại một đống.
+	# Đống hàng bên trái, mỗi loại một đống trên pallet.
 	for i in types.size():
 		var k: String = types[i]
 		var z := -3.6 + i * 3.6
-		_solid(Vector3(1.8, 0.15, 1.8), Color("8a6a45"), -6.6, z)
+		_prop(WP.pallet(), -6.6, z, 0.0, 1.3, 1.1)
+		var h := WP.item_h(k)
 		for row in 3:
-			for col in 3 - row:
-				_box(Vector3(0.5, 0.36, 0.5), _type_color(k), -7.1 + col * 0.55 + row * 0.27, z + (col % 2) * 0.2 - 0.1, 0.15 + row * 0.37)
+			for col in 3:
+				if row == 2 and col != 1:
+					continue
+				_place_item(k, Vector3(-7.0 + col * 0.42, 0.124 + row * h, z - 0.2 + (col % 2) * 0.35), _rng.randf_range(-0.15, 0.15))
 		_spot("pile", -6.6, z, 1.8, _type_name(k)).merge({"key": k})
-	# Chỗ xếp bên phải: pallet (kho) hay điểm thi công (công trình).
+	# Chỗ xếp bên phải: pallet trống (kho) hay điểm thi công trên tấm ván (công trình).
 	for i in 3:
 		var z := -3.6 + i * 3.6
-		var base := _solid(Vector3(2.0, 0.18, 1.6), Color("b08a58") if not site else Color("5f6f7a"), 5.2, z)
+		_prop(WP.pallet(), 5.2, z, PI / 2.0, 1.1, 1.3)
 		var s := _spot("slot", 5.2, z, 1.9, "")
-		s["base"] = base
 		s["boxes"] = []
 		_new_slot(s)
-	# Đồ bày cho có không khí: kệ hàng, thùng phuy (kho) hay giàn giáo, cọc tiêu (công trình).
 	if site:
-		for x in [-2.0, 1.2]:
-			_solid(Vector3(0.25, 3.0, 0.25), Color("c9a227"), x, -5.0)
-			_solid(Vector3(0.25, 3.0, 0.25), Color("c9a227"), x + 1.6, -5.0)
-			_box(Vector3(1.85, 0.12, 0.6), Color("8b6b3d"), x + 0.8, -5.0, 1.5)
-		for x in [-3.5, -1.0, 1.5]:
-			_box(Vector3(0.3, 0.7, 0.3), Color("e8692c"), x, 5.2)
+		_prop(WP.model("wooden_ladder", 1.6), -1.0, -5.3, 0.0, 1.5, 0.6)
+		_prop(WP.model("portable_generator", 1.3), 2.4, -5.2, 0.3, 1.1, 0.8)
+		for x in [-3.0, -2.2]:
+			_prop(WP.model("barrel_03"), x, 5.0, 0.0, 0.7, 0.7)
+		for i in 3:
+			var box := WP.model("power_box_01")
+			box.get_child(0).position.y = 0.25
+			_prop(box, -4.0 + i * 1.4, -5.75, 0.0, 0.0, 0.0, 1.3)
+		_prop(WP.model("plastic_crate_01", 1.4), 1.0, 5.0, 0.4, 0.6, 0.6)
 		_idlers.append(_person(Character.LOOKS.get("TRAM", {}), 0.5, -4.2, 0.0))
 	else:
-		for x in [-3.0, 0.0]:
-			_solid(Vector3(2.4, 2.6, 0.8), Color("4a6f8f"), x, -5.3)
-			for y in [0.5, 1.4, 2.2]:
-				_box(Vector3(2.2, 0.35, 0.6), Color("c79c63"), x, -5.3, y)
-		# Thùng phuy, xe nâng, vạch sơn vàng lối đi.
+		for x in [-3.0, 0.2]:
+			var shelf := _prop(WP.model("wooden_bookshelf_worn", 1.15), x, -5.55, 0.0, 1.7, 0.7)
+			for lvl in 3:
+				for j in 3:
+					_place_item(["mi", "nuoc", "mi"][(j + lvl) % 3], Vector3(x - 0.5 + j * 0.5, 0.08 + lvl * 0.78, -5.6))
+		_prop(WP.model("industrial_storage_cart", 1.0), 2.7, -5.3, 0.0, 1.7, 1.2)
 		for i in 4:
-			var drum := MeshInstance3D.new()
-			var cyl := CylinderMesh.new()
-			cyl.top_radius = 0.38
-			cyl.bottom_radius = 0.38
-			cyl.height = 1.0
-			drum.mesh = cyl
-			drum.material_override = _mat(Color("a8552f"))
-			drum.position = Vector3(-2.4 + (i % 2) * 0.8, 0.5, 4.6 + (i / 2) * 0.8)
-			_world.add_child(drum)
-		_blocks.append(Rect2(-2.85, 4.15, 1.7, 1.7))
-		_solid(Vector3(1.2, 1.1, 2.0), Color("d9a227"), 2.6, 4.6)
-		_box(Vector3(0.1, 2.2, 0.1), Color("2b2b2b"), 2.2, 5.6, 0.0)
-		_box(Vector3(0.1, 2.2, 0.1), Color("2b2b2b"), 3.0, 5.6, 0.0)
+			_prop(WP.model("barrel_03"), -2.4 + (i % 2) * 0.68, 4.6 + (i / 2) * 0.68, _rng.randf() * TAU)
+		_blocks.append(Rect2(-2.8, 4.25, 1.5, 1.5))
+		_prop(WP.model("plastic_crate_01", 1.5), 2.2, 4.9, 0.3, 0.6, 0.7)
 		for x in [-4.6, 3.4]:
-			_box(Vector3(0.12, 0.01, 11.0), Color("d6b22e"), x, 0.0)
+			WP.box(_world, Vector3(0.12, 0.005, 11.0), WP.plain(Color("d6b22e"), 0.6), Vector3(x, 0.0, 0))
 		_idlers.append(_person(Character.random_look(_rng), 1.5, -3.8, 0.4))
+	for x in [-3.5, 0.5, 4.5]:
+		_lamp(x, -1.0)
 	_idlers.append(_person(Character.random_look(_rng), -1.2, 3.6, 2.6))
 
 
@@ -286,7 +318,7 @@ func _carry_act(s: Dictionary) -> void:
 				s["have"] = int(s.have) + 1
 				put += 1
 				var n: int = s.boxes.size()
-				s.boxes.append(_box(Vector3(0.5, 0.36, 0.5), _type_color(str(k)), 4.65 + (n % 3) * 0.55, (s.pos as Vector2).y - 0.3 + (n / 3 % 2) * 0.6, 0.18 + (n / 6) * 0.37))
+				s.boxes.append(_place_item(str(k), Vector3(4.8 + (n % 2) * 0.45, 0.124 + (n / 4) * WP.item_h(str(k)), (s.pos as Vector2).y - 0.3 + (n / 2 % 2) * 0.55)))
 			else:
 				kept.append(k)
 		_carry = kept
@@ -311,28 +343,33 @@ func _carry_act(s: Dictionary) -> void:
 # ---------------------------------------------------------------- quán cơm: bưng món, dọn bát
 
 func _build_quan() -> void:
-	_floor(16.0, 12.0, Color("9c8668"), Color("d98a5f"))
-	# Quầy món phía trong, chị Hạnh đứng sau quầy.
-	_solid(Vector3(9.0, 1.0, 1.0), Color("8f5a3a"), -1.0, -4.6)
+	_floor(16.0, 12.0, "worn_tile_floor", "plastered_wall_04", Color(1.0, 0.93, 0.82))
+	# Quầy món phía trong (mặt gạch men, thân ván), chị Hạnh đứng sau quầy.
+	_blocks.append(Rect2(-5.5, -5.1, 9.0, 1.0))
+	WP.box(_world, Vector3(9.0, 0.9, 0.9), WP.tex("brown_planks_05", 0.8), Vector3(-1.0, 0, -4.6))
+	WP.box(_world, Vector3(9.1, 0.05, 1.0), WP.plain(Color("d8dde2"), 0.25, 0.6), Vector3(-1.0, 0.9, -4.6))
 	_idlers.append(_person(Character.LOOKS.get("HANH", {}), -1.0, -5.5, 0.0))
 	var items: Array = cfg.items.keys()
 	for i in items.size():
 		var k: String = items[i]
 		var x := -4.2 + i * 3.2
-		_box(Vector3(1.2, 0.25, 0.6), _type_color(k), x, -4.6, 1.0)
+		# Nồi cơm lớn, nồi canh, thùng trà đá trên quầy; vài tô bày sẵn.
+		var big: Node3D = WP.rice_cooker() if k == "com" else (WP.model("pot_enamel_01", 3.0) if k == "canh" else WP.model("plastic_crate_03", 1.4))
+		_prop(big, x - 0.45, -4.75, 0.0, 0.0, 0.0, 0.95)
+		for j in 3:
+			_place_item(k, Vector3(x + 0.2 + j * 0.25, 0.95, -4.4))
 		_spot("station", x, -4.6, 1.5, _type_name(k)).merge({"key": k})
-	# Chậu rửa bên phải.
-	_solid(Vector3(1.6, 0.9, 1.2), Color("7b8b99"), 6.3, -3.6)
-	_box(Vector3(1.2, 0.1, 0.8), Color("a9c6d8"), 6.3, -3.6, 0.9)
+	# Chậu rửa inox bên phải, thau bát dơ.
+	_blocks.append(Rect2(5.5, -4.2, 1.6, 1.2))
+	WP.box(_world, Vector3(1.6, 0.85, 1.2), WP.plain(Color("aeb4ba"), 0.3, 0.8), Vector3(6.3, 0, -3.6))
+	WP.box(_world, Vector3(1.2, 0.02, 0.8), WP.plain(Color("6f8fa8"), 0.05, 0.2), Vector3(6.3, 0.85, -3.6))
 	_spot("sink", 6.3, -3.6, 1.6, "Chậu rửa")
-	# Bàn khách: bốn bàn nhựa, mỗi bàn hai ghế đẩu.
+	# Bàn inox thấp, ghế nhựa trắng.
 	var tables := [Vector2(-4.5, 0.4), Vector2(0.0, 0.4), Vector2(-4.5, 3.9), Vector2(0.0, 3.9), Vector2(4.5, 1.8)]
 	for p in tables:
-		_solid(Vector3(1.4, 0.75, 1.0), Color("d23c3c"), p.x, p.y)
+		_prop(WP.steel_table(), p.x, p.y, 0.0, 1.3, 0.9)
 		for side in [-1.0, 1.0]:
-			var stool := Props3D.instance(Props3D.stool("low"), Color("2f6fb0"))
-			stool.position = Vector3(p.x + side * 1.05, 0, p.y)
-			_world.add_child(stool)
+			_prop(WP.model("plastic_monobloc_chair_01"), p.x + side * 0.95, p.y, -side * PI / 2.0)
 		var s := _spot("table", p.x, p.y, 1.6, "")
 		s["cust"] = null
 		s["order"] = {}
@@ -340,11 +377,19 @@ func _build_quan() -> void:
 		s["patience"] = 0.0
 		s["bowls"] = []
 	_idlers.append(_person(Character.LOOKS.get("MINH", {}), 6.5, 4.5, -2.4))
-	# Tủ lạnh nước ngọt, nồi cơm lớn, bảng giá trên tường.
-	_solid(Vector3(1.0, 1.9, 0.8), Color("2f6fb0"), 4.2, -5.3)
-	_box(Vector3(0.7, 0.6, 0.7), Color("c8ccd2"), -5.6, -4.6, 1.0)
-	_box(Vector3(3.6, 1.0, 0.08), Color("f2e2b0"), -1.0, -5.95, 1.6)
-	_label("CƠM HẠNH · cơm sườn 35k · canh chua 20k · trà đá 3k", -1.0, -5.9, 3.0).font_size = 28
+	# Tủ mát nước ngọt, két nước, chậu cây, bảng giá.
+	_blocks.append(Rect2(3.7, -5.7, 1.0, 0.8))
+	WP.box(_world, Vector3(1.0, 1.9, 0.8), WP.plain(Color("c0392b"), 0.4), Vector3(4.2, 0, -5.3))
+	var glass := WP.plain(Color(0.7, 0.85, 0.95, 0.45), 0.05)
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	WP.box(_world, Vector3(0.8, 1.4, 0.02), glass, Vector3(4.2, 0.35, -4.89))
+	for i in 3:
+		_prop(WP.model("plastic_crate_01", 1.4), -6.8, 4.6 - i * 0.65, 0.0)
+	_blocks.append(Rect2(-7.2, 3.0, 0.8, 2.0))
+	_prop(WP.model("potted_plant_04", 3.0), 7.0, 5.2)
+	_sign("CƠM HẠNH\ncơm sườn 35k · canh chua 20k · trà đá 3k", -1.0, -5.98, 5.2, Color("b8322a"))
+	for x in [-4.5, 0.0, 4.5]:
+		_lamp(x, 1.5)
 
 
 func _tables() -> Array:
@@ -454,7 +499,7 @@ func _serve_act(s: Dictionary) -> void:
 					if int(order[k]) == 0:
 						order.erase(k)
 					gave += 1
-					s.bowls.append(_box(Vector3(0.28, 0.14, 0.28), _type_color(str(k)), (s.pos as Vector2).x - 0.3 + s.bowls.size() * 0.32, (s.pos as Vector2).y, 0.75))
+					s.bowls.append(_place_item(str(k), Vector3((s.pos as Vector2).x - 0.3 + s.bowls.size() * 0.3, 0.75, (s.pos as Vector2).y)))
 				else:
 					kept.append(k)
 			_carry = kept
@@ -482,39 +527,47 @@ func _serve_act(s: Dictionary) -> void:
 # ---------------------------------------------------------------- tiệm sửa: quầy, bàn sửa, kệ linh kiện
 
 func _build_tiem() -> void:
-	_floor(14.0, 11.0, Color("8a8476"), Color("6f8fa8"))
+	_floor(14.0, 11.0, "concrete_floor_worn_001", "painted_plaster_wall", Color(0.78, 0.88, 0.96))
 	# Quầy nhận máy phía trước (khách đứng ngoài, phía máy quay), hai chỗ đặt máy.
-	_solid(Vector3(7.0, 1.0, 0.8), Color("7a5a3c"), 0.5, 3.6)
+	_blocks.append(Rect2(-3.0, 3.2, 7.0, 0.8))
+	WP.box(_world, Vector3(7.0, 0.95, 0.8), WP.tex("brown_planks_05", 0.8), Vector3(0.5, 0, 3.6))
+	WP.box(_world, Vector3(7.1, 0.04, 0.9), WP.tex("brown_planks_05", 0.6, Color(0.8, 0.7, 0.6)), Vector3(0.5, 0.95, 3.6))
 	for i in 2:
 		var x := -1.5 + i * 4.0
 		var s := _spot("counter", x, 3.6, 1.5, "")
 		s["cust"] = null
 		s["machine"] = {}
 		s["wait"] = 0.0
-	# Bàn sửa phía trong, cái ghế đẩu của chú Sáu.
-	_solid(Vector3(3.0, 0.9, 1.2), Color("5d4a36"), 1.0, -3.4)
-	var stool := Props3D.instance(Props3D.stool("low"), Color("8b6b3d"))
-	stool.position = Vector3(1.0, 0, -2.3)
-	_world.add_child(stool)
+	# Bàn sửa: bàn sắt, ê tô, radio cũ, đèn; cái ghế đẩu của chú Sáu.
+	_prop(WP.model("metal_office_desk", 1.4), 1.0, -3.4, PI, 2.8, 1.3)
+	_prop(WP.model("bench_vice_01", 1.4), 2.2, -3.55, 0.0, 0.0, 0.0, 1.1)
+	_prop(WP.model("boombox", 0.7), -0.2, -3.75, 0.0, 0.0, 0.0, 1.1)
+	_prop(WP.model("metal_stool_01"), 1.0, -2.2)
 	var bench := _spot("bench", 1.0, -3.4, 1.7, "Bàn sửa")
 	bench["machine"] = {}
 	bench["progress"] = 0.0
 	bench["node"] = null
-	# Kệ linh kiện bên trái, mỗi ngăn một loại.
-	_solid(Vector3(0.8, 2.2, 6.0), Color("4a5a6a"), -6.0, -1.0)
+	# Kệ linh kiện bên trái (hai kệ gỗ xoay ra giữa tiệm), mỗi ngăn một loại có hộp màu.
+	_prop(WP.model("wooden_bookshelf_worn", 1.1), -6.1, -2.4, PI / 2.0, 0.7, 1.6)
+	_prop(WP.model("wooden_bookshelf_worn", 1.1), -6.1, 0.9, PI / 2.0, 0.7, 1.6)
 	var parts: Array = cfg.parts.keys()
 	for i in parts.size():
 		var k: String = parts[i]
-		var z := -3.4 + i * 1.6
-		_box(Vector3(0.5, 0.3, 0.6), _type_color(k), -5.75, z, 1.0)
+		var z := -3.0 + i * 1.6
+		for j in 3:
+			WP.box(_world, Vector3(0.22, 0.14, 0.22), WP.plain(_type_color(k), 0.5), Vector3(-6.0, 0.95, z - 0.3 + j * 0.3))
 		_spot("shelf", -5.2, z, 1.1, _type_name(k)).merge({"key": k})
-	_idlers.append(_person(Character.LOOKS.get("SAU", {}), 5.5, -3.8, -0.6))
-	# Máy chờ sửa xếp góc, quạt treo tường, bảng "Báo giá trước khi sửa".
-	for i in 5:
-		_box(Vector3(0.55, 0.45, 0.5), [Color("6fa8c8"), Color("e8e4da"), Color("3c8d5a"), Color("8e44ad"), Color("c0603a")][i], 4.6 + (i % 3) * 0.6, -1.0 + (i / 3) * 0.6)
-	_blocks.append(Rect2(4.3, -1.3, 1.9, 1.3))
-	_box(Vector3(3.0, 0.9, 0.08), Color("f2e2b0"), 1.0, -5.45, 1.5)
-	_label("BÁO GIÁ TRƯỚC KHI SỬA", 1.0, -5.4, 2.7).font_size = 30
+	# Tủ đồ nghề, xe dụng cụ, máy chờ sửa xếp góc.
+	_prop(WP.model("metal_tool_chest", 1.2), 5.6, -4.9, 0.0, 0.9, 0.6)
+	_prop(WP.model("industrial_storage_cart", 0.8), 3.9, -4.9, 0.0, 1.4, 0.9)
+	var waiting := ["Quạt bàn", "Nồi cơm điện", "Máy bơm", "Quạt bàn", "Bàn ủi"]
+	for i in waiting.size():
+		_place_item(waiting[i], Vector3(4.6 + (i % 3) * 0.6, 0.0, -0.8 + (i / 3) * 0.7), _rng.randf_range(-0.5, 0.5))
+	_blocks.append(Rect2(4.2, -1.2, 1.9, 1.4))
+	_sign("SÁU SỬA ĐIỆN\nbáo giá trước khi sửa", 1.0, -5.48, 3.0, Color("1f4f8a"))
+	_idlers.append(_person(Character.LOOKS.get("SAU", {}), 5.5, -3.6, -0.6))
+	for x in [-3.0, 1.0, 5.0]:
+		_lamp(x, -1.5)
 
 
 func _counters() -> Array:
@@ -563,7 +616,7 @@ func _customer(s: Dictionary) -> void:
 	s["cust"] = c
 	s["machine"] = m
 	s["wait"] = float(cfg.get("patience", 70.0))
-	s["node"] = _box(Vector3(0.6, 0.45, 0.5), Color(str(m.color)), (s.pos as Vector2).x, 3.6, 1.0)
+	s["node"] = _place_item(str(m.name), Vector3((s.pos as Vector2).x, 1.0, 3.6), PI)
 	_counter_label(s)
 
 
@@ -664,7 +717,7 @@ func _repair_act(s: Dictionary) -> void:
 				var cs: Dictionary = _counters()[int(key.substr(4))]
 				b["machine"] = cs.machine
 				b["progress"] = 0.0
-				b["node"] = _box(Vector3(0.6, 0.45, 0.5), Color(str(cs.machine.color)), 0.4, -3.4, 0.9)
+				b["node"] = _place_item(str(cs.machine.name), Vector3(0.6, 1.1, -3.3), PI)
 				_bench_label(b)
 			elif bool(m.get("fixed", false)):
 				if not _carry.is_empty():
@@ -770,24 +823,24 @@ func _act(s: Dictionary) -> void:
 func _refresh_carry() -> void:
 	for c in _stack.get_children():
 		c.queue_free()
-	var i := 0
+	var y := 0.0
 	for k in _carry:
-		var col := Color("8a8f98")
-		var size := Vector3(0.42, 0.3, 0.42)
-		if str(k) == "dirty":
-			col = Color("d8d2c0")
-			size = Vector3(0.36, 0.2, 0.36)
-		elif str(k).begins_with("may:"):
-			var cs: Dictionary = _counters()[int(str(k).substr(4))]
-			col = Color(str(cs.machine.get("color", "8a8f98")))
-			size = Vector3(0.6, 0.45, 0.5)
-		elif str(k).begins_with("part:"):
-			col = _type_color(str(k).substr(5))
-			size = Vector3(0.22, 0.16, 0.22)
+		var key := str(k)
+		var n: Node3D
+		var h := 0.16
+		if key.begins_with("may:"):
+			var cs: Dictionary = _counters()[int(key.substr(4))]
+			key = str(cs.machine.get("name", ""))
+			h = 0.45
+		if key.begins_with("part:"):
+			n = Node3D.new()
+			WP.box(n, Vector3(0.22, 0.14, 0.22), WP.plain(_type_color(key.substr(5)), 0.5), Vector3.ZERO)
 		else:
-			col = _type_color(str(k))
-		_box(size, col, 0, 0, i * (size.y + 0.02), _stack)
-		i += 1
+			n = WP.item(key)
+			h = WP.item_h(key) if not str(k).begins_with("may:") else h
+		n.position = Vector3(0, y, 0)
+		_stack.add_child(n)
+		y += h + 0.01
 	_body.hold("push" if not _carry.is_empty() else "")
 	if is_instance_valid(_carry_l):
 		var names := []

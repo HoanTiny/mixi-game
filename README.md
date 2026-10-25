@@ -84,7 +84,7 @@ Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu đ�
 - **Quán Cơm Hạnh** (ca phụ quán): khách ngồi bàn gọi món, lấy cơm sườn, canh chua, trà đá ở quầy bưng ra đúng bàn; khách ăn xong thì dọn bát dơ về chậu rửa; khách chờ lâu sẽ bỏ đi.
 - **Tiệm Sáu** (sửa đồ lẻ, trông tiệm, ngồi bàn thứ Bảy, mở tiệm, làm khoán): khách mang quạt, nồi cơm, máy bơm, bàn ủi tới quầy; đem lên bàn sửa, lấy đúng linh kiện ở kệ (tụ quạt, cầu chì nhiệt, phốt bơm, rơ le nhiệt), đứng tại bàn sửa xong rồi trả đúng khách.
 
-Đủ chỉ tiêu trong giờ thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%), làm nhanh, khéo được thưởng. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, cảnh dựng ở `scripts/work/work_site.gd`.
+Đủ chỉ tiêu trong giờ thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%), làm nhanh, khéo được thưởng. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, cảnh dựng ở `scripts/work/work_site.gd`. Đồ vật và vật liệu là mô hình chụp từ đồ thật của [Poly Haven](https://polyhaven.com) (CC0: thùng carton, sóng nhựa, thùng phuy, ghế nhựa trắng, nồi, bàn sắt, ê tô, tủ đồ nghề, kệ gỗ, sàn bê tông, gạch men, tường vữa, tôn), danh sách ở `assets/ph/NGUON.md`; pallet, cuộn dây, bao gạo, quạt, nồi cơm, tô cơm dựng bằng khối phủ vật liệu thật (`scripts/work/work_props.gd`).
 
 **Ve chai:** thùng rác dọc vỉa hè, đứng gần bấm **E** để lục (mỗi thùng một lần mỗi ngày): được chai nhựa, lon, bìa giấy nhưng bẩn người. Mang ra sạp của cô Út ở **chợ Cầu Nhỏ** để bán.
 
