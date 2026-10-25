@@ -23,6 +23,10 @@ const FADE := 3.0
 ## Ba kiểu xe máy chạy: tay ga một người, xe số một người, tay ga chở thêm người ngồi sau (tỉ lệ).
 const KINDS := [["tay_ga", false, 0.5], ["xe_so", false, 0.3], ["tay_ga", true, 0.2]]
 const BIKE_PAINT := ["b23a32", "2b2d33", "e8e6e1", "3a6ea5", "c9ccd1", "7a2a3a", "e0b23c", "2f6f4f"]
+## Người lái xe máy (người thật nướng sẵn, xem props3d.gd rider_real), màu mũ bảo hiểm.
+const RIDERS := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02", "Female_Adult_08",
+	"Female_Adult_07"]
+const HELMETS := ["c0392b", "f2f0ea", "2f6fb0", "1f1f24", "f1c40f", "d98fa0", "7d8c6a"]
 const CAR_PAINT := ["e8e6e1", "2b2d33", "b23a32", "3a6ea5", "c9ccd1", "e0b23c", "5a7d4f"]
 
 ## Tuyến: {line, cum (quãng đường tới từng đỉnh), len, width, y, rect}.
@@ -72,7 +76,10 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount
 		var n := roundi(float(r.len) * float(r.k) * k_bike)
 		for kind in KINDS:
 			var m := roundi(n * float(kind[2]))
-			_add(kinds, "%s|%s" % [kind[0], kind[1]], ri, m, bike_lane, Vector2(6.5, 9.5), BIKE_PAINT)
+			# Mỗi loại xe hai nhóm người lái (mỗi nhóm một kiểu người, đỡ số lần vẽ).
+			var half := m / 2
+			_add(kinds, "%s|%s|0" % [kind[0], kind[1]], ri, half, bike_lane, Vector2(6.5, 9.5), BIKE_PAINT)
+			_add(kinds, "%s|%s|1" % [kind[0], kind[1]], ri, m - half, bike_lane, Vector2(6.5, 9.5), BIKE_PAINT)
 			counts.bikes += m
 		if cars:
 			var m := roundi(float(r.len) * float(r.k) * k_car)
@@ -85,7 +92,17 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount
 			if list.is_empty():
 				continue
 			var parts := str(kk).split("|")
-			_group(Props3D.car() if kk == "car" else Props3D.rider_bike(parts[0], parts[1] == "true"), list, clusters[key].rect, kk == "car")
+			if kk == "car":
+				_group(Props3D.car(), list, clusters[key].rect, true)
+				continue
+			# Người lái chọn theo cụm và nhóm: mỗi cụm một vẻ.
+			var h := absi(hash(key)) + int(parts[2]) * 3 + (1 if parts[0] == "xe_so" else 0)
+			var back: String = RIDERS[(h + 2) % RIDERS.size()] if parts[1] == "true" else ""
+			var real := Props3D.rider_real(parts[0], RIDERS[h % RIDERS.size()], back, Color(HELMETS[h % HELMETS.size()]))
+			if real != null:
+				_group(real, list, clusters[key].rect, false, false)
+			else:
+				_group(Props3D.rider_bike(parts[0], parts[1] == "true"), list, clusters[key].rect, false)
 
 
 ## Độ đông xe của tuyến: đủ trong vòng 65 m quanh chỗ của truyện, xa dần thưa dần, xa hẳn còn một phần ba.
@@ -111,7 +128,7 @@ func _add(kinds: Dictionary, kk: String, ri: int, m: int, lane: Vector2, speed: 
 
 ## Một nhóm (cụm, loại xe): MultiMesh khung bao cố định quanh các tuyến trong cụm. shadows: đổ bóng thật (ô tô); xe máy
 ## đông nên dùng bóng giả có sẵn trong lưới.
-func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool) -> void:
+func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := true) -> void:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	# Màu sơn ở custom data (sắc áo ở kênh a); màu instance trắng (bản Compatibility nhân màu đỉnh với màu instance).
@@ -146,7 +163,8 @@ func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool) -> void:
 	g["seg"] = seg
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
-	mi.material_override = Props3D.instanced_material()
+	if override:
+		mi.material_override = Props3D.instanced_material()
 	if not shadows:
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)

@@ -2,7 +2,7 @@
 
 Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh phường An Hòa của thành phố hư cấu Bình Giang. An, 27 tuổi, vừa mất việc ở tiệm điện máy. Cả nhà có 30 ngày để dọn khỏi xóm trọ Bờ Me và tìm chỗ ở mới; chơi tiếp 30 ngày nữa ở chỗ mới khi mùa mưa tới và má An về nhà sau mười sáu năm, rồi tháng Bảy mưa ngâu khi chú Sáu muốn sang lại tiệm, rồi tháng Tám trăng tròn với tháng đầu của cái tiệm. Thiết kế đầy đủ nằm trong [docs/](docs/README.md).
 
-Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người, xe máy, ô tô, xe đẩy, ghe, cây dựng bằng code thành lưới 3D bo tròn (`scripts/world/character.gd`, `scripts/world/props3d.gd`); có file mô hình thật trong `assets/` thì dùng file đó (xem mục *Thêm mô hình thật*).
+Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người là người thật của bộ Microsoft Rocketbox (MIT, `assets/rb/NGUON.md`): mặt, tóc, quần áo chụp thật, có xương và động tác đứng, đi, ngồi, nói chuyện (`scripts/world/human.gd`); đám đông và người lái xe máy dùng tư thế nướng sẵn thành lưới nhẹ (`tools/bake_people.gd`), người đi bộ gần An thì có động tác thật. Xe máy, ô tô, xe đẩy, ghe, cây dựng bằng code thành lưới 3D bo tròn (`scripts/world/props3d.gd`); có file mô hình thật trong `assets/` thì dùng file đó (xem mục *Thêm mô hình thật*).
 
 **Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29 (rạch dâng, chỗ trũng ngập, lội nước tốn giờ), chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
 
@@ -112,11 +112,12 @@ data/
   models.json     file mô hình cho nhà, người, xe, cây, đồ vật và cách co giãn
   sounds.json     âm nền, tiếng rao, còi xe, tiếng hiệu ứng
 docs/             tài liệu thiết kế "Trước mùa mưa" (Godot bỏ qua thư mục này)
-assets/           texture, HDRI, mô hình đồ vật Poly Haven, âm thanh
+assets/           texture, HDRI, mô hình đồ vật Poly Haven, người thật Rocketbox (assets/rb), âm thanh
 prototype/        bản thử HTML đầu tiên (cốt truyện cũ)
 tools/
   gen_sounds.py   tổng hợp âm thanh tạm
   bake_map.gd     nướng một khu thật thành map của truyện (OSM + Open Buildings, cắt theo khung)
+  bake_people.gd  nướng tư thế người thật thành lưới nhẹ cho đám đông, người lái xe (chạy có màn hình: xvfb-run)
 scripts/
   game_logic.gd   toàn bộ luật chơi, không phụ thuộc giao diện
   game_state.gd   autoload GameState: giữ ván chơi, tự lưu
@@ -124,7 +125,8 @@ scripts/
   world/models.gd nạp mô hình, co giãn cho vừa chỗ, phát hoạt cảnh
   world/surfaces.gd    vật liệu texture chiếu theo tọa độ thế giới
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
-  world/character.gd   nhân vật 3D liền khối có khung xương: An, 8 nhân vật, người đi đường; đi, đứng, ngồi xe, đẩy xe, gánh
+  world/character.gd   ngoại hình từng nhân vật (LOOKS), người đi đường ngẫu nhiên; khung người dựng bằng code làm dự phòng
+  world/human.gd       người thật Rocketbox: đi, đứng, ngồi xe, nói, đẩy xe, gánh, gắn nón
   world/props3d.gd     đồ vật 3D dựng bằng code: xe máy, ô tô, ghế bàn nhựa, xe đẩy bán rong, gánh hàng, ghe, cây, cây dừa
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
   realmap/realmap.gd     chế độ Dựng khu thật: giao diện hai nửa, tiến độ, camera xoay nghiêng, tải .glb, đi dạo

@@ -15,6 +15,18 @@ extends Node3D
 const Props3D := preload("res://scripts/world/props3d.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
+const Human := preload("res://scripts/world/human.gd")
+
+## Người thật (Rocketbox, tools/bake_people.gd nướng sẵn từng tư thế thành lưới nhẹ ở assets/rb/crowd): người đứng, ngồi,
+## đi xa An là lưới tĩnh vẽ hàng loạt; người đi bộ và trẻ con trong vòng NEAR mét quanh An thì thay bằng người có xương,
+## có động tác (lấy từ nhóm dựng sẵn POOL_PER người mỗi kiểu, khỏi dựng lúc đang chơi).
+const AVATARS := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02", "Female_Adult_08",
+	"Female_Adult_07"]
+const CHILD := "Male_Child_01"
+const NEAR := 24.0
+const POOL_PER := 3
+## Phần người đứng trước tiệm, nhóm nói chuyện đang đưa tay nói.
+const TALK_SHARE := 0.35
 
 ## Phần chỗ ngồi quán cóc có khách, phần tiệm có người đứng trước cửa (gần chỗ của truyện; xa thì nhân thêm độ đông
 ## _near), phần tiệm đó có thêm khách đứng mua.
@@ -49,7 +61,6 @@ var _taken := {}
 ## Ô ROAD_CELL mét → các đoạn đường lớn, cầu [a, b, cách tim dưới chừng này thì tránh] (xem _index_roads).
 var _roads := {}
 ## Người đi bộ: khúc đi (các điểm cách nhau STEP mét), quãng đã đi trên khúc, chiều, lệch bên phải, tốc độ.
-var _walk_mm: MultiMesh
 var _w_pts: Array[PackedVector2Array] = []
 var _w_s := PackedFloat32Array()
 var _w_dir := PackedFloat32Array()
@@ -61,6 +72,12 @@ var _ball_mm: MultiMesh
 var _groups: Array = []
 var _time := 0.0
 var _show := {"seated": 1.0, "shop": 1.0, "hot": 1.0, "walk": 1.0, "kids": 1.0}
+## Người đi bộ i nằm ở MultiMesh _walk_mms[i % số kiểu người], chỗ i / số kiểu người.
+var _walk_mms: Array[MultiMesh] = []
+## Người có xương đang rảnh theo kiểu người; đang thay cho ai (khóa: số người đi bộ, trẻ con thì -1 - số thứ tự).
+var _pool := {}
+var _live := {}
+var _kid_prev: Array[Vector2] = []
 
 
 ## dress: street_dress.gd của khu (chỗ ngồi, tiệm); roads: đường của khu; center: chỗ của truyện; walkable(p): đi được;
@@ -100,7 +117,7 @@ func build(dress, roads: Array, center: Vector2, walkable: Callable, hot: Array 
 		_take(p)
 		_take(p + f * 0.55)
 		if _rng.randf() < SEAT_SHARE * _near(p, center):
-			seated.append([p, f, float(it[2]) - 0.3])
+			seated.append([p, f, float(it[2])])
 	var shop: Array = []
 	for it in dress.shops:
 		var p: Vector2 = it[0]
@@ -170,27 +187,42 @@ func _chat_groups(roads: Array, center: Vector2, ok: Callable, want: int) -> Arr
 	return out
 
 
-## Người đứng, ngồi yên: hai MultiMesh (không đội, đội nón lá), áo quần mỗi người một màu; thứ tự xáo trộn để buổi tối
-## vắng bớt thì vắng đều các chỗ.
+## Người đứng, ngồi yên: mỗi kiểu người, mỗi tư thế một MultiMesh lưới nướng sẵn (ngồi: ghế cao hay ghế đẩu thấp theo
+## độ cao ghế; đứng trước tiệm: có người đang nói); thứ tự xáo trộn để buổi tối vắng bớt thì vắng đều các chỗ.
 func _people(items: Array, pose: String, key: String) -> void:
-	var split := [[], []]
+	var split := {}
 	for it in items:
-		split[1 if _rng.randf() < 0.25 else 0].append(it)
-	for hat in 2:
-		var mine: Array = split[hat]
-		if mine.is_empty():
-			continue
+		var p := pose
+		if pose == "sit":
+			p = "sit" if float(it[2]) > 0.35 else "low"
+		elif key == "shop" and _rng.randf() < TALK_SHARE:
+			p = "talk"
+		var k := "%s|%s" % [AVATARS[_rng.randi() % AVATARS.size()], p]
+		if not split.has(k):
+			split[k] = []
+		split[k].append(it)
+	for k in split:
+		var mine: Array = split[k]
 		for i in range(mine.size() - 1, 0, -1):
 			var j := _rng.randi() % (i + 1)
 			var t = mine[i]
 			mine[i] = mine[j]
 			mine[j] = t
-		var mm := _mm(Props3D.person(pose, hat == 1), mine.size())
+		var parts := str(k).split("|")
+		var mesh := _real(parts[0], parts[1])
+		var mm := _mm(mesh if mesh != null else Props3D.person("sit" if pose == "sit" else "stand"), mine.size())
 		for i in mine.size():
 			var p: Vector2 = mine[i][0]
 			var f: Vector2 = mine[i][1]
-			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, atan2(f.x, f.y)), Vector3(p.x, float(mine[i][2]), p.y)))
-		_static[key].append(_mmi(mm, Props3D.instanced_material()))
+			var y := 0.0 if mesh != null or pose != "sit" else float(mine[i][2]) - 0.3
+			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, atan2(f.x, f.y)), Vector3(p.x, y, p.y)))
+		_static[key].append(_mmi(mm, null if mesh != null else Props3D.instanced_material()))
+
+
+## Lưới người thật nướng sẵn (null nếu chưa nướng).
+static func _real(avatar: String, pose: String) -> Mesh:
+	var path := "res://assets/rb/crowd/%s_%s.res" % [avatar, pose]
+	return load(path) if ResourceLoader.exists(path) else null
 
 
 func _mm(mesh: Mesh, n: int) -> MultiMesh:
@@ -212,7 +244,8 @@ func _mm(mesh: Mesh, n: int) -> MultiMesh:
 func _mmi(mm: MultiMesh, mat: Material) -> MultiMeshInstance3D:
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
-	mi.material_override = mat
+	if mat != null:
+		mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
 	return mi
@@ -290,8 +323,14 @@ func _build_walkers(roads: Array, center: Vector2, ok: Callable, amount: float) 
 		_w_dir[j] = t.y
 		_w_lat[j] = t.z
 		_w_speed[j] = t.w
-	_walk_mm = _mm(Props3D.person("walk"), _w_pts.size())
-	_mmi(_walk_mm, Props3D.walking_material(7.0))
+	var na := AVATARS.size()
+	for a in na:
+		var mesh := _real(AVATARS[a], "walk")
+		var mm := _mm(mesh if mesh != null else Props3D.person("walk"), (_w_pts.size() - a + na - 1) / na)
+		_mmi(mm, null if mesh != null else Props3D.walking_material(7.0))
+		_walk_mms.append(mm)
+		for k in POOL_PER:
+			_spare(AVATARS[a])
 	counts.walkers = _w_pts.size()
 	_update_walkers(0.0, Vector2.ZERO, true)
 
@@ -321,8 +360,12 @@ func _build_kids(roads: Array, center: Vector2, ok: Callable) -> void:
 		_groups.append({"c": c, "d": d, "kids": [0.0, 2.1, 4.2], "from": 0, "to": 1, "t": 0.0})
 	if _groups.is_empty():
 		return
-	_kid_mm = _mm(Props3D.person("walk"), _groups.size() * 3)
-	_mmi(_kid_mm, Props3D.walking_material(11.0))
+	var kid := _real(CHILD, "walk")
+	_kid_mm = _mm(kid if kid != null else Props3D.person("walk"), _groups.size() * 3)
+	_mmi(_kid_mm, null if kid != null else Props3D.walking_material(11.0))
+	_kid_prev.resize(_groups.size() * 3)
+	for k in POOL_PER:
+		_spare(CHILD)
 	var ball := SphereMesh.new()
 	ball.radius = 0.11
 	ball.height = 0.22
@@ -352,8 +395,8 @@ func set_time(hour: float, rain: bool) -> void:
 		for mi in _static[key]:
 			var mm: MultiMesh = mi.multimesh
 			mm.visible_instance_count = int(round(mm.instance_count * float(_show[key])))
-	if _walk_mm != null:
-		_walk_mm.visible_instance_count = int(round(_walk_mm.instance_count * float(_show.walk)))
+	for mm in _walk_mms:
+		mm.visible_instance_count = int(round(mm.instance_count * float(_show.walk)))
 	if _kid_mm != null:
 		_kid_mm.visible_instance_count = _kid_mm.instance_count if float(_show.kids) > 0.5 else 0
 		_ball_mm.visible_instance_count = _ball_mm.instance_count if float(_show.kids) > 0.5 else 0
@@ -362,19 +405,27 @@ func set_time(hour: float, rain: bool) -> void:
 ## Mỗi khung hình: người đi bộ bước tiếp, trẻ con chạy, banh nảy. focus: chỗ An (xa quá thì khỏi cập nhật hình).
 func update(delta: float, focus: Vector2) -> void:
 	_time += delta
-	if _walk_mm != null and _walk_mm.visible_instance_count != 0:
-		_update_walkers(delta, focus)
+	var seen := {}
+	if not _walk_mms.is_empty():
+		_update_walkers(delta, focus, false, seen)
 	if _kid_mm != null and _kid_mm.visible_instance_count != 0:
-		_update_kids(delta)
+		_update_kids(delta, focus, seen)
+	for key in _live.keys():
+		if not seen.has(key):
+			_release(key)
 
 
-## all: cập nhật hình cả những người xa focus và những người đang ẩn (lúc mới dựng).
-func _update_walkers(delta: float, focus: Vector2, all := false) -> void:
+## all: cập nhật hình cả những người xa focus và những người đang ẩn (lúc mới dựng). seen: ghi những ai đang được thay
+## bằng người có xương.
+func _update_walkers(delta: float, focus: Vector2, all := false, seen := {}) -> void:
 	var r2 := UPDATE_RANGE * UPDATE_RANGE
-	var n := _walk_mm.visible_instance_count
-	if n < 0 or all:
-		n = _w_pts.size()
-	for i in n:
+	var na := _walk_mms.size()
+	for i in _w_pts.size():
+		var mm := _walk_mms[i % na]
+		var slot := i / na
+		var shown := all or mm.visible_instance_count < 0 or slot < mm.visible_instance_count
+		if not shown:
+			continue
 		var pts := _w_pts[i]
 		var span := float(pts.size() - 1) * STEP
 		var s := _w_s[i] + _w_dir[i] * _w_speed[i] * delta
@@ -391,10 +442,48 @@ func _update_walkers(delta: float, focus: Vector2, all := false) -> void:
 		# Bên phải chiều đi: orthogonal() của hướng khúc là bên trái chiều xuôi.
 		var p := a.lerp(b, s / STEP - float(k)) - (b - a).normalized().orthogonal() * _w_lat[i]
 		var f := (b - a) * _w_dir[i]
-		_walk_mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, atan2(f.x, f.y)), Vector3(p.x, 0.0, p.y)))
+		var xf := Transform3D(Basis(Vector3.UP, atan2(f.x, f.y)), Vector3(p.x, 0.0, p.y))
+		if not all and p.distance_squared_to(focus) < NEAR * NEAR and _animate(i, AVATARS[i % na], xf, _w_speed[i], delta, seen):
+			xf = Transform3D(Basis().scaled(Vector3.ZERO), xf.origin)
+		mm.set_instance_transform(slot, xf)
 
 
-func _update_kids(delta: float) -> void:
+## Người có xương đứng thay cho người key ở xf, bước theo tốc độ speed (m/giây); hết người rảnh thì trả false.
+func _animate(key: int, avatar: String, xf: Transform3D, speed: float, delta: float, seen: Dictionary) -> bool:
+	var h: Node3D = _live.get(key)
+	if h == null:
+		var free: Array = _pool.get(avatar, [])
+		if free.is_empty():
+			return false
+		h = free.pop_back()
+		h.visible = true
+		_live[key] = h
+	seen[key] = true
+	h.transform = xf
+	h.animate(delta, speed / (Human.WALK_SPEED * 1.6))
+	return true
+
+
+func _release(key: int) -> void:
+	var h: Node3D = _live[key]
+	_live.erase(key)
+	h.visible = false
+	_pool[str(h.look.rb)].append(h)
+
+
+## Dựng sẵn một người có xương kiểu avatar, cất vào nhóm rảnh.
+func _spare(avatar: String) -> void:
+	if not Human.exists(avatar):
+		return
+	var h := Human.make({"rb": avatar})
+	h.visible = false
+	add_child(h)
+	if not _pool.has(avatar):
+		_pool[avatar] = []
+	_pool[avatar].append(h)
+
+
+func _update_kids(delta: float, focus := Vector2.ZERO, seen := {}) -> void:
 	for g in range(_groups.size()):
 		var grp: Dictionary = _groups[g]
 		var c: Vector2 = grp.c
@@ -418,7 +507,14 @@ func _update_kids(delta: float) -> void:
 		for k in 3:
 			var look: Vector2 = bp - pos[k]
 			var yaw := atan2(look.x, look.y) if look.length() > 0.05 else 0.0
-			_kid_mm.set_instance_transform(g * 3 + k, Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * 0.62), Vector3(pos[k].x, 0.0, pos[k].y)))
+			var idx := g * 3 + k
+			var xf := Transform3D(Basis(Vector3.UP, yaw), Vector3(pos[k].x, 0.0, pos[k].y))
+			var speed := pos[k].distance_to(_kid_prev[idx]) / maxf(delta, 0.001)
+			_kid_prev[idx] = pos[k]
+			if not seen.is_empty() or focus != Vector2.ZERO:
+				if pos[k].distance_squared_to(focus) < NEAR * NEAR and _animate(-1 - idx, CHILD, xf, speed, delta, seen):
+					xf = Transform3D(Basis().scaled(Vector3.ZERO), xf.origin)
+			_kid_mm.set_instance_transform(idx, xf)
 
 
 # ---------------------------------------------------------------- chỗ trống, lòng đường

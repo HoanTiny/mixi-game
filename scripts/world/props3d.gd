@@ -335,6 +335,46 @@ static func rider_bike(kind := "tay_ga", passenger := false) -> ArrayMesh:
 	return m
 
 
+## Xe máy đang chạy có người thật lái (tư thế nướng sẵn ở assets/rb/crowd, tools/bake_people.gd): mặt lưới đầu là xe
+## và bóng giả (vật liệu sơn theo MultiMesh), sau là người lái (back: người ngồi sau, rỗng thì không) với ảnh thật, mũ
+## bảo hiểm màu helmet. Chưa nướng thì trả null.
+static func rider_real(kind: String, driver: String, back: String, helmet: Color) -> ArrayMesh:
+	var key := "that|%s|%s|%s|%s" % [kind, driver, back, helmet.to_html()]
+	if _cache.has(key):
+		return _cache[key]
+	var parts := [[driver, "ride"]] + ([[back, "back"]] if back != "" else [])
+	for pr in parts:
+		if not ResourceLoader.exists("res://assets/rb/crowd/%s_%s.res" % pr):
+			return null
+	var g = Character.Mesher.new(false)
+	_motorbike(g, kind, false)
+	var disc := PackedInt32Array()
+	var mid: int = g.vert(Vector3(0.0, 0.012, 0.0), Vector3.UP, _c("1c1d20"), NB)
+	for j in 10:
+		var th := TAU * float(j) / 10.0
+		disc.append(g.vert(Vector3(sin(th) * 0.42, 0.012, cos(th) * 1.0 - 0.05), Vector3.UP, _c("26272b"), NB))
+	for j in 10:
+		g.tri(mid, disc[j], disc[(j + 1) % 10])
+	var m: ArrayMesh = g.commit()
+	for i in m.get_surface_count():
+		m.surface_set_material(i, instanced_material())
+	var hm := StandardMaterial3D.new()
+	hm.vertex_color_use_as_albedo = true
+	hm.albedo_color = helmet
+	hm.roughness = 0.35
+	for pr in parts:
+		var src: ArrayMesh = load("res://assets/rb/crowd/%s_%s.res" % pr)
+		for i in src.get_surface_count():
+			m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(i))
+			var mat := src.surface_get_material(i)
+			# Mặt lưới mũ bảo hiểm (vật liệu theo màu đỉnh) đổi màu theo xe.
+			if mat is StandardMaterial3D and (mat as StandardMaterial3D).vertex_color_use_as_albedo:
+				mat = hm
+			m.surface_set_material(m.get_surface_count() - 1, mat)
+	_cache[key] = m
+	return m
+
+
 ## Người ngồi xe máy, gộp vào lưới xe: hông ở (0, SEAT_H, hz), bàn chân ở (±foot.x, foot.y, foot.z); driver: hai tay
 ## nắm tay lái, không thì đặt trên đùi. Áo là phần sơn thứ hai (alpha 0,5: MultiMesh cho mỗi người một màu áo), nón
 ## bảo hiểm là phần sơn (cùng màu xe).
