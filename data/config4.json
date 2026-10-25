@@ -2,7 +2,7 @@
  "_ghi_chu": "Việc làm, sinh hoạt, việc tùy chọn thêm ở chương 4 (cùng cú pháp actions trong config.json). \"home\" là chỗ ở hiện tại.",
  "actions": [
   {
-   "id": "lam_tiem",
+   "id": "lam_tiem", "minigame": "repair",
    "group": "work",
    "location": "tiem_sau",
    "name": "Mở tiệm cả ngày (khách quạt, nồi cơm, máy bơm)",
@@ -33,7 +33,7 @@
    "desc": "Tháng đầu của tiệm: khách lẻ, khách quen của chú Sáu, phiếu nhận sửa có báo giá. Tiền công phần của An."
   },
   {
-   "id": "tho_khoan",
+   "id": "tho_khoan", "minigame": "repair",
    "group": "work",
    "location": "tiem_sau",
    "name": "Làm thợ nhận khoán ở tiệm (quạt, nồi cơm, máy bơm)",

@@ -76,9 +76,15 @@ Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu đ�
 
 **Tiền và Mệt:** góc phải hiện tiền mặt tiêu được, tách riêng khỏi tiền phải thu (trước và sau ngày 30) và khoản phải trả. Mỗi tối trừ tiền sinh hoạt của cả nhà (`livingCostPerDay`, chưa gồm cơm của An). Mệt từ 70 trở lên là mức cảnh báo; nghỉ ở phòng, ăn cơm với bà, ngồi trà đá giúp giảm Mệt. Nút **Sổ** mở các khoản phải thu, phải trả, sổ lời hứa, sổ gia đình, độ thân thiết và đồ đang mang.
 
-**Nhu cầu cơ thể và Phong độ (kiểu Nobody):** No bụng, Vệ sinh, Quần áo tự giảm theo giờ; việc bẩn (ca kho, rửa bát, lục rác) làm bẩn người và đồ. Cùng độ tỉnh táo (100 − Mệt), chúng gộp thành **Phong độ**: từ 55 trở lên đủ lương, 30–55 chỉ được 70%, dưới 30 chỉ 50% và đi chậm. Nhịn đói tới 0 thì Mệt tăng nhanh. Ăn ở Cơm Hạnh, bánh mì ở chợ Cầu Nhỏ buổi sáng; tắm và giặt đồ ở xóm trọ. Số liệu trong `needs` của `data/config.json`.
+**Nhu cầu cơ thể và Phong độ (kiểu Nobody):** No bụng, Vệ sinh, Quần áo tự giảm theo giờ; việc bẩn (ca kho, phụ quán, lục rác) làm bẩn người và đồ. Cùng độ tỉnh táo (100 − Mệt), chúng gộp thành **Phong độ**: từ 55 trở lên đủ lương, 30–55 chỉ được 70%, dưới 30 chỉ 50% và đi chậm. Nhịn đói tới 0 thì Mệt tăng nhanh. Ăn ở Cơm Hạnh, bánh mì ở chợ Cầu Nhỏ buổi sáng; tắm và giặt đồ ở xóm trọ. Số liệu trong `needs` của `data/config.json`.
 
-**Trò chơi nhỏ khi đi làm (kiểu Nobody):** ca kho ở khu công nghiệp (đi từ bến xe số 6) là xếp đúng loại hàng (thùng mì, lốc nước, bao gạo) lên pallet trong 60 giây; bỏ nhầm loại phải dỡ ra. Ca phụ quán Cơm Hạnh là rửa bát: bấm từng vết bẩn để kỳ cọ (vết to chà hai lần), sạch thì xếp lên giá (phím cách), xếp bát còn bẩn bị trả lại. Đủ chỉ tiêu thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%), làm khéo được thưởng. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số và chữ trên màn trong `minigames` của `data/config.json`.
+**Ca làm việc 3D (kiểu Nobody):** mỗi việc có một bản đồ nhỏ riêng, An tự đi lại làm (WASD hay bấm, chạm xuống sàn để đi; tới gần rồi bấm E, Space hay bấm thẳng vào chỗ đó). Nhãn treo trên đầu từng chỗ ghi cần gì, còn bao lâu.
+- **Kho khu công nghiệp** (ca kho, tổ trưởng ca chiều): bưng thùng mì, lốc nước, bao gạo từ đống bên trái lên pallet bên phải đúng loại nhãn ghi, đầy pallet thì xe nâng chở đi.
+- **Công trình điện Bến Cạn** (làm cùng tổ, điều phối, bảo trì sau mưa, đi lại điện chợ): đưa cuộn dây, ống luồn, hộp CB tới từng điểm thi công.
+- **Quán Cơm Hạnh** (ca phụ quán): khách ngồi bàn gọi món, lấy cơm sườn, canh chua, trà đá ở quầy bưng ra đúng bàn; khách ăn xong thì dọn bát dơ về chậu rửa; khách chờ lâu sẽ bỏ đi.
+- **Tiệm Sáu** (sửa đồ lẻ, trông tiệm, ngồi bàn thứ Bảy, mở tiệm, làm khoán): khách mang quạt, nồi cơm, máy bơm, bàn ủi tới quầy; đem lên bàn sửa, lấy đúng linh kiện ở kệ (tụ quạt, cầu chì nhiệt, phốt bơm, rơ le nhiệt), đứng tại bàn sửa xong rồi trả đúng khách.
+
+Đủ chỉ tiêu trong giờ thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%), làm nhanh, khéo được thưởng. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, cảnh dựng ở `scripts/work/work_site.gd`.
 
 **Ve chai:** thùng rác dọc vỉa hè, đứng gần bấm **E** để lục (mỗi thùng một lần mỗi ngày): được chai nhựa, lon, bìa giấy nhưng bẩn người. Mang ra sạp của cô Út ở **chợ Cầu Nhỏ** để bán.
 
@@ -140,8 +146,7 @@ scripts/
   ui/ui_kit.gd    màu sắc, theme, thẻ hành động, hai cột tiền, Sổ dạng chữ
   ui/screen_fit.gd    autoload ScreenFit: co giao diện theo màn và mật độ điểm ảnh, chế độ gọn cho điện thoại, nhắc xoay ngang
   ui/dialog_layer.gd  hộp thoại chọn tuyến, sự kiện, đi ngủ, tổng kết lát cắt
-  ui/minigame_bricks.gd  trò chơi nhỏ bưng xếp hàng (ca kho)
-  ui/minigame_dishes.gd  trò chơi nhỏ rửa bát (Cơm Hạnh)
+  work/work_site.gd    ca làm việc 3D: kho, công trình, quán cơm, tiệm sửa (mỗi việc một bản đồ nhỏ)
   board.gd        Bảng cân bằng: chơi bằng nút bấm, thấy hết dòng tiền và các sổ
 scenes/
   world.tscn      màn chính

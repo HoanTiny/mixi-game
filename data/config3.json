@@ -24,7 +24,7 @@
    "desc": "Tổ của phường do Trâm phụ trách: kiểm ổ điện, cầu dao, dây nối cho từng nhà có người già, ghi phiếu cho nhà đó giữ. Mỗi nhà 100.000đ."
   },
   {
-   "id": "trong_tiem_chieu",
+   "id": "trong_tiem_chieu", "minigame": "repair",
    "group": "work",
    "location": "tiem_sau",
    "name": "Trông tiệm Sáu buổi chiều (chia đôi tiền công)",

@@ -74,7 +74,7 @@
    "desc": "Ngày nước lên, hẻm nào cũng có máy bơm không chạy, cầu dao nhảy."
   },
   {
-   "id": "bao_tri_ben_can",
+   "id": "bao_tri_ben_can", "minigame": "site",
    "group": "work",
    "location": "ben_can",
    "name": "Bảo trì dãy quán Bến Cạn sau mưa",
@@ -290,7 +290,7 @@
    }
   },
   {
-   "id": "ca_chieu_kho",
+   "id": "ca_chieu_kho", "minigame": "bricks",
    "group": "work",
    "location": "ben_xe_6",
    "name": "Tổ trưởng ca chiều ở kho",
@@ -317,7 +317,7 @@
    "desc": "Hai giờ chiều tới mười giờ tối. Về tới nhà thì cả nhà đã ăn cơm."
   },
   {
-   "id": "ca_chieu_kho_sau",
+   "id": "ca_chieu_kho_sau", "minigame": "bricks",
    "group": "work",
    "location": "ben_xe_6",
    "name": "Tổ trưởng ca chiều ở kho",
@@ -343,7 +343,7 @@
    "desc": "Bắt đầu sau tuần mổ mắt của bà, như đã xin."
   },
   {
-   "id": "dien_cho",
+   "id": "dien_cho", "minigame": "site",
    "group": "work",
    "location": "cho_cau_nho",
    "name": "Đi lại điện dãy sạp chợ với tổ Trâm",
@@ -450,7 +450,7 @@
    }
   },
   {
-   "id": "ban_sau_thu_bay",
+   "id": "ban_sau_thu_bay", "minigame": "repair",
    "group": "work",
    "location": "tiem_sau",
    "name": "Ngồi bàn chú Sáu ngày thứ Bảy (chia đôi tiền công)",

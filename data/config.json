@@ -37,17 +37,36 @@
     "fatigue": 3, "lateFatigue": 2, "cancelFatigue": 2,
     "rush": [[10, 13.5], [17, 21]], "offerSec": [3, 7], "offPeakSec": [25, 45]
   },
+  "_minigames": "Ca làm việc 3D (scripts/work/work_site.gd), mỗi việc một bản đồ nhỏ riêng: bricks là kho khu công nghiệp, site là công trình điện ở Bến Cạn (cùng kiểu bưng xếp), dishes là quán cơm (bưng món, dọn bát), repair là tiệm sửa (quầy, bàn sửa, kệ linh kiện). seconds: giờ một ca; target: chỉ tiêu đủ công; minRatio: công tối thiểu khi thiếu chỉ tiêu.",
   "minigames": {
     "bricks": {
-      "seconds": 60, "target": 8, "carry": 2, "minRatio": 0.5, "stepSec": 0.35,
-      "kicker": "KHO KHU CÔNG NGHIỆP", "heading": "Xếp hàng lên pallet", "pile": "ĐỐNG HÀNG (bấm để bưng)", "crate": "PALLET (bấm để xếp hàng lên)", "unit": "thùng", "doneWord": "Đầy pallet! Xe nâng chở đi",
+      "seconds": 90, "target": 6, "carry": 3, "minRatio": 0.5,
+      "kicker": "KHO KHU CÔNG NGHIỆP", "heading": "Xếp hàng lên pallet", "unit": "thùng", "goalWord": "Đầy pallet", "doneWord": "Đầy pallet! Xe nâng chở đi",
       "types": {"mi": {"name": "Thùng mì", "color": "d9a35b"}, "nuoc": {"name": "Lốc nước", "color": "6f8fb5"}, "gao": {"name": "Bao gạo", "color": "e6e2d3"}},
       "sizes": [2, 3, 4], "bonusPerBrick": 2000
     },
+    "site": {
+      "seconds": 90, "target": 5, "carry": 3, "minRatio": 0.5,
+      "kicker": "CÔNG TRÌNH ĐIỆN BẾN CẠN", "heading": "Đưa vật tư tới từng điểm thi công", "unit": "món", "goalWord": "Xong điểm thi công", "doneWord": "Đủ vật tư, tổ đóng điện thử",
+      "types": {"day": {"name": "Cuộn dây điện", "color": "e07a2f"}, "ong": {"name": "Ống luồn dây", "color": "b8bcc2"}, "cb": {"name": "Hộp CB", "color": "f2f0ea"}},
+      "sizes": [2, 3, 4], "bonusPerBrick": 2500
+    },
     "dishes": {
-      "kicker": "QUÁN CƠM HẠNH",
-      "seconds": 45, "target": 12, "minRatio": 0.5, "spots": [2, 5],
-      "bonusPerExtra": 3000, "cleanBonus": 15000
+      "seconds": 90, "target": 7, "carry": 2, "minRatio": 0.5,
+      "kicker": "QUÁN CƠM HẠNH", "heading": "Bưng cơm giờ trưa, dọn bát", "patience": 35, "spawnEvery": 6, "maxCustomers": 4, "eatSec": 4,
+      "items": {"com": {"name": "Cơm sườn", "color": "d9a35b"}, "canh": {"name": "Canh chua", "color": "e0703c"}, "tra": {"name": "Trà đá", "color": "c9a227"}},
+      "bonusPerExtra": 3000, "cleanBonus": 2000
+    },
+    "repair": {
+      "seconds": 100, "target": 4, "minRatio": 0.5,
+      "kicker": "TIỆM SÁU", "heading": "Sửa đồ cho khách tới tiệm", "patience": 70, "spawnEvery": 10, "repairSec": 3, "bonusPerFix": 12000,
+      "parts": {"tu": {"name": "Tụ quạt", "color": "3f6fb5"}, "cau_chi": {"name": "Cầu chì nhiệt", "color": "e6e2d3"}, "phot": {"name": "Phốt bơm", "color": "2b2b2b"}, "ro_le": {"name": "Rơ le nhiệt", "color": "c0392b"}},
+      "machines": [
+        {"name": "Quạt bàn", "fault": "kêu ù ù, không quay", "part": "tu", "color": "6fa8c8"},
+        {"name": "Nồi cơm điện", "fault": "không lên nguồn", "part": "cau_chi", "color": "e8e4da"},
+        {"name": "Máy bơm", "fault": "rỉ nước ở trục", "part": "phot", "color": "3c8d5a"},
+        {"name": "Bàn ủi", "fault": "cắm điện không nóng", "part": "ro_le", "color": "8e44ad"}
+      ]
     }
   },
   "housingDeadline": 26,
@@ -261,15 +280,15 @@
   "actions": [
     { "id": "ca_kho", "group": "work", "location": "ben_xe_6", "name": "Ca kho khu công nghiệp (có suất cơm ca)", "hours": 8, "pay": 300000, "window": [6, 18], "minigame": "bricks", "dirty": { "clean": -15, "neat": -12 },
       "effects": { "fatigue": 28, "need.fed": 35 } },
-    { "id": "ca_phu_quan", "group": "work", "location": "com_hanh", "name": "Ca phụ quán Cơm Hạnh (rửa bát)", "hours": 4, "pay": 160000, "minigame": "dishes", "dirty": { "clean": -10, "neat": -10 },
+    { "id": "ca_phu_quan", "group": "work", "location": "com_hanh", "name": "Ca phụ quán Cơm Hạnh (bưng cơm, rửa bát)", "hours": 4, "pay": 160000, "minigame": "dishes", "dirty": { "clean": -10, "neat": -10 },
       "effects": { "fatigue": 12, "rep.HANH": 3 } },
     { "id": "giao_com", "group": "work", "location": "com_hanh", "name": "Giao cơm trưa", "hours": 3, "pay": 120000, "window": [10, 14],
       "effects": { "fatigue": 10, "rep.HANH": 2 } },
-    { "id": "sua_do_le", "group": "work", "location": "tiem_sau", "name": "Sửa đồ lẻ ở bàn chú Sáu", "hours": 3, "pay": 130000,
+    { "id": "sua_do_le", "minigame": "repair", "group": "work", "location": "tiem_sau", "name": "Sửa đồ lẻ ở bàn chú Sáu", "hours": 3, "pay": 130000,
       "effects": { "fatigue": 10, "rep.SAU": 2 } },
-    { "id": "ben_can_b", "group": "work", "location": "ben_can", "name": "Làm cùng tổ ở Bến Cạn", "hours": 6, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
+    { "id": "ben_can_b", "minigame": "site", "group": "work", "location": "ben_can", "name": "Làm cùng tổ ở Bến Cạn", "hours": 6, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
       "days": [11, 30], "require": { "route": "B" }, "effects": { "fatigue": 15, "progress": 1, "rep.TRAM": 2, "need.fed": 30 } },
-    { "id": "ben_can_c", "group": "work", "location": "ben_can", "name": "Điều phối và làm ở Bến Cạn", "hours": 8, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
+    { "id": "ben_can_c", "minigame": "site", "group": "work", "location": "ben_can", "name": "Điều phối và làm ở Bến Cạn", "hours": 8, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
       "days": [11, 30], "require": { "route": "C" }, "effects": { "fatigue": 22, "progress": 1, "rep.PHUC": 2, "need.fed": 35 } },
 
     { "id": "an_com", "group": "life", "location": "com_hanh", "name": "Ăn dĩa cơm phần", "hours": 0.33, "cost": 30000, "perDay": 3, "hideIfFlag": "comQuen",
