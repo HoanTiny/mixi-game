@@ -6,8 +6,9 @@ extends Node3D
 ##   theo tầng, mái ngói có hàng ngói (shader). Nhà che An thì hạ nguyên căn xuống thành khối thấp có mặt cắt sáng
 ##   (shader), cây che thì thu nhỏ. Nhà chia lưới theo ô TILE mét; ban công, hoa, đồ trên sân thượng (street_dress.gd)
 ##   ở lưới chi tiết ô DETAIL_TILE mét, nhìn xa thì khỏi vẽ. Màu nhà, màu mặt đất là mã sRGB như trong bảng màu.
-## - Đường có vỉa hè lát gạch, vạch vàng giữa, vạch trắng mép và chia làn; ngõ nhỏ, sân láng xi măng chia ô; cầu có
-##   lan can. Sông, hồ, kênh, công viên, sân bóng, tường rào, đường sắt, nhãn tên đường, hồ, chùa, di tích.
+## - Đường có vỉa hè lát theo vùng (PAVINGS: đá granite, gạch terrazzo, gạch block con sâu), bó vỉa đá, rãnh biên có ga
+##   thu nước, vạch kẻ theo QCVN 41 (vàng ở tim, trắng mép và chia làn); ngõ nhỏ, sân láng xi măng chia ô; cầu có
+##   lan can; gốc cây ven đường quét vôi trắng, ô gốc cây. Sông, hồ, kênh, công viên, sân bóng, tường rào, đường sắt, nhãn tên đường, hồ, chùa, di tích.
 ## - Lưới đi bộ 1 m: không đi xuyên nhà, tường, mặt nước (trừ trên cầu).
 ## - Kiểu mô hình thu nhỏ: mọi thứ cắt theo vùng đã vẽ, đặt trên một tấm đế đất; cây (cây OSM, hàng cây, công viên,
 ##   ven đường; xen cây phượng tán đỏ cam), ô tô và xe máy đậu dọc đường, nhãn địa danh có chấm cam.
@@ -41,9 +42,11 @@ varying float v_kind;
 varying float v_var;
 varying float v_flame;
 varying float v_idx;
+varying float v_ly;
 
 void vertex() {
 	v_cut = 0.0;
+	v_ly = VERTEX.y;
 	v_up = NORMAL.y;
 	v_var = flat_color ? INSTANCE_CUSTOM.g : 0.5;
 	v_flame = (flat_color && !trunk) ? INSTANCE_CUSTOM.b : 0.0;
@@ -75,6 +78,10 @@ void fragment() {
 	vec3 leaf = mix(tint, flame_tint, step(0.5, v_flame));
 	// Màu đỉnh của nhà là mã màu sRGB (như trong bảng màu), đổi sang tuyến tính; tán cây giữ màu tint nhân thẳng.
 	vec3 col = flat_color ? leaf * COLOR.rgb * mix(vec3(0.82, 0.86, 0.95), vec3(1.16, 1.12, 0.92), v_var) : pow(COLOR.rgb, vec3(2.2));
+	if (trunk && v_ly < -0.22) {
+		// Gốc cây ven đường quét vôi trắng chừng một mét (kiểu phố Việt), mép vôi hơi loang.
+		col = mix(vec3(0.8, 0.79, 0.74), col, smoothstep(-0.3, -0.22, v_ly));
+	}
 	if (v_cut > 0.999 && v_up > 0.4) {
 		// Mặt cắt của nhà bị hạ: sáng hơn mặt đường hẳn, nhìn ra ngay đâu là nhà, đâu là lối đi.
 		col = mix(cut_color, col, 0.2);
@@ -149,6 +156,42 @@ void fragment() {
 			NORMAL_MAP = texture(normal_tex, w / meters).rgb;
 			NORMAL_MAP_DEPTH = 0.8;
 		}
+	} else if (COLOR.a > 0.74) {
+		// Gạch block tự chèn "con sâu" (các tỉnh): viên 22,5 × 11,2 cm xếp so le, mạch đứng lượn sóng.
+		vec2 p = w / vec2(0.225, 0.112);
+		float row = floor(p.y);
+		p.x += 0.5 * mod(row, 2.0) + 0.13 * sin(fract(p.y) * 6.2832);
+		vec2 f = fract(p);
+		float vis = 1.0 - smoothstep(0.3, 0.8, max(fwidth(p.x), fwidth(p.y)));
+		col *= mix(1.0, 0.86 + 0.24 * hash(floor(p)), vis);
+		float g = max(step(f.x, 0.06), step(f.y, 0.1));
+		col = mix(col, col * 0.62, g * 0.8 * vis);
+	} else if (COLOR.a > 0.7) {
+		// Đá granite (trung tâm TP.HCM, Hà Nội): tấm 60 × 30 cm so le, hạt đá lấm tấm, mạch vữa sáng.
+		vec2 p = w / vec2(0.6, 0.3);
+		p.x += 0.5 * mod(floor(p.y), 2.0);
+		vec2 f = fract(p);
+		float vis = 1.0 - smoothstep(0.2, 0.6, max(fwidth(p.x), fwidth(p.y)));
+		float grain = hash(floor(w / 0.008));
+		col *= mix(1.0, (0.93 + 0.1 * hash(floor(p))) * (0.86 + 0.26 * grain * grain), vis);
+		float g = max(step(f.x, 0.012), step(f.y, 0.025));
+		col = mix(col, col * 1.18 + 0.03, g * 0.7 * vis);
+	} else if (COLOR.a > 0.62) {
+		// Gạch terrazzo 40 × 40 cm (TP.HCM, các tỉnh): hai màu xen kẽ bàn cờ (đỏ với vàng đất, hay xám với đỏ), mỗi
+		// viên chín nút nổi, mặt đá mài lấm tấm, mạch vữa sẫm.
+		vec2 p = w / 0.4;
+		vec2 cell = floor(p);
+		vec2 f = fract(p);
+		float vis = 1.0 - smoothstep(0.2, 0.6, max(fwidth(p.x), fwidth(p.y)));
+		vec3 other = COLOR.a > 0.665 ? vec3(0.39, 0.12, 0.07) : vec3(0.55, 0.34, 0.11);
+		if (mod(cell.x + cell.y, 2.0) > 0.5) col = mix(col, other, vis);
+		float chip = hash(floor(w / 0.01));
+		col *= mix(1.0, 0.9 + 0.2 * chip, vis);
+		vec2 g3 = fract(f * 3.0) - 0.5;
+		float d = length(g3);
+		col *= mix(1.0, d < 0.2 ? 1.07 : (d < 0.26 ? 0.86 : 1.0), vis);
+		float g = max(max(step(f.x, 0.025), step(1.0 - f.x, 0.025)), max(step(f.y, 0.025), step(1.0 - f.y, 0.025)));
+		col = mix(col, col * 0.6, g * vis);
 	} else if (COLOR.a > 0.45) {
 		vec2 p = w / 0.32;
 		p.x += 0.5 * mod(floor(p.y), 2.0);
@@ -169,11 +212,32 @@ void fragment() {
 	ROUGHNESS = 0.92;
 }
 """
-## Kiểu mặt đất trong alpha màu đỉnh (GROUND_SHADER): nhựa đường, gạch vỉa hè, nền xi măng, màu trơn.
+## Kiểu mặt đất trong alpha màu đỉnh (GROUND_SHADER): nhựa đường, gạch vỉa hè, nền xi măng, màu trơn; vỉa hè kiểu Việt
+## (PAVINGS): gạch terrazzo đỏ xen vàng đất, terrazzo xám xen đỏ, đá granite, gạch block con sâu.
 const GROUND_ASPHALT := 1.0
+const GROUND_BLOCK := 0.76
+const GROUND_GRANITE := 0.72
+const GROUND_TERRAZZO_GREY := 0.68
+const GROUND_TERRAZZO := 0.64
 const GROUND_BRICK := 0.6
 const GROUND_CONCRETE := 0.3
 const GROUND_PLAIN := 0.0
+## Vỉa hè theo vùng: [kiểu (alpha màu đỉnh), màu chính, tỉ lệ]. Trung tâm TP.HCM, Hà Nội lát đá granite tự nhiên; TP.HCM
+## ngoài trung tâm phần nhiều gạch terrazzo; các tỉnh gạch block tự chèn, terrazzo. Màu sRGB.
+const PAVINGS := {
+	"hcm_center": [[GROUND_GRANITE, "aaa29a", 1.0]],
+	"hcm": [[GROUND_TERRAZZO, "a65842", 0.45], [GROUND_TERRAZZO_GREY, "a19d95", 0.25], [GROUND_BLOCK, "8e8b86", 0.15],
+		[GROUND_GRANITE, "a8a098", 0.15]],
+	"hanoi_center": [[GROUND_GRANITE, "8e9193", 1.0]],
+	"hanoi": [[GROUND_GRANITE, "8e9193", 0.45], [GROUND_TERRAZZO, "a65842", 0.3], [GROUND_BLOCK, "8e8b86", 0.25]],
+	"tinh": [[GROUND_BLOCK, "8e8b86", 0.35], [GROUND_BLOCK, "9a5c48", 0.15], [GROUND_TERRAZZO, "a65842", 0.35],
+		[GROUND_TERRAZZO_GREY, "a19d95", 0.15]],
+}
+## Bó vỉa đá (cao, rộng mét), rãnh biên xi măng sát bó vỉa, ga thu nước mỗi chừng này mét.
+const CURB_H := 0.12
+const CURB_W := 0.18
+const GUTTER_W := 0.32
+const DRAIN_STEP := 26.0
 ## Mặt cầu cao hơn mặt đường chừng này (màn phố nâng người đi trên cầu theo, xem real_city.ground_y).
 const BRIDGE_Y := 0.5
 ## Hạ nhà che An (xem cut_target). near_w: nửa bề ngang dải ngay trước mặt An (bằng người); wide_w: dải rộng hai
@@ -224,6 +288,8 @@ var _flat := {}
 ## Lưới nhà theo ô (xem _bst): khóa (ô x, ô z, 1 nếu là lưới chi tiết).
 var _bsts := {}
 var _rng := RandomNumberGenerator.new()
+## Vùng của khu (region_of): chọn kiểu vỉa hè.
+var region := "hcm"
 
 
 ## clip: vùng đã vẽ (mét, cùng gốc với dữ liệu). walk: lưới đi bộ dựng sẵn (map của truyện), không có thì tự dựng.
@@ -244,10 +310,12 @@ func build(d, clip_poly: PackedVector2Array, walk = null) -> void:
 	building_mat.shader = sh
 	building_mat.set_shader_parameter("cut_color", CUT_COLOR)
 	cut_materials.append(building_mat)
+	region = region_of(d.geo.lat0, d.geo.lon0) if d.get("geo") != null else "hcm"
 	_ground()
 	_parks()
 	_water()
 	_roads()
+	_curbs()
 	_rails()
 	_walls()
 	_buildings()
@@ -459,27 +527,130 @@ func _roads() -> void:
 			_strip(_st("ground"), r.line, w, y, Color("a8a296" if str(r.kind) != "steps" else "9c958a", GROUND_CONCRETE))
 			continue
 		if w >= 6.0:
-			# Vỉa hè lát gạch đỏ hai bên, rồi mặt nhựa.
-			_strip(_st("ground"), r.line, w + (3.2 if w >= 7.0 else 2.4), y - 0.01, Color("b0664b", GROUND_BRICK))
+			# Vỉa hè lát theo vùng hai bên, rồi mặt nhựa, rãnh biên, bó vỉa (_curbs).
+			var pv := paving(region, hash(r.line[0].snapped(Vector2.ONE)))
+			_strip(_st("ground"), r.line, w + (3.2 if w >= 7.0 else 2.4), y - 0.01, Color(str(pv[1]), float(pv[0])))
 		_strip(_st("ground"), r.line, w, y, Color("4a4b4e") if w >= 7.0 else Color("66676a"))
+		if w >= 6.0 and not r.bridge:
+			for side in [-1.0, 1.0]:
+				_strip(_st("ground"), _offset(r.line, side * (w / 2.0 - GUTTER_W / 2.0)), GUTTER_W, y + 0.002, Color("9d988e", GROUND_PLAIN))
 		_markings(r.line, w, y + 0.005)
 		if r.bridge:
 			_bridge_rails(r.line, w)
 
 
-## Vạch sơn: đường từ 8 m có vạch vàng liền ở tim, vạch trắng liền hai mép, đường từ 12 m thêm vạch trắng đứt chia làn;
-## đường 6–8 m có vạch trắng đứt ở tim.
+## Vạch sơn theo QCVN 41: đường từ 8 m có vạch vàng liền ở tim (vạch 1.2, rộng 15 cm), vạch trắng liền hai mép,
+## đường từ 12 m thêm vạch trắng đứt chia làn; đường 6–8 m có vạch vàng đứt ở tim (vạch 1.1).
 func _markings(line: PackedVector2Array, w: float, y: float) -> void:
 	var st := _st("ground")
 	var white := Color("eeeae0", GROUND_PLAIN)
+	var yellow := Color("f2c230", GROUND_PLAIN)
 	if w >= 8.0:
-		_strip(st, line, 0.16, y, Color("f2c230", GROUND_PLAIN))
+		_strip(st, line, 0.15, y, yellow)
 		for side in [-1.0, 1.0]:
-			_strip(st, _offset(line, side * (w / 2.0 - 0.35)), 0.12, y, white)
+			_strip(st, _offset(line, side * (w / 2.0 - GUTTER_W - 0.2)), 0.12, y, white)
 			if w >= 12.0:
 				_dashes(_offset(line, side * w / 4.0), y, white)
 	elif w >= 6.0:
-		_dashes(line, y, white)
+		_dashes(line, y, yellow)
+
+
+## Vùng theo tọa độ gốc của khu: trung tâm TP.HCM (quanh chợ Bến Thành 2 km), TP.HCM, trung tâm Hà Nội (quanh hồ
+## Gươm 3 km), Hà Nội, còn lại là các tỉnh.
+static func region_of(lat: float, lon: float) -> String:
+	var km := func(a: float, b: float) -> float:
+		return Vector2((lon - b) * 111.32 * cos(deg_to_rad(lat)), (lat - a) * 110.57).length()
+	if km.call(10.7725, 106.698) < 2.0:
+		return "hcm_center"
+	if lat > 10.35 and lat < 11.2 and lon > 106.35 and lon < 107.05:
+		return "hcm"
+	if km.call(21.0287, 105.8524) < 3.0:
+		return "hanoi_center"
+	if lat > 20.75 and lat < 21.4 and lon > 105.45 and lon < 106.1:
+		return "hanoi"
+	return "tinh"
+
+
+## Kiểu vỉa hè [alpha, màu] của một đường trong vùng (seed: số riêng của đường, cùng đường cùng kiểu).
+static func paving(reg: String, seed: int) -> Array:
+	var list: Array = PAVINGS.get(reg, PAVINGS.tinh)
+	var t := float(absi(seed) % 1000) / 1000.0
+	for pv in list:
+		t -= float(pv[2])
+		if t < 0.0:
+			return pv
+	return list[0]
+
+
+## Bó vỉa đá hai bên đường có vỉa hè (chừa chỗ ngã ba, ngã tư, miệng hẻm), ga thu nước dọc rãnh biên.
+func _curbs() -> void:
+	# Chỗ giao nhau: đỉnh dùng chung giữa hai đường trở lên, bán kính chừa theo đường rộng nhất ở đó.
+	var count := {}
+	var widest := {}
+	for r in data.roads:
+		if r.tunnel:
+			continue
+		for p in r.line:
+			var k: Vector2 = (p as Vector2).snapped(Vector2.ONE * 0.5)
+			count[k] = int(count.get(k, 0)) + 1
+			widest[k] = maxf(float(widest.get(k, 0.0)), float(r.width))
+	var cells := {}
+	for k in count:
+		if int(count[k]) < 2:
+			continue
+		var c := Vector2i(floori(k.x / 20.0), floori(k.y / 20.0))
+		if not cells.has(c):
+			cells[c] = []
+		cells[c].append([k, float(widest[k]) / 2.0 + 2.5])
+	var blocked := func(p: Vector2) -> bool:
+		var c := Vector2i(floori(p.x / 20.0), floori(p.y / 20.0))
+		for dx in [-1, 0, 1]:
+			for dy in [-1, 0, 1]:
+				for j in cells.get(c + Vector2i(dx, dy), []):
+					if p.distance_to(j[0]) < float(j[1]):
+						return true
+		return false
+	var walls := _st("walls")
+	var ground := _st("ground")
+	var stone := Color("a39f97")
+	for r in data.roads:
+		var w := float(r.width)
+		if r.small or r.bridge or r.tunnel or w < 6.0:
+			continue
+		for side in [-1.0, 1.0]:
+			var line := _offset(r.line, side * (w / 2.0 + CURB_W / 2.0))
+			var since := 0.0
+			for i in line.size() - 1:
+				var a := line[i]
+				var b := line[i + 1]
+				var l := a.distance_to(b)
+				if l < 0.05:
+					continue
+				var d := (b - a) / l
+				# Chia đoạn thành khúc chừng 1 m, gộp các khúc liền nhau không vướng chỗ giao nhau thành một dải bó vỉa.
+				var n := ceili(l)
+				var run_start := -1.0
+				for k in n + 1:
+					var s0 := float(k) * l / float(n)
+					var ok: bool = k < n and not blocked.call(a + d * (s0 + 0.5 * l / float(n)))
+					if ok and run_start < 0.0:
+						run_start = s0
+					elif not ok and run_start >= 0.0:
+						_wall_seg(walls, a + d * run_start, a + d * s0, 0.04, CURB_H, CURB_W, stone)
+						run_start = -1.0
+					if ok:
+						since += l / float(n)
+						if since >= DRAIN_STEP:
+							since = 0.0
+							_drain(ground, a + d * s0 - d.orthogonal() * side * (CURB_W / 2.0 + GUTTER_W / 2.0), d)
+
+
+## Ga thu nước ở rãnh biên: khung gang, lưới song sẫm.
+func _drain(st: SurfaceTool, c: Vector2, d: Vector2) -> void:
+	_strip(st, PackedVector2Array([c - d * 0.45, c + d * 0.45]), 0.4, 0.056, Color("5d5a55", GROUND_PLAIN))
+	for k in 5:
+		var q := c - d * 0.32 + d * (0.16 * float(k))
+		_strip(st, PackedVector2Array([q - d * 0.04, q + d * 0.04]), 0.3, 0.058, Color("1c1c1d", GROUND_PLAIN))
 
 
 ## Đường gấp khúc dời sang ngang d mét (dương: bên trái theo chiều vẽ), mỗi đỉnh dời theo hướng trung bình hai cạnh kề.
@@ -513,7 +684,7 @@ func _bridge_rails(line: PackedVector2Array, w: float) -> void:
 		var b := line[i + 1]
 		var n := (b - a).normalized().orthogonal() * (w / 2.0 + 0.1)
 		for side in [-1.0, 1.0]:
-			_wall_seg(st, a + n * side, b + n * side, 0.5, 1.5, 0.15, Color("8a8478"))
+			_wall_seg(st, a + n * side, b + n * side, BRIDGE_Y, 0.85, 0.2, Color("b3ada2"))
 
 
 func _rails() -> void:
@@ -1132,6 +1303,7 @@ func _street_trees() -> void:
 			if _rng.randf() < 0.2:
 				_flame[_trees.size()] = true
 			_trees.append(p))
+	var pits: Array = []
 	for r in data.roads:
 		if r.small or r.bridge or float(r.width) < 6.0:
 			continue
@@ -1143,8 +1315,24 @@ func _street_trees() -> void:
 						and not keep_clear.any(func(k: Vector2) -> bool: return k.distance_to(q) < 7.0):
 					if _rng.randf() < 0.35:
 						_flame[_trees.size()] = true
-					_trees.append(q))
+					_trees.append(q)
+					pits.append([q, d]))
 	counts.trees = _trees.size()
+	# Ô gốc cây trên vỉa hè: viền xi măng, đất bên trong.
+	if pits.is_empty():
+		return
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for pt in pits:
+		var q: Vector2 = pt[0]
+		var d: Vector2 = pt[1]
+		_strip(st, PackedVector2Array([q - d * 0.62, q + d * 0.62]), 1.24, 0.052, Color("8f897e", GROUND_PLAIN))
+		_strip(st, PackedVector2Array([q - d * 0.5, q + d * 0.5]), 1.0, 0.055, Color("4b3b2d", GROUND_PLAIN))
+	var mi := MeshInstance3D.new()
+	mi.mesh = st.commit()
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.material_override = ground_material if ground_material != null else ground_shader_material()
+	add_child(mi)
 
 
 ## Gọi f(điểm, hướng) đều đặn mỗi step mét dọc đường gấp khúc.

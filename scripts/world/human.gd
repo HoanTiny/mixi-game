@@ -67,7 +67,12 @@ func _build() -> void:
 	var pelvis := _sk.find_bone("Bip01 Pelvis")
 	if pelvis >= 0:
 		_sk.motion_scale = _sk.get_bone_global_rest(pelvis).origin.y / ADULT_HIP
-	_skin(name)
+	_skin(name, "")
+	var head := str(look.get("head", ""))
+	if head != "" and head != name and exists(head):
+		_swap_head(name, head)
+	# Người Việt thấp hơn người mẫu Rocketbox (nam chừng 1,75 m, nữ 1,65 m).
+	_model.scale = Vector3.ONE * float(look.get("scale", 1.0))
 	# Trình chạy động tác sẵn có trong fbx (rỗng): nạp thư viện đứng, đi, ngồi, nói.
 	_ap = _model.get_node_or_null("AnimationPlayer")
 	if _ap == null:
@@ -96,33 +101,82 @@ static func _library(female: bool) -> AnimationLibrary:
 	return lib
 
 
-## Vật liệu theo tên mặt lưới: thân (quần áo, tay chân), đầu (mặt), tóc và mi (ảnh có kênh trong suốt).
-func _skin(name: String) -> void:
-	for mi in _sk.find_children("*", "MeshInstance3D", true, false):
+## Vật liệu theo tên mặt lưới: thân (quần áo, tay chân), đầu (mặt), tóc và mi (ảnh có kênh trong suốt). hair "grey":
+## dùng ảnh tóc bạc (tools/viet_look.py) cho đầu và tóc.
+func _skin(name: String, hair: String, only: MeshInstance3D = null) -> void:
+	for mi in ([only] if only != null else _sk.find_children("*", "MeshInstance3D", true, false)):
 		var mesh: Mesh = (mi as MeshInstance3D).mesh
 		for i in mesh.get_surface_count():
-			var src := mesh.surface_get_material(i)
-			var sname := src.resource_name.to_lower() if src != null else ""
-			var part := "opacity" if sname.contains("opacity") else ("head" if sname.contains("head") else "body")
-			(mi as MeshInstance3D).set_surface_override_material(i, _material(name, part))
+			(mi as MeshInstance3D).set_surface_override_material(i, _material(name, _part(mesh, i), hair))
 
 
-static func _material(name: String, part: String) -> Material:
-	var key := name + "|" + part
+static func _part(mesh: Mesh, i: int) -> String:
+	var src := mesh.surface_get_material(i)
+	var sname := src.resource_name.to_lower() if src != null else ""
+	return "opacity" if sname.contains("opacity") else ("head" if sname.contains("head") else "body")
+
+
+## Ghép đầu (mặt, tóc, mi) của người head lên thân người name: bỏ mặt lưới đầu, tóc của thân; lưới đầu kia gắn vào
+## cùng khung xương theo tên xương (hai người chung bộ xương Biped), nên đi theo cổ, đầu của thân.
+func _swap_head(name: String, head: String) -> void:
+	for mi in _sk.find_children("*", "MeshInstance3D", true, false):
+		(mi as MeshInstance3D).mesh = _parts(name, ["body"])
+		_skin(name, "", mi)
+	if not _scenes.has(head):
+		_scenes[head] = load("%s/%s/%s.fbx" % [ROOT, head, head])
+	var src: Node = (_scenes[head] as PackedScene).instantiate()
+	var smi: MeshInstance3D = src.find_children("*", "MeshInstance3D", true, false)[0]
+	var mi := MeshInstance3D.new()
+	mi.mesh = _parts(head, ["head", "opacity"])
+	mi.skin = smi.skin
+	_sk.add_child(mi)
+	mi.skeleton = NodePath("..")
+	src.free()
+	_skin(head, str(look.get("hair_tone", "")), mi)
+
+
+## Lưới của người name chỉ gồm các mặt thuộc parts (dùng chung giữa những người cùng kiểu).
+static func _parts(name: String, parts: Array) -> ArrayMesh:
+	var key := "mesh|%s|%s" % [name, ",".join(parts)]
+	if _mats.has(key):
+		return _mats[key]
+	var n: Node = (_scenes[name] as PackedScene).instantiate()
+	var mesh: Mesh = (n.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).mesh
+	var out := ArrayMesh.new()
+	for i in mesh.get_surface_count():
+		if _part(mesh, i) not in parts:
+			continue
+		var arrays := mesh.surface_get_arrays(i)
+		# Kênh phụ (custom) của bản nhập fbx không cần cho người: bỏ, khỏi khai kiểu kênh.
+		for c in [Mesh.ARRAY_CUSTOM0, Mesh.ARRAY_CUSTOM1, Mesh.ARRAY_CUSTOM2, Mesh.ARRAY_CUSTOM3]:
+			arrays[c] = null
+		out.add_surface_from_arrays(mesh.surface_get_primitive_type(i), arrays, [], {},
+			mesh.surface_get_format(i) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS)
+		out.surface_set_material(out.get_surface_count() - 1, mesh.surface_get_material(i))
+	n.free()
+	_mats[key] = out
+	return out
+
+
+static func _material(name: String, part: String, hair := "") -> Material:
+	var key := name + "|" + part + "|" + hair
 	if _mats.has(key):
 		return _mats[key]
 	var dir := "%s/%s/" % [ROOT, name]
 	var m := StandardMaterial3D.new()
 	m.roughness = 0.82
 	if part == "opacity":
-		if ResourceLoader.exists(dir + "opacity_color.png"):
-			m.albedo_texture = load(dir + "opacity_color.png")
+		var tex := dir + ("opacity_grey.png" if hair == "grey" and ResourceLoader.exists(dir + "opacity_grey.png") else "opacity_color.png")
+		if ResourceLoader.exists(tex):
+			m.albedo_texture = load(tex)
 		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 		m.alpha_scissor_threshold = 0.45
 		m.cull_mode = BaseMaterial3D.CULL_DISABLED
 		m.roughness = 0.6
 	else:
 		var color := dir + part + "_color.jpg"
+		if part == "head" and hair == "grey" and ResourceLoader.exists(dir + "head_grey.jpg"):
+			color = dir + "head_grey.jpg"
 		if not ResourceLoader.exists(color):
 			color = dir + "body_color.jpg"
 		m.albedo_texture = load(color)
@@ -192,7 +246,7 @@ func animate(_delta: float, moving: float) -> void:
 ## Ngồi: hip_h là độ cao khớp hông so với gốc người (ghế đẩu, yên xe); hạ hay nâng cả người cho khớp.
 func sit(on: bool, hip_h := 0.93, _back := false) -> void:
 	_sitting = on
-	_model.position.y = (hip_h - SIT_HIP) if on else 0.0
+	_model.position.y = (hip_h - SIT_HIP * _model.scale.y) if on else 0.0
 	animate(0.0, 0.0)
 
 

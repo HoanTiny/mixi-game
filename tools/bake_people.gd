@@ -1,7 +1,7 @@
 extends SceneTree
 ## Nướng người thật (Rocketbox, assets/rb) thành lưới tĩnh nhẹ cho đám đông (crowd.gd) và người lái xe (traffic.gd):
 ## dựng người, chạy động tác tới một khung, lấy lưới theo tư thế đó, bớt tam giác (còn chừng TARGET_TRIS), bỏ đỉnh thừa,
-## lưu assets/rb/crowd/<người>_<tư thế>.res kèm vật liệu ảnh thật.
+## lưu assets/rb/crowd/<id người>_<tư thế>.res (người theo Character.CROWD) kèm vật liệu ảnh thật.
 ## Tư thế: stand (đứng), talk (đứng nói, tay đưa), sit (ngồi ghế, hông 0,6 m), walk (giữa bước), ride (lái xe máy:
 ## hông ở Props3D.SEAT_H, RIDER_Z, hai tay nắm tay lái, đội mũ bảo hiểm), back (ngồi sau xe, đội mũ).
 ## Chạy: godot --headless --path . -s res://tools/bake_people.gd
@@ -10,8 +10,7 @@ const Human := preload("res://scripts/world/human.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const OUT := "res://assets/rb/crowd"
 const TARGET_TRIS := 1800
-const ADULTS := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02", "Female_Adult_08",
-	"Female_Adult_07"]
+const Character := preload("res://scripts/world/character.gd")
 ## Độ cao khớp hông lúc ngồi ghế đẩu cao (0,42 m) và ghế đẩu thấp (0,27 m) ở quán cóc (street_dress.gd).
 const SEAT_HIP := {"sit": 0.52, "low": 0.37}
 ## Tay lái xe máy (hai tay nắm) theo dáng xe trong props3d.gd.
@@ -24,16 +23,18 @@ func _initialize() -> void:
 
 func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
-	for name in ADULTS:
+	for look in Character.CROWD:
 		for pose in ["stand", "talk", "sit", "low", "walk", "ride", "back"]:
-			await _bake(name, pose)
-	await _bake("Male_Child_01", "walk")
-	await _bake("Male_Child_01", "stand")
+			await _bake(look, pose)
+	await _bake(Character.CROWD_CHILD, "walk")
+	await _bake(Character.CROWD_CHILD, "stand")
 	quit()
 
 
-func _bake(name: String, pose: String) -> void:
-	var h: Node3D = Human.make({"rb": name})
+func _bake(look: Dictionary, pose: String) -> void:
+	var name := str(look.id)
+	var h: Node3D = Human.make(look)
+	var hip: float = Human.SIT_HIP * float(look.get("scale", 1.0))
 	root.add_child(h)
 	var anim: String = {"stand": "idle", "talk": "talk", "sit": "sit", "low": "sit", "walk": "walk", "ride": "sit", "back": "sit"}[pose]
 	var ap: AnimationPlayer = h._ap
@@ -41,11 +42,11 @@ func _bake(name: String, pose: String) -> void:
 	ap.seek({"walk": 0.3, "talk": 1.2}.get(pose, 0.5), true)
 	var off := Vector3.ZERO
 	if pose == "ride":
-		off = Vector3(0, Props3D.SEAT_H - Human.SIT_HIP, Props3D.RIDER_Z)
+		off = Vector3(0, Props3D.SEAT_H - hip, Props3D.RIDER_Z)
 	elif pose == "back":
-		off = Vector3(0, Props3D.SEAT_H - Human.SIT_HIP + 0.04, Props3D.BACK_Z)
+		off = Vector3(0, Props3D.SEAT_H - hip + 0.04, Props3D.BACK_Z)
 	elif pose in SEAT_HIP:
-		off = Vector3(0, SEAT_HIP[pose] - Human.SIT_HIP, 0)
+		off = Vector3(0, SEAT_HIP[pose] - hip, 0)
 	h.position = off
 	await process_frame
 	var sk: Skeleton3D = h._sk

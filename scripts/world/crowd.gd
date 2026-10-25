@@ -16,15 +16,16 @@ const Props3D := preload("res://scripts/world/props3d.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
 const Human := preload("res://scripts/world/human.gd")
+const Character := preload("res://scripts/world/character.gd")
 
 ## Người thật (Rocketbox, tools/bake_people.gd nướng sẵn từng tư thế thành lưới nhẹ ở assets/rb/crowd): người đứng, ngồi,
 ## đi xa An là lưới tĩnh vẽ hàng loạt; người đi bộ và trẻ con trong vòng NEAR mét quanh An thì thay bằng người có xương,
 ## có động tác (lấy từ nhóm dựng sẵn POOL_PER người mỗi kiểu, khỏi dựng lúc đang chơi).
-const AVATARS := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02", "Female_Adult_08",
-	"Female_Adult_07"]
-const CHILD := "Male_Child_01"
+## Kiểu người: id trong Character.CROWD (thân và đầu người Việt ghép sẵn), trẻ con Character.CROWD_CHILD.
+const AVATARS := ["m1", "m2", "m3", "m4", "m5", "f1", "f2", "f3", "f4"]
+const CHILD := "c1"
 const NEAR := 24.0
-const POOL_PER := 3
+const POOL_PER := 2
 ## Phần người đứng trước tiệm, nhóm nói chuyện đang đưa tay nói.
 const TALK_SHARE := 0.35
 
@@ -468,14 +469,18 @@ func _release(key: int) -> void:
 	var h: Node3D = _live[key]
 	_live.erase(key)
 	h.visible = false
-	_pool[str(h.look.rb)].append(h)
+	_pool[str(h.look.id)].append(h)
 
 
-## Dựng sẵn một người có xương kiểu avatar, cất vào nhóm rảnh.
+## Dựng sẵn một người có xương kiểu avatar (id), cất vào nhóm rảnh.
 func _spare(avatar: String) -> void:
-	if not Human.exists(avatar):
+	var look: Dictionary = Character.CROWD_CHILD
+	for l in Character.CROWD:
+		if l.id == avatar:
+			look = l
+	if not Human.exists(str(look.rb)):
 		return
-	var h := Human.make({"rb": avatar})
+	var h := Human.make(look)
 	h.visible = false
 	add_child(h)
 	if not _pool.has(avatar):

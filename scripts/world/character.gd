@@ -12,57 +12,69 @@ extends Node3D
 
 const LOOKS := {
 	# An, 27 tuổi, thợ sửa điện máy: áo thun xám xanh, quần kaki, dép quai hậu, ba lô đồ nghề.
-	"AN": {"rb": "Male_Adult_09", "skin": "d1a07a", "hair": "1b1714", "hair_style": "short", "shirt": "5b7f8f", "sleeve": "short",
+	"AN": {"rb": "Male_Adult_09", "head": "Male_Adult_09", "scale": 0.96,
+		"skin": "d1a07a", "hair": "1b1714", "hair_style": "short", "shirt": "5b7f8f", "sleeve": "short",
 		"pants": "5e5446", "shoes": "3b3b3b", "hat": "none", "bag": true, "height": 1.72, "build": 1.02},
 	# Linh, 20 tuổi: áo đồng phục trường nghề xanh, quần jean, giày trắng, tóc cột đuôi ngựa.
-	"LINH": {"rb": "Female_Adult_12", "skin": "e2b48f", "hair": "1b1714", "hair_style": "ponytail", "shirt": "4f8fb5", "sleeve": "short",
+	"LINH": {"rb": "Female_Adult_12", "head": "Sports_Female_02", "scale": 0.95,
+		"skin": "e2b48f", "hair": "1b1714", "hair_style": "ponytail", "shirt": "4f8fb5", "sleeve": "short",
 		"pants": "3b5b82", "shoes": "f2f0ea", "footwear": "shoes", "hat": "none", "bag": true, "height": 1.58,
 		"build": 0.94, "female": true},
 	# Bà Tư, 70 tuổi: áo bà ba tím dài qua hông, quần đen, tóc bạc búi.
-	"BA_TU": {"rb": "Female_Adult_02", "skin": "c99a76", "hair": "d8d8d8", "hair_style": "bun", "shirt": "8a6f9a", "sleeve": "long",
+	"BA_TU": {"rb": "Female_Adult_02", "head": "Business_Female_03", "scale": 0.92, "hair_tone": "grey",
+		"skin": "c99a76", "hair": "d8d8d8", "hair_style": "bun", "shirt": "8a6f9a", "sleeve": "long",
 		"pants": "1f1f24", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.5, "build": 0.95,
 		"female": true, "tunic": true},
 	# Chị Hạnh: áo thun cam, tạp dề, tóc búi.
-	"HANH": {"rb": "Chef_Female_01", "skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "c0603a", "sleeve": "short",
+	"HANH": {"rb": "Chef_Female_01", "head": "Chef_Female_01", "scale": 0.95,
+		"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "c0603a", "sleeve": "short",
 		"pants": "2c2f3a", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.58, "build": 1.04,
 		"female": true, "apron": true},
 	# Chú Sáu: sơ mi xanh bạc màu dài tay, quần kaki, nón kết.
-	"SAU": {"rb": "Male_Adult_14", "skin": "b97d55", "hair": "9a9a9a", "hair_style": "short", "shirt": "3f6f8f", "sleeve": "long",
+	"SAU": {"rb": "Male_Adult_14", "head": "Business_Male_02", "scale": 0.95, "hair_tone": "grey",
+		"skin": "b97d55", "hair": "9a9a9a", "hair_style": "short", "shirt": "3f6f8f", "sleeve": "long",
 		"pants": "6d5d4b", "shoes": "3b3b3b", "hat": "cap", "bag": false, "height": 1.64, "build": 1.08},
 	# Minh, tài xế giao hàng: áo khoác xanh, mũ bảo hiểm, giày.
-	"MINH": {"rb": "Male_Adult_10", "skin": "c98f63", "hair": "1b1714", "hair_style": "short", "shirt": "2f8a5a", "sleeve": "long",
+	"MINH": {"rb": "Male_Adult_10", "head": "Male_Adult_10", "scale": 0.97,
+		"skin": "c98f63", "hair": "1b1714", "hair_style": "short", "shirt": "2f8a5a", "sleeve": "long",
 		"pants": "2c3e50", "shoes": "f5f5f5", "footwear": "shoes", "hat": "helmet", "bag": false, "height": 1.74,
 		"build": 1.04},
 	# Cô Duyên: áo sơ mi hoa, quần tây.
-	"DUYEN": {"rb": "Female_Adult_05", "skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "b5577a", "sleeve": "long",
+	"DUYEN": {"rb": "Female_Adult_05", "head": "Female_Adult_03", "scale": 0.94,
+		"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "b5577a", "sleeve": "long",
 		"pants": "4a4a52", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.56, "build": 1.06,
 		"female": true},
 	# Trâm, thợ điện: áo bảo hộ xanh rêu, nón kết, giày bảo hộ.
-	"TRAM": {"rb": "Female_Adult_03", "skin": "d9a77c", "hair": "1b1714", "hair_style": "ponytail", "shirt": "2f6f6a", "sleeve": "long",
+	"TRAM": {"rb": "Female_Adult_03", "head": "Female_Adult_03", "scale": 0.95,
+		"skin": "d9a77c", "hair": "1b1714", "hair_style": "ponytail", "shirt": "2f6f6a", "sleeve": "long",
 		"pants": "35455e", "shoes": "3b3b3b", "footwear": "shoes", "hat": "cap", "bag": false, "height": 1.62,
 		"build": 0.98, "female": true},
 	# Anh Phúc: áo sơ mi trắng, quần tây, giày da.
-	"PHUC": {"rb": "Business_Male_02", "skin": "c99a76", "hair": "1b1714", "hair_style": "short", "shirt": "efeee8", "sleeve": "short",
+	"PHUC": {"rb": "Business_Male_02", "head": "Business_Male_02", "scale": 0.97,
+		"skin": "c99a76", "hair": "1b1714", "hair_style": "short", "shirt": "efeee8", "sleeve": "short",
 		"pants": "6f7277", "shoes": "3b3b3b", "footwear": "shoes", "hat": "none", "bag": false, "height": 1.7,
 		"build": 1.12},
 	# Chương 2 · Má (cô Hậu), 49 tuổi: áo sơ mi caro tay dài của người làm xưởng, quần đen, tóc búi có sợi bạc.
-	"MA": {"rb": "Female_Adult_11", "skin": "c99a76", "hair": "3a3028", "hair_style": "bun", "shirt": "7a8f6a", "sleeve": "long",
+	"MA": {"rb": "Female_Adult_11", "head": "Business_Female_03", "scale": 0.94,
+		"skin": "c99a76", "hair": "3a3028", "hair_style": "bun", "shirt": "7a8f6a", "sleeve": "long",
 		"pants": "26262c", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.55, "build": 1.02,
 		"female": true},
 	# Ông Ba Lành, 78 tuổi: áo thun trắng ngả màu, quần đùi, tóc bạc trắng.
-	"ONG_BA": {"rb": "Gardener_Male_01", "skin": "b07a52", "hair": "e0e0dc", "hair_style": "short", "shirt": "e6e1d3", "sleeve": "short",
+	"ONG_BA": {"rb": "Gardener_Male_01", "head": "Male_Adult_10", "scale": 0.93, "hair_tone": "grey",
+		"skin": "b07a52", "hair": "e0e0dc", "hair_style": "short", "shirt": "e6e1d3", "sleeve": "short",
 		"pants": "4a4a52", "legs": "shorts", "shoes": "6b4f3a", "hat": "none", "bag": false, "height": 1.6,
 		"build": 0.94},
 	# Kha, 23 tuổi, sửa điện thoại ở chợ: áo thun đen, quần jean, giày trắng.
-	"KHA": {"rb": "Male_Adult_17", "skin": "d9a77c", "hair": "1b1714", "hair_style": "short", "shirt": "2b2b31", "sleeve": "short",
+	"KHA": {"rb": "Male_Adult_17", "head": "Male_Adult_10", "scale": 0.96,
+		"skin": "d9a77c", "hair": "1b1714", "hair_style": "short", "shirt": "2b2b31", "sleeve": "short",
 		"pants": "3b5b82", "shoes": "f2f0ea", "footwear": "shoes", "hat": "none", "bag": false, "height": 1.7,
 		"build": 0.95},
 	# Chương 3–5: chị Mai (y tá), anh Quân, anh Phong, bé Tín, chị Lụa (dựng sẵn bằng người thật).
-	"MAI": {"rb": "Medical_Female_01", "female": true, "hat": "none"},
-	"QUAN": {"rb": "Male_Adult_02", "hat": "none"},
-	"PHONG": {"rb": "Male_Adult_05", "hat": "none"},
-	"TIN": {"rb": "Male_Child_01", "hat": "none", "height": 1.25},
-	"LUA": {"rb": "Female_Adult_14", "female": true, "hat": "none"},
+	"MAI": {"rb": "Medical_Female_01", "head": "Medical_Female_01", "scale": 0.95, "female": true, "hat": "none"},
+	"QUAN": {"rb": "Male_Adult_02", "head": "Business_Male_02", "scale": 0.96, "hat": "none"},
+	"PHONG": {"rb": "Male_Adult_05", "head": "Male_Adult_10", "scale": 0.95, "hair_tone": "grey", "hat": "none"},
+	"TIN": {"rb": "Male_Child_01", "scale": 1.0, "hat": "none", "height": 1.25},
+	"LUA": {"rb": "Female_Adult_14", "head": "Sports_Female_02", "scale": 0.94, "female": true, "hat": "none"},
 }
 
 ## Xương: tên, cha, vị trí trong khung (mét, dáng cao 1,72 m, mặt nhìn về +z). Dáng nữ co vai, nở hông.
@@ -164,9 +176,29 @@ static func make(look_in: Dictionary) -> Node3D:
 	return c
 
 
-## Người thật cho người đi đường (không trùng nhân vật chính).
-const POOL_M := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02"]
-const POOL_F := ["Female_Adult_08", "Female_Adult_07"]
+## Người thật cho người đi đường: thân (quần áo) trong POOL, đầu (mặt, tóc) người châu Á trong HEADS (ghép đầu, xem
+## human.gd); người lớn tuổi tóc bạc. Không dùng thân, mặt của An, Linh.
+const POOL_M := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02", "Male_Adult_02",
+	"Male_Adult_05", "Male_Adult_14", "Male_Adult_17"]
+const POOL_F := ["Female_Adult_08", "Female_Adult_07", "Female_Adult_02", "Female_Adult_05", "Female_Adult_11",
+	"Female_Adult_14", "Business_Female_03"]
+const HEADS_M := ["Male_Adult_10", "Business_Male_02"]
+const HEADS_F := ["Female_Adult_03", "Business_Female_03", "Medical_Female_01", "Sports_Female_02"]
+## Người đám đông, người lái xe (tools/bake_people.gd nướng sẵn từng tư thế theo id, crowd.gd và traffic.gd dùng).
+const CROWD := [
+	{"id": "m1", "rb": "Male_Adult_01", "head": "Male_Adult_10", "scale": 0.95},
+	{"id": "m2", "rb": "Male_Adult_07", "head": "Business_Male_02", "scale": 0.96},
+	{"id": "m3", "rb": "Delivery_Male_01", "head": "Male_Adult_10", "hair_tone": "grey", "scale": 0.94},
+	{"id": "m4", "rb": "Male_Adult_17", "head": "Business_Male_02", "scale": 0.95},
+	{"id": "m5", "rb": "Construction_Male_02", "head": "Male_Adult_10", "scale": 0.96},
+	{"id": "f1", "rb": "Female_Adult_08", "head": "Female_Adult_03", "scale": 0.94},
+	{"id": "f2", "rb": "Female_Adult_07", "head": "Sports_Female_02", "scale": 0.94},
+	{"id": "f3", "rb": "Female_Adult_02", "head": "Business_Female_03", "hair_tone": "grey", "scale": 0.92},
+	{"id": "f4", "rb": "Female_Adult_05", "head": "Medical_Female_01", "scale": 0.94},
+]
+const CROWD_CHILD := {"id": "c1", "rb": "Male_Child_01", "scale": 1.0}
+## Đầu có bản tóc bạc (tools/viet_look.py).
+const GREY_HEADS := ["Male_Adult_10", "Business_Male_02", "Business_Female_03"]
 
 
 ## Ngoại hình ngẫu nhiên cho người đi đường: quần áo thường ngày ở Sài Gòn.
@@ -180,7 +212,7 @@ static func random_look(rng: RandomNumberGenerator) -> Dictionary:
 		hat = "non_la"
 	elif r < 0.27:
 		hat = "cap"
-	return {
+	var out := {
 		"skin": ["c98f63", "d9a77c", "e2b48f", "b97d55"][rng.randi() % 4],
 		"hair": ["1b1714", "2b211b", "3a2a20"][rng.randi() % 3],
 		"hair_style": (["long", "bun", "ponytail"][rng.randi() % 3]) if female else "short",
@@ -196,7 +228,12 @@ static func random_look(rng: RandomNumberGenerator) -> Dictionary:
 		"build": rng.randf_range(0.92, 1.1),
 		"female": female,
 		"rb": (POOL_F if female else POOL_M)[rng.randi() % (POOL_F if female else POOL_M).size()],
+		"head": (HEADS_F if female else HEADS_M)[rng.randi() % (HEADS_F if female else HEADS_M).size()],
+		"scale": rng.randf_range(0.92, 0.96) if female else rng.randf_range(0.93, 0.98),
 	}
+	if str(out.head) in GREY_HEADS and rng.randf() < 0.2:
+		out["hair_tone"] = "grey"
+	return out
 
 
 # ---------------------------------------------------------------- dựng

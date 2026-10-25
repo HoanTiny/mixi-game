@@ -24,8 +24,7 @@ const FADE := 3.0
 const KINDS := [["tay_ga", false, 0.5], ["xe_so", false, 0.3], ["tay_ga", true, 0.2]]
 const BIKE_PAINT := ["b23a32", "2b2d33", "e8e6e1", "3a6ea5", "c9ccd1", "7a2a3a", "e0b23c", "2f6f4f"]
 ## Người lái xe máy (người thật nướng sẵn, xem props3d.gd rider_real), màu mũ bảo hiểm.
-const RIDERS := ["Male_Adult_01", "Male_Adult_07", "Delivery_Male_01", "Construction_Male_02", "Female_Adult_08",
-	"Female_Adult_07"]
+const RIDERS := ["m1", "m2", "m3", "m4", "m5", "f1", "f2", "f3", "f4"]
 const HELMETS := ["c0392b", "f2f0ea", "2f6fb0", "1f1f24", "f1c40f", "d98fa0", "7d8c6a"]
 const CAR_PAINT := ["e8e6e1", "2b2d33", "b23a32", "3a6ea5", "c9ccd1", "e0b23c", "5a7d4f"]
 

@@ -8,11 +8,20 @@ Nhân vật trong game (An, các nhân vật phụ, người đi đường, ngư
 - `anims/`: bốn động tác của Rocketbox (đứng, đi, ngồi ghế, nói chuyện; bản nam và nữ), đã bỏ phần trôi theo mặt đất.
 - `crowd/`: tư thế nướng sẵn thành lưới nhẹ cho đám đông và người lái xe (`tools/bake_people.gd`).
 
-Ai là ai: An `Male_Adult_09`, Linh `Female_Adult_12`, má `Female_Adult_11`, bà Tư `Female_Adult_02`, chị Hạnh
-`Chef_Female_01`, chú Sáu `Male_Adult_14`, ông Ba `Gardener_Male_01`, Minh `Male_Adult_10`, Trâm `Female_Adult_03`, Kha
-`Male_Adult_17`, anh Phúc `Business_Male_02`, cô Duyên `Female_Adult_05`, anh Quân `Male_Adult_02`, chị Mai
-`Medical_Female_01`, thầy Phong `Male_Adult_05`, Tín `Male_Child_01`, chị Lụa `Female_Adult_14`; người đi đường
-`Male_Adult_01`, `Male_Adult_07`, `Delivery_Male_01`, `Construction_Male_02`, `Female_Adult_08`, `Female_Adult_07`.
+**Việt hoá** (tools/viet_look.py, ảnh gốc giữ ở `<tên>/orig/`): cả bộ chỉ có vài gương mặt châu Á (`Male_Adult_09`,
+`Male_Adult_10`, `Business_Male_02`, `Female_Adult_03`, `Business_Female_03`, `Chef_Female_01`, `Medical_Female_01`,
+`Sports_Female_02`), nên người trong game là **thân người này ghép đầu người kia** (human.gd: lưới đầu, tóc gắn vào cùng
+bộ xương Biped theo tên xương). Da mặt và da thân đưa về cùng một tông da ngăm sáng; đầu dùng cho ông bà có thêm bản
+tóc bạc (`head_grey.jpg`, `opacity_grey.png`); bé Tín nhuộm tóc đen. Chiều cao hạ còn 92–98% (người Việt thấp hơn người
+mẫu Rocketbox).
+
+Ai là ai (thân + đầu): An `Male_Adult_09`; Linh `Female_Adult_12` + `Sports_Female_02`; má `Female_Adult_11` +
+`Business_Female_03`; bà Tư `Female_Adult_02` + `Business_Female_03` tóc bạc; chị Hạnh `Chef_Female_01`; chú Sáu
+`Male_Adult_14` + `Business_Male_02` tóc bạc; ông Ba `Gardener_Male_01` + `Male_Adult_10` tóc bạc; Minh `Male_Adult_10`;
+Trâm `Female_Adult_03`; Kha `Male_Adult_17` + `Male_Adult_10`; anh Phúc `Business_Male_02`; cô Duyên `Female_Adult_05` +
+`Female_Adult_03`; anh Quân `Male_Adult_02` + `Business_Male_02`; chị Mai `Medical_Female_01`; thầy Phong `Male_Adult_05`
++ `Male_Adult_10` tóc bạc; Tín `Male_Child_01`; chị Lụa `Female_Adult_14` + `Sports_Female_02`. Người đi đường, đám đông,
+người lái xe: `Character.CROWD` (character.gd).
 
 ---
 
