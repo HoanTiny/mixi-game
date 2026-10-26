@@ -1835,6 +1835,25 @@ func _update_ride() -> void:
 	_float_text("Lên xe đi giao" if want else "Dựng xe", Color("ffd27a"))
 
 
+## Thay bộ quần áo của An (bảng Nhân vật): dựng lại người theo thân mặc bộ mới, giữ nguyên dáng đang ngồi xe.
+func dress_player() -> void:
+	if player_body == null or not player_body.has_method("wear"):
+		return
+	var look := Character.an_look(game)
+	var cur = player_body.get("look")
+	if not cur is Dictionary or str(cur.get("rb", "")) == str(look.rb):
+		return
+	var body := Character.make(look)
+	player.remove_child(player_body)
+	player_body.queue_free()
+	player.add_child(body)
+	player.move_child(body, 0)
+	player_body = body
+	if _riding:
+		_riding = false
+		_update_ride()
+
+
 ## An đang lội qua chỗ ngập ngày mưa.
 func _wading() -> bool:
 	return _rain_layer != null and _rain_layer.wading(Vector2(player.position.x, player.position.z))
@@ -2071,6 +2090,7 @@ func _on_changed() -> void:
 			_hold_for_title(true)
 		return
 	_sync_home()
+	dress_player()
 	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3", "full4", "full5"] and _ending_home == null:
 		_show_ending_home()
 	elif not game.is_over() and _ending_home != null:
@@ -2319,7 +2339,7 @@ func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenera
 	var m := models.spawn(key, rng)
 	if m == null:
 		var id := "AN" if key == "player" else key.trim_prefix("npc.")
-		var look: Dictionary = Character.LOOKS.get(id, {})
+		var look: Dictionary = Character.an_look(game) if key == "player" else Character.LOOKS.get(id, {})
 		if look.is_empty():
 			var r := rng if rng != null else RandomNumberGenerator.new()
 			look = Character.random_look(r)

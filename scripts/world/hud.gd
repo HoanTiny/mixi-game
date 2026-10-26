@@ -6,6 +6,7 @@ extends CanvasLayer
 const GameLogic := preload("res://scripts/game_logic.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
+const CharacterPanel := preload("res://scripts/ui/character_panel.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
 ## Ca làm việc 3D theo trường minigame của việc trong config.json (bricks, site, dishes, repair): mỗi việc một bản đồ
 ## nhỏ riêng, An tự đi lại làm.
@@ -16,6 +17,8 @@ var game
 ## Trò chơi nhỏ đang mở (phụ hồ bưng gạch), null nếu không có.
 var minigame: Control
 var dialogs: DialogLayer
+## Bảng Nhân vật (phím C): hành trang, An 3D, trạng thái, đặc điểm, quan hệ.
+var character: CharacterPanel
 
 var _objectives: PanelContainer
 var _map: Control
@@ -129,7 +132,7 @@ func _ready() -> void:
 
 	# Hàng dưới: hướng dẫn điều khiển bên trái, thanh công cụ bên phải.
 	var bottom := _pass(HBoxContainer.new(), rows)
-	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa, toàn cảnh · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · M: bản đồ · Esc: đóng", 12, UI.HUD_TEXT)
+	var hint := UI.label("Chuột trái: đi tới chỗ bấm · Con lăn: gần xa, toàn cảnh · Bấm cửa tiệm hoặc người: tương tác · WASD: đi · E: vào · M: bản đồ · C: nhân vật · Esc: đóng", 12, UI.HUD_TEXT)
 	hint.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	hint.add_theme_constant_override("outline_size", 5)
 	hint.size_flags_vertical = Control.SIZE_SHRINK_END
@@ -152,6 +155,11 @@ func _ready() -> void:
 	dialogs.game = game
 	root.add_child(dialogs)
 	dialogs.closed.connect(_refresh)
+	character = CharacterPanel.new()
+	character.world = world
+	character.game = game
+	add_child(character)
+	character.closed.connect(func() -> void: _root.visible = true)
 	game.changed.connect(_refresh)
 	ScreenFit.changed.connect(_apply_fit)
 	_apply_fit()
@@ -160,7 +168,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible or _working or minigame != null or (_big_map != null and _big_map.visible)
+	return dialogs.visible or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
 
 
 func location_open() -> String:
@@ -246,7 +254,20 @@ func set_prompt(id: String) -> void:
 	_update_prompt()
 
 
+## Mở bảng Nhân vật; trong lúc mở giấu các bảng của màn phố để nền vẽ mực chỉ có phố.
+func open_character() -> void:
+	if not game.is_started() or blocking() or world.title_open():
+		return
+	close_location()
+	_root.visible = false
+	character.open()
+
+
 func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_C, KEY_I]:
+		open_character()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if _loc_id != "":
 			close_location()
@@ -880,6 +901,7 @@ func _build_bottom(parent: Control) -> void:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 10)
 	_bottom.add_child(h)
+	h.add_child(_tool_button("Nhân vật", open_character))
 	h.add_child(_tool_button("Điện thoại", func() -> void:
 		_phone.visible = not _phone.visible
 		_skills.visible = false

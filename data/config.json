@@ -24,6 +24,21 @@
     "payTiers": [[55, 1.0], [30, 0.7], [0, 0.5]],
     "slowBelow": 30
   },
+  "_items": "Hành trang trong bảng Nhân vật (phím C, scripts/ui/character_panel.gd): kind là hình vẽ biểu tượng (scripts/ui/item_icon.gd), rb của quần áo là thân người Rocketbox mặc bộ đó (ghép đầu An lên), when là điều kiện như check() (bỏ trống là luôn có). Ve chai lấy từ s.inv, đồ của việc nhờ từ s.qitems, kỷ vật từ keepsakes của chương.",
+  "items": {
+    "tools": [
+      {"id": "dien_thoai", "name": "Điện thoại cũ", "kind": "phone", "slot": "phone", "desc": "Màn nứt một góc, pin chai, sạc hai lần một ngày. Đủ để nghe gọi, nhắn tin và chạy app Giao Nhanh."},
+      {"id": "do_nghe", "name": "Túi đồ nghề", "kind": "toolbag", "slot": "tool", "desc": "Tua vít, kìm, đồng hồ đo, mỏ hàn, cuộn băng keo điện. Mười năm ở tiệm điện máy gói trong một cái túi vải."},
+      {"id": "cccd", "name": "Căn cước công dân", "kind": "card", "desc": "Làm lại năm ngoái. Đi xin việc, ký hợp đồng thuê phòng đều cần."},
+      {"id": "quat_ban", "name": "Quạt bàn hỏng", "kind": "fan", "when": {"chapter": 1}, "desc": "Tiệm cũ cho thay tiền công tháng cuối. Cháy tụ, chưa có tiền mua tụ mới."},
+      {"id": "xe_may", "name": "Chìa khóa xe máy", "kind": "key", "desc": "Chiếc Wave đời cũ mượn của người quen để chạy giao hàng. Đổ xăng thì tự lo."}
+    ],
+    "clothes": [
+      {"id": "ao_thun", "name": "Áo thun đen, quần jean", "kind": "tshirt", "rb": "Male_Adult_09", "desc": "Bộ mặc hằng ngày. Đi làm bẩn thì giặt ở chỗ ở."},
+      {"id": "ao_so_mi", "name": "Áo sơ mi caro", "kind": "shirt", "rb": "Delivery_Male_01", "desc": "Bộ tươm tất nhất, để dành đi xin việc, đi gặp người ta."},
+      {"id": "ao_khoac", "name": "Áo khoác gió, quần jean", "kind": "jacket", "rb": "Male_Adult_07", "desc": "Mua lại ở sạp đồ cũ chợ Cầu Nhỏ. Chạy xe sáng sớm, chiều lất phất mưa đều cần."}
+    ]
+  },
   "scrap": {
     "chai": {"name": "chai nhựa", "price": 3000},
     "lon": {"name": "lon nhôm", "price": 5000},

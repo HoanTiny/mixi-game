@@ -769,7 +769,7 @@ func _repair_act(s: Dictionary) -> void:
 func _build_player() -> void:
 	_player = Node3D.new()
 	_world.add_child(_player)
-	_body = Character.make(Character.LOOKS.get("AN", {}))
+	_body = Character.make(Character.an_look(GameState.game))
 	_player.add_child(_body)
 	_stack = Node3D.new()
 	_stack.position = Vector3(0, 1.0, 0.45)

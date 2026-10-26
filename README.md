@@ -80,6 +80,11 @@ Chữ: [Sedgwick Ave Display](https://fonts.google.com/specimen/Sedgwick+Ave+Dis
 | Esc | Đóng bảng |
 | Nút **Về xóm trọ** | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
 
+**Bảng Nhân vật** (phím **C**, nút **Nhân vật** trên thanh dưới; `scripts/ui/character_panel.gd`), dựng theo bảng nhân vật của Nobody, nền là phố phủ shader vẽ mực tối:
+- **Hành trang** bên trái, bốn ngăn: *Công cụ* (điện thoại cũ, túi đồ nghề, căn cước, quạt bàn hỏng, chìa khóa xe), *Quần áo* (áo thun đen, sơ mi caro, áo khoác gió; bấm **Mặc bộ này** là An đổi đồ thật trên phố, trong ca làm: ghép đầu An lên thân người Rocketbox mặc bộ đó), *Phế* (ve chai đang mang, ước giá bán), *Đồ giữ* (đồ việc nhờ đang mang và kỷ vật của chương). Hình đồ vật vẽ bằng nét trong `scripts/ui/item_icon.gd`; danh sách trong `items` của `data/config.json`.
+- **Giữa:** An 3D đứng xoay được (kéo chuột), bốn ô đang dùng: đồ nghề, điện thoại, quần áo, chỗ ở.
+- **Bên phải:** mặt Phong độ (vui, lo, mếu theo mức), Tỉnh táo, No bụng, Vệ sinh cá nhân, Quần áo (rê chuột xem cách hồi lại); **Đặc điểm tính cách** rút ra từ cách đã sống (`traits()` trong `scripts/game_logic.gd`: Tiết kiệm hay Tay rộng, Chăm chỉ, Giữ lời hay Hứa trước lo sau, Ôm việc một mình hay Biết nhờ người, Thương nhà, Được lòng xóm, Cố quá sức, Lôi thôi); **Mối quan hệ** với từng người (Thân thiết, Quen, Xa cách).
+
 **Thời gian:** đi bộ trên phố tốn giờ (chỉnh bằng `walkHoursPerMeter`). Làm việc thì An vào trong, thanh thời gian chạy (`workSecondsPerHour` giây thật cho mỗi giờ trong game) rồi mới tính kết quả. Làm việc kéo qua 20 giờ thì Mệt tăng thêm. Vào **Xóm trọ Bờ Me** để **Đi ngủ**.
 
 **Tiền và Mệt:** góc phải hiện tiền mặt tiêu được, tách riêng khỏi tiền phải thu (trước và sau ngày 30) và khoản phải trả. Mỗi tối trừ tiền sinh hoạt của cả nhà (`livingCostPerDay`, chưa gồm cơm của An). Mệt từ 70 trở lên là mức cảnh báo; nghỉ ở phòng, ăn cơm với bà, ngồi trà đá giúp giảm Mệt. Nút **Sổ** mở các khoản phải thu, phải trả, sổ lời hứa, sổ gia đình, độ thân thiết và đồ đang mang.

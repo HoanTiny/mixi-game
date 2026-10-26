@@ -164,6 +164,17 @@ var _hip_h := 0.93
 var _hold := ""
 
 
+## Dáng An theo bộ quần áo đang mặc (bảng Nhân vật): thân người mặc bộ đó, giữ đầu, mặt của An.
+static func an_look(game) -> Dictionary:
+	var look: Dictionary = LOOKS.AN.duplicate()
+	if game == null or not game.is_started():
+		return look
+	for it in game.cfg.get("items", {}).get("clothes", []):
+		if str(it.id) == game.outfit() and it.has("rb"):
+			look["rb"] = str(it.rb)
+	return look
+
+
 static func make(look_in: Dictionary) -> Node3D:
 	# Có người thật (Rocketbox, assets/rb) thì dùng người thật; khung người dựng bằng code chỉ còn làm dự phòng.
 	if look_in.has("rb"):

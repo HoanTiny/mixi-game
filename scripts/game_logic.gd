@@ -1904,6 +1904,74 @@ func teaser(d: int) -> String:
 
 
 ## Những món An giữ được trong tháng (mỗi món gắn với một việc đã làm).
+## Đặc điểm tính cách hiện trong bảng Nhân vật (kiểu Nobody), rút ra từ chính cách người chơi đã sống: tiêu tiền, làm
+## việc, giữ lời, với gia đình, với xóm. Mỗi mục {name, desc, tone}: tone "good" xanh, "bad" cam, "base" là vốn có.
+func traits() -> Array:
+	var out := [{"name": "Thợ điện máy", "tone": "base",
+		"desc": "Mười năm ở tiệm điện máy: nghe tiếng quạt là biết bệnh. Sửa đồ nhanh, khéo hơn người thường."}]
+	if not is_started():
+		return out
+	var days := maxi(1, day() - (1 if is_full() else int(cfg.sliceStartDay)) + 1)
+	var earned := int(s.stats.get("earned", 0))
+	var spent := int(s.stats.get("spent", 0))
+	if days >= 3 and earned > 0 and spent <= earned * 0.4:
+		out.append({"name": "Tiết kiệm", "tone": "good", "desc": "Tiêu chưa tới bốn phần mười số kiếm được. Đồng nào ra cũng tính."})
+	elif days >= 3 and spent > earned and earned > 0:
+		out.append({"name": "Tay rộng", "tone": "bad", "desc": "Tiền ra nhiều hơn tiền vào. Còn ba mươi ngày, không ai cho mượn mãi."})
+	var work := 0
+	for a in cfg.actions:
+		if a.get("group", "") == "work":
+			work += count(str(a.id))
+	work += count("giao_hang")
+	if work >= days * 2:
+		out.append({"name": "Chăm chỉ", "tone": "good", "desc": "Trung bình mỗi ngày hai việc kiếm tiền trở lên."})
+	var kept := 0
+	var broke := 0
+	for pr in s.promises:
+		if pr.status == "done":
+			kept += 1
+		elif pr.status in ["overdue", "late"]:
+			broke += 1
+	if kept >= 2 and broke == 0:
+		out.append({"name": "Giữ lời", "tone": "good", "desc": "Hứa gì làm nấy, chưa để lời hứa nào quá hạn."})
+	elif broke >= 2:
+		out.append({"name": "Hứa trước lo sau", "tone": "bad", "desc": "Đã %d lần báo trễ hay để quá hạn lời hứa." % broke})
+	if hidden_marks() >= 2:
+		out.append({"name": "Ôm việc một mình", "tone": "bad", "desc": "Hay giấu chuyện khó với nhà, quyết thay người khác. \"Để anh lo.\""})
+	elif count_family("", "support") >= 2:
+		out.append({"name": "Biết nhờ người", "tone": "good", "desc": "Kể thật với nhà, để người khác cùng lo một phần."})
+	if count("com_voi_ba") + count("dua_ba_di_cho") >= 3:
+		out.append({"name": "Thương nhà", "tone": "good", "desc": "Bận mấy cũng về ăn cơm với bà, đưa bà đi chợ."})
+	var rep_sum := 0
+	for k in s.rep:
+		rep_sum += int(s.rep[k])
+	if s.rep.size() > 0 and rep_sum / s.rep.size() >= 60:
+		out.append({"name": "Được lòng xóm", "tone": "good", "desc": "Hàng xóm, người quen trung bình thân từ 60 trở lên."})
+	if float(s.fatigue) >= float(cfg.fatigue.warn) or int(s.get("warn_days", 0)) >= 3:
+		out.append({"name": "Cố quá sức", "tone": "bad", "desc": "Làm tới kiệt sức. Mệt cao thì đi chậm, dễ hỏng việc."})
+	if has_needs() and need("neat") < 30.0:
+		out.append({"name": "Lôi thôi", "tone": "bad", "desc": "Quần áo bẩn nhàu, người ta nhìn vào là ngại. Giặt đồ ở chỗ ở."})
+	return out
+
+
+## Bộ quần áo đang mặc (bảng Nhân vật): mã trong items.clothes của config.
+func outfit() -> String:
+	return str(s.get("outfit", "ao_thun"))
+
+
+func set_outfit(id: String) -> void:
+	s["outfit"] = id
+	_commit()
+
+
+## Tên một người quen theo chương đang chơi (chương sau có thêm người: má, ông bà…).
+func rep_label(k: String) -> String:
+	var st := chapter_story()
+	if st.get("reps", {}).has(k):
+		return str(st.reps[k])
+	return rep_name(k)
+
+
 func keepsakes() -> Array:
 	var out := []
 	for k in chapter_story().get("keepsakes", []):
