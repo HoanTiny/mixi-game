@@ -243,8 +243,9 @@ const BRIDGE_Y := 0.5
 ## Hạ nhà che An (xem cut_target). near_w: nửa bề ngang dải ngay trước mặt An (bằng người); wide_w: dải rộng hai
 ## bên, hạ ít hơn wide_add mét; beside: căn trong dải rộng phải nằm hẳn phía nam An quá chừng này mới hạ; focus_r:
 ## khoảng trước mặt An luôn thấy mặt đường; stub: chân tường còn lại; speed: mét mỗi giây khi hạ, nâng; reach: xa nhất
-## về phía nam còn phải xét.
-const CUT := {"near_w": 0.45, "wide_w": 6.0, "wide_add": 2.0, "beside": 0.5, "focus_r": 2.5, "stub": 0.5, "speed": 30.0, "reach": 45.0}
+## về phía nam còn phải xét; behind, lip: căn trong dải hẹp trải ra sau lưng An quá behind mét mà chỉ lấn ra trước An
+## dưới lip mét (An đứng sát chân tường) thì không hạ.
+const CUT := {"behind": 1.0, "lip": 1.0, "near_w": 0.45, "wide_w": 6.0, "wide_add": 2.0, "beside": 0.5, "focus_r": 2.5, "stub": 0.5, "speed": 30.0, "reach": 45.0}
 ## Màu mặt cắt của nhà bị hạ (vữa sáng).
 const CUT_COLOR := Color(0.4, 0.38, 0.34)
 ## Giá trị trong ảnh caps nghĩa là căn để nguyên.
@@ -1032,7 +1033,9 @@ func _cut_label(idx: int, label: Label3D, thr: float) -> void:
 static func cut_target(poly: PackedVector2Array, p: Vector2, slope: float) -> float:
 	var best := INF
 	var zr := _strip_z(poly, p.x - CUT.near_w, p.x + CUT.near_w)
-	if zr.y > p.y:
+	# Căn ngay trước mặt. Căn trải ra sau lưng An mà phần lấn ra trước An chỉ là gờ mỏng dưới lip mét (An đứng sát chân
+	# tường, ở cửa) thì để nguyên; căn chữ L ôm quanh An, phần trước mặt dày hơn thì vẫn hạ.
+	if zr.y > p.y and not (zr.x < p.y - CUT.behind and zr.y < p.y + CUT.lip):
 		best = CUT.stub + maxf(zr.x - p.y - CUT.focus_r, 0.0) * slope
 	zr = _strip_z(poly, p.x - CUT.wide_w, p.x + CUT.wide_w)
 	if zr.x < INF and zr.x > p.y + CUT.beside:

@@ -10,6 +10,7 @@ extends Node
 
 signal changed
 
+const TITLE := "Trước mùa mưa"
 const DESIGN_SIZE := Vector2(1280, 720)
 const COMPACT_SIZE := Vector2(1100, 520)
 const COMPACT_BELOW := 560.0
@@ -35,7 +36,7 @@ func _ready() -> void:
 	dpr = _device_pixel_ratio()
 	# Bản cài trên máy: tên cửa sổ theo tên game (config/name giữ tên cũ để không đổi chỗ lưu ván chơi).
 	if not OS.has_feature("web"):
-		DisplayServer.window_set_title("Trước mùa mưa")
+		_set_title.call_deferred()
 	touch = DisplayServer.is_touchscreen_available()
 	low_power = OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
 	light_shadows = low_power or OS.has_feature("web")
@@ -51,6 +52,17 @@ func _ready() -> void:
 			dpr = float(a.substr(6))
 	get_tree().root.size_changed.connect(_fit)
 	_fit()
+
+
+## Godot đặt lại tên cửa sổ theo config/name sau khi nạp ngôn ngữ: đặt sau đó, và đặt lại mỗi lần đổi ngôn ngữ.
+func _set_title() -> void:
+	get_tree().root.title = TITLE
+	DisplayServer.window_set_title(TITLE)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_inside_tree() and not OS.has_feature("web"):
+		_set_title.call_deferred()
 
 
 func _device_pixel_ratio() -> float:
