@@ -33,6 +33,9 @@ var _rotate_dismissed := false
 
 func _ready() -> void:
 	dpr = _device_pixel_ratio()
+	# Bản cài trên máy: tên cửa sổ theo tên game (config/name giữ tên cũ để không đổi chỗ lưu ván chơi).
+	if not OS.has_feature("web"):
+		DisplayServer.window_set_title("Trước mùa mưa")
 	touch = DisplayServer.is_touchscreen_available()
 	low_power = OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
 	light_shadows = low_power or OS.has_feature("web")

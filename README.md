@@ -276,3 +276,10 @@ Godot không tự đóng gói file `.json`. Trong **Project → Export**, thêm 
 - Trình duyệt máy tính màn mật độ cao vẽ cảnh 3D chừng 1,25 điểm mỗi điểm CSS (`ScreenFit.WEB_3D_DENSITY`), giao diện vẫn nét; trên web bóng nắng chỉ hai tầng (`ScreenFit.light_shadows`).
 - Tìm đường (`walk_grid.gd`): nắn thẳng bằng chia đôi trong 48 điểm tới, nhớ sẵn 256 đường; đường đi việc của nhân vật phụ tìm sẵn lúc dựng màn phố, lúc chơi khỏi khựng.
 - Đám đông chia ô, dùng chung một vật liệu atlas; dòng xe gom cụm 100 m.
+
+## Bản Windows
+
+Tải: <https://hoantiny.github.io/mixi-game/download/TruocMuaMua-Windows.zip> (Windows 10/11 64-bit, OpenGL 3.3). Giải nén, bấm đúp `TruocMuaMua.exe`; bản chưa ký số nên lần đầu Windows có thể hỏi, bấm "More info" rồi "Run anyway". Bản cài trên máy vẽ đầy đủ hơn bản web: cảnh 3D đủ độ nét của màn hình, bóng nắng bốn tầng.
+
+Xuất lại: cần khuôn `windows_release_x86_64.exe` của Godot 4.7.2 trong thư mục export_templates, rồi
+`godot --headless --path . --export-release "Windows" build/windows/TruocMuaMua.exe` (dữ liệu game nhúng sẵn trong file exe, biểu tượng `icon.ico`, tên và số phiên bản trong `export_presets.cfg`). Cả bản web và bản Windows dùng bộ vẽ Compatibility (OpenGL) như lúc thử.
