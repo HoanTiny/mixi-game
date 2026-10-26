@@ -66,6 +66,13 @@ var _top_row: Control
 var _root: Control
 var _left_col: Control
 var _phone_scroll: ScrollContainer
+var _phone_clock: Label
+var _phone_batt: ColorRect
+var _phone_status: Label
+## Điện thoại: bề ngang, chiều cao phần nội dung, màu app Giao Nhanh.
+const PHONE_W := 320.0
+const PHONE_BODY_H := 430.0
+const PHONE_GREEN := Color("0f9d58")
 ## Bảng mục tiêu ở chế độ gọn (điện thoại): chỉ hiện vài mục đầu, chạm vào bảng để xem hết.
 var _obj_n := 0
 var _obj_hidden := 0
@@ -471,18 +478,217 @@ func _open_minigame(id: String, a: Dictionary) -> void:
 
 # ---------------------------------------------------------------- điện thoại: app giao hàng
 
+## Điện thoại cầm tay: vỏ máy đen bo tròn, màn hình có thanh trạng thái (giờ trong game, sóng, pin, tai thỏ), thanh
+## tiêu đề app Giao Nhanh màu xanh lá, nội dung cuộn được, vạch home ở đáy.
 func _build_phone(parent: Control) -> void:
-	_phone = _light_panel(parent)
-	_phone.custom_minimum_size = Vector2(330, 0)
-	# Màn thấp (điện thoại) thì cuộn trong bảng.
+	_phone = PanelContainer.new()
+	var shell := StyleBoxFlat.new()
+	shell.bg_color = Color("16181d")
+	shell.border_color = Color("3a3e47")
+	shell.set_border_width_all(2)
+	shell.set_corner_radius_all(38)
+	shell.set_content_margin_all(9)
+	shell.shadow_color = Color(0, 0, 0, 0.45)
+	shell.shadow_size = 14
+	shell.shadow_offset = Vector2(0, 6)
+	_phone.add_theme_stylebox_override("panel", shell)
+	_phone.custom_minimum_size = Vector2(PHONE_W, 0)
+	_phone.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	parent.add_child(_phone)
+	var screen := PanelContainer.new()
+	var scr := StyleBoxFlat.new()
+	scr.bg_color = Color("f2f4f7")
+	scr.set_corner_radius_all(30)
+	screen.add_theme_stylebox_override("panel", scr)
+	screen.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	_phone.add_child(screen)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	screen.add_child(col)
+	# Thanh trạng thái: giờ bên trái, tai thỏ ở giữa, sóng và pin bên phải.
+	var bar := MarginContainer.new()
+	for side in ["left", "right"]:
+		bar.add_theme_constant_override("margin_" + side, 22)
+	bar.add_theme_constant_override("margin_top", 8)
+	bar.add_theme_constant_override("margin_bottom", 4)
+	col.add_child(bar)
+	var row := HBoxContainer.new()
+	bar.add_child(row)
+	_phone_clock = UI.label("06:00", 13, Color("111318"))
+	_phone_clock.custom_minimum_size.x = 60
+	row.add_child(_phone_clock)
+	var mid := CenterContainer.new()
+	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(mid)
+	var notch := Panel.new()
+	notch.custom_minimum_size = Vector2(84, 22)
+	var ns := StyleBoxFlat.new()
+	ns.bg_color = Color("0c0d10")
+	ns.set_corner_radius_all(11)
+	notch.add_theme_stylebox_override("panel", ns)
+	mid.add_child(notch)
+	var right := HBoxContainer.new()
+	right.add_theme_constant_override("separation", 5)
+	right.alignment = BoxContainer.ALIGNMENT_END
+	right.custom_minimum_size.x = 60
+	row.add_child(right)
+	var bars := HBoxContainer.new()
+	bars.add_theme_constant_override("separation", 2)
+	bars.alignment = BoxContainer.ALIGNMENT_END
+	for i in 4:
+		var r := ColorRect.new()
+		r.color = Color("111318")
+		r.custom_minimum_size = Vector2(3, 4 + i * 2)
+		r.size_flags_vertical = Control.SIZE_SHRINK_END
+		bars.add_child(r)
+	right.add_child(bars)
+	right.add_child(UI.label("4G", 11, Color("111318")))
+	var batt := Panel.new()
+	batt.custom_minimum_size = Vector2(24, 12)
+	batt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var bs := StyleBoxFlat.new()
+	bs.bg_color = Color(0, 0, 0, 0)
+	bs.border_color = Color("111318")
+	bs.set_border_width_all(1)
+	bs.set_corner_radius_all(3)
+	batt.add_theme_stylebox_override("panel", bs)
+	_phone_batt = ColorRect.new()
+	_phone_batt.color = Color("111318")
+	_phone_batt.position = Vector2(2, 2)
+	_phone_batt.size = Vector2(20, 8)
+	batt.add_child(_phone_batt)
+	right.add_child(batt)
+	# Thanh tiêu đề app.
+	var head := PanelContainer.new()
+	var hs := StyleBoxFlat.new()
+	hs.bg_color = PHONE_GREEN
+	hs.content_margin_left = 16
+	hs.content_margin_right = 16
+	hs.content_margin_top = 10
+	hs.content_margin_bottom = 12
+	head.add_theme_stylebox_override("panel", hs)
+	col.add_child(head)
+	var hrow := HBoxContainer.new()
+	head.add_child(hrow)
+	var logo := PanelContainer.new()
+	var ls := StyleBoxFlat.new()
+	ls.bg_color = Color.WHITE
+	ls.set_corner_radius_all(8)
+	ls.set_content_margin_all(4)
+	logo.add_theme_stylebox_override("panel", ls)
+	var lg := UI.label("GN", 13, PHONE_GREEN)
+	lg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lg.custom_minimum_size = Vector2(22, 0)
+	logo.add_child(lg)
+	hrow.add_child(logo)
+	hrow.add_theme_constant_override("separation", 10)
+	var titles := VBoxContainer.new()
+	titles.add_theme_constant_override("separation", 0)
+	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hrow.add_child(titles)
+	titles.add_child(UI.label("Giao Nhanh", 18, Color.WHITE))
+	_phone_status = UI.label("", 12, Color(1, 1, 1, 0.88))
+	titles.add_child(_phone_status)
+	# Nội dung cuộn được.
 	_phone_scroll = ScrollContainer.new()
 	_phone_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_phone.add_child(_phone_scroll)
+	# Như điện thoại: không hiện thanh cuộn, lăn chuột hay kéo để cuộn.
+	_phone_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	col.add_child(_phone_scroll)
+	var pad := MarginContainer.new()
+	for side in ["left", "right", "top", "bottom"]:
+		pad.add_theme_constant_override("margin_" + side, 12)
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_phone_scroll.add_child(pad)
 	_phone_box = VBoxContainer.new()
-	_phone_box.add_theme_constant_override("separation", 8)
+	_phone_box.add_theme_constant_override("separation", 10)
 	_phone_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_phone_scroll.add_child(_phone_box)
+	pad.add_child(_phone_box)
+	# Vạch home.
+	var home := CenterContainer.new()
+	home.custom_minimum_size.y = 22
+	col.add_child(home)
+	var pill := Panel.new()
+	pill.custom_minimum_size = Vector2(110, 5)
+	var ps := StyleBoxFlat.new()
+	ps.bg_color = Color("1b1d22")
+	ps.set_corner_radius_all(3)
+	pill.add_theme_stylebox_override("panel", ps)
+	home.add_child(pill)
 	_phone.visible = false
+
+
+## Thẻ trắng bo góc trong màn điện thoại.
+func _phone_card(accent := Color(0, 0, 0, 0)) -> VBoxContainer:
+	var card := PanelContainer.new()
+	var cs := StyleBoxFlat.new()
+	cs.bg_color = Color.WHITE
+	cs.set_corner_radius_all(14)
+	cs.set_content_margin_all(12)
+	cs.shadow_color = Color(0, 0, 0, 0.08)
+	cs.shadow_size = 4
+	cs.shadow_offset = Vector2(0, 2)
+	if accent.a > 0.0:
+		cs.border_color = accent
+		cs.border_width_left = 4
+	card.add_theme_stylebox_override("panel", cs)
+	_phone_box.add_child(card)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 4)
+	card.add_child(v)
+	return v
+
+
+## Một dòng "nhãn: giá trị" trong thẻ đơn.
+func _phone_line(parent: Control, key: String, value: String, strong := false) -> void:
+	var r := HBoxContainer.new()
+	r.add_theme_constant_override("separation", 6)
+	var k := UI.label(key, 12, Color("7a8090"))
+	k.custom_minimum_size.x = 64
+	r.add_child(k)
+	var v := UI.label(value, 14 if strong else 13, Color("15181f"))
+	v.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	r.add_child(v)
+	parent.add_child(r)
+
+
+## Nút kiểu app: primary nền xanh lá, ghost viền xám, danger chữ đỏ; sub là dòng nhỏ bên dưới; lock: khóa kèm lý do.
+func _phone_btn(text: String, kind: String, sub: String, lock: String, on_press: Callable) -> Button:
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(0, 46 if sub == "" and lock == "" else 58)
+	b.disabled = lock != ""
+	var bg: Color = {"primary": PHONE_GREEN, "ghost": Color.WHITE, "danger": Color("fff1f0")}[kind]
+	var fg: Color = {"primary": Color.WHITE, "ghost": Color("15181f"), "danger": Color("d93025")}[kind]
+	for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = bg.darkened(0.08) if st == "hover" else (bg.darkened(0.16) if st == "pressed" else bg)
+		if st == "focus":
+			sb.bg_color = Color(0, 0, 0, 0)
+		if kind == "ghost":
+			sb.border_color = Color("d5d9e2")
+			sb.set_border_width_all(1)
+		sb.set_corner_radius_all(23)
+		b.add_theme_stylebox_override(st, sb)
+	b.pressed.connect(on_press)
+	var v := VBoxContainer.new()
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_theme_constant_override("separation", 0)
+	v.set_anchors_preset(Control.PRESET_FULL_RECT)
+	b.add_child(v)
+	var t := UI.label(text, 15, fg)
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(t)
+	if lock != "" or sub != "":
+		var s2 := UI.label(lock if lock != "" else sub, 11, Color("d93025") if lock != "" else fg.lerp(bg, 0.35))
+		s2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		s2.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		v.add_child(s2)
+	if lock != "":
+		t.modulate.a = 0.5
+	_phone_box.add_child(b)
+	return b
 
 
 func _build_order_strip(parent: Control) -> void:
@@ -567,45 +773,91 @@ func _refresh_phone() -> void:
 		return
 	for c in _phone_box.get_children():
 		c.queue_free()
-	_phone_box.add_child(UI.label("App Giao Nhanh", 20, UI.INK))
+	# Thanh trạng thái: giờ trong game; pin tụt dần trong ngày.
+	var clock: float = game.clock()
+	_phone_clock.text = GameLogic.hh(clock)
+	var charge := clampf(1.0 - (clock - 6.0) / 20.0, 0.15, 1.0)
+	_phone_batt.size.x = 20.0 * charge
+	_phone_batt.color = Color("111318") if charge > 0.25 else Color("d93025")
 	var lock: String = game.delivery_lock()
 	var rush: bool = game.delivery_rush()
-	_phone_box.add_child(UI.wrap(("Giờ cao điểm: đơn nhiều." if rush else "Ngoài giờ cao điểm (10:00–13:30, 17:00–21:00): ít đơn.")
-		+ " Đã giao hôm nay: %d đơn." % game.today_count("giao_hang"), 13, UI.INK_SOFT, 300))
+	_phone_status.text = ("● Đang nhận đơn" if _app_on else "○ Đã tắt nhận đơn") + (" · giờ cao điểm" if rush else "")
 	var o: Dictionary = game.delivery_active()
 	if not o.is_empty():
 		var left := _minutes_left(o)
-		_phone_box.add_child(UI.label("ĐƠN ĐANG GIAO", 11, UI.INK_SOFT))
-		_phone_box.add_child(UI.wrap("%s\nLấy ở: %s%s\nGiao tới: %s\nTiền công: %s · hạn %s (%s)" % [o.item, o.shop_name, " ✓" if o.picked else "",
-			o.dest, GameLogic.fmt_k(int(o.pay)), GameLogic.hh(float(o.deadline)), ("còn %d phút" % left) if left >= 0 else "đã trễ"], 14, UI.INK, 300))
-		_phone_box.add_child(UI.choice("Hủy đơn", "Khách đánh giá 1 sao · Tinh thần %d" % int(game.cfg.delivery.cancelMood), "", func() -> void:
+		var card := _phone_card(PHONE_GREEN)
+		card.add_child(UI.label("ĐƠN ĐANG GIAO", 11, PHONE_GREEN))
+		var it := UI.label(str(o.item), 16, Color("15181f"))
+		it.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		card.add_child(it)
+		_phone_line(card, "Lấy ở", str(o.shop_name) + ("  ✓ đã lấy" if o.picked else ""))
+		_phone_line(card, "Giao tới", str(o.dest))
+		_phone_line(card, "Tiền công", GameLogic.fmt_k(int(o.pay)), true)
+		var due := UI.label("Hạn %s · %s" % [GameLogic.hh(float(o.deadline)), ("còn %d phút" % left) if left >= 0 else "đã trễ"], 13,
+			PHONE_GREEN if left >= 10 else (Color("c27c0e") if left >= 0 else Color("d93025")))
+		card.add_child(due)
+		_phone_btn("Hủy đơn", "danger", "Khách đánh giá 1 sao · Mệt +%d" % int(game.cfg.delivery.cancelFatigue), "", func() -> void:
 			game.delivery_cancel()
-			_refresh_phone()))
+			_refresh_phone())
 	elif not _offer.is_empty():
-		_phone_box.add_child(UI.label("ĐƠN MỚI · tự hủy sau %d giây" % ceili(_offer_left), 11, UI.TIM))
-		_phone_box.add_child(UI.wrap("%s\nLấy ở: %s\nGiao tới: %s\nTiền công: %s · giao trước %s" % [_offer.item, _offer.shop_name, _offer.dest,
-			GameLogic.fmt_k(int(_offer.pay)), GameLogic.hh(float(_offer.deadline))], 14, UI.INK, 300))
-		_phone_box.add_child(UI.choice("Nhận đơn", "Mũi tên cam chỉ quán, xanh chỉ nhà khách", "", func() -> void:
+		var card := _phone_card(Color("f29d38"))
+		card.add_child(UI.label("ĐƠN MỚI · tự hủy sau %d giây" % ceili(_offer_left), 11, Color("c27c0e")))
+		var timer := ProgressBar.new()
+		timer.show_percentage = false
+		timer.custom_minimum_size.y = 4
+		timer.max_value = 12.0
+		timer.value = _offer_left
+		var fill := StyleBoxFlat.new()
+		fill.bg_color = Color("f29d38")
+		fill.set_corner_radius_all(2)
+		var back := StyleBoxFlat.new()
+		back.bg_color = Color("f1e4d3")
+		back.set_corner_radius_all(2)
+		timer.add_theme_stylebox_override("fill", fill)
+		timer.add_theme_stylebox_override("background", back)
+		card.add_child(timer)
+		var it := UI.label(str(_offer.item), 16, Color("15181f"))
+		it.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		card.add_child(it)
+		_phone_line(card, "Lấy ở", str(_offer.shop_name))
+		_phone_line(card, "Giao tới", str(_offer.dest))
+		_phone_line(card, "Tiền công", GameLogic.fmt_k(int(_offer.pay)), true)
+		_phone_line(card, "Giao trước", GameLogic.hh(float(_offer.deadline)))
+		_phone_btn("Nhận đơn", "primary", "Mũi tên cam chỉ quán, xanh chỉ nhà khách", "", func() -> void:
 			game.delivery_accept(_offer)
 			_offer = {}
-			_refresh_phone()))
-		_phone_box.add_child(UI.choice("Bỏ qua", "", "", func() -> void:
+			_refresh_phone())
+		_phone_btn("Bỏ qua", "ghost", "", "", func() -> void:
 			_offer = {}
-			_refresh_phone()))
-	_phone_box.add_child(UI.choice("Tắt nhận đơn" if _app_on else "Bật nhận đơn",
-		"Đang chờ đơn…" if _app_on and o.is_empty() and _offer.is_empty() else "", lock, func() -> void:
-			_app_on = not _app_on
-			_offer = {}
-			_offer_wait = 2.0
-			_refresh_phone()))
-	_phone_box.add_child(UI.choice("Cất điện thoại", "", "", func() -> void:
+			_refresh_phone())
+	else:
+		var card := _phone_card()
+		card.add_child(UI.label("Đang chờ đơn…" if _app_on else "Bật nhận đơn để có đơn mới", 14, Color("15181f")))
+		var info := UI.label(("Giờ cao điểm: đơn nhiều." if rush else "Ngoài giờ cao điểm (10:00–13:30, 17:00–21:00): ít đơn."), 12, Color("7a8090"))
+		info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		card.add_child(info)
+	var stats := UI.label("Hôm nay đã giao %d đơn" % game.today_count("giao_hang"), 12, Color("7a8090"))
+	stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_phone_box.add_child(stats)
+	_phone_btn("Tắt nhận đơn" if _app_on else "Bật nhận đơn", "ghost" if _app_on else "primary", "", lock, func() -> void:
+		_app_on = not _app_on
+		_offer = {}
+		_offer_wait = 2.0
+		_refresh_phone())
+	_phone_btn("Cất điện thoại", "ghost", "", "", func() -> void:
 		_phone.visible = false
-		_make_room()))
+		_make_room())
 	_fit_phone.call_deferred()
 
 
 func _fit_phone() -> void:
-	_phone_scroll.custom_minimum_size.y = minf(_phone_box.get_combined_minimum_size().y, _panel_max_h())
+	# Màn hình điện thoại cao như máy thật; chỗ trống từ đầu máy tới đáy màn game ít hơn thì co lại, nội dung cuộn.
+	var chrome := _phone.size.y - _phone_scroll.size.y
+	var room := ScreenFit.view_size().y - _phone.global_position.y - chrome - 16.0
+	var want := clampf(room, 140.0, PHONE_BODY_H)
+	if absf(_phone_scroll.custom_minimum_size.y - want) > 1.0:
+		_phone_scroll.custom_minimum_size.y = want
+		_phone.reset_size()
 
 
 func _build_log(parent: Control) -> void:
