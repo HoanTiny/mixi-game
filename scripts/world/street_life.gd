@@ -292,6 +292,8 @@ func _add_vendor(v: Dictionary) -> void:
 			body.hold("push")
 		sign_at = Vector3(0, 1.75, cart.position.z)
 	var sign: Label3D = world._label3d(str(v.get("name", "")).to_upper(), sign_at, 20)
+	sign.add_to_group("near_tag")
+	sign.set_meta("range", 12.0)
 	sign.modulate = Color("ffe7a8")
 	root.add_child(sign)
 	var length := 0.0

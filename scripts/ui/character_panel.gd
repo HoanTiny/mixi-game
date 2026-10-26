@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Bảng Nhân vật (phím C, nút Nhân vật trên thanh dưới), dựng theo bảng nhân vật của Nobody: trái là hành trang chia
+## Bảng Nhân vật (phím C, nút hình người trên thanh trên cùng, bấm vòng Phong độ), dựng theo bảng nhân vật của Nobody: trái là hành trang chia
 ## ngăn (Công cụ, Quần áo, Phế, Đồ giữ) với ô đồ vẽ tay và lời tả; giữa là An 3D đứng xoay được (kéo chuột), quanh là
 ## bốn ô đang dùng (đồ nghề, quần áo, điện thoại, chỗ ở); phải là trạng thái (mặt Phong độ, Tỉnh táo, No bụng, Vệ
 ## sinh, Quần áo), đặc điểm tính cách rút ra từ cách đã sống (game_logic.traits) và mối quan hệ với từng người.
@@ -214,7 +214,7 @@ func _build_left(row: HBoxContainer) -> void:
 	var v := _panel(row, 410)
 	var top := HBoxContainer.new()
 	v.add_child(top)
-	top.add_child(_heading(top, "Hành trang"))
+	_heading(top, "Hành trang")
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(sp)

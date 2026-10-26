@@ -87,6 +87,8 @@ func _fit() -> void:
 	elif OS.has_feature("web"):
 		# Trình duyệt máy tính màn mật độ cao: cảnh 3D vẽ chừng WEB_3D_DENSITY điểm mỗi điểm CSS (giao diện vẫn nét).
 		root.scaling_3d_scale = clampf(WEB_3D_DENSITY / dpr, 0.5, 1.0)
+	# Khử răng cưa cạnh nhà, người: bản cài trên máy 4 lần, trình duyệt máy tính 2 lần, điện thoại tắt cho nhẹ.
+	root.msaa_3d = Viewport.MSAA_DISABLED if low_power else (Viewport.MSAA_2X if OS.has_feature("web") else Viewport.MSAA_4X)
 	_update_rotate(win)
 	changed.emit()
 

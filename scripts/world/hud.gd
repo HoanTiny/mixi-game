@@ -1,6 +1,6 @@
 extends CanvasLayer
-## Giao diện đè lên màn phố: bảng mục tiêu góc trái (giống Nobody), trạng thái góc phải,
-## bảng địa điểm khi bước vào một cửa tiệm, thanh công cụ dưới cùng và các hộp thoại.
+## Giao diện đè lên màn phố, gọn như Nobody: thanh mảnh trên cùng (ngày giờ, tiền, vòng ngày còn lại, nút biểu tượng),
+## mục tiêu chữ nổi góc trái, vòng Phong độ góc dưới trái; bảng địa điểm khi bước vào một cửa tiệm và các hộp thoại.
 ## Bố cục dùng container lồng nhau; mọi container trong suốt với chuột để bấm xuyên xuống cảnh 3D.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
@@ -8,6 +8,8 @@ const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
 const CharacterPanel := preload("res://scripts/ui/character_panel.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
+const ItemIcon := preload("res://scripts/ui/item_icon.gd")
+const MoodRing := preload("res://scripts/ui/mood_ring.gd")
 ## Ca làm việc 3D theo trường minigame của việc trong config.json (bricks, site, dishes, repair): mỗi việc một bản đồ
 ## nhỏ riêng, An tự đi lại làm.
 const WorkSite := preload("res://scripts/work/work_site.gd")
@@ -76,7 +78,17 @@ var _phone_status: Label
 const PHONE_W := 320.0
 const PHONE_BODY_H := 430.0
 const PHONE_GREEN := Color("0f9d58")
-## Bảng mục tiêu ở chế độ gọn (điện thoại): chỉ hiện vài mục đầu, chạm vào bảng để xem hết.
+## Thanh mảnh trên cùng (kiểu Nobody): ngày, buổi, giờ, tiền mặt, vòng "còn lại N ngày" ở giữa, các nút biểu tượng.
+var _topbar: Control
+var _tb_day: Label
+var _tb_cash: Label
+var _tb_left: Label
+var _tb_left_sub: Label
+var _tb_icons := {}
+## Vòng Phong độ góc dưới bên trái, các biểu tượng nhu cầu đang thiếu bên cạnh.
+var _mood: Control
+var _mood_needs: HBoxContainer
+## Bảng mục tiêu: chỉ hiện vài mục đầu (ít chữ), bấm vào bảng để xem hết.
 var _obj_n := 0
 var _obj_hidden := 0
 var _obj_expanded := false
@@ -100,7 +112,10 @@ func _ready() -> void:
 	var rows := _pass(VBoxContainer.new(), margin)
 	rows.add_theme_constant_override("separation", 12)
 
-	# Hàng trên: mục tiêu bên trái, trạng thái bên phải.
+	# Chừa chỗ cho thanh trên cùng; hàng trên chỉ còn bảng mục tiêu bên trái (bản đồ nhỏ, bảng trạng thái cũ giữ lại
+	# nhưng ẩn: bản đồ lớn mở bằng phím M hay nút bản đồ, trạng thái ở vòng Phong độ và bảng Nhân vật).
+	var gap := _pass(Control.new(), rows)
+	gap.custom_minimum_size.y = 34
 	var top := _pass(HBoxContainer.new(), rows)
 	_top_row = top
 	_build_objectives(top)
@@ -151,6 +166,21 @@ func _ready() -> void:
 	root.add_child(_big_map)
 	_map.other = _big_map
 
+	_build_topbar(root)
+	_build_mood(root)
+	# Tối nhẹ bốn góc màn hình cho mắt dồn vào An và người quanh đó ở giữa.
+	var vig := ColorRect.new()
+	vig.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vig.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vm := ShaderMaterial.new()
+	var vs := Shader.new()
+	vs.code = VIGNETTE_SHADER
+	vm.shader = vs
+	vig.material = vm
+	root.add_child(vig)
+	root.move_child(vig, 0)
+	root.move_child(_big_map, -1)
+
 	dialogs = DialogLayer.new()
 	dialogs.game = game
 	root.add_child(dialogs)
@@ -193,7 +223,7 @@ func close_location() -> void:
 ## điện thoại thấp lại cho vừa; bảng mục tiêu chỉ hiện vài mục đầu); máy cảm ứng ẩn dòng phím tắt.
 func _apply_fit() -> void:
 	var compact: bool = ScreenFit.compact
-	_hint.visible = not compact and not ScreenFit.touch
+	_hint.visible = false
 	_map.fit(compact, ScreenFit.view_size())
 	_big_map.fit(compact, ScreenFit.view_size())
 	var h := _panel_max_h()
@@ -240,6 +270,8 @@ func _make_room() -> void:
 	if busy and _tip.visible:
 		_close_tip()
 	_top_row.visible = not busy
+	if _mood != null:
+		_mood.visible = game.is_started() and not _panel_open()
 
 
 func set_prompt(id: String) -> void:
@@ -271,10 +303,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if _loc_id != "":
 			close_location()
-		else:
+		elif _log.visible or _skills.visible or _phone.visible:
 			_log.visible = false
 			_skills.visible = false
+			_phone.visible = false
 			_make_room()
+		elif game.is_started() and not blocking():
+			world.open_menu()
 
 
 # ---------------------------------------------------------------- dựng khối
@@ -308,6 +343,8 @@ func _light_panel(parent: Control) -> PanelContainer:
 
 func _build_objectives(parent: Control) -> void:
 	_objectives = _dark_panel(parent)
+	_objectives.add_theme_stylebox_override("panel", UI.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6))
+	_objectives.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 4)
 	_objectives.add_child(v)
@@ -321,7 +358,7 @@ func _build_objectives(parent: Control) -> void:
 	bang.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.add_child(bang)
 	head.add_child(badge)
-	head.add_child(UI.label("Mục tiêu quan trọng", 18, UI.GOLD))
+	head.add_child(_outlined(UI.label("Mục tiêu quan trọng", 17, UI.GOLD)))
 	_obj_scroll = ScrollContainer.new()
 	_obj_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_obj_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -333,7 +370,7 @@ func _build_objectives(parent: Control) -> void:
 	_objective_box.minimum_size_changed.connect(_fit_objectives)
 	# Chế độ gọn: chạm vào bảng để xem hết các mục, chạm lần nữa để thu lại (vuốt để cuộn thì không tính là chạm).
 	_objectives.gui_input.connect(func(e: InputEvent) -> void:
-		if not (ScreenFit.compact and e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT):
+		if not (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT):
 			return
 		if e.pressed:
 			_obj_press = e.position
@@ -902,29 +939,254 @@ func _build_bottom(parent: Control) -> void:
 	h.add_theme_constant_override("separation", 10)
 	_bottom.add_child(h)
 	h.add_child(_tool_button("Nhân vật", open_character))
-	h.add_child(_tool_button("Điện thoại", func() -> void:
-		_phone.visible = not _phone.visible
-		_skills.visible = false
-		_log.visible = false
-		_make_room()
-		_refresh_phone()))
-	h.add_child(_tool_button("Sổ", func() -> void:
-		_skills.visible = not _skills.visible
-		_log.visible = false
-		_make_room()))
-	h.add_child(_tool_button("Nhật ký", func() -> void:
-		_log.visible = not _log.visible
-		_make_room()
-		_skills.visible = false))
-	h.add_child(_tool_button("Bảng cân bằng", func() -> void: get_tree().change_scene_to_file("res://scenes/board.tscn")))
+	h.add_child(_tool_button("Điện thoại", _toggle_phone))
+	h.add_child(_tool_button("Sổ", _toggle_skills))
+	h.add_child(_tool_button("Nhật ký", _toggle_log))
+	h.add_child(_tool_button("Bảng cân bằng", _open_board))
 	# Lùi máy quay ra xa ngắm cả khu phố (máy cảm ứng không có con lăn chuột), bấm lần nữa về góc chơi.
 	h.add_child(_tool_button("Toàn cảnh", func() -> void: world.toggle_overview()))
-	_end_day_btn = _tool_button("Về xóm trọ", func() -> void:
-		close_location()
-		world.walk_to_location(world.home))
+	_end_day_btn = _tool_button("Về xóm trọ", _go_home)
 	_end_day_btn.add_theme_stylebox_override("normal", UI.box(UI.GOLD, UI.GOLD, 8, 10))
 	_end_day_btn.add_theme_stylebox_override("hover", UI.box(UI.GOLD.lightened(0.15), UI.GOLD, 8, 10))
 	h.add_child(_end_day_btn)
+
+
+func _toggle_phone() -> void:
+	_phone.visible = not _phone.visible
+	_skills.visible = false
+	_log.visible = false
+	_make_room()
+	_refresh_phone()
+
+
+func _toggle_skills() -> void:
+	_skills.visible = not _skills.visible
+	_log.visible = false
+	_phone.visible = false
+	_make_room()
+
+
+func _toggle_log() -> void:
+	_log.visible = not _log.visible
+	_skills.visible = false
+	_phone.visible = false
+	_make_room()
+
+
+func _open_board() -> void:
+	get_tree().change_scene_to_file("res://scenes/board.tscn")
+
+
+func _go_home() -> void:
+	if _end_day_btn.disabled:
+		return
+	close_location()
+	world.walk_to_location(world.home)
+
+
+## Chữ nổi trên cảnh 3D không cần nền: viền tối quanh chữ.
+func _outlined(l: Label) -> Label:
+	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	l.add_theme_constant_override("outline_size", 5)
+	return l
+
+
+# ---------------------------------------------------------------- thanh trên cùng, vòng Phong độ
+
+const TOPBAR_SHADER := """
+shader_type canvas_item;
+// Dải tối mờ dần hai đầu và mép dưới, như thanh trên cùng của Nobody.
+void fragment() {
+	float a = smoothstep(0.0, 0.14, UV.x) * smoothstep(1.0, 0.86, UV.x) * smoothstep(1.0, 0.55, UV.y);
+	COLOR = vec4(0.05, 0.05, 0.06, 0.8 * a);
+}
+"""
+
+const VIGNETTE_SHADER := """
+shader_type canvas_item;
+void fragment() {
+	// Tâm sáng lệch lên trên một chút (chỗ An đứng), mép dưới (mái nhà sát máy quay) tối hơn mép trên.
+	vec2 d = (UV - vec2(0.5, 0.45)) * vec2(1.2, 1.0);
+	COLOR = vec4(0.02, 0.02, 0.03, smoothstep(0.3, 0.85, length(d)) * 0.65);
+}
+"""
+
+const MEDAL_SHADER := """
+shader_type canvas_item;
+// Huy hiệu tròn giữa thanh: nền tối, vành vàng đồng, vân xước nhẹ.
+void fragment() {
+	vec2 p = UV - 0.5;
+	float r = length(p) * 2.0;
+	float disc = 1.0 - smoothstep(0.96, 1.0, r);
+	float rim = smoothstep(0.8, 0.86, r) * (1.0 - smoothstep(0.93, 0.97, r));
+	vec3 col = mix(vec3(0.09, 0.08, 0.07), vec3(0.16, 0.14, 0.11), 1.0 - r);
+	col = mix(col, vec3(0.72, 0.56, 0.3), rim);
+	COLOR = vec4(col, disc * 0.95);
+}
+"""
+
+
+func _build_topbar(root: Control) -> void:
+	_topbar = Control.new()
+	_topbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_topbar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_topbar.offset_bottom = 44
+	root.add_child(_topbar)
+	var band := ColorRect.new()
+	var m := ShaderMaterial.new()
+	var sh := Shader.new()
+	sh.code = TOPBAR_SHADER
+	m.shader = sh
+	band.material = m
+	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	band.anchor_left = 0.5
+	band.anchor_right = 0.5
+	band.offset_left = -560
+	band.offset_right = 560
+	band.offset_bottom = 40
+	_topbar.add_child(band)
+	# Nửa trái (ngày, giờ, tiền) dồn về phía huy hiệu giữa, nửa phải là các nút.
+	var left := HBoxContainer.new()
+	left.add_theme_constant_override("separation", 22)
+	left.alignment = BoxContainer.ALIGNMENT_END
+	left.anchor_left = 0.5
+	left.anchor_right = 0.5
+	left.offset_left = -560
+	left.offset_right = -70
+	left.offset_top = 4
+	left.offset_bottom = 36
+	left.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_topbar.add_child(left)
+	_tb_day = _outlined(UI.label("", 16, UI.HUD_TEXT))
+	left.add_child(_tb_day)
+	var cash := HBoxContainer.new()
+	cash.add_theme_constant_override("separation", 8)
+	left.add_child(cash)
+	var ci := ItemIcon.new("cash", UI.HUD_TEXT)
+	ci.custom_minimum_size = Vector2(28, 28)
+	cash.add_child(ci)
+	_tb_cash = _outlined(UI.label("", 17, UI.GOLD))
+	cash.add_child(_tb_cash)
+	var right := HBoxContainer.new()
+	right.add_theme_constant_override("separation", 6)
+	right.anchor_left = 0.5
+	right.anchor_right = 0.5
+	right.offset_left = 70
+	right.offset_right = 560
+	right.offset_top = 2
+	right.offset_bottom = 38
+	_topbar.add_child(right)
+	var specs := [["person", "Nhân vật (C)", open_character], ["book", "Sổ: phải thu, phải trả, lời hứa", _toggle_skills],
+		["list", "Nhật ký", _toggle_log], ["phone_line", "Điện thoại", _toggle_phone],
+		["map", "Bản đồ (M)", func() -> void: _big_map.toggle()], ["zoom", "Toàn cảnh", func() -> void: world.toggle_overview()],
+		["house", "Về chỗ ở ngủ", _go_home]]
+	for sp in specs:
+		var b := Button.new()
+		b.flat = true
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(44, 36)
+		b.tooltip_text = sp[1]
+		var hover := StyleBoxFlat.new()
+		hover.bg_color = Color(1, 1, 1, 0.12)
+		hover.set_corner_radius_all(6)
+		b.add_theme_stylebox_override("hover", hover)
+		b.add_theme_stylebox_override("pressed", hover)
+		b.pressed.connect(sp[2])
+		var ic := ItemIcon.new(sp[0], Color("e9e4d8"))
+		ic.position = Vector2(9, 5)
+		ic.size = Vector2(26, 26)
+		b.add_child(ic)
+		var dot := _outlined(UI.label("!", 15, Color("ff4d3d")))
+		dot.position = Vector2(30, -4)
+		dot.visible = false
+		b.add_child(dot)
+		right.add_child(b)
+		_tb_icons[sp[0]] = {"button": b, "icon": ic, "dot": dot}
+	# Huy hiệu giữa: số ngày còn lại tới mốc của chương.
+	var medal := ColorRect.new()
+	var mm := ShaderMaterial.new()
+	var msh := Shader.new()
+	msh.code = MEDAL_SHADER
+	mm.shader = msh
+	medal.material = mm
+	medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	medal.anchor_left = 0.5
+	medal.anchor_right = 0.5
+	medal.offset_left = -56
+	medal.offset_right = 56
+	medal.offset_top = -38
+	medal.offset_bottom = 74
+	_topbar.add_child(medal)
+	_tb_left = _outlined(UI.label("", 30, Color("f3e6c8")))
+	_tb_left.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tb_left.position = Vector2(0, 38)
+	_tb_left.size = Vector2(112, 36)
+	medal.add_child(_tb_left)
+	_tb_left_sub = _outlined(UI.label("ngày còn lại", 11, Color("d9c9a3")))
+	_tb_left_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tb_left_sub.position = Vector2(0, 74)
+	_tb_left_sub.size = Vector2(112, 16)
+	medal.add_child(_tb_left_sub)
+
+
+func _build_mood(root: Control) -> void:
+	_mood = MoodRing.new()
+	_mood.custom_minimum_size = Vector2(84, 84)
+	_mood.size = Vector2(84, 84)
+	_mood.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_mood.position = Vector2(20, -128)
+	_mood.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_mood.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
+			open_character())
+	root.add_child(_mood)
+	# Nhu cầu đang thiếu (đói, bẩn, quần áo, mệt) hiện thành biểu tượng nhỏ cạnh vòng.
+	_mood_needs = HBoxContainer.new()
+	_mood_needs.add_theme_constant_override("separation", 4)
+	_mood_needs.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mood_needs.position = Vector2(92, 30)
+	_mood.add_child(_mood_needs)
+
+
+func _refresh_topbar(s: Dictionary) -> void:
+	var hour: float = game.clock()
+	var part := "Buổi sáng" if hour < 11.0 else ("Buổi trưa" if hour < 13.5 else ("Buổi chiều" if hour < 18.0 else "Buổi tối"))
+	if ScreenFit.compact:
+		_tb_day.text = "Ngày %d · %s" % [game.day(), GameLogic.hh(minf(hour, 22.0))]
+	else:
+		_tb_day.text = "Ngày %d · %s (%s)   %s" % [game.day(), game.weekday_name(), part, GameLogic.hh(minf(hour, 22.0))]
+	_tb_cash.text = GameLogic.fmt_money(int(s.cash))
+	var last: int = game.last_day() if game.is_full() else 22
+	_tb_left.text = str(maxi(0, last - game.day() + 1))
+	var due_today := false
+	for p in s.promises:
+		if p.status == "open" and int(p.due) == game.day():
+			due_today = true
+	_tb_icons.book.dot.visible = due_today
+	_tb_icons.phone_line.dot.visible = not _offer.is_empty() and not _phone.visible
+	(_tb_icons.house.button as Button).disabled = _end_day_btn.disabled
+	(_tb_icons.house.icon as Control).modulate.a = 0.35 if _end_day_btn.disabled else 1.0
+	(_tb_icons.house.button as Button).tooltip_text = ("Về nhà" if game.chapter() >= 2 else "Về xóm trọ") + " (ngủ, tắm giặt)"
+	var pd: float = game.phong_do()
+	_mood.set("value", pd)
+	_mood.set("word", MoodRing.word_for(pd))
+	_mood.tooltip_text = "Phong độ %d · %s\nMệt %d/100 · No bụng %d · Vệ sinh %d · Quần áo %d\nBấm để mở bảng Nhân vật" % [
+		int(pd), "đủ lương" if game.pay_mult() >= 1.0 else "chỉ được %d%% lương" % int(game.pay_mult() * 100.0),
+		int(s.fatigue), int(game.need("fed")), int(game.need("clean")), int(game.need("neat"))]
+	_mood.queue_redraw()
+	for c in _mood_needs.get_children():
+		c.queue_free()
+	var lows := []
+	if game.fatigue_warn():
+		lows.append("moon")
+	if game.has_needs():
+		for k in [["fed", "bowl"], ["clean", "drop"], ["neat", "tshirt"]]:
+			if game.need(k[0]) < 30.0:
+				lows.append(k[1])
+	for k in lows:
+		var ic := ItemIcon.new(k)
+		ic.custom_minimum_size = Vector2(26, 26)
+		_mood_needs.add_child(ic)
 
 
 func _tool_button(text: String, on_press: Callable) -> Button:
@@ -938,8 +1200,10 @@ func _tool_button(text: String, on_press: Callable) -> Button:
 
 func _refresh() -> void:
 	var started: bool = game.is_started()
-	for p in [_objectives, _status, _bottom, _map]:
+	for p in [_objectives, _topbar, _mood]:
 		p.visible = started
+	for p in [_status, _bottom, _map]:
+		p.visible = false
 	if not started:
 		_loc_id = ""
 		_location.visible = false
@@ -973,6 +1237,7 @@ func _refresh() -> void:
 		_needs_label.add_theme_color_override("font_color", UI.HUD_SOFT if worst >= 35.0 else (UI.GOLD if worst >= 15.0 else Color("ff8a7a")))
 	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
 	_end_day_btn.text = "Về nhà" if game.chapter() >= 2 else "Về xóm trọ"
+	_refresh_topbar(s)
 	_refresh_skills(s)
 	_log_text.text = UI.log_bbcode(game)
 	_refresh_location()
@@ -991,9 +1256,9 @@ func _refresh_objectives(s: Dictionary) -> void:
 	_obj_hidden = 0
 	_fill_objectives(s)
 	if _obj_hidden > 0:
-		_objective_box.add_child(UI.label("     +%d mục nữa · chạm để xem hết" % _obj_hidden, 12, UI.HUD_SOFT))
-	elif ScreenFit.compact and _obj_expanded:
-		_objective_box.add_child(UI.label("     chạm để thu gọn", 12, UI.HUD_SOFT))
+		_objective_box.add_child(_outlined(UI.label("     +%d mục nữa · bấm để xem hết" % _obj_hidden, 12, UI.HUD_SOFT)))
+	elif _obj_expanded:
+		_objective_box.add_child(_outlined(UI.label("     bấm để thu gọn", 12, UI.HUD_SOFT)))
 	_fit_objectives()
 
 
@@ -1001,7 +1266,7 @@ func _refresh_objectives(s: Dictionary) -> void:
 ## công cụ (chương 3 có nhiều khoản phải trả, mở hết là dài hơn màn điện thoại nằm ngang). Các lúc khác bảng cao theo
 ## nội dung như cũ.
 func _fit_objectives() -> void:
-	var limit: bool = ScreenFit.compact and _obj_expanded
+	var limit: bool = _obj_expanded
 	_obj_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if limit else ScrollContainer.SCROLL_MODE_DISABLED
 	var h := 0.0
 	if limit:
@@ -1299,8 +1564,8 @@ func _quest_objectives() -> void:
 
 func _objective(text: String, sub: String, state: String) -> void:
 	_obj_n += 1
-	var short: bool = ScreenFit.compact and not _obj_expanded
-	if short and _obj_n > 2:
+	var short: bool = not _obj_expanded
+	if short and _obj_n > (2 if ScreenFit.compact else 3):
 		_obj_hidden += 1
 		return
 	var color := UI.HUD_TEXT
@@ -1314,13 +1579,13 @@ func _objective(text: String, sub: String, state: String) -> void:
 			mark = "✗"
 		"current":
 			color = UI.GOLD
-	_objective_box.add_child(UI.label("%s  %s" % [mark, text], 14, color))
-	if sub != "" and (not short or state == "current"):
-		# Dòng phụ dài thì xuống hàng: bảng mục tiêu gọn lại để hàng trên (và thanh công cụ ở dưới) vừa màn hình hẹp.
+	_objective_box.add_child(_outlined(UI.label("%s  %s" % [mark, text], 14, color)))
+	# Gọn như Nobody: chỉ mục đang cần làm mới có dòng phụ; bấm mở hết bảng thì hiện đủ.
+	if sub != "" and (not short or (state == "current" and _obj_n == 1)):
 		var l := UI.label("     " + sub, 12, UI.HUD_SOFT)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size.x = 380 if ScreenFit.compact else 460
-		_objective_box.add_child(l)
+		l.custom_minimum_size.x = 380 if ScreenFit.compact else 420
+		_objective_box.add_child(_outlined(l))
 
 
 func _refresh_skills(s: Dictionary) -> void:

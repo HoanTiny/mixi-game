@@ -187,7 +187,6 @@ func _ready() -> void:
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	marker.position = Vector3(0, 0.18, 0)
 	player.add_child(marker)
-	player.add_child(_label3d("An", Vector3(0, 2.15, 0), 22))
 	home = game.home_loc() if game.is_started() and LOCATIONS.has(game.home_loc()) else HOME
 	player.position = loc_point(home, -1.5, 0.8)
 	# Về từ màn khác thì hiện ra ở chỗ đó.
@@ -271,6 +270,14 @@ func _hold_for_title(on: bool) -> void:
 		_title_hidden.clear()
 
 
+## Esc giữa lúc chơi: mở lại màn đầu như menu tạm dừng (Chơi tiếp, Bắt đầu câu chuyện khác, Cài đặt, Thoát).
+func open_menu() -> void:
+	if title == null or title.visible:
+		return
+	title.show_page("title")
+	_hold_for_title(true)
+
+
 func title_open() -> bool:
 	return title != null and title.visible
 
@@ -321,8 +328,8 @@ func _build_environment() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_exposure = 1.05
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.05
-	env.adjustment_saturation = 1.08
+	env.adjustment_contrast = 1.1
+	env.adjustment_saturation = 0.94
 	env.ssao_enabled = true
 	env.ssao_radius = 1.2
 	env.ssao_intensity = 1.4
@@ -557,7 +564,11 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	cs.position = Vector3(0, maxf(top, 2.5) / 2.0, -d / 2.0)
 	body.add_child(cs)
 	holder.add_child(body)
-	holder.add_child(_label3d(str(loc.name), Vector3(0, sign_height, 0.5), 36))
+	# Tên địa điểm: thẻ nhỏ ngang cửa (như "Bánh kẹp" trong Nobody), chỉ hiện khi An tới gần.
+	var loc_tag := _label3d(str(loc.name), Vector3(0, 3.0, city.door_out + 0.4), 22)
+	loc_tag.add_to_group("near_tag")
+	loc_tag.set_meta("range", LOC_TAG_RANGE)
+	holder.add_child(loc_tag)
 	var occ := {"node": bld, "rect": CityMap.footprint(p), "h": top}
 	if real:
 		occ.merge(_cut_stand_in(p, holder, color, top))
@@ -586,7 +597,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		npc.position = Vector3(1.6 + slot * 1.7, 0, city.door_out + 0.2 + (slot % 2) * 0.45)
 		npc.rotation.y = PI
 		holder.add_child(npc)
-		npc.add_child(_label3d(who.name, Vector3(0, 2.0 + (slot % 2) * 0.3, 0), 22))
+		npc.add_child(_name_tag(who.name, Vector3(0, 2.0 + (slot % 2) * 0.3, 0)))
 		slot += 1
 		var nb := StaticBody3D.new()
 		nb.set_meta("loc", id)
@@ -658,7 +669,10 @@ void vertex() {
 	up = NORMAL.y;
 }
 void fragment() {
-	ALBEDO = up > 0.5 ? top : wall;
+	// Nhà đang hạ (đứng chắn An): sẫm, nhạt màu như nhà thật bị hạ, cho mắt dồn vào người trên phố.
+	vec3 col = up > 0.5 ? top : wall;
+	float g = dot(col, vec3(0.3, 0.59, 0.11));
+	ALBEDO = mix(col, vec3(g), 0.6) * 0.55;
 	ROUGHNESS = 0.9;
 }
 """
@@ -1441,7 +1455,7 @@ func cam_offset() -> Vector3:
 	return CAM_NEAR.lerp(CAM_OFFSET, zoom)
 
 
-## Bật tắt nhìn toàn cảnh (nút trên thanh dưới cho máy cảm ứng): đang ở gần thì lùi ra xa hẳn, đang xa thì về góc chơi.
+## Bật tắt nhìn toàn cảnh (nút kính lúp trên thanh trên cùng, cho máy cảm ứng): đang ở gần thì lùi ra xa hẳn, đang xa thì về góc chơi.
 func toggle_overview() -> void:
 	zoom = 0.3 if zoom > 1.0 else ZOOM_MAX
 
@@ -1527,6 +1541,7 @@ func _process(delta: float) -> void:
 	delta = minf(delta, 0.1)
 	if title_open():
 		# Màn tiêu đề: phố vẫn sống (xe, thuyền) làm nền, An đứng yên.
+		RenderingServer.global_shader_parameter_set("focus_depth", 0.0)
 		_update_traffic(delta)
 		if real:
 			_update_boats(delta)
@@ -1595,6 +1610,8 @@ func _process(delta: float) -> void:
 		hud.close_location()
 
 	_update_trail()
+	_update_tags(delta)
+	RenderingServer.global_shader_parameter_set("focus_depth", camera.position.distance_to(player.position + Vector3(0, 1, 0)) if zoom <= 1.0 else 0.0)
 	_update_traffic(delta)
 	if real:
 		_update_boats(delta)
@@ -2317,6 +2334,36 @@ func _wire(a: Vector3, b: Vector3) -> void:
 		mi.basis = Basis(Quaternion(Vector3.UP, dir))
 
 
+## Tên người chỉ hiện khi An tới gần (NAME_RANGE m), tên địa điểm trong LOC_TAG_RANGE m: phố đỡ rối chữ như Nobody.
+const NAME_RANGE := 7.0
+const LOC_TAG_RANGE := 11.0
+var _tag_t := 0.0
+
+
+func _name_tag(text: String, pos: Vector3) -> Label3D:
+	var l := _label3d(text, pos, 18)
+	l.outline_size = 8
+	l.add_to_group("near_tag")
+	l.set_meta("range", NAME_RANGE)
+	return l
+
+
+func _update_tags(delta: float) -> void:
+	_tag_t -= delta
+	if _tag_t > 0.0:
+		return
+	_tag_t = 0.2
+	for l in get_tree().get_nodes_in_group("near_tag"):
+		var lb := l as Label3D
+		if not lb.is_inside_tree():
+			continue
+		var d := Vector2(lb.global_position.x - player.position.x, lb.global_position.z - player.position.z).length()
+		var on: bool = d < float(lb.get_meta("range", NAME_RANGE)) or zoom > 1.2
+		if on != (lb.modulate.a > 0.5):
+			lb.modulate.a = 1.0 if on else 0.0
+			lb.outline_modulate.a = 0.9 if on else 0.0
+
+
 func _label3d(text: String, pos: Vector3, size: int) -> Label3D:
 	var l := Label3D.new()
 	l.text = text
@@ -2450,7 +2497,7 @@ func _spawn_npc(e: Dictionary) -> void:
 	var loc: String = game.loc_of(str(e.loc))
 	var npc := _character("npc." + id, Color(str(e.color)), Color("3a3a40"))
 	add_child(npc)
-	npc.add_child(_label3d(str(e.name), Vector3(0, 2.0, 0), 22))
+	npc.add_child(_name_tag(str(e.name), Vector3(0, 2.0, 0)))
 	var nb := StaticBody3D.new()
 	nb.set_meta("loc", loc)
 	var ncs := CollisionShape3D.new()

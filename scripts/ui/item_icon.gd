@@ -170,6 +170,40 @@ func _draw() -> void:
 			draw_circle(Vector2(64, 40), 28, Color("2b2b2e"))
 			draw_circle(Vector2(30, 30), 3, Color("f2d27a"))
 			draw_circle(Vector2(78, 76), 2.5, Color("f2d27a"))
+		# Biểu tượng nét mảnh trên thanh trên cùng (màu tint).
+		"person":
+			draw_arc(Vector2(50, 32), 15, 0, TAU, 24, tint, 6)
+			draw_arc(Vector2(50, 92), 34, PI * 1.12, PI * 1.88, 20, tint, 6)
+		"book":
+			draw_polyline(PackedVector2Array([Vector2(50, 26), Vector2(14, 18), Vector2(14, 80), Vector2(50, 88), Vector2(86, 80), Vector2(86, 18), Vector2(50, 26), Vector2(50, 88)]), tint, 6)
+			for y in [40, 54]:
+				draw_line(Vector2(24, y - 6), Vector2(42, y - 2), tint, 4)
+				draw_line(Vector2(58, y - 2), Vector2(76, y - 6), tint, 4)
+		"list":
+			draw_polyline(PackedVector2Array([Vector2(24, 12), Vector2(76, 12), Vector2(76, 90), Vector2(24, 90), Vector2(24, 12)]), tint, 6)
+			for y in [32, 50, 68]:
+				draw_line(Vector2(36, y), Vector2(64, y), tint, 5)
+		"phone_line":
+			draw_polyline(PackedVector2Array([Vector2(32, 8), Vector2(68, 8), Vector2(68, 92), Vector2(32, 92), Vector2(32, 8)]), tint, 6)
+			draw_line(Vector2(44, 80), Vector2(56, 80), tint, 5)
+		"map":
+			var m := PackedVector2Array([Vector2(10, 22), Vector2(36, 12), Vector2(64, 22), Vector2(90, 12), Vector2(90, 78), Vector2(64, 88),
+				Vector2(36, 78), Vector2(10, 88), Vector2(10, 22)])
+			draw_polyline(m, tint, 6)
+			draw_line(Vector2(36, 12), Vector2(36, 78), tint, 4)
+			draw_line(Vector2(64, 22), Vector2(64, 88), tint, 4)
+		"zoom":
+			draw_arc(Vector2(42, 42), 26, 0, TAU, 28, tint, 6)
+			draw_line(Vector2(62, 62), Vector2(88, 88), tint, 9)
+			draw_line(Vector2(30, 42), Vector2(54, 42), tint, 5)
+		"house":
+			draw_polyline(PackedVector2Array([Vector2(8, 50), Vector2(50, 12), Vector2(92, 50)]), tint, 7)
+			draw_polyline(PackedVector2Array([Vector2(20, 42), Vector2(20, 88), Vector2(80, 88), Vector2(80, 42)]), tint, 6)
+			draw_rect(Rect2(42, 60, 16, 28), tint)
+		"cash":
+			draw_polyline(PackedVector2Array([Vector2(8, 28), Vector2(92, 28), Vector2(92, 76), Vector2(8, 76), Vector2(8, 28)]), tint, 6)
+			draw_arc(Vector2(50, 52), 12, 0, TAU, 20, tint, 5)
+			draw_line(Vector2(20, 18), Vector2(84, 18), tint, 4)
 		_:
 			_rrect(Rect2(20, 30, 60, 54), Color("b8875a"), ink, w)
 			draw_rect(Rect2(46, 30, 8, 54), Color("c0392b"))

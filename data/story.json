@@ -252,11 +252,11 @@
   },
   {
    "id": "canh_chinh",
-   "text": "Hôm nay có cảnh chính. Tìm dấu ◆ vàng trên phố (hoặc chấm trên bản đồ phố phía trên), tới nơi bấm thẻ ◆. Có cảnh chỉ diễn ra trong một khung giờ; bỏ lỡ thì việc không tự xong."
+   "text": "Hôm nay có cảnh chính. Tìm dấu ◆ vàng trên phố (hoặc mở bản đồ: phím M, nút bản đồ trên cùng), tới nơi bấm thẻ ◆. Có cảnh chỉ diễn ra trong một khung giờ; bỏ lỡ thì việc không tự xong."
   },
   {
    "id": "tien",
-   "text": "Góc phải: số lớn là tiền mặt tiêu được. Dòng dưới là tiền phải thu và phải trả; tiền chưa về thì chưa tiêu được. Mỗi tối trừ tiền sinh hoạt của cả nhà."
+   "text": "Thanh trên cùng: số vàng là tiền mặt tiêu được, vòng giữa là số ngày còn lại. Tiền phải thu, phải trả xem trong Sổ (nút quyển sổ); tiền chưa về thì chưa tiêu được. Mỗi tối trừ tiền sinh hoạt của cả nhà."
   },
   {
    "id": "an_uong",
@@ -268,11 +268,11 @@
   },
   {
    "id": "phong_do",
-   "text": "Phong độ dưới 55 thì chỉ được 70% tiền công, dưới 30 còn 50%. Ăn, tắm, giặt và nghỉ cho bớt Mệt."
+   "text": "Vòng góc dưới bên trái là Phong độ: dưới 55 thì chỉ được 70% tiền công, dưới 30 còn 50%. Cạnh vòng hiện biểu tượng thứ đang thiếu (đói, bẩn, đồ dơ, mệt). Bấm vòng để xem bảng Nhân vật."
   },
   {
    "id": "so",
-   "text": "Có lời hứa mới. Mở nút Sổ ở dưới để xem hạn. Quá hạn mà không báo thì người nhận mất lòng tin."
+   "text": "Có lời hứa mới. Mở Sổ (nút quyển sổ trên cùng) để xem hạn. Quá hạn mà không báo thì người nhận mất lòng tin."
   },
   {
    "id": "noi_chuyen",

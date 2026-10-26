@@ -43,9 +43,14 @@ varying float v_var;
 varying float v_flame;
 varying float v_idx;
 varying float v_ly;
+// 1 khi căn nhà đang bị hạ (đứng chắn An): cả căn sẫm, nhạt màu đi cho mắt dồn vào An và người trên phố.
+varying float v_low;
+// Khoảng cách máy quay tới An (world.gd đặt mỗi khung hình; 0 là tắt): nhà gần máy quay hơn An mấy mét thì sẫm dần.
+global uniform float focus_depth;
 
 void vertex() {
 	v_cut = 0.0;
+	v_low = 0.0;
 	v_ly = VERTEX.y;
 	v_up = NORMAL.y;
 	v_var = flat_color ? INSTANCE_CUSTOM.g : 0.5;
@@ -61,6 +66,7 @@ void vertex() {
 	} else if (cut_on && CUSTOM0.y > 0.5) {
 		int i = int(CUSTOM0.x + 0.5);
 		float cap = texelFetch(caps, ivec2(i % caps_w, i / caps_w), 0).r;
+		v_low = cap < 9000.0 ? 1.0 : 0.0;
 		if (CUSTOM0.y > 1.5) {
 			// Đồ gắn kèm (bồn nước, mái hiên, biển hiệu, cổng hẻm; UV2.y là đỉnh của món đồ): hạ thấp hơn đỉnh là ẩn.
 			if (cap < UV2.y + 0.2) {
@@ -117,6 +123,12 @@ void fragment() {
 		float fv = fract(UV.y / 0.32);
 		float vis = 1.0 - smoothstep(0.2, 0.5, fwidth(UV.y) / 0.32);
 		col *= mix(1.0, 0.82 + 0.18 * smoothstep(0.0, 0.75, fv), vis);
+	}
+	float near = focus_depth > 0.0 ? 1.0 - smoothstep(focus_depth - 11.0, focus_depth - 4.0, -VERTEX.z) : 0.0;
+	float dim = max(v_low, near * 0.8);
+	if (dim > 0.0) {
+		float g = dot(col, vec3(0.3, 0.59, 0.11));
+		col = mix(col, mix(vec3(g), col, 0.4) * 0.55, dim);
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.88;
@@ -358,9 +370,39 @@ func _commit_flat() -> void:
 			continue
 		if key == "water":
 			m.roughness = 0.3
-		mi.material_override = m
+			mi.material_override = m
+		else:
+			mi.material_override = _flat_focus_material()
 		add_child(mi)
 	_flat.clear()
+
+
+## Lớp phẳng tô màu đỉnh (tường rào, mái bằng, đồ dựng): như StandardMaterial màu đỉnh, thêm sẫm dần phần gần máy
+## quay hơn An (focus_depth, như nhà).
+const FLAT_SHADER := """
+shader_type spatial;
+global uniform float focus_depth;
+void fragment() {
+	vec3 col = COLOR.rgb;
+	float near = focus_depth > 0.0 ? 1.0 - smoothstep(focus_depth - 11.0, focus_depth - 4.0, -VERTEX.z) : 0.0;
+	if (near > 0.0) {
+		float g = dot(col, vec3(0.3, 0.59, 0.11));
+		col = mix(col, mix(vec3(g), col, 0.4) * 0.55, near * 0.8);
+	}
+	ALBEDO = col;
+	ROUGHNESS = 0.92;
+}
+"""
+static var _flat_mat: ShaderMaterial
+
+
+static func _flat_focus_material() -> ShaderMaterial:
+	if _flat_mat == null:
+		_flat_mat = ShaderMaterial.new()
+		var sh := Shader.new()
+		sh.code = FLAT_SHADER
+		_flat_mat.shader = sh
+	return _flat_mat
 
 
 ## Vật liệu mặt đất (GROUND_SHADER): albedo, normal là texture nhựa đường (null: lòng đường màu trơn), tint nhân màu

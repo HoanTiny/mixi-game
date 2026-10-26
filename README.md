@@ -77,8 +77,10 @@ Chữ: [Sedgwick Ave Display](https://fonts.google.com/specimen/Sedgwick+Ave+Dis
 | Con lăn chuột, nút **Toàn cảnh** | Kéo máy quay gần, xa; xa hẳn là nhìn toàn cảnh khu phố |
 
 **Chơi trên điện thoại** (bản web, nên xoay ngang; màn dọc có tấm nhắc xoay và nút Toàn màn hình): chạm mặt đường để đi, chạm cửa tiệm hay người để vào; chụm, mở hai ngón để kéo máy quay xa, gần; chạm lời nhắc giữa màn hình thay cho phím E; bản đồ lớn có nút Đóng. Giao diện tự co theo màn (`scripts/ui/screen_fit.gd`, autoload `ScreenFit`): máy tính giữ cỡ chữ theo mật độ điểm ảnh, màn thấp như điện thoại nằm ngang thì vào chế độ gọn (bảng mục tiêu chỉ hiện hai mục, chạm để xem hết; bản đồ nhỏ thu lại; mở Sổ, Nhật ký, điện thoại hay bảng địa điểm thì cất hàng trên cho bảng đủ cao; ô gợi ý nổi trên thanh công cụ; Bảng cân bằng bỏ cột Sổ). Điện thoại vẽ cảnh 3D ở nửa độ nét (giao diện vẫn nét), bóng nắng hai tầng trên bản đồ bóng nhỏ hơn, đồ chi tiết của nhà chỉ vẽ trong 120 m, bớt một phần ba số xe. Thử trên máy tính: chạy với `-- --phone --dpr=3` ở cửa sổ 2532×1170.
-| Esc | Đóng bảng |
-| Nút **Về xóm trọ** | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
+| Esc | Đóng bảng; không có bảng nào mở thì về màn đầu (menu) |
+| Nút hình ngôi nhà (trên cùng) | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
+
+**Giao diện màn phố** (gọn như Nobody, `scripts/world/hud.gd`): thanh mảnh trên cùng có ngày, buổi, giờ, tiền mặt, vòng giữa ghi số ngày còn lại tới mốc của chương, và các nút biểu tượng: Nhân vật, Sổ, Nhật ký, Điện thoại, Bản đồ, Toàn cảnh, Về chỗ ở (dấu ! đỏ khi có lời hứa đến hạn, có đơn giao hàng mới). Mục tiêu hiện ba mục đầu bằng chữ nổi, bấm để xem hết. Góc dưới trái là vòng Phong độ (Tích cực, Bình thường, Uể oải, Kiệt sức), cạnh vòng hiện biểu tượng thứ đang thiếu; bấm vòng mở bảng Nhân vật. Tên người chỉ hiện khi An tới gần (7 m), tên địa điểm thành thẻ nhỏ ngang cửa (11 m). Cảnh 3D: khử răng cưa (bản cài 4×, web 2×), lọc texture dị hướng, màu bớt rực, tối nhẹ bốn góc; nhà nằm giữa máy quay và An sẫm, nhạt màu đi (`focus_depth` trong `[shader_globals]` của project.godot) cho mắt dồn vào An và người trên phố. Bảng cân bằng (công cụ chỉnh số) không còn nút trên màn phố: mở `scenes/board.tscn` trong Godot.
 
 **Bảng Nhân vật** (phím **C**, nút **Nhân vật** trên thanh dưới; `scripts/ui/character_panel.gd`), dựng theo bảng nhân vật của Nobody, nền là phố phủ shader vẽ mực tối:
 - **Hành trang** bên trái, bốn ngăn: *Công cụ* (điện thoại cũ, túi đồ nghề, căn cước, quạt bàn hỏng, chìa khóa xe), *Quần áo* (áo thun đen, sơ mi caro, áo khoác gió; bấm **Mặc bộ này** là An đổi đồ thật trên phố, trong ca làm: ghép đầu An lên thân người Rocketbox mặc bộ đó), *Phế* (ve chai đang mang, ước giá bán), *Đồ giữ* (đồ việc nhờ đang mang và kỷ vật của chương). Hình đồ vật vẽ bằng nét trong `scripts/ui/item_icon.gd`; danh sách trong `items` của `data/config.json`.
@@ -107,7 +109,7 @@ Chữ: [Sedgwick Ave Display](https://fonts.google.com/specimen/Sedgwick+Ave+Dis
 
 **Việc nhờ (kiểu Nobody):** người trong phố nhờ những việc nhiều bước, có hạn giờ và có lựa chọn. Chỗ có người nhờ hiện dấu **!** vàng; nhận việc thì bảng mục tiêu hiện bước đang làm, dấu **◆** xanh chỉ chỗ cần tới. Lát cắt có 7 việc: sửa quạt của cô bán trái cây (đọc triệu chứng, chọn đúng bệnh, trả trước 18:00), rửa bát đủ chỉ tiêu rồi chở 20 suất cơm xuống Bến Cạn trước khi nguội, gom lon nhôm cho cô Út, tìm mèo của bé Bắp, chậu mới cho cây húng của bà Tư (để bà tự chọn hay chọn thay), in hồ sơ thực tập cho Linh (in đúng bản em gửi hay tự ý sửa), đo lại trước nghiệm thu với Trâm (tuyến B, C). Quá hạn là hỏng việc; làm xong được tiền, thân thiết hoặc ưu đãi (cơm giá quen, ve chai được giá). Viết trong `data/quests.json`.
 
-Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi lại** trong Bảng cân bằng xóa ván đang chơi.
+Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. **Esc** (khi không có bảng nào mở) về màn đầu: Chơi tiếp, Bắt đầu câu chuyện khác (hỏi trước khi xóa ván đang chơi), Cài đặt.
 
 ## Cấu trúc thư mục
 

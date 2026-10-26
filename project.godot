@@ -30,7 +30,15 @@ window/size/viewport_height=800
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/anisotropic_filtering_level=2
 
 [editor_plugins]
 
 enabled=PackedStringArray()
+
+[shader_globals]
+
+focus_depth={
+"type": "float",
+"value": 0.0
+}
