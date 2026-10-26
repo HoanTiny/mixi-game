@@ -458,15 +458,30 @@ func _leave(s: Dictionary) -> void:
 		_walkers.append({"node": c, "to": Vector3(c.position.x, 0, 8.0)})
 
 
+## Số phần món key các bàn đang có khách còn chờ.
+func _wanted(key: String) -> int:
+	var n := 0
+	for t in _tables():
+		if t.cust != null:
+			n += int((t.order as Dictionary).get(key, 0))
+	return n
+
+
 func _serve_act(s: Dictionary) -> void:
 	match str(s.type):
 		"station":
-			if _carry.has("dirty"):
+			var key := str(s.key)
+			# Đang cầm món này mà các bàn không cần thêm (hay tay đầy): trả lại một phần lên quầy.
+			if _carry.has(key) and (_carry.count(key) >= _wanted(key) or _carry.size() >= int(cfg.carry)):
+				_carry.erase(key)
+				_note("Trả lại quầy một phần " + _type_name(key).to_lower() + ".")
+				_cool = 0.25
+			elif _carry.has("dirty"):
 				_note("Tay đang cầm bát dơ, đem ra chậu rửa đã.")
 			elif _carry.size() >= int(cfg.carry):
-				_note("Tay đầy rồi.")
+				_note("Tay đầy rồi. Món thừa đem trả ở quầy món đó.")
 			else:
-				_carry.append(str(s.key))
+				_carry.append(key)
 				_cool = 0.25
 		"sink":
 			var n := _carry.count("dirty")
@@ -478,8 +493,9 @@ func _serve_act(s: Dictionary) -> void:
 			_note("Rửa xong, +%s" % GameLogic.fmt_k(n * int(cfg.cleanBonus)), true)
 		"table":
 			if s.dirty:
-				if not _carry.is_empty():
-					_note("Tay không mới dọn bát được.")
+				# Dọn bát dơ được cả khi đang bưng món, miễn tay còn chỗ.
+				if _carry.size() >= int(cfg.carry):
+					_note("Tay đầy rồi: bưng món ra bàn, hay trả món thừa ở quầy, rồi mới dọn bát.")
 					return
 				_carry.append("dirty")
 				s["dirty"] = false
@@ -504,7 +520,7 @@ func _serve_act(s: Dictionary) -> void:
 					kept.append(k)
 			_carry = kept
 			if gave == 0:
-				_note("Bàn này không gọi món đó.")
+				_note("Bàn này không gọi món đó." + (" Món thừa đem trả ở quầy." if _carry.any(func(k) -> bool: return k != "dirty") else ""))
 				return
 			if order.is_empty():
 				_done += 1
