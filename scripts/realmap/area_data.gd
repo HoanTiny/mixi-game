@@ -358,6 +358,12 @@ static func _in_poly(p: Vector2, grid: Dictionary) -> bool:
 
 ## Giữ phần nằm trong vùng clip (mét): đường, kênh, tường bị cắt thành đoạn; hồ, công viên giao với vùng;
 ## nhà, cây, địa danh giữ nếu tâm nằm trong vùng.
+## Tim đường xuyên qua nhà quá chừng này mét thì bỏ nhà (drop_buildings_over_lanes).
+const LANE_THROUGH := 1.5
+## Mảnh nhà còn lại sau khi cắt hẻm nhỏ hơn chừng này (m²) thì bỏ.
+const MIN_PIECE := 8.0
+
+
 func clip_to(clip: PackedVector2Array) -> void:
 	roads = _clip_items(roads, clip)
 	waterways = _clip_items(waterways, clip)
@@ -369,6 +375,80 @@ func clip_to(clip: PackedVector2Array) -> void:
 	buildings = buildings.filter(func(b) -> bool: return Geometry2D.is_point_in_polygon(Geo.centroid(b.poly), clip))
 	pois = pois.filter(func(p) -> bool: return Geometry2D.is_point_in_polygon(p.pos, clip))
 	trees = trees.filter(func(t) -> bool: return Geometry2D.is_point_in_polygon(t, clip))
+	drop_buildings_over_lanes()
+
+
+## Nhà lấy từ ảnh vệ tinh (Open Buildings) hay gộp mái hai dãy nhà thành một khối phủ qua hẻm: tim một con đường, hẻm
+## (trừ hầm) chạy xuyên giữa nhà quá LANE_THROUGH mét thì cắt lòng hẻm ra khỏi khối nhà (rộng bằng hẻm, nới 0,3 m mỗi
+## bên); mảnh còn lại từ MIN_PIECE m² giữ làm nhà. Hẻm hiện ra, không ai đi xuyên nhà. Nhà ghi trong OSM giữ nguyên (có
+## thể là lối đi có mái che thật). Trả về số nhà đã cắt.
+func drop_buildings_over_lanes() -> int:
+	var g := {}
+	for r in roads:
+		if r.tunnel or str(r.kind) == "steps":
+			continue
+		var l: PackedVector2Array = r.line
+		var hw := float(r.width) / 2.0 + 0.3
+		for i in l.size() - 1:
+			for c in _cells(Rect2(l[i], Vector2.ZERO).expand(l[i + 1])):
+				if not g.has(c):
+					g[c] = []
+				g[c].append([l[i], l[i + 1], hw])
+	var out := []
+	var cut := 0
+	for b in buildings:
+		if bool(b.known) and str(b.get("src", "")) != "ob":
+			out.append(b)
+			continue
+		var poly: PackedVector2Array = b.poly
+		var through := 0.0
+		var hits := []
+		var seen := {}
+		for c in _cells(Geo.bounds(poly)):
+			for seg in g.get(c, []):
+				var key := Vector4(seg[0].x, seg[0].y, seg[1].x, seg[1].y)
+				if seen.has(key):
+					continue
+				seen[key] = true
+				var a: Vector2 = seg[0]
+				var e: Vector2 = seg[1]
+				var n := maxi(1, ceili(a.distance_to(e) / 0.5))
+				var inside := 0.0
+				for k in n:
+					if Geometry2D.is_point_in_polygon(a.lerp(e, (float(k) + 0.5) / float(n)), poly):
+						inside += a.distance_to(e) / float(n)
+				if inside > 0.0:
+					through += inside
+					hits.append(seg)
+		if through <= LANE_THROUGH:
+			out.append(b)
+			continue
+		cut += 1
+		var pieces: Array = [poly]
+		for seg in hits:
+			var strip: Array = Geometry2D.offset_polyline(PackedVector2Array([seg[0], seg[1]]), float(seg[2]), Geometry2D.JOIN_SQUARE, Geometry2D.END_SQUARE)
+			var next: Array = []
+			for pc in pieces:
+				var rest: Array = [pc]
+				for sp in strip:
+					var r2: Array = []
+					for x in rest:
+						r2.append_array(Geometry2D.clip_polygons(x, sp))
+					rest = r2
+				next.append_array(rest)
+			pieces = next
+		for pc in pieces:
+			var pp: PackedVector2Array = pc
+			# Bỏ lỗ (đường viền ngược chiều) và mảnh vụn.
+			# Kết quả cắt: đường viền ngoài ngược chiều kim đồng hồ, lỗ thuận chiều.
+			if pp.size() < 3 or Geometry2D.is_polygon_clockwise(pp) or absf(Geo.area(pp)) < MIN_PIECE:
+				continue
+			var nb: Dictionary = b.duplicate()
+			nb["poly"] = pp
+			out.append(nb)
+	buildings = out
+	stats["ob_lane"] = cut
+	return cut
 
 
 static func _clip_items(items: Array, clip: PackedVector2Array) -> Array:

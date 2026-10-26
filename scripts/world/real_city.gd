@@ -51,6 +51,8 @@ func _init(map_id: String) -> void:
 	var cfg = JSON.parse_string(FileAccess.get_file_as_string("res://data/realmap.json"))
 	data = AreaData.new(Geo.new(float(m.center[0]), float(m.center[1])), cfg)
 	data.from_dict(m.data)
+	# Nhà ảnh vệ tinh phủ qua hẻm: bỏ trước khi dựng lưới đi bộ, đặt địa điểm (khỏi đi xuyên nhà).
+	data.drop_buildings_over_lanes()
 	clip = AreaData._pts(m.clip)
 	bounds = Geo.bounds(clip)
 	sources = str(m.get("sources", ""))
