@@ -257,7 +257,7 @@ func _quests() -> void:
 							var f := 0
 							while w._target != null and f < 3000 and game.day() == d:
 								f += 1
-								await physics_frame
+								await process_frame
 							w._scavenge(b.id)
 				"action":
 					# Việc buổi tối (lớp học, trực đêm) thì chờ tới gần giờ mới đi, không đứng chờ cả ngày.
@@ -297,7 +297,7 @@ func _scrap(d: int) -> void:
 		var f := 0
 		while w._target != null and f < 3000 and game.day() == d:
 			f += 1
-			await physics_frame
+			await process_frame
 		w._scavenge(b.id)
 		done += 1
 	if done > 0:
@@ -421,7 +421,7 @@ func _walk(loc: String) -> void:
 	var frames := 0
 	while hud.location_open() != loc and frames < 3000 and game.day() == d and not game.is_over():
 		frames += 1
-		await physics_frame
+		await process_frame
 		if not game.s.queue.is_empty():
 			await _events()
 			if game.day() == d:

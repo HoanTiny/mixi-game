@@ -45,6 +45,15 @@ func setup(w) -> void:
 			"state": "home", "errand": {}, "path": PackedVector2Array(), "i": 0}
 	for v in data.get("vendors", []):
 		_add_vendor(v)
+	# Tìm sẵn đường đi việc riêng (nhà ↔ chỗ tới) lúc dựng màn phố: lúc chơi lấy đường nhớ sẵn, khỏi khựng khung hình.
+	for e in errands:
+		var id := str(e.npc)
+		if not npcs.has(id) or not world.city.locs.has(str(e.to)):
+			continue
+		var home := _v2(npcs[id].home_pos)
+		var spot := _v2(_spot(e))
+		world.city.path(home, spot)
+		world.city.path(spot, home)
 
 
 # ---------------------------------------------------------------- nhân vật

@@ -1,5 +1,5 @@
 extends Node3D
-## Đám đông trên phố thật (map thật), dựng bằng MultiMesh cho nhẹ (props3d.gd person); càng gần chỗ của truyện càng
+## Đám đông trên phố thật (map thật), dựng bằng MultiMesh cho nhẹ (người thật nướng sẵn, chia ô CELL mét); càng gần chỗ của truyện càng
 ## đông (như dòng xe, traffic.gd):
 ## - khách ngồi ghế đẩu quán cóc (chỗ ngồi do street_dress.gd ghi lại), quay mặt vào bàn;
 ## - chủ tiệm, người bán đứng trước cửa tiệm có biển hiệu, có tiệm thêm khách đứng mua; nhóm hai ba người đứng nói
@@ -26,6 +26,9 @@ const AVATARS := ["m1", "m2", "m3", "m4", "m5", "f1", "f2", "f3", "f4"]
 const CHILD := "c1"
 const NEAR := 24.0
 const POOL_PER := 2
+## Đám đông chia ô vuông chừng này mét (ô ngoài khung nhìn khỏi vẽ); mỗi ô vài kiểu người.
+const CELL := 90.0
+const LOOKS_PER_CELL := 4
 ## Phần người đứng trước tiệm, nhóm nói chuyện đang đưa tay nói.
 const TALK_SHARE := 0.35
 
@@ -73,8 +76,12 @@ var _ball_mm: MultiMesh
 var _groups: Array = []
 var _time := 0.0
 var _show := {"seated": 1.0, "shop": 1.0, "hot": 1.0, "walk": 1.0, "kids": 1.0}
-## Người đi bộ i nằm ở MultiMesh _walk_mms[i % số kiểu người], chỗ i / số kiểu người.
+## Người đi bộ i nằm ở MultiMesh _walk_mms[_w_mm[i]], chỗ _w_slot[i] (chia theo ô của khúc đi, kiểu người theo ô);
+## _w_look[i]: kiểu người.
 var _walk_mms: Array[MultiMesh] = []
+var _w_mm := PackedInt32Array()
+var _w_slot := PackedInt32Array()
+var _w_look: PackedStringArray = []
 ## Người có xương đang rảnh theo kiểu người; đang thay cho ai (khóa: số người đi bộ, trẻ con thì -1 - số thứ tự).
 var _pool := {}
 var _live := {}
@@ -188,8 +195,9 @@ func _chat_groups(roads: Array, center: Vector2, ok: Callable, want: int) -> Arr
 	return out
 
 
-## Người đứng, ngồi yên: mỗi kiểu người, mỗi tư thế một MultiMesh lưới nướng sẵn (ngồi: ghế cao hay ghế đẩu thấp theo
-## độ cao ghế; đứng trước tiệm: có người đang nói); thứ tự xáo trộn để buổi tối vắng bớt thì vắng đều các chỗ.
+## Người đứng, ngồi yên: mỗi ô CELL mét, mỗi kiểu người, mỗi tư thế một MultiMesh lưới nướng sẵn (ô ngoài khung nhìn
+## thì khỏi vẽ; mỗi ô chỉ dùng vài kiểu người, _look_of, cho đỡ lần vẽ). Ngồi: ghế cao hay ghế đẩu thấp theo độ cao ghế;
+## đứng trước tiệm: có người đang nói. Thứ tự xáo trộn để buổi tối vắng bớt thì vắng đều các chỗ.
 func _people(items: Array, pose: String, key: String) -> void:
 	var split := {}
 	for it in items:
@@ -198,7 +206,8 @@ func _people(items: Array, pose: String, key: String) -> void:
 			p = "sit" if float(it[2]) > 0.35 else "low"
 		elif key == "shop" and _rng.randf() < TALK_SHARE:
 			p = "talk"
-		var k := "%s|%s" % [AVATARS[_rng.randi() % AVATARS.size()], p]
+		var cell := _cell(it[0])
+		var k := "%s|%s|%s" % [_look_of(cell), p, cell]
 		if not split.has(k):
 			split[k] = []
 		split[k].append(it)
@@ -220,6 +229,17 @@ func _people(items: Array, pose: String, key: String) -> void:
 		_static[key].append(_mmi(mm, null if mesh != null else Props3D.instanced_material()))
 
 
+static func _cell(p: Vector2) -> Vector2i:
+	return Vector2i(floori(p.x / CELL), floori(p.y / CELL))
+
+
+## Kiểu người ngẫu nhiên trong ô: mỗi ô LOOKS_PER_CELL kiểu (nam nữ xen kẽ), ô bên cạnh kiểu khác.
+func _look_of(cell: Vector2i) -> String:
+	var start := absi(hash(cell)) % AVATARS.size()
+	var step := AVATARS.size() / LOOKS_PER_CELL
+	return AVATARS[(start + step * (_rng.randi() % LOOKS_PER_CELL)) % AVATARS.size()]
+
+
 ## Lưới người thật nướng sẵn (null nếu chưa nướng).
 static func _real(avatar: String, pose: String) -> Mesh:
 	var path := "res://assets/rb/crowd/%s_%s.res" % [avatar, pose]
@@ -229,10 +249,14 @@ static func _real(avatar: String, pose: String) -> Mesh:
 func _mm(mesh: Mesh, n: int) -> MultiMesh:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	# Người thật (ảnh atlas) khỏi cần màu riêng từng người.
+	if mesh.resource_path.begins_with("res://assets/rb/"):
+		mm.instance_count = n
+		return mm
 	# Màu áo ở custom data, sắc quần ở kênh a; màu instance trắng (bản Compatibility nhân màu đỉnh với màu instance).
 	mm.use_custom_data = true
 	mm.use_colors = true
-	mm.mesh = mesh
 	mm.instance_count = n
 	for i in n:
 		var c := Color(str(SHIRTS[_rng.randi() % SHIRTS.size()]))
@@ -324,14 +348,33 @@ func _build_walkers(roads: Array, center: Vector2, ok: Callable, amount: float) 
 		_w_dir[j] = t.y
 		_w_lat[j] = t.z
 		_w_speed[j] = t.w
-	var na := AVATARS.size()
-	for a in na:
-		var mesh := _real(AVATARS[a], "walk")
-		var mm := _mm(mesh if mesh != null else Props3D.person("walk"), (_w_pts.size() - a + na - 1) / na)
+	# Chia người đi bộ theo ô của giữa khúc đi và kiểu người: mỗi nhóm một MultiMesh.
+	var groups := {}
+	for i in _w_pts.size():
+		var pts := _w_pts[i]
+		var cell := _cell(pts[pts.size() / 2])
+		var look := _look_of(cell)
+		var k := "%s|%s" % [look, cell]
+		if not groups.has(k):
+			groups[k] = [look, PackedInt32Array()]
+		groups[k][1].append(i)
+	_w_mm.resize(_w_pts.size())
+	_w_slot.resize(_w_pts.size())
+	_w_look.resize(_w_pts.size())
+	for k in groups:
+		var look: String = groups[k][0]
+		var list: PackedInt32Array = groups[k][1]
+		var mesh := _real(look, "walk")
+		var mm := _mm(mesh if mesh != null else Props3D.person("walk"), list.size())
 		_mmi(mm, null if mesh != null else Props3D.walking_material(7.0))
+		for j in list.size():
+			_w_mm[list[j]] = _walk_mms.size()
+			_w_slot[list[j]] = j
+			_w_look[list[j]] = look
 		_walk_mms.append(mm)
+	for a in AVATARS:
 		for k in POOL_PER:
-			_spare(AVATARS[a])
+			_spare(a)
 	counts.walkers = _w_pts.size()
 	_update_walkers(0.0, Vector2.ZERO, true)
 
@@ -420,10 +463,9 @@ func update(delta: float, focus: Vector2) -> void:
 ## bằng người có xương.
 func _update_walkers(delta: float, focus: Vector2, all := false, seen := {}) -> void:
 	var r2 := UPDATE_RANGE * UPDATE_RANGE
-	var na := _walk_mms.size()
 	for i in _w_pts.size():
-		var mm := _walk_mms[i % na]
-		var slot := i / na
+		var mm := _walk_mms[_w_mm[i]]
+		var slot := _w_slot[i]
 		var shown := all or mm.visible_instance_count < 0 or slot < mm.visible_instance_count
 		if not shown:
 			continue
@@ -444,7 +486,7 @@ func _update_walkers(delta: float, focus: Vector2, all := false, seen := {}) -> 
 		var p := a.lerp(b, s / STEP - float(k)) - (b - a).normalized().orthogonal() * _w_lat[i]
 		var f := (b - a) * _w_dir[i]
 		var xf := Transform3D(Basis(Vector3.UP, atan2(f.x, f.y)), Vector3(p.x, 0.0, p.y))
-		if not all and p.distance_squared_to(focus) < NEAR * NEAR and _animate(i, AVATARS[i % na], xf, _w_speed[i], delta, seen):
+		if not all and p.distance_squared_to(focus) < NEAR * NEAR and _animate(i, _w_look[i], xf, _w_speed[i], delta, seen):
 			xf = Transform3D(Basis().scaled(Vector3.ZERO), xf.origin)
 		mm.set_instance_transform(slot, xf)
 

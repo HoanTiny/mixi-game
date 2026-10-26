@@ -6,7 +6,7 @@ extends Node
 ##   COMPACT_SIZE điểm, chữ đủ đọc, nút đủ to cho ngón tay; hud.gd, street_map.gd đổi bố cục theo tín hiệu changed.
 ## - Máy cảm ứng: ẩn dòng phím tắt, lời nhắc E thành nút chạm; màn dọc thì nhắc xoay ngang.
 ## - Điện thoại, máy tính bảng: cảnh 3D vẽ ở độ nét thấp hơn (giao diện vẫn nét), bóng nắng nhẹ hơn (world.gd đọc
-##   low_power).
+##   low_power); trình duyệt máy tính màn mật độ cao cũng vẽ cảnh 3D thưa bớt điểm ảnh.
 
 signal changed
 
@@ -15,6 +15,8 @@ const COMPACT_SIZE := Vector2(1100, 520)
 const COMPACT_BELOW := 560.0
 ## Điện thoại: cảnh 3D vẽ chừng này điểm ảnh mỗi điểm CSS (iPhone mật độ 3 thì vẽ một nửa số điểm mỗi chiều).
 const PHONE_3D_DENSITY := 1.5
+## Trình duyệt máy tính (màn retina, 4K): cảnh 3D vẽ chừng này điểm ảnh mỗi điểm CSS.
+const WEB_3D_DENSITY := 1.25
 
 ## Mật độ điểm ảnh (window.devicePixelRatio trên web), máy cảm ứng, chế độ gọn, máy yếu (điện thoại, máy tính bảng),
 ## hệ số co giao diện đang dùng.
@@ -22,6 +24,8 @@ var dpr := 1.0
 var touch := false
 var compact := false
 var low_power := false
+## Bóng nắng nhẹ (hai tầng, bản đồ bóng nhỏ): máy yếu và mọi trình duyệt (WebGL vẽ lại cả phố cho mỗi tầng bóng).
+var light_shadows := false
 var ui_scale := 1.0
 var _rotate: CanvasLayer
 var _rotate_dismissed := false
@@ -31,11 +35,15 @@ func _ready() -> void:
 	dpr = _device_pixel_ratio()
 	touch = DisplayServer.is_touchscreen_available()
 	low_power = OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
+	light_shadows = low_power or OS.has_feature("web")
 	for a in OS.get_cmdline_user_args():
 		# Thử trên máy tính: --phone giả làm điện thoại (cảm ứng, máy yếu), --dpr=3 giả mật độ điểm ảnh.
 		if a == "--phone":
 			touch = true
 			low_power = true
+			light_shadows = true
+		elif a == "--web":
+			light_shadows = true
 		elif a.begins_with("--dpr="):
 			dpr = float(a.substr(6))
 	get_tree().root.size_changed.connect(_fit)
@@ -61,6 +69,9 @@ func _fit() -> void:
 	root.content_scale_factor = ui_scale
 	if low_power:
 		root.scaling_3d_scale = clampf(PHONE_3D_DENSITY / dpr, 0.4, 1.0)
+	elif OS.has_feature("web"):
+		# Trình duyệt máy tính màn mật độ cao: cảnh 3D vẽ chừng WEB_3D_DENSITY điểm mỗi điểm CSS (giao diện vẫn nét).
+		root.scaling_3d_scale = clampf(WEB_3D_DENSITY / dpr, 0.5, 1.0)
 	_update_rotate(win)
 	changed.emit()
 

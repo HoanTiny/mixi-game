@@ -31,6 +31,7 @@ var _state := ""
 var _sitting := false
 var _hold := ""
 var _female := false
+var _seen: VisibleOnScreenNotifier3D
 
 
 static func make(look_in: Dictionary) -> Node3D:
@@ -84,6 +85,13 @@ func _build() -> void:
 	_arms = _HoldArms.new()
 	_sk.add_child(_arms)
 	_accessories()
+	# Ra khỏi khung nhìn hay bị ẩn (người dựng sẵn chờ dùng) thì dừng động tác: đỡ tính xương cho cả chục người.
+	var vis := VisibleOnScreenNotifier3D.new()
+	vis.aabb = AABB(Vector3(-0.6, 0.0, -0.6), Vector3(1.2, 2.0, 1.2))
+	vis.screen_entered.connect(_wake.bind(true))
+	vis.screen_exited.connect(_wake.bind(false))
+	add_child(vis)
+	_seen = vis
 
 
 static func _library(female: bool) -> AnimationLibrary:
@@ -230,6 +238,15 @@ func _attach(bone: String, mesh: Mesh, tint: Color) -> void:
 	var old: Vector3 = OLD_BONE_POS.get(bone, Vector3(0, 1.3, 0))
 	mi.position = -old + (Vector3(0, 0.06, 0) if bone == "head" else Vector3.ZERO)
 	fix.add_child(mi)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED and _ap != null:
+		_wake(_seen == null or _seen.is_on_screen())
+
+
+func _wake(on_screen: bool) -> void:
+	_ap.active = on_screen and is_visible_in_tree()
 
 
 func animate(_delta: float, moving: float) -> void:

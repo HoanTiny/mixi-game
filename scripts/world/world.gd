@@ -288,8 +288,8 @@ func _build_environment() -> void:
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
 	sun.directional_shadow_max_distance = 70.0
-	if ScreenFit.low_power:
-		# Điện thoại: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
+	if ScreenFit.light_shadows:
+		# Điện thoại, trình duyệt: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
 		RenderingServer.directional_shadow_atlas_set_size(2048, true)
 		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 		sun.directional_shadow_split_1 = 0.4
@@ -1471,7 +1471,10 @@ func _pinch(event: InputEvent) -> bool:
 	return false
 
 
-func _physics_process(delta: float) -> void:
+## Mỗi khung hình (theo nhịp vẽ của màn, không theo nhịp vật lý cố định: màn 120 Hz hay khung hình dao động trên web
+## thì An và máy quay vẫn đi đều, không nhảy cóc). Khung hình lâu bất thường (đổi tab) tính như 0,1 giây.
+func _process(delta: float) -> void:
+	delta = minf(delta, 0.1)
 	if _pending_click != null:
 		_handle_click(_pending_click)
 		_pending_click = null
@@ -1518,7 +1521,7 @@ func _physics_process(delta: float) -> void:
 	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
 	var far := clampf(zoom - 1.0, 0.0, 1.0)
 	sun.directional_shadow_max_distance = lerpf(50.0, 180.0, far) if ScreenFit.low_power else lerpf(70.0, 240.0, far)
-	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.low_power else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.light_shadows else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	if sun.directional_shadow_mode != shadow_mode:
 		sun.directional_shadow_mode = shadow_mode
 	_update_cutaway(delta)
@@ -2430,7 +2433,7 @@ func _update_quests() -> void:
 	if not game.is_started():
 		return
 	var bob := 0.18 * sin(Time.get_ticks_msec() / 260.0)
-	_quest_tick -= get_physics_process_delta_time()
+	_quest_tick -= get_process_delta_time()
 	if _quest_tick <= 0.0:
 		_quest_tick = 0.3
 		_refresh_quest_marks()

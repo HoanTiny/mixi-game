@@ -1,20 +1,31 @@
 extends SceneTree
 ## Nướng người thật (Rocketbox, assets/rb) thành lưới tĩnh nhẹ cho đám đông (crowd.gd) và người lái xe (traffic.gd):
 ## dựng người, chạy động tác tới một khung, lấy lưới theo tư thế đó, bớt tam giác (còn chừng TARGET_TRIS), bỏ đỉnh thừa,
-## lưu assets/rb/crowd/<id người>_<tư thế>.res (người theo Character.CROWD) kèm vật liệu ảnh thật.
+## lưu assets/rb/crowd/<id người>_<tư thế>.res (người theo Character.CROWD). Ảnh thân, mặt, tóc của mọi người gom vào
+## một tấm atlas.png (ô 512 cho thân, ô 256 cho mặt và tóc), mỗi người một mặt lưới duy nhất dùng chung vật liệu
+## crowd_mat.tres: đám đông, dòng xe vẽ mỗi nhóm một lần (web đỡ giật).
 ## Tư thế: stand (đứng), talk (đứng nói, tay đưa), sit (ngồi ghế, hông 0,6 m), walk (giữa bước), ride (lái xe máy:
 ## hông ở Props3D.SEAT_H, RIDER_Z, hai tay nắm tay lái, đội mũ bảo hiểm), back (ngồi sau xe, đội mũ).
-## Chạy: godot --headless --path . -s res://tools/bake_people.gd
+## Chạy hai bước (lần đầu làm atlas, nhập ảnh, rồi nướng):
+##   godot --headless --path . -s res://tools/bake_people.gd -- --atlas
+##   godot --headless --path . --import
+##   xvfb-run godot --path . --rendering-driver opengl3 -s res://tools/bake_people.gd
 
 const Human := preload("res://scripts/world/human.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const OUT := "res://assets/rb/crowd"
-const TARGET_TRIS := 1800
+const TARGET_TRIS := 900
 const Character := preload("res://scripts/world/character.gd")
 ## Độ cao khớp hông lúc ngồi ghế đẩu cao (0,42 m) và ghế đẩu thấp (0,27 m) ở quán cóc (street_dress.gd).
 const SEAT_HIP := {"sit": 0.52, "low": 0.37}
 ## Tay lái xe máy (hai tay nắm) theo dáng xe trong props3d.gd.
 const GRIP := Vector3(0.3, 1.08, 0.38)
+const ATLAS := OUT + "/atlas.png"
+const ATLAS_MAT := OUT + "/crowd_mat.tres"
+const ATLAS_SIZE := 2048
+## Ô của từng ảnh trong atlas: "người|phần|tóc" -> Rect2i (điểm ảnh).
+var _tiles := {}
+var _mat: Material
 
 
 func _initialize() -> void:
@@ -23,6 +34,21 @@ func _initialize() -> void:
 
 func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
+	var looks: Array = Character.CROWD + [Character.CROWD_CHILD]
+	_layout(looks)
+	if "--atlas" in OS.get_cmdline_user_args():
+		_make_atlas()
+		quit()
+		return
+	if not ResourceLoader.exists(ATLAS_MAT):
+		var m := StandardMaterial3D.new()
+		m.albedo_texture = load(ATLAS)
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+		m.alpha_scissor_threshold = 0.45
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		m.roughness = 0.8
+		ResourceSaver.save(m, ATLAS_MAT)
+	_mat = load(ATLAS_MAT)
 	for look in Character.CROWD:
 		for pose in ["stand", "talk", "sit", "low", "walk", "ride", "back"]:
 			await _bake(look, pose)
@@ -60,20 +86,38 @@ func _bake(look: Dictionary, pose: String) -> void:
 			var s := 1.0 if side == "L" else -1.0
 			_reach(sk, h, ["%s Thigh", "%s Calf", "%s Foot"], side, Vector3(s * 0.14, 0.09, 0.4), Vector3(0.0, 1.0, 1.0), true)
 	await process_frame
-	var surfaces := []
+	# Mọi mặt lưới (thân, mặt, tóc; cả đầu ghép) gộp thành một, UV dời vào ô của ảnh đó trong atlas.
+	var merged := []
+	merged.resize(Mesh.ARRAY_MAX)
+	merged[Mesh.ARRAY_VERTEX] = PackedVector3Array()
+	merged[Mesh.ARRAY_NORMAL] = PackedVector3Array()
+	merged[Mesh.ARRAY_TEX_UV] = PackedVector2Array()
+	merged[Mesh.ARRAY_INDEX] = PackedInt32Array()
 	for mi in sk.find_children("*", "MeshInstance3D", true, false):
+		var src: Mesh = (mi as MeshInstance3D).mesh
+		var has_body := false
+		for i in src.get_surface_count():
+			has_body = has_body or Human._part(src, i) == "body"
 		var baked: ArrayMesh = (mi as MeshInstance3D).bake_mesh_from_current_skeleton_pose()
 		var xf: Transform3D = h.global_transform.affine_inverse() * (mi as MeshInstance3D).global_transform
 		xf = Transform3D(Basis(), off) * xf
 		for i in baked.get_surface_count():
-			surfaces.append([baked.surface_get_arrays(i), (mi as MeshInstance3D).get_surface_override_material(i), xf])
+			var part := Human._part(src, i)
+			var owner := str(look.rb) if part == "body" or has_body else str(look.get("head", look.rb))
+			var tile: Rect2i = _tiles[_key(owner, part, "" if part == "body" else str(look.get("hair_tone", "")))]
+			var arrays := _simplify(baked.surface_get_arrays(i), xf, float(TARGET_TRIS) / 7500.0)
+			var base: int = (merged[Mesh.ARRAY_VERTEX] as PackedVector3Array).size()
+			merged[Mesh.ARRAY_VERTEX].append_array(arrays[Mesh.ARRAY_VERTEX])
+			merged[Mesh.ARRAY_NORMAL].append_array(arrays[Mesh.ARRAY_NORMAL])
+			for uv in arrays[Mesh.ARRAY_TEX_UV]:
+				var u := (uv as Vector2).clamp(Vector2.ZERO, Vector2.ONE)
+				merged[Mesh.ARRAY_TEX_UV].append((Vector2(tile.position) + u * Vector2(tile.size)) / float(ATLAS_SIZE))
+			for k in arrays[Mesh.ARRAY_INDEX]:
+				merged[Mesh.ARRAY_INDEX].append(base + int(k))
 	var out := ArrayMesh.new()
-	var tris := 0
-	for s in surfaces:
-		var arrays := _simplify(s[0], s[2], float(TARGET_TRIS) / 7500.0)
-		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-		out.surface_set_material(out.get_surface_count() - 1, s[1])
-		tris += (arrays[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
+	out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, merged)
+	out.surface_set_material(0, _mat)
+	var tris: int = (merged[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
 	if pose in ["ride", "back"]:
 		_helmet(out, sk, h, off)
 	var path := "%s/%s_%s.res" % [OUT, name, pose]
@@ -81,6 +125,62 @@ func _bake(look: Dictionary, pose: String) -> void:
 	print("%s  tam giác %d" % [path, tris])
 	h.queue_free()
 	await process_frame
+
+
+static func _key(avatar: String, part: String, hair: String) -> String:
+	return "%s|%s|%s" % [avatar, part, hair if part != "body" else ""]
+
+
+## Chia ô atlas: thân mỗi người một ô 512, mặt và tóc ô 256 (bốn ô nhỏ trong một ô lớn).
+func _layout(looks: Array) -> void:
+	var big := []
+	var small := []
+	for look in looks:
+		var b := _key(str(look.rb), "body", "")
+		if b not in big:
+			big.append(b)
+		var head := str(look.get("head", look.rb))
+		for part in ["head", "opacity"]:
+			var k := _key(head, part, str(look.get("hair_tone", "")))
+			if k not in small and (part != "opacity" or _file(head, part, "") != ""):
+				small.append(k)
+	var slot := 0
+	for k in big:
+		_tiles[k] = Rect2i((slot % 4) * 512, (slot / 4) * 512, 512, 512)
+		slot += 1
+	for j in small.size():
+		var s2 := slot + j / 4
+		var sub := j % 4
+		_tiles[small[j]] = Rect2i((s2 % 4) * 512 + (sub % 2) * 256, (s2 / 4) * 512 + (sub / 2) * 256, 256, 256)
+	assert(slot + ceili(small.size() / 4.0) <= 16, "atlas đầy")
+
+
+## File ảnh của một phần (tóc bạc nếu có), "" nếu không có.
+func _file(avatar: String, part: String, hair: String) -> String:
+	var dir := "res://assets/rb/%s/" % avatar
+	var names: Array = {"body": ["body_color.jpg"], "head": ["head_color.jpg"], "opacity": ["opacity_color.png"]}[part]
+	if hair == "grey":
+		names = {"body": ["body_color.jpg"], "head": ["head_grey.jpg", "head_color.jpg"], "opacity": ["opacity_grey.png", "opacity_color.png"]}[part]
+	for n in names:
+		if FileAccess.file_exists(dir + n):
+			return dir + n
+	return "" if part == "opacity" else dir + "body_color.jpg"
+
+
+## Ghép atlas (thân, mặt kênh trong suốt đầy; tóc giữ kênh trong suốt), lưu atlas.png và vật liệu dùng chung.
+func _make_atlas() -> void:
+	var img := Image.create(ATLAS_SIZE, ATLAS_SIZE, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.5, 0.5, 0.5, 0.0))
+	for k in _tiles:
+		var parts: PackedStringArray = str(k).split("|")
+		var path := _file(parts[0], parts[1], parts[2])
+		var src := Image.load_from_file(ProjectSettings.globalize_path(path))
+		src.convert(Image.FORMAT_RGBA8)
+		var r: Rect2i = _tiles[k]
+		src.resize(r.size.x, r.size.y, Image.INTERPOLATE_LANCZOS)
+		img.blit_rect(src, Rect2i(Vector2i.ZERO, r.size), r.position)
+	img.save_png(ProjectSettings.globalize_path(ATLAS))
+	print("atlas: %d ô" % _tiles.size())
 
 
 ## Bớt tam giác một mặt lưới (meshoptimizer qua ImporterMesh), dời theo xf, chỉ giữ đỉnh còn dùng.

@@ -6,7 +6,7 @@ Nhân vật trong game (An, các nhân vật phụ, người đi đường, ngư
 - Mỗi thư mục `<Tên>/`: `<Tên>.fbx` (lưới có xương Biped, xuất từ `Assets/Avatars/.../Export/`), ảnh màu thân, đầu,
   tóc và mi (`body_color.jpg`, `head_color.jpg`, `opacity_color.png`, thu về 512 px), ảnh pháp tuyến cho nhân vật chính.
 - `anims/`: bốn động tác của Rocketbox (đứng, đi, ngồi ghế, nói chuyện; bản nam và nữ), đã bỏ phần trôi theo mặt đất.
-- `crowd/`: tư thế nướng sẵn thành lưới nhẹ cho đám đông và người lái xe (`tools/bake_people.gd`).
+- `crowd/`: tư thế nướng sẵn thành lưới nhẹ cho đám đông và người lái xe (`tools/bake_people.gd`); `atlas.png` gom ảnh thân, mặt, tóc của các kiểu người đám đông, `crowd_mat.tres` là vật liệu dùng chung.
 
 **Việt hoá** (tools/viet_look.py, ảnh gốc giữ ở `<tên>/orig/`): cả bộ chỉ có vài gương mặt châu Á (`Male_Adult_09`,
 `Male_Adult_10`, `Business_Male_02`, `Female_Adult_03`, `Business_Female_03`, `Chef_Female_01`, `Medical_Female_01`,

@@ -362,17 +362,46 @@ static func rider_real(kind: String, driver: String, back: String, helmet: Color
 	hm.vertex_color_use_as_albedo = true
 	hm.albedo_color = helmet
 	hm.roughness = 0.35
+	# Người (ảnh atlas chung) gộp một mặt, mũ bảo hiểm (màu đỉnh) gộp một mặt: mỗi nhóm xe vẽ ba lần.
+	var groups := {}
 	for pr in parts:
 		var src: ArrayMesh = load("res://assets/rb/crowd/%s_%s.res" % pr)
 		for i in src.get_surface_count():
-			m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(i))
 			var mat := src.surface_get_material(i)
-			# Mặt lưới mũ bảo hiểm (vật liệu theo màu đỉnh) đổi màu theo xe.
-			if mat is StandardMaterial3D and (mat as StandardMaterial3D).vertex_color_use_as_albedo:
-				mat = hm
-			m.surface_set_material(m.get_surface_count() - 1, mat)
+			var is_helmet: bool = mat is StandardMaterial3D and (mat as StandardMaterial3D).vertex_color_use_as_albedo
+			var k := "mu" if is_helmet else "nguoi"
+			if not groups.has(k):
+				groups[k] = [[], hm if is_helmet else mat]
+			groups[k][0].append(src.surface_get_arrays(i))
+	for k in groups:
+		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, _merge_arrays(groups[k][0]))
+		m.surface_set_material(m.get_surface_count() - 1, groups[k][1])
 	_cache[key] = m
 	return m
+
+
+## Gộp nhiều mặt lưới (cùng kiểu kênh: đỉnh, pháp tuyến, UV, màu nếu có, chỉ số) thành một.
+static func _merge_arrays(list: Array) -> Array:
+	var out := []
+	out.resize(Mesh.ARRAY_MAX)
+	for c in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_COLOR]:
+		if list[0][c] != null:
+			out[c] = list[0][c].duplicate()
+	var idx := PackedInt32Array()
+	for j in list.size():
+		var a: Array = list[j]
+		var base := 0
+		if j > 0:
+			base = (out[Mesh.ARRAY_VERTEX] as PackedVector3Array).size()
+			for c in [Mesh.ARRAY_VERTEX, Mesh.ARRAY_NORMAL, Mesh.ARRAY_TEX_UV, Mesh.ARRAY_COLOR]:
+				if out[c] != null:
+					out[c].append_array(a[c])
+		# Mặt lưới không có chỉ số thì mỗi ba đỉnh một tam giác.
+		var own: PackedInt32Array = a[Mesh.ARRAY_INDEX] if a[Mesh.ARRAY_INDEX] != null else PackedInt32Array(range((a[Mesh.ARRAY_VERTEX] as PackedVector3Array).size()))
+		for k in own:
+			idx.append(base + k)
+	out[Mesh.ARRAY_INDEX] = idx
+	return out
 
 
 ## Người ngồi xe máy, gộp vào lưới xe: hông ở (0, SEAT_H, hz), bàn chân ở (±foot.x, foot.y, foot.z); driver: hai tay

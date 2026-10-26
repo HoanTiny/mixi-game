@@ -10,6 +10,11 @@ const PARK := 1.3
 const PARK_KINDS := ["park", "garden", "pitch", "playground", "village_green", "recreation_ground", "pedestrian", "square"]
 
 var grid: AStarGrid2D
+## Nắn thẳng đường đi xét tối đa chừng này điểm phía trước; nhớ sẵn tối đa PATH_CACHE đường (nhân vật đi việc lặp lại
+## mỗi ngày giữa các chỗ quen).
+const SMOOTH_LOOK := 48
+const PATH_CACHE := 256
+var _paths := {}
 
 
 func _init(data, bounds: Rect2) -> void:
@@ -199,22 +204,42 @@ func _cost(p: Vector2) -> float:
 func path(a: Vector2, b: Vector2) -> PackedVector2Array:
 	var s := nearest_walkable(a)
 	var g := nearest_walkable(b)
-	var ids := grid.get_id_path(Vector2i(floori(s.x), floori(s.y)), Vector2i(floori(g.x), floori(g.y)))
+	var key := Vector4i(floori(s.x), floori(s.y), floori(g.x), floori(g.y))
+	if _paths.has(key):
+		var hit: PackedVector2Array = _paths[key].duplicate()
+		# Đường nhớ sẵn tính từ giữa ô: đầu, cuối đặt lại đúng chỗ.
+		hit[0] = s
+		hit[hit.size() - 1] = g
+		return hit
+	var ids := grid.get_id_path(Vector2i(key.x, key.y), Vector2i(key.z, key.w))
 	if ids.is_empty():
 		return PackedVector2Array()
 	var pts := PackedVector2Array([s])
 	for i in range(1, ids.size() - 1):
 		pts.append(Vector2(ids[i]) + Vector2(0.5, 0.5))
 	pts.append(g)
+	# Nắn thẳng: từ mỗi điểm nhảy tới điểm xa nhất (trong SMOOTH_LOOK điểm tới) đi thẳng được, tìm bằng chia đôi cho
+	# nhanh (đường dài trên map thật cả nghìn ô, xét từng cặp thì khựng cả khung hình).
 	var out := PackedVector2Array([pts[0]])
 	var i := 0
 	while i < pts.size() - 1:
-		var j := pts.size() - 1
-		while j > i + 1 and not _clear(pts[i], pts[j]):
-			j -= 1
-		out.append(pts[j])
-		i = j
-	return out
+		var lo := i + 1
+		var hi := mini(i + SMOOTH_LOOK, pts.size() - 1)
+		if _clear(pts[i], pts[hi]):
+			lo = hi
+		else:
+			while hi - lo > 1:
+				var mid := (lo + hi) / 2
+				if _clear(pts[i], pts[mid]):
+					lo = mid
+				else:
+					hi = mid
+		out.append(pts[lo])
+		i = lo
+	if _paths.size() >= PATH_CACHE:
+		_paths.clear()
+	_paths[key] = out
+	return out.duplicate()
 
 
 ## Đi thẳng từ a tới b được không: không vướng gì, và không cắt qua chỗ đắt hơn cả hai đầu (đang đi trên phố thì

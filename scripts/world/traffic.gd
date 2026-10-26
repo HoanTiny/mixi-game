@@ -14,7 +14,7 @@ const BIKES_PER_M := 0.16
 const CARS_PER_M := 0.018
 const MAX_BIKES := 480
 const MAX_CARS := 44
-const CLUSTER := 220.0
+const CLUSTER := 100.0
 const UPDATE_RANGE := 240.0
 ## Đường rộng từ chừng này mét mới có ô tô đậu dọc lề (AreaBuilder.park_cars_from): xe máy chạy chừa chỗ.
 const PARKED_CARS_FROM := 12.0
@@ -75,10 +75,7 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount
 		var n := roundi(float(r.len) * float(r.k) * k_bike)
 		for kind in KINDS:
 			var m := roundi(n * float(kind[2]))
-			# Mỗi loại xe hai nhóm người lái (mỗi nhóm một kiểu người, đỡ số lần vẽ).
-			var half := m / 2
-			_add(kinds, "%s|%s|0" % [kind[0], kind[1]], ri, half, bike_lane, Vector2(6.5, 9.5), BIKE_PAINT)
-			_add(kinds, "%s|%s|1" % [kind[0], kind[1]], ri, m - half, bike_lane, Vector2(6.5, 9.5), BIKE_PAINT)
+			_add(kinds, "%s|%s" % [kind[0], kind[1]], ri, m, bike_lane, Vector2(6.5, 9.5), BIKE_PAINT)
 			counts.bikes += m
 		if cars:
 			var m := roundi(float(r.len) * float(r.k) * k_car)
@@ -94,8 +91,8 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount
 			if kk == "car":
 				_group(Props3D.car(), list, clusters[key].rect, true)
 				continue
-			# Người lái chọn theo cụm và nhóm: mỗi cụm một vẻ.
-			var h := absi(hash(key)) + int(parts[2]) * 3 + (1 if parts[0] == "xe_so" else 0)
+			# Người lái chọn theo cụm và loại xe: mỗi cụm một vẻ (cụm nhỏ nên đi một đoạn đã thấy người khác).
+			var h := absi(hash(key)) + (1 if parts[0] == "xe_so" else 0) + (4 if parts[1] == "true" else 0)
 			var back: String = RIDERS[(h + 2) % RIDERS.size()] if parts[1] == "true" else ""
 			var real := Props3D.rider_real(parts[0], RIDERS[h % RIDERS.size()], back, Color(HELMETS[h % HELMETS.size()]))
 			if real != null:

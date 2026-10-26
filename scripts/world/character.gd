@@ -190,7 +190,7 @@ const CROWD := [
 	{"id": "m2", "rb": "Male_Adult_07", "head": "Business_Male_02", "scale": 0.96},
 	{"id": "m3", "rb": "Delivery_Male_01", "head": "Male_Adult_10", "hair_tone": "grey", "scale": 0.94},
 	{"id": "m4", "rb": "Male_Adult_17", "head": "Business_Male_02", "scale": 0.95},
-	{"id": "m5", "rb": "Construction_Male_02", "head": "Male_Adult_10", "scale": 0.96},
+	{"id": "m5", "rb": "Male_Adult_02", "head": "Male_Adult_10", "scale": 0.96},
 	{"id": "f1", "rb": "Female_Adult_08", "head": "Female_Adult_03", "scale": 0.94},
 	{"id": "f2", "rb": "Female_Adult_07", "head": "Sports_Female_02", "scale": 0.94},
 	{"id": "f3", "rb": "Female_Adult_02", "head": "Business_Female_03", "hair_tone": "grey", "scale": 0.92},

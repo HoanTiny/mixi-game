@@ -791,7 +791,9 @@ func _walk_to(p: Vector2) -> void:
 	_path_i = 1
 
 
-func _physics_process(delta: float) -> void:
+## Đi dạo: theo nhịp vẽ (máy quay đi đều cả trên màn 120 Hz, trên web).
+func _process(delta: float) -> void:
+	delta = minf(delta, 0.1)
 	if not walking or player == null or builder == null:
 		return
 	var key := Vector2.ZERO
