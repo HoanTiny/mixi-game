@@ -55,7 +55,15 @@ Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu đ�
 ## Mở project
 
 1. Mở Godot, chọn **Import**, trỏ tới file `project.godot` trong thư mục này.
-2. Bấm **Run** (F5). Màn chính là phố 3D (`scenes/world.tscn`). Màn đầu có **Bắt đầu ngày 1** (đủ 30 ngày) hoặc thử nhanh lát cắt ngày 18–22 với tuyến A, B, C.
+2. Bấm **Run** (F5). Màn chính là phố 3D (`scenes/world.tscn`).
+
+**Màn đầu game** (`scripts/ui/title_screen.gd`): nền là chính hẻm Bờ Me nhìn qua máy quay dựng cảnh, phủ shader vẽ mực (viền nét, màu ngả nâu, vân giấy, tối bốn góc); tên game chữ bút lông trên vệt sơn. Menu: **Chơi tiếp** (khi có ván dở), **Bắt đầu**, **Cài đặt**, **Giới thiệu**, **Thoát** (bản cài trên máy).
+- **Câu chuyện của bạn:** truyện chính (5 chương, 150 ngày), ba lát cắt ngày 18–22 theo tuyến A, B, C, và Dựng khu thật. Chọn bên trái, lời giới thiệu bên phải, bấm **Vào game**. Đang có ván dở thì hỏi trước khi xóa.
+- **Chọn độ khó:** *Dễ thở* (thêm 500.000đ tiền mặt lúc đầu, đói, bẩn chậm hơn 30%, mệt chậm hơn 20%) hay *Đúng đời* (số liệu gốc). Số liệu trong `difficulty` của `data/config.json`; đổi được giữa chừng trong Cài đặt.
+- **Tin nhắn mở đầu:** 5 giờ 40 sáng ngày 1, điện thoại của An nhận tin của chú Hòa (tiệm cũ), cô Duyên (chủ đất), Linh; bấm hay phím cách để đọc nhanh, có nút Bỏ qua. Viết trong `prologue.intro` của `data/story.json`.
+- **Cài đặt** (lưu ở `user://settings.json`): âm lượng, toàn màn hình, bóng nắng nhẹ, độ khó.
+
+Chữ: [Sedgwick Ave Display](https://fonts.google.com/specimen/Sedgwick+Ave+Display) và [Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand) (SIL OFL, giấy phép kèm trong `assets/fonts/`). Chạy với `-- --no-title` (hay các chế độ `--demo…`) để vào thẳng phố.
 
 **Điều khiển ở màn phố:**
 

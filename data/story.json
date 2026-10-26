@@ -62,7 +62,43 @@
   "text": "Chuyến xe đêm thả An ở đầu đường lúc trời chưa sáng hẳn. Trong túi là một cái quạt bàn hỏng, một túi đồ nghề và 1,2 triệu đồng. Tiệm cũ cho anh nghỉ từ tuần trước, còn nợ 3,6 triệu tiền công. Ở nhà chưa ai biết.\n\nXóm trọ Bờ Me vẫn như cũ: dây phơi chằng ngang sân, mùi cá kho bay ra từ phòng bà Tư. Chỉ có một tờ giấy mới dán trên cửa: cuối tháng, cả xóm phải dọn đi.\n\nCòn ba mươi ngày, và mùa mưa đang tới. An quen nói \"để anh lo\". Lần này, anh có lo một mình được không?",
   "quote": "Linh đang đo cái kệ bếp bằng sợi dây: \"Nếu kiếm phòng khác thì mình phải biết cái nào mang theo được chứ.\"",
   "start": "Bắt đầu ngày 1",
-  "slicePick": "HOẶC THỬ NHANH LÁT CẮT NGÀY 18–22 (TUYẾN ĐÃ CHỌN Ở NGÀY 11)"
+  "slicePick": "HOẶC THỬ NHANH LÁT CẮT NGÀY 18–22 (TUYẾN ĐÃ CHỌN Ở NGÀY 11)",
+  "intro": {
+   "caption": "Ngày 1 · 5 giờ 40 sáng",
+   "place": "Đầu đường Bờ Me, chuyến xe đêm vừa thả An xuống",
+   "chats": [
+    {
+     "name": "Chú Hòa (tiệm điện máy cũ)",
+     "badge": "H",
+     "color": "c0392b",
+     "msgs": [
+      "An à, chú nói thiệt: tiệm chú đóng hẳn rồi, mặt bằng trả lại cho chủ.",
+      "Tiền công tháng rồi chú còn thiếu con 3 triệu 6. Cho chú khất ít bữa, có là chú gửi liền.",
+      "Con thông cảm cho chú nghen."
+     ]
+    },
+    {
+     "name": "Cô Duyên (chủ đất Bờ Me)",
+     "badge": "D",
+     "color": "8e44ad",
+     "msgs": [
+      "Thông báo cả xóm trọ Bờ Me: chủ đất lấy lại đất, cuối tháng này các phòng dọn đi.",
+      "Ngày 30 mỗi phòng trả chìa khóa cho cô. Tiền điện nước tháng này cô tính tới ngày 30.",
+      "Ai cần giấy xác nhận tạm trú để tìm chỗ mới thì báo cô sớm."
+     ]
+    },
+    {
+     "name": "Linh",
+     "badge": "L",
+     "color": "2e86c1",
+     "msgs": [
+      "Anh tới bến chưa? Bà Tư hỏi anh hoài.",
+      "Tờ giấy dọn đi dán trên cửa rồi đó anh.",
+      "Em đang đo cái kệ bếp. Nếu kiếm phòng khác thì mình phải biết cái nào mang theo được chứ."
+     ]
+    }
+   ]
+  }
  },
  "endings": {
   "E1": {

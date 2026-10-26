@@ -14,6 +14,8 @@ signal closed
 
 var game
 var night_open := false
+## Màn tiêu đề đang mở: giấu hết bảng thoại cho tới khi vào game.
+var hold := false
 var _box: VBoxContainer
 var _diary_open := false
 var _scrim: ColorRect
@@ -70,6 +72,9 @@ func open_night() -> void:
 
 
 func refresh() -> void:
+	if hold:
+		visible = false
+		return
 	for child in _box.get_children():
 		_box.remove_child(child)
 		child.queue_free()

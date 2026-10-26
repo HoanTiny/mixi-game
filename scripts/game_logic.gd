@@ -98,8 +98,8 @@ static func _read_json(path: String) -> Variant:
 # ---------------------------------------------------------------- bắt đầu
 
 ## mode "full": chơi đủ 30 ngày từ ngày 1 (cfg.full). "A", "B", "C": lát cắt ngày 18–22
-## với trạng thái dựng sẵn của tuyến đó (cfg.presets).
-func new_game(mode: String) -> void:
+## với trạng thái dựng sẵn của tuyến đó (cfg.presets). diff: độ khó (cfg.difficulty: "de" dễ thở, "thuong" đúng đời).
+func new_game(mode: String, diff := "thuong") -> void:
 	var full := mode == "full"
 	var p: Dictionary = cfg.full if full else cfg.presets[mode]
 	_event_data = {}
@@ -122,6 +122,9 @@ func new_game(mode: String) -> void:
 	if cfg.has("needs"):
 		s["needs"] = cfg.needs.start.duplicate()
 		s["needs_t"] = float(cfg.dayStart)
+	s["difficulty"] = diff if cfg.get("difficulty", {}).has(diff) else "thuong"
+	if full:
+		s["cash"] = int(s.cash) + int(_diff().get("cashBonus", 0))
 	for r in p.receivables:
 		_add_receivable(r)
 	for x in p.payables:
@@ -385,7 +388,25 @@ func spend(n: int, why: String) -> int:
 	return taken
 
 
+## Độ khó đang chơi (cfg.difficulty), mặc định đúng đời.
+func _diff() -> Dictionary:
+	return cfg.get("difficulty", {}).get(str(s.get("difficulty", "thuong")), {})
+
+
+func difficulty() -> String:
+	return str(s.get("difficulty", "thuong"))
+
+
+## Đổi độ khó giữa chừng (Cài đặt): chỉ đổi nhịp đói, bẩn, mệt về sau, không cộng trừ tiền.
+func set_difficulty(diff: String) -> void:
+	if is_started() and cfg.get("difficulty", {}).has(diff):
+		s["difficulty"] = diff
+		_commit()
+
+
 func add_fatigue(d: float) -> void:
+	if d > 0.0:
+		d *= float(_diff().get("fatigueRate", 1.0))
 	s["fatigue"] = clampf(float(s.fatigue) + d, 0.0, float(cfg.fatigue.max))
 
 
@@ -1355,7 +1376,7 @@ func finish_day() -> void:
 	_tick_needs()
 	if has_needs():
 		for k in cfg.needs.overnight:
-			need_adj(k, float(cfg.needs.overnight[k]))
+			need_adj(k, float(cfg.needs.overnight[k]) * float(_diff().get("needsRate", 1.0)))
 		s["needs_t"] = float(cfg.dayStart)
 	spend(living_cost(), "Sinh hoạt cả nhà")
 
@@ -2153,7 +2174,7 @@ func _tick_needs() -> void:
 	s["needs_t"] = clock()
 	var starving := need("fed") <= 0.0
 	for k in cfg.needs.perHour:
-		need_adj(k, float(cfg.needs.perHour[k]) * dt)
+		need_adj(k, float(cfg.needs.perHour[k]) * dt * float(_diff().get("needsRate", 1.0)))
 	if starving or need("fed") <= 0.0:
 		add_fatigue(float(cfg.needs.starveFatiguePerHour) * dt)
 

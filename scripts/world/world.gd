@@ -22,6 +22,7 @@ const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
 const Crowd := preload("res://scripts/world/crowd.gd")
+const TitleScreen := preload("res://scripts/ui/title_screen.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
 ## (game.home_loc()); bà, Linh, má đứng trước cửa chỗ đó, ông Ba ở sát vách.
@@ -124,6 +125,9 @@ var occluders: Array = []
 ## Nhân vật có tên: id -> {node, body, name, loc}; street_life cho họ đi lại theo giờ.
 var npc_nodes := {}
 var life: Node
+## Màn đầu game (tiêu đề, chọn câu chuyện, tin nhắn mở đầu); null khi chạy thử không qua cảnh chính.
+var title: CanvasLayer = null
+var _title_hidden: Array = []
 
 ## Đích cuối của lượt đi bộ đang chạy (null khi đứng yên) và các điểm rẽ trên đường đi.
 var _target = null
@@ -224,6 +228,7 @@ func _ready() -> void:
 	if to_realmap:
 		get_tree().change_scene_to_file.call_deferred("res://scenes/realmap.tscn")
 		return
+	_open_title()
 	# Dùng khi chụp màn hình kiểm tra: "-- --demo --demo-open=com_hanh" mở sẵn một địa điểm.
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--demo-open="):
@@ -231,6 +236,43 @@ func _ready() -> void:
 			player.position = door_of(id)
 			camera.position = player.position + cam_offset()
 			hud.open_location.call_deferred(id)
+
+
+## Mở màn tiêu đề khi vào game (chỉ khi đây là cảnh chính và ván chơi thật; bài thử dựng màn phố riêng, các chế độ
+## "--demo…" và "--no-title" thì bỏ qua). Trong lúc đó giấu thanh trên dưới, giữ các bảng thoại lại, máy quay do màn tiêu đề điều khiển.
+func _open_title() -> void:
+	if get_tree().current_scene != self or not GameState._persist or "--no-title" in OS.get_cmdline_user_args():
+		return
+	TitleScreen.apply_settings(TitleScreen.load_settings())
+	title = TitleScreen.new()
+	title.world = self
+	title.game = game
+	add_child(title)
+	_hold_for_title(true)
+	title.started.connect(func() -> void:
+		_hold_for_title(false)
+		camera.position = player.position + cam_offset())
+
+
+func _hold_for_title(on: bool) -> void:
+	hud.visible = not on
+	hud.dialogs.hold = on
+	hud.dialogs.refresh()
+	# Nền màn đầu như tranh vẽ: giấu tên người, tên địa điểm nổi trên phố, vào game thì hiện lại đúng những cái đã giấu.
+	if on:
+		for l in find_children("*", "Label3D", true, false):
+			if l.visible:
+				l.visible = false
+				_title_hidden.append(l)
+	else:
+		for l in _title_hidden:
+			if is_instance_valid(l):
+				l.visible = true
+		_title_hidden.clear()
+
+
+func title_open() -> bool:
+	return title != null and title.visible
 
 
 # ---------------------------------------------------------------- toạ độ
@@ -1405,6 +1447,8 @@ func toggle_overview() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if title_open():
+		return
 	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 		var up: bool = event.button_index == MOUSE_BUTTON_WHEEL_UP
 		# Góc chơi nhích từng chút; quá góc chơi xa thì mỗi nấc lùi nhiều hơn, tới toàn cảnh.
@@ -1481,6 +1525,12 @@ func _pinch(event: InputEvent) -> bool:
 ## thì An và máy quay vẫn đi đều, không nhảy cóc). Khung hình lâu bất thường (đổi tab) tính như 0,1 giây.
 func _process(delta: float) -> void:
 	delta = minf(delta, 0.1)
+	if title_open():
+		# Màn tiêu đề: phố vẫn sống (xe, thuyền) làm nền, An đứng yên.
+		_update_traffic(delta)
+		if real:
+			_update_boats(delta)
+		return
 	if _pending_click != null:
 		_handle_click(_pending_click)
 		_pending_click = null
@@ -2016,6 +2066,9 @@ func _on_changed() -> void:
 	if not game.is_started():
 		_last_money = -1
 		_clear_ending_home()
+		if title != null and not title.visible:
+			title.show_page("title")
+			_hold_for_title(true)
 		return
 	_sync_home()
 	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3", "full4", "full5"] and _ending_home == null:

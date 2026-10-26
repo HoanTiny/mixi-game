@@ -388,5 +388,21 @@
       "maxTimes": 1, "effects": { "respect": 1, "rep.LINH": 2 } },
     { "id": "tra_hop_com", "group": "optional", "location": "com_hanh", "name": "Trả các hộp cơm dùng chung", "hours": 1, "showIfPromise": "tra_hop_com",
       "maxTimes": 1, "effects": { "rep.HANH": 4, "promise_status": { "id": "tra_hop_com", "status": "done" } } }
-  ]
+  ],
+  "difficulty": {
+    "de": {
+      "name": "Dễ thở",
+      "cashBonus": 500000,
+      "needsRate": 0.7,
+      "fatigueRate": 0.8,
+      "desc": "Cuộc sống bớt khắc nghiệt: thêm 500.000đ tiền mặt lúc đầu, đói, bẩn và mệt tăng chậm hơn. Hợp để đọc truyện, làm quen các việc làm và các nhân vật."
+    },
+    "thuong": {
+      "name": "Đúng đời",
+      "cashBonus": 0,
+      "needsRate": 1.0,
+      "fatigueRate": 1.0,
+      "desc": "Tiền, sức và thời gian sát như ngoài đời: tiêu một đồng phải tính, ngày nào cũng phải ăn, tắm, nghỉ. Lựa chọn nào cũng có giá."
+    }
+  }
 }
