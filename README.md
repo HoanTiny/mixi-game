@@ -283,3 +283,5 @@ Tải: <https://hoantiny.github.io/mixi-game/download/TruocMuaMua-Windows.zip> (
 
 Xuất lại: cần khuôn `windows_release_x86_64.exe` của Godot 4.7.2 trong thư mục export_templates, rồi
 `godot --headless --path . --export-release "Windows" build/windows/TruocMuaMua.exe` (dữ liệu game nhúng sẵn trong file exe, biểu tượng `icon.ico`, tên và số phiên bản trong `export_presets.cfg`). Cả bản web và bản Windows dùng bộ vẽ Compatibility (OpenGL) như lúc thử.
+
+**Giao hàng bằng xe máy:** nhận đơn trên app Giao Nhanh thì An lên chiếc tay ga đỏ, đội mũ bảo hiểm, hai tay nắm tay lái; đi nhanh gấp 1,8 lần đi bộ và mỗi mét chỉ tốn 35% giờ so với đi bộ (`world.gd` RIDE_SPEED, RIDE_TIME). Giao xong hay hủy đơn thì dựng xe, đi bộ tiếp.

@@ -61,6 +61,9 @@ const LOCATIONS := {
 		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
 }
 const SPEED := 6.0
+## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
+const RIDE_SPEED := 1.8
+const RIDE_TIME := 0.35
 ## Camera góc chơi xa (nhìn cả dãy phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức, lăn tiếp ra
 ## xa là nhìn toàn cảnh (CAM_FAR).
 const CAM_OFFSET := Vector3(0, 24, 17)
@@ -102,6 +105,9 @@ var sun: DirectionalLight3D
 var env: Environment
 var player: Node3D
 var player_body: Node3D
+## Xe máy của An (hiện khi đang có đơn giao hàng), An đang ngồi trên xe.
+var _ride_bike: Node3D
+var _riding := false
 var font: SystemFont
 var lamps: Array = []
 var door_rings := {}
@@ -1489,6 +1495,7 @@ func _process(delta: float) -> void:
 			key_dir.z -= 1
 		if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
 			key_dir.z += 1
+	_update_ride()
 	var step := Vector3.ZERO
 	if key_dir != Vector3.ZERO:
 		_target = null
@@ -1499,8 +1506,9 @@ func _process(delta: float) -> void:
 	if step != Vector3.ZERO:
 		player.position += step
 		player.position.y = lerpf(player.position.y, city.ground_y(Vector2(player.position.x, player.position.z)), clampf(delta * 12.0, 0.0, 1.0))
-		_add_walk(step.length() * (RainLayer.WADE_COST if _wading() else 1.0))
-		audio.step(delta)
+		_add_walk(step.length() * (RIDE_TIME if _riding else (RainLayer.WADE_COST if _wading() else 1.0)))
+		if not _riding:
+			audio.step(delta)
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
 		if player_body.has_method("animate"):
 			player_body.animate(delta, _speed() / SPEED)
@@ -1739,7 +1747,7 @@ func _update_cutaway(delta := 0.0) -> void:
 
 ## Phong độ thấp thì lê bước, đi chậm hẳn.
 func _speed() -> float:
-	var v := SPEED
+	var v := SPEED * (RIDE_SPEED if _riding else 1.0)
 	if _wading():
 		v *= RainLayer.WADE_SPEED
 	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
@@ -1755,6 +1763,26 @@ func _speed() -> float:
 				v *= 0.8
 				break
 	return v
+
+
+## Có đơn giao hàng thì An lên xe máy (đội mũ bảo hiểm, ngồi tư thế lái, hai tay nắm tay lái); giao xong hay hủy đơn
+## thì xuống xe.
+func _update_ride() -> void:
+	var want: bool = game.is_started() and not game.delivery_active().is_empty()
+	if want == _riding or not player_body.has_method("sit"):
+		return
+	_riding = want
+	if _ride_bike == null:
+		_ride_bike = Props3D.instance(Props3D.motorbike("tay_ga", true), Color("b23a32"))
+		player.add_child(_ride_bike)
+	_ride_bike.visible = want
+	player_body.position.z = Props3D.RIDER_Z if want else 0.0
+	player_body.sit(want, Props3D.SEAT_H)
+	if player_body.has_method("hold"):
+		player_body.hold("ride" if want else "")
+	if player_body.has_method("wear"):
+		player_body.wear("helmet", want)
+	_float_text("Lên xe đi giao" if want else "Dựng xe", Color("ffd27a"))
 
 
 ## An đang lội qua chỗ ngập ngày mưa.

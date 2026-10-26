@@ -32,6 +32,7 @@ var _sitting := false
 var _hold := ""
 var _female := false
 var _seen: VisibleOnScreenNotifier3D
+var _worn := {}
 
 
 static func make(look_in: Dictionary) -> Node3D:
@@ -214,11 +215,11 @@ func add_item(bone: String, mesh: Mesh) -> void:
 
 ## Gắn lưới theo xương: bù hướng nghỉ của xương Biped (trục x dọc xương) để lưới giữ hướng như ở khung cũ, chỉ đi
 ## theo chuyển động của xương.
-func _attach(bone: String, mesh: Mesh, tint: Color) -> void:
+func _attach(bone: String, mesh: Mesh, tint: Color) -> Node3D:
 	var bname: String = BONE_MAP.get(bone, "Bip01 Spine2")
 	var idx := _sk.find_bone(bname)
 	if idx < 0:
-		return
+		return null
 	var ba := BoneAttachment3D.new()
 	ba.bone_name = bname
 	_sk.add_child(ba)
@@ -238,6 +239,16 @@ func _attach(bone: String, mesh: Mesh, tint: Color) -> void:
 	var old: Vector3 = OLD_BONE_POS.get(bone, Vector3(0, 1.3, 0))
 	mi.position = -old + (Vector3(0, 0.06, 0) if bone == "head" else Vector3.ZERO)
 	fix.add_child(mi)
+	return ba
+
+
+## Đội, cởi đồ thêm lúc đang chơi (mũ bảo hiểm khi lên xe máy): dựng lần đầu, sau đó chỉ bật tắt.
+func wear(kind: String, on: bool, tint := Color("2f6fb0")) -> void:
+	if on and not _worn.has(kind):
+		var Character = load("res://scripts/world/character.gd")
+		_worn[kind] = _attach("head", Character._acc(kind), tint)
+	if _worn.get(kind) != null:
+		(_worn[kind] as Node3D).visible = on
 
 
 func _notification(what: int) -> void:
@@ -267,7 +278,8 @@ func sit(on: bool, hip_h := 0.93, _back := false) -> void:
 	animate(0.0, 0.0)
 
 
-## "push": đẩy xe, bưng đồ trước bụng; "carry": tay phải giữ đòn gánh trên vai; "": tay theo động tác.
+## "push": đẩy xe, bưng đồ trước bụng; "carry": tay phải giữ đòn gánh trên vai; "ride": nắm tay lái xe máy; "": tay
+## theo động tác.
 func hold(kind: String) -> void:
 	_hold = kind
 	_arms.kind = kind
@@ -299,6 +311,10 @@ class _HoldArms extends SkeletonModifier3D:
 					continue
 				up_dir = Vector3(-0.35, -0.15, 0.55)
 				fore_dir = Vector3(0.15, 0.85, -0.25)
+			elif kind == "ride":
+				# Lái xe máy: vai xuống chéo ra trước tới tay lái.
+				up_dir = Vector3(s * 0.18, -0.6, 0.78)
+				fore_dir = Vector3(s * 0.05, -0.25, 0.97)
 			else:
 				up_dir = Vector3(s * 0.1, -0.78, 0.6)
 				fore_dir = Vector3(-s * 0.12, 0.08, 1.0)
