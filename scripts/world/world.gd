@@ -212,6 +212,9 @@ func _ready() -> void:
 		gs.spawn_at = ""
 	camera = Camera3D.new()
 	camera.fov = 34
+	# Máy quay phối cảnh đứng xa An 11–110 m: mặt cắt gần 0,1 m không bao giờ cắt cụt mái, tầng trên nhà gần máy.
+	camera.near = 0.1
+	camera.far = 1500.0
 	add_child(camera)
 	camera.position = player.position + cam_offset()
 	camera.look_at(player.position + Vector3(0, 1, 0), Vector3.UP)
@@ -681,23 +684,11 @@ shader_type spatial;
 render_mode cull_disabled;
 uniform vec3 wall : source_color;
 uniform vec3 top;
-// Phần cao hơn cap thành lưới thưa nhìn xuyên (như nhà của khu, xem AreaBuilder.BUILDING_SHADER).
-uniform float cap = 100.0;
 varying float up;
-varying float wy;
 void vertex() {
 	up = NORMAL.y;
-	wy = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y;
 }
 void fragment() {
-	if (wy > cap) {
-		int bi = int(mod(FRAGCOORD.x, 4.0)) + int(mod(FRAGCOORD.y, 4.0)) * 4;
-		float bayer = float(bi == 0 ? 0 : bi == 1 ? 8 : bi == 2 ? 2 : bi == 3 ? 10 : bi == 4 ? 12 : bi == 5 ? 4 : bi == 6 ? 14 : bi == 7 ? 6
-			: bi == 8 ? 3 : bi == 9 ? 11 : bi == 10 ? 1 : bi == 11 ? 9 : bi == 12 ? 15 : bi == 13 ? 7 : bi == 14 ? 13 : 5) / 16.0;
-		if (bayer < clamp((wy - cap) / 1.2, 0.0, 1.0) * 0.82) {
-			discard;
-		}
-	}
 	ALBEDO = up > 0.5 ? top : wall;
 	ROUGHNESS = 0.9;
 }
@@ -1866,12 +1857,13 @@ func _update_cutaway(delta := 0.0) -> void:
 		if overview and not _overview:
 			area.reset_cut()
 		_overview = overview
+		# Tia nhìn từ máy quay thật (kể cả khi đang kéo màn hình) tới chân An.
+		var cam := camera.global_position
 		if not overview:
-			area.lane_mode = _lane
-			area.update_cut(here, off.y / off.z, delta)
+			area.update_cut(cam, player.position, delta)
 		for o in occluders:
 			var top := float(o.h)
-			var want := top if overview else minf(AreaBuilder.cut_target(o.poly, here, off.y / off.z), top)
+			var want := top if overview else minf(AreaBuilder.ray_cap(o.poly, top, cam, player.position), top)
 			var cur := move_toward(float(o.cap), want, float(AreaBuilder.CUT.speed) * delta)
 			o["cap"] = cur
 			var low := cur < top - 0.05
@@ -1881,13 +1873,13 @@ func _update_cutaway(delta := 0.0) -> void:
 				node.scale = Vector3.ONE * clampf((cur - AreaBuilder.CUT.stub) / (top - AreaBuilder.CUT.stub), 0.0, 1.0)
 				node.visible = node.scale.x > 0.02
 				continue
-			# Nhà của địa điểm đứng chắn An: thay bằng khối cùng màu cao bằng nhà, phần che An thành lưới thưa nhìn xuyên.
+			# Nhà của địa điểm đứng chắn tia nhìn tới An: thay bằng khối cùng màu cắt ngang ở mức đang hạ (nền móng, tầng
+			# trệt còn nguyên như nhà búp bê), mọc lại từ từ khi hết che.
 			node.visible = not low
 			var stand: Node3D = o.stand
 			stand.visible = low
 			if low:
-				stand.scale.y = top
-				(o.stand_mat as ShaderMaterial).set_shader_parameter("cap", maxf(cur, 0.05))
+				stand.scale.y = maxf(cur, 0.05)
 		return
 	for o in occluders:
 		var r: Rect2 = o.rect

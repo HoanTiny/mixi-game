@@ -26,9 +26,7 @@ render_mode cull_disabled;
 // Hạ nhà che An: mỗi căn một độ cao tối đa đọc từ ảnh caps (AreaBuilder.update_cut tính bên GDScript, hạ và nâng
 // từ từ). Cả căn hạ một lượt, mái thành mặt cắt màu vữa sáng, không khoét lỗ giữa tường.
 uniform bool cut_on = false;
-// Nhìn xuyên (như Nobody): căn chắn An giữ nguyên hình, phần cao hơn mức caps thành lưới thưa nhìn xuyên được thay vì
-// hạ thấp căn nhà (hạ nhà để lại mặt cắt phẳng to, đi trong ngõ trông như nhà vỡ).
-uniform bool see_through = true;
+// Căn chắn An bị cắt tầng như nhà búp bê (không còn lưới chấm bi nhìn xuyên): giữ tầng trệt, mặt cắt như sàn nhà.
 uniform sampler2D caps : filter_nearest;
 uniform int caps_w = 128;
 // Màu mặt cắt của nhà bị hạ.
@@ -47,9 +45,8 @@ varying float v_var;
 varying float v_flame;
 varying float v_idx;
 varying float v_ly;
-// Mức caps của căn (CUT_NONE: để nguyên), độ cao thật của điểm (nhìn xuyên phần cao hơn mức caps).
+// Mức caps của căn (CUT_NONE: để nguyên).
 varying float v_cap;
-varying float v_wy;
 // Khoảng cách máy quay tới An (world.gd đặt mỗi khung hình; 0 là tắt): nhà gần máy quay hơn An mấy mét thì sẫm dần.
 global uniform float focus_depth;
 // 0 ban ngày, 1 ban đêm (world.gd đặt theo giờ): cửa sổ, cửa tiệm sáng đèn.
@@ -58,7 +55,6 @@ global uniform float night;
 void vertex() {
 	v_cut = 0.0;
 	v_cap = 10000.0;
-	v_wy = VERTEX.y;
 	v_ly = VERTEX.y;
 	v_up = NORMAL.y;
 	v_var = flat_color ? INSTANCE_CUSTOM.g : 0.5;
@@ -75,11 +71,10 @@ void vertex() {
 		int i = int(CUSTOM0.x + 0.5);
 		float cap = texelFetch(caps, ivec2(i % caps_w, i / caps_w), 0).r;
 		v_cap = cap;
-		if (see_through) {
-			// Giữ nguyên hình, fragment() làm thưa phần cao hơn cap.
-		} else if (CUSTOM0.y > 1.5) {
-			// Đồ gắn kèm (bồn nước, mái hiên, biển hiệu, cổng hẻm; UV2.y là đỉnh của món đồ): hạ thấp hơn đỉnh là ẩn.
-			if (cap < UV2.y + 0.2) {
+		if (CUSTOM0.y > 1.5) {
+			// Đồ gắn kèm (bồn nước, ban công, biển hiệu, cổng hẻm; UV2.y là đỉnh của món đồ): món nào nằm trên mức cắt
+			// thì ẩn cùng tầng trên; mái hiên, biển hiệu tầng trệt thấp hơn mức cắt nên vẫn còn.
+			if (cap < UV2.y - 0.1) {
 				VERTEX = vec3(0.0, -10.0, 0.0);
 			}
 		} else if (VERTEX.y > cap) {
@@ -101,7 +96,10 @@ void fragment() {
 	}
 	if (v_cut > 0.999 && v_up > 0.4) {
 		// Mặt cắt của nhà bị hạ: sáng hơn mặt đường hẳn, nhìn ra ngay đâu là nhà, đâu là lối đi.
-		col = mix(cut_color, col, 0.2);
+		// Sàn lát gạch ô 0,6 m, mép tường viền sẫm, để mặt cắt đọc ra là sàn nhà chứ không phải mảng phẳng.
+		vec2 tile = fract(UV / 0.6);
+		float grout = step(tile.x, 0.05) + step(tile.y, 0.05);
+		col = mix(cut_color, col, 0.15) * (1.0 - 0.18 * min(grout, 1.0));
 	} else if (!flat_color && UV2.x > 0.5) {
 		// Tường: vạch sàn mỗi tầng, ô cửa sổ nhỏ có khung (xanh ngọc, trắng, nâu hay xanh dương tùy căn), kính tối;
 		// tầng trệt cửa cuốn rộng hơn; chân tường sẫm dần.
@@ -145,17 +143,6 @@ void fragment() {
 		float fv = fract(UV.y / 0.32);
 		float vis = 1.0 - smoothstep(0.2, 0.5, fwidth(UV.y) / 0.32);
 		col *= mix(1.0, 0.82 + 0.18 * smoothstep(0.0, 0.75, fv), vis);
-	}
-	if (see_through && v_cap < 9000.0 && v_wy > v_cap) {
-		// Lưới thưa theo ma trận Bayer 4x4: càng cao hơn mức cap càng thưa (tối đa bỏ 4/5 điểm ảnh).
-		int bx = int(mod(FRAGCOORD.x, 4.0));
-		int by = int(mod(FRAGCOORD.y, 4.0));
-		int bi = bx + by * 4;
-		float bayer = float(bi == 0 ? 0 : bi == 1 ? 8 : bi == 2 ? 2 : bi == 3 ? 10 : bi == 4 ? 12 : bi == 5 ? 4 : bi == 6 ? 14 : bi == 7 ? 6
-			: bi == 8 ? 3 : bi == 9 ? 11 : bi == 10 ? 1 : bi == 11 ? 9 : bi == 12 ? 15 : bi == 13 ? 7 : bi == 14 ? 13 : 5) / 16.0;
-		if (bayer < clamp((v_wy - v_cap) / 1.2, 0.0, 1.0) * 0.82) {
-			discard;
-		}
 	}
 	float near = focus_depth > 0.0 ? 1.0 - smoothstep(focus_depth - 11.0, focus_depth - 4.0, -VERTEX.z) : 0.0;
 	float dim = near * 0.6;
@@ -291,9 +278,9 @@ const BRIDGE_Y := 0.5
 ## khoảng trước mặt An luôn thấy mặt đường; stub: chân tường còn lại; speed: mét mỗi giây khi hạ, nâng; reach: xa nhất
 ## về phía nam còn phải xét; behind, lip: căn trong dải hẹp trải ra sau lưng An quá behind mét mà chỉ lấn ra trước An
 ## dưới lip mét (An đứng sát chân tường) thì không hạ.
-const CUT := {"behind": 1.0, "lip": 1.0, "near_w": 0.45, "wide_w": 6.0, "wide_add": 2.0, "beside": 0.5, "focus_r": 2.5, "stub": 0.5, "speed": 30.0, "reach": 45.0}
-## Màu mặt cắt của nhà bị hạ (vữa sáng).
-const CUT_COLOR := Color(0.4, 0.38, 0.34)
+const CUT := {"behind": 1.0, "lip": 1.0, "near_w": 0.45, "wide_w": 6.0, "wide_add": 2.0, "beside": 0.5, "focus_r": 2.5, "stub": 0.5, "speed": 14.0, "reach": 45.0}
+## Màu mặt cắt của nhà bị cắt tầng (sàn gạch nâu sẫm, như nhìn vào nhà búp bê), tuyến tính.
+const CUT_COLOR := Color(0.2, 0.15, 0.11)
 ## Giá trị trong ảnh caps nghĩa là căn để nguyên.
 const CUT_NONE := 10000.0
 const CUT_CELL := 10.0
@@ -539,6 +526,9 @@ func _parks() -> void:
 				col = Color("9fb08c")
 			"forest", "wood", "nature_reserve":
 				col = Color("5e9a45")
+			"sand", "beach":
+				# Bãi bồi cát vàng ven sông.
+				col = Color("d8c48e")
 		col.a = GROUND_PLAIN if str(p.kind) != "playground" else GROUND_CONCRETE
 		_fill(_st("ground"), p.poly, 0.02, col)
 		# Cây trong công viên: rải theo lưới thưa.
@@ -1150,19 +1140,22 @@ static func _strip_z(poly: PackedVector2Array, x0: float, x1: float) -> Vector2:
 	return Vector2(lo, hi)
 
 
-## Mỗi khung hình ở màn phố: căn nào che An (cut_target) thì hạ dần xuống, hết che thì nâng dần lên lại; tán cây chắn
-## trước An thu nhỏ dần. p: chỗ An đứng (x, z).
-## An đang trong ngõ hẹp (world.gd đặt): tầng trên các căn trong vòng LANE_R mét quanh An cũng nhìn xuyên, chỉ giữ
-## tầng trệt (LANE_CAP mét), như bỏ mái khi đi sâu vào ngõ.
+## Mỗi khung hình ở màn phố (kiểu Nobody): chỉ căn nào nằm chắn giữa máy quay và An mới bị cắt tầng, nhà sau lưng An
+## (An đứng trên vỉa hè trước mặt tiền) để nguyên. Thử bằng tia từ máy quay tới đầu, ngực, gối An (ray_cap): căn bị tia
+## xuyên qua thân thì cắt dần xuống tầng trệt (GROUND_H), nếu vẫn che thì thấp hơn nhưng không dưới BASE_H; An đứng
+## lọt trong lô nhà thì cắt còn BASE_H. Hết che thì mọc lại từ từ; tán cây chắn tia thì thu nhỏ dần.
+## lane_mode (world.gd đặt khi An trong ngõ hẹp) chỉ còn để tương thích, không cắt thêm căn nào.
 var lane_mode := false
-const LANE_R := 7.0
-const LANE_CAP := 3.4
+const BASE_H := 1.0
+const GROUND_H := 3.4
+## Độ cao trên chân An của các điểm tia nhắm tới: đầu, ngực, gối.
+const RAY_TARGETS := [1.7, 1.2, 0.5]
 
 
-func update_cut(p: Vector2, slope: float, delta: float) -> void:
+func update_cut(cam: Vector3, pos: Vector3, delta: float) -> void:
 	if _cut_img == null:
 		return
-	var cells := _cells_near(p)
+	var cells := _cells_on_ray(cam, pos)
 	var want := {}
 	var seen := {}
 	for k in cells:
@@ -1170,9 +1163,7 @@ func update_cut(p: Vector2, slope: float, delta: float) -> void:
 			if seen.has(i):
 				continue
 			seen[i] = true
-			var t := cut_target(_cut_polys[i], p, slope)
-			if lane_mode and Geo.bounds(_cut_polys[i]).grow(LANE_R).has_point(p):
-				t = minf(t, LANE_CAP)
+			var t := ray_cap(_cut_polys[i], _cut_tops[i], cam, pos)
 			if t < _cut_tops[i]:
 				want[i] = t
 				if not _cut_now.has(i):
@@ -1196,11 +1187,37 @@ func update_cut(p: Vector2, slope: float, delta: float) -> void:
 			(lb[0] as Label3D).visible = cur >= float(lb[1])
 	if changed:
 		_cut_tex.update(_cut_img)
-	_update_crowns(cells, p, slope, delta)
+	_update_crowns(cells, cam, pos, delta)
 
 
-## Tán cây: coi như một khối vuông bằng tán; che An (theo cut_target) thì thu nhỏ hẳn, hết che thì to lại.
-func _update_crowns(cells: Array, p: Vector2, slope: float, delta: float) -> void:
+## Mức cắt cho một khối đáy poly cao top: INF nếu không chắn tia nào từ máy quay cam tới An (pos là chân An).
+## Tia nào đi xuyên qua đáy khối ở độ cao thấp hơn đỉnh khối là bị che; mức cắt lấy theo chỗ tia thấp nhất trong khối
+## (gần An nhất), kẹp giữa BASE_H và GROUND_H.
+static func ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3) -> float:
+	var p2 := Vector2(pos.x, pos.z)
+	if Geometry2D.is_point_in_polygon(p2, poly):
+		return BASE_H
+	var a := Vector2(cam.x, cam.z)
+	var bb := Geo.bounds(poly)
+	var seg := Rect2(a, Vector2.ZERO).expand(p2)
+	if not seg.grow(0.5).intersects(bb):
+		return INF
+	var len := a.distance_to(p2)
+	if len < 0.01:
+		return INF
+	var low := INF
+	for part in Geometry2D.intersect_polyline_with_polygon(PackedVector2Array([a, p2]), poly):
+		for q in part:
+			var t := clampf(a.distance_to(q) / len, 0.0, 1.0)
+			for h in RAY_TARGETS:
+				low = minf(low, lerpf(cam.y, pos.y + float(h), t))
+	if low >= top:
+		return INF
+	return clampf(low - 0.3, BASE_H, GROUND_H)
+
+
+## Tán cây: coi như khối vuông bằng tán, cao chừng 2,5 lần bán kính; chắn tia tới An thì thu nhỏ hẳn, hết chắn thì to lại.
+func _update_crowns(cells: Array, cam: Vector3, pos: Vector3, delta: float) -> void:
 	if _crown_mms.is_empty():
 		return
 	var want := {}
@@ -1211,8 +1228,7 @@ func _update_crowns(cells: Array, p: Vector2, slope: float, delta: float) -> voi
 			var o: Vector2 = _trees[i]
 			var r: float = _tree_r[i]
 			var sq := PackedVector2Array([o + Vector2(-r, -r), o + Vector2(r, -r), o + Vector2(r, r), o + Vector2(-r, r)])
-			# Ngọn tán cao chừng 2,5 lần bán kính: phải hạ thấp hơn thế là tán chắn tầm nhìn.
-			if cut_target(sq, p, slope) < r * 2.5:
+			if ray_cap(sq, r * 2.5, cam, pos) < INF:
 				want[i] = true
 				if not _crown_now.has(i):
 					_crown_now[i] = 1.0
@@ -1225,11 +1241,12 @@ func _update_crowns(cells: Array, p: Vector2, slope: float, delta: float) -> voi
 		_tree_size(i, cur)
 
 
-## Các ô lưới có thể có căn che An: hai bên An một dải rộng, từ ngang An về phía nam tới reach mét.
-func _cells_near(p: Vector2) -> Array:
+## Các ô lưới tia từ máy quay tới An đi qua (cộng một ô quanh An để bắt căn An đang đứng trong).
+func _cells_on_ray(cam: Vector3, pos: Vector3) -> Array:
+	var r := Rect2(Vector2(cam.x, cam.z), Vector2.ZERO).expand(Vector2(pos.x, pos.z)).grow(2.0)
 	var out := []
-	for gx in range(floori((p.x - CUT.wide_w - 1.0) / CUT_CELL), floori((p.x + CUT.wide_w + 1.0) / CUT_CELL) + 1):
-		for gz in range(floori((p.y - 1.0) / CUT_CELL), floori((p.y + CUT.reach) / CUT_CELL) + 1):
+	for gx in range(floori(r.position.x / CUT_CELL), floori(r.end.x / CUT_CELL) + 1):
+		for gz in range(floori(r.position.y / CUT_CELL), floori(r.end.y / CUT_CELL) + 1):
 			out.append(Vector2i(gx, gz))
 	return out
 

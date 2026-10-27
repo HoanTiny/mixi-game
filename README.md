@@ -7,6 +7,14 @@
 
 **Map phố cổ tám khu** (`"map": "hn_pho_co"`, sinh bằng `python3 tools/gen_phocu_map.py` ra `data/maps/hn_pho_co.json` và `hn_pho_co_story.json`), tên phố thật, bố cục giản lược từ bắc xuống nam: (1) cầu Long Biên, đoạn cầu sắt bắc qua sông Hồng, chợ đầu mối Long Biên; (2) bãi Phúc Tân ngoài đê Trần Nhật Duật, ngõ 25–131 Phúc Tân, bãi đồng nát; (3) dãy vòm cầu đường sắt Phùng Hưng – Gầm Cầu (sửa xe, hàn tiện); (4) chợ Đồng Xuân ba đầu hồi, phố Hàng Chiếu, ngõ chợ, kho shipper; (5) mê cung ngõ Hàng Buồm, Hàng Bạc, Mã Mây, Đinh Liệt, ngõ Gạch (gác xép, quán net, cầm đồ); (6) phố Tạ Hiện, Lương Ngọc Quyến (quán bia đêm); (7) quảng trường Đông Kinh Nghĩa Thục, hồ Hoàn Kiếm có Tháp Rùa, đền Ngọc Sơn, cầu Thê Húc; (8) phố Tràng Tiền, Tràng Tiền Plaza, phố Pháp quanh Lý Thái Tổ. Công trình nhận diện dựng riêng trong `scripts/world/landmarks.gd` (dàn thép cầu nóc cong từng nhịp, mặt cầu cạn có hai đường ray, ô vòm, đầu hồi chợ, Tháp Rùa, lan can đỏ cầu Thê Húc, chữ lớn tên khu hiện khi tới gần hay thu nhỏ). Map cũ vẫn chọn được: `hn_an_hoa`, `q8_tau_hu`, `an_hoa`.
 
+**Bản 1.1:**
+- **Bản đồ M** vẽ lại kiểu bản đồ minh họa (`scripts/world/street_map.gd`): mái phố cổ nâu đất, cam gạch có nóc mái; chợ Đồng Xuân, chợ Long Biên cam có ô sạp; phố đêm Tạ Hiện tím hồng; vành cây quanh hồ Gươm có đường dạo, Tháp Rùa, đền Ngọc Sơn, cầu Thê Húc đỏ; sông Hồng bờ uốn lượn có bãi bồi cát; cầu Long Biên khung sắt gỉ có đường ray; cầu cạn đường sắt trên dãy vòm.
+  - Tên phố chữ hoa nhỏ, trắng mờ, xoay theo chiều đường, nằm trong lòng đường; ngõ chỉ hiện khi phóng gần. Tên khu lớn chữ kem.
+  - Địa điểm là biểu tượng tròn theo loại (chỗ ở, ăn uống, việc làm, giải trí, bến xe), tên nằm trên dải băng nền tối dưới biểu tượng khi phóng gần hay rê chuột; dải nào đè dải khác thì bỏ. Bảng chú thích ở góc dưới.
+  - Lăn chuột (hay nút +/−) để phóng 1–5 lần quanh con trỏ, kéo để dời.
+- **Ẩn nhà kiểu Nobody** (`AreaBuilder.update_cut`, `ray_cap`): bỏ hẳn lưới chấm bi. Chỉ căn nào bị tia từ máy quay tới đầu, ngực, gối của An xuyên qua mới bị cắt tầng như nhà búp bê: tầng trên, ban công, mái ẩn dần, còn tầng trệt (3,4 m) với mái hiên, biển hiệu; vẫn chắn thì thấp hơn nhưng không dưới 1 m; An đứng lọt trong lô thì còn 1 m. Nhà sau lưng An (An đi trên vỉa hè trước mặt tiền) không bao giờ bị cắt. Mặt cắt là sàn nâu sẫm. Máy quay đặt `near = 0.1`.
+- Sông Hồng bờ uốn lượn, bãi bồi cát vàng ở bờ Phúc Tân; đáy hồ là phố Hàng Khay nối sang Tràng Tiền.
+
 Phần dưới đây là ghi chép từ các bản trước, còn dùng tên cũ miền Nam (bà Tư, chú Sáu, Bờ Me, Cầu Nhỏ…); bảng đổi tên ở [docs/HA_NOI.md](docs/HA_NOI.md).
 
 ## Ghi chép các bản trước

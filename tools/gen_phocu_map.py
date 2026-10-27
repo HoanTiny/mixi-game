@@ -60,12 +60,20 @@ LANDMARKS = []
 def build():
     X0, X1, Z0, Z1 = g.X0, g.X1, g.Z0, g.Z1
     # --- Sông Hồng dọc mép đông, bãi sông cỏ, bên kia là Ngọc Thụy.
-    river = rect(190, Z0, 238, Z1)
+    # Bờ sông uốn lượn tự nhiên; bờ Phúc Tân có dải bãi bồi cát vàng, rộng hẹp theo khúc sông.
+    def west(z):
+        return 192 + 3.2 * math.sin(z / 46.0) + 1.6 * math.sin(z / 17.0 + 0.7)
+
+    def east(z):
+        return 236 + 2.4 * math.sin(z / 52.0 + 1.3) + 1.2 * math.sin(z / 21.0)
+    zs = [Z0 + (Z1 - Z0) * i / 60.0 for i in range(61)]
+    river = [(round(west(z), 2), round(z, 2)) for z in zs] + [(round(east(z), 2), round(z, 2)) for z in reversed(zs)]
     g.water.append(river)
-    g.waterways.append({"k": "river", "l": [214, Z0, 214, Z1], "n": "Sông Hồng", "w": 48.0})
-    bai = rect(184, Z0, 190, Z1)
-    g.parks.append({"k": "grass", "n": "Bãi sông Hồng", "p": bai})
-    g.reserved.append(bai)
+    g.waterways.append({"k": "river", "l": [214, Z0, 214, Z1], "n": "Sông Hồng", "w": 44.0})
+    bai = [(185.0, z) for z in (Z0, Z1)] + [(round(west(z), 2), round(z, 2)) for z in reversed(zs)]
+    bai = [bai[0]] + bai[2:] + [bai[1]]
+    g.parks.append({"k": "sand", "n": "Bãi bồi sông Hồng", "p": bai})
+    g.reserved.append(rect(184, Z0, 190, Z1))
     z = Z0 + 8
     while z < Z1 - 6:
         if abs(z + 200) > 10:
@@ -109,7 +117,9 @@ def build():
     dinh_liet = g.road("Phố Đinh Liệt", [(-60, -20), (-60, 40)], 5.0, "residential", sw=1.5)
     le_thai_to = g.road("Phố Lê Thái Tổ", [(-125, 40), (-125, Z1)], 7.0, "tertiary", sw=3.0)
     dinh_tien_hoang = g.road("Phố Đinh Tiên Hoàng", [(5, 40), (5, 255)], 7.0, "tertiary", sw=3.0)
-    trang_tien = g.road("Phố Tràng Tiền", [(-225, 255), (115, 255)], 8.0, "secondary", sw=3.0)
+    # Đáy hồ: phố Hàng Khay chạy dưới hồ, sang tới Đinh Tiên Hoàng thì thành phố Tràng Tiền.
+    hang_khay = g.road("Phố Hàng Khay", [(-225, 255), (5, 255)], 8.0, "secondary", sw=3.0)
+    trang_tien = g.road("Phố Tràng Tiền", [(5, 255), (115, 255)], 8.0, "secondary", sw=3.0)
     ly_thai_to = g.road("Phố Lý Thái Tổ", [(60, 40), (60, Z1)], 7.0, "tertiary", sw=3.5)
     vong_xuyen = g.ellipse(-60, 64, 13, 13, n=24)
     vong_xuyen.append(vong_xuyen[0])
@@ -198,7 +208,7 @@ def build():
 
     # --- Dãy nhà ống theo thứ tự ưu tiên.
     for r, zone, dmax in ((hang_chieu, "pho", 20), (hang_buom, "pho_co", 20), (hang_bac, "pho_co", 20),
-                          (cau_go, "pho", 18), (gam_cau, "pho", 14), (hang_dau, "pho", 14), (trang_tien, "pho", 18)):
+                          (cau_go, "pho", 18), (gam_cau, "pho", 14), (hang_dau, "pho", 14), (trang_tien, "pho", 18), (hang_khay, "pho", 18)):
         g.row(r, +1, zone, dmax=dmax)
         g.row(r, -1, zone, dmax=dmax)
     g.row(de, -1, "pho", dmax=18)
@@ -223,7 +233,7 @@ def build():
     g.row(long_bien, +1, "phuc_tan", dmax=10, dmin=4.0)
 
     # --- Cây sấu, cây bàng dọc vỉa hè phố lớn.
-    for r in (hang_chieu, cau_go, trang_tien, de, ly_thai_to, le_thai_to, dinh_tien_hoang):
+    for r in (hang_chieu, cau_go, trang_tien, hang_khay, de, ly_thai_to, le_thai_to, dinh_tien_hoang):
         pts = r["_pts"]
         a, b = pts[0], pts[-1]
         horiz = abs(b[0] - a[0]) > abs(b[1] - a[1])
