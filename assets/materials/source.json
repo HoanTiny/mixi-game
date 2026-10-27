@@ -1,0 +1,7 @@
+{
+  "aged-plaster.png": {
+    "source": "Generated with built-in image_gen for this project on 2026-10-27",
+    "usage": "Triplanar albedo on the modular neighborhood facades",
+    "prompt": "Create a seamless tileable photographic PBR base-color texture for a realistic Vietnamese working-class neighborhood game: old warm gray beige lime plaster concrete wall, subtle pale ochre remnants of paint, irregular peeling paint exposing gray cement, fine hairline cracks, subdued water stains and tiny pores. Flat orthographic straight-on evenly illuminated diffuse surface filling the entire square image, no directional shadows, no vignette, no perspective, no objects, no doors, no windows, no lettering, no border. Moderate wear, not ruined, subtle low contrast natural gray/khaki hues. Approximately 3 meters square of wall. Actual game-ready albedo texture, photorealistic surface detail, 1024 square."
+  }
+}

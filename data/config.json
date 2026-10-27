@@ -3,9 +3,9 @@
   "dayEnd": 22,
   "lateHour": 20,
   "lateFatigue": 5,
-  "livingCostPerDay": 120000,
+  "livingCostPerDay": 60000,
   "walkHoursPerMeter": 0.004,
-  "workSecondsPerHour": 0.35,
+  "workSecondsPerHour": 0.7,
   "fatigue": {
     "warn": 70,
     "max": 100,
@@ -17,9 +17,21 @@
   "sliceStartDay": 18,
   "sliceEndDay": 22,
   "housing": {
-    "hem_dua": { "name": "Phòng Hẻm Dừa", "cost": 5000000, "note": "Gần chợ và gần việc. Phòng nhỏ, ít chỗ phơi." },
-    "cau_tre": { "name": "Phòng Cầu Tre", "cost": 4200000, "note": "Xa hơn nhưng thoáng, có hiên. Tốn thêm tiền xăng." },
-    "di_nam": { "name": "Ở tạm nhà dì Năm (7 ngày)", "cost": 500000, "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được." }
+    "hem_dua": {
+      "name": "Phòng Hẻm Dừa",
+      "cost": 5000000,
+      "note": "Gần chợ và gần việc. Phòng nhỏ, ít chỗ phơi."
+    },
+    "cau_tre": {
+      "name": "Phòng Cầu Tre",
+      "cost": 4200000,
+      "note": "Xa hơn nhưng thoáng, có hiên. Tốn thêm tiền xăng."
+    },
+    "di_nam": {
+      "name": "Ở tạm nhà dì Năm (7 ngày)",
+      "cost": 500000,
+      "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được."
+    }
   },
   "presets": {
     "A": {
@@ -30,13 +42,33 @@
       "progress": 0,
       "progressNeed": 0,
       "linhWish": "xa",
-      "rep": { "LINH": 55, "BA_TU": 60, "HANH": 55, "SAU": 50, "MINH": 50, "DUYEN": 45, "TRAM": 30, "PHUC": 30 },
+      "rep": {
+        "LINH": 55,
+        "BA_TU": 60,
+        "HANH": 55,
+        "SAU": 50,
+        "MINH": 50,
+        "DUYEN": 45,
+        "TRAM": 30,
+        "PHUC": 30
+      },
       "receivables": [
-        { "id": "luong_cu_2", "from": "Tiệm cũ", "label": "Lương cũ đợt 2", "amount": 1800000, "due": 24 }
+        {
+          "id": "luong_cu_2",
+          "from": "Tiệm cũ",
+          "label": "Lương cũ đợt 2",
+          "amount": 1800000,
+          "due": 24
+        }
       ],
       "payables": [],
       "promises": [
-        { "id": "tra_hop_com", "text": "Trả các hộp cơm dùng chung cho chị Hạnh", "to": "HANH", "due": 23 }
+        {
+          "id": "tra_hop_com",
+          "text": "Trả các hộp cơm dùng chung cho chị Hạnh",
+          "to": "HANH",
+          "due": 23
+        }
       ]
     },
     "B": {
@@ -47,19 +79,70 @@
       "progress": 2,
       "progressNeed": 3,
       "linhWish": "xa",
-      "rep": { "LINH": 50, "BA_TU": 55, "HANH": 55, "SAU": 55, "MINH": 55, "DUYEN": 45, "TRAM": 55, "PHUC": 50 },
+      "rep": {
+        "LINH": 50,
+        "BA_TU": 55,
+        "HANH": 55,
+        "SAU": 55,
+        "MINH": 55,
+        "DUYEN": 45,
+        "TRAM": 55,
+        "PHUC": 50
+      },
       "receivables": [
-        { "id": "luong_cu_2", "from": "Tiệm cũ", "label": "Lương cũ đợt 2", "amount": 1800000, "due": 24 },
-        { "id": "hd_giua", "from": "Bến Cạn", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
-        { "id": "hd_cuoi", "from": "Bến Cạn", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
+        {
+          "id": "luong_cu_2",
+          "from": "Tiệm cũ",
+          "label": "Lương cũ đợt 2",
+          "amount": 1800000,
+          "due": 24
+        },
+        {
+          "id": "hd_giua",
+          "from": "Bến Cạn",
+          "label": "Hợp đồng đợt giữa (sau nghiệm thu)",
+          "amount": 2520000,
+          "due": 20,
+          "needsProgress": true
+        },
+        {
+          "id": "hd_cuoi",
+          "from": "Bến Cạn",
+          "label": "Hợp đồng đợt cuối",
+          "amount": 2520000,
+          "due": 32
+        }
       ],
       "payables": [
-        { "id": "vat_tu_2", "to": "", "label": "Vật tư đợt 2 ở sạp Cầu Nhỏ", "amount": 600000, "due": 19 },
-        { "id": "cong_doi", "to": "TRAM", "label": "Công Trâm và Minh đợt 1", "amount": 1200000, "due": 20 }
+        {
+          "id": "vat_tu_2",
+          "to": "",
+          "label": "Vật tư đợt 2 ở sạp Cầu Nhỏ",
+          "amount": 600000,
+          "due": 19
+        },
+        {
+          "id": "cong_doi",
+          "to": "TRAM",
+          "label": "Công Trâm và Minh đợt 1",
+          "amount": 1200000,
+          "due": 20
+        }
       ],
       "promises": [
-        { "id": "tra_hop_com", "text": "Trả các hộp cơm dùng chung cho chị Hạnh", "to": "HANH", "due": 23 },
-        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
+        {
+          "id": "tra_hop_com",
+          "text": "Trả các hộp cơm dùng chung cho chị Hạnh",
+          "to": "HANH",
+          "due": 23
+        },
+        {
+          "id": "ban_giao_giua",
+          "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn",
+          "to": "PHUC",
+          "due": 20,
+          "doneIf": "progress_ready"
+        }
       ]
     },
     "C": {
@@ -70,60 +153,427 @@
       "progress": 2,
       "progressNeed": 4,
       "linhWish": "xa",
-      "rep": { "LINH": 50, "BA_TU": 55, "HANH": 50, "SAU": 50, "MINH": 45, "DUYEN": 45, "TRAM": 50, "PHUC": 55 },
+      "rep": {
+        "LINH": 50,
+        "BA_TU": 55,
+        "HANH": 50,
+        "SAU": 50,
+        "MINH": 45,
+        "DUYEN": 45,
+        "TRAM": 50,
+        "PHUC": 55
+      },
       "receivables": [
-        { "id": "luong_cu_2", "from": "Tiệm cũ", "label": "Lương cũ đợt 2", "amount": 1800000, "due": 24 },
-        { "id": "hd_giua", "from": "Bến Cạn", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
-        { "id": "hd_cuoi", "from": "Bến Cạn", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
+        {
+          "id": "luong_cu_2",
+          "from": "Tiệm cũ",
+          "label": "Lương cũ đợt 2",
+          "amount": 1800000,
+          "due": 24
+        },
+        {
+          "id": "hd_giua",
+          "from": "Bến Cạn",
+          "label": "Hợp đồng đợt giữa (sau nghiệm thu)",
+          "amount": 2520000,
+          "due": 20,
+          "needsProgress": true
+        },
+        {
+          "id": "hd_cuoi",
+          "from": "Bến Cạn",
+          "label": "Hợp đồng đợt cuối",
+          "amount": 2520000,
+          "due": 32
+        }
       ],
       "payables": [
-        { "id": "vat_tu_2", "to": "", "label": "Vật tư An ứng đợt 2", "amount": 1100000, "due": 19 },
-        { "id": "cong_doi", "to": "TRAM", "label": "Thuê Trâm phần chuyên môn", "amount": 900000, "due": 20 }
+        {
+          "id": "vat_tu_2",
+          "to": "",
+          "label": "Vật tư An ứng đợt 2",
+          "amount": 1100000,
+          "due": 19
+        },
+        {
+          "id": "cong_doi",
+          "to": "TRAM",
+          "label": "Thuê Trâm phần chuyên môn",
+          "amount": 900000,
+          "due": 20
+        }
       ],
       "promises": [
-        { "id": "tra_hop_com", "text": "Trả các hộp cơm dùng chung cho chị Hạnh", "to": "HANH", "due": 23 },
-        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
+        {
+          "id": "tra_hop_com",
+          "text": "Trả các hộp cơm dùng chung cho chị Hạnh",
+          "to": "HANH",
+          "due": 23
+        },
+        {
+          "id": "ban_giao_giua",
+          "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn",
+          "to": "PHUC",
+          "due": 20,
+          "doneIf": "progress_ready"
+        }
       ]
     }
   },
   "actions": [
-    { "id": "ca_kho", "group": "work", "location": "ben_xe_6", "name": "Ca kho khu công nghiệp", "hours": 8, "pay": 320000, "window": [6, 18],
-      "effects": { "fatigue": 25 } },
-    { "id": "ca_phu_quan", "group": "work", "location": "com_hanh", "name": "Ca phụ quán Cơm Hạnh", "hours": 4, "pay": 160000,
-      "effects": { "fatigue": 12, "rep.HANH": 3 } },
-    { "id": "giao_com", "group": "work", "location": "com_hanh", "name": "Giao cơm trưa", "hours": 3, "pay": 150000, "window": [10, 14],
-      "effects": { "fatigue": 10, "rep.HANH": 2 } },
-    { "id": "sua_do_le", "group": "work", "location": "tiem_sau", "name": "Sửa đồ lẻ ở bàn chú Sáu", "hours": 3, "pay": 180000,
-      "effects": { "fatigue": 10, "rep.SAU": 2 } },
-    { "id": "ben_can_b", "group": "work", "location": "ben_can", "name": "Làm cùng tổ ở Bến Cạn", "hours": 6, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay",
-      "require": { "route": "B" }, "effects": { "fatigue": 15, "progress": 1, "rep.TRAM": 2 } },
-    { "id": "ben_can_c", "group": "work", "location": "ben_can", "name": "Điều phối và làm ở Bến Cạn", "hours": 8, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay",
-      "require": { "route": "C" }, "effects": { "fatigue": 22, "progress": 1, "rep.PHUC": 2 } },
-
-    { "id": "nghi", "group": "life", "location": "xom_bo_me", "name": "Nghỉ ở phòng", "hours": 2, "perDay": 2, "rest": true,
-      "effects": { "fatigue": -15 } },
-    { "id": "com_voi_ba", "group": "life", "location": "xom_bo_me", "name": "Ăn cơm với bà, không mở sổ", "hours": 1, "rest": true,
-      "effects": { "fatigue": -5, "rep.BA_TU": 3 } },
-    { "id": "phu_xom_don_do", "group": "life", "location": "xom_bo_me", "name": "Phụ xóm phân loại đồ", "hours": 2,
-      "effects": { "fatigue": 6, "rep.DUYEN": 3, "flag.phuXom": true } },
-    { "id": "tra_da", "group": "life", "location": "cho_cau_nho", "name": "Ngồi trà đá với hàng xóm", "hours": 1, "cost": 10000, "rest": true,
-      "effects": { "fatigue": -5 } },
-    { "id": "xem_bang_tin", "group": "life", "location": "cho_cau_nho", "name": "Xem bảng tin cho thuê phòng", "hours": 1,
-      "effects": { "flag.xemBangTin": true }, "maxTimes": 1 },
-
-    { "id": "tap_bao_gia", "group": "optional", "location": "ben_can", "name": "Tập câu báo giá với Trâm", "hours": 1, "days": [18, 18],
-      "require": { "route": ["B", "C"] }, "maxTimes": 1, "effects": { "rep.TRAM": 4, "flag.tapBaoGia": true } },
-    { "id": "tap_bao_gia_a", "group": "optional", "location": "tiem_sau", "name": "Tập câu báo giá với chú Sáu", "hours": 1, "days": [18, 18],
-      "require": { "route": "A" }, "maxTimes": 1, "effects": { "rep.SAU": 4, "flag.tapBaoGia": true } },
-    { "id": "may_chan_doan", "group": "optional", "location": "xom_bo_me", "name": "Xem máy chẩn đoán mô phỏng với Linh", "hours": 1, "days": [19, 19],
-      "maxTimes": 1, "effects": { "fatigue": -3, "respect": 1, "rep.LINH": 3 } },
-    { "id": "doi_chieu", "group": "optional", "location": "tiem_sau", "name": "Đối chiếu phần đã chia với chú Sáu và Trâm", "hours": 1, "days": [20, 20],
-      "require": { "route": ["B", "C"] }, "maxTimes": 1, "effects": { "rep.SAU": 3, "rep.TRAM": 3, "flag.doiChieu": true } },
-    { "id": "chau_hung", "group": "optional", "location": "xom_bo_me", "name": "Nghe bà kể chuyện chậu húng", "hours": 1, "days": [21, 21],
-      "maxTimes": 1, "rest": true, "effects": { "fatigue": -5, "rep.BA_TU": 5, "flag.nghe_chuyen_hung": true } },
-    { "id": "goi_me_linh", "group": "optional", "location": "xom_bo_me", "name": "Nghe cuộc gọi của mẹ Linh", "hours": 1, "days": [22, 22],
-      "maxTimes": 1, "effects": { "respect": 1, "rep.LINH": 2 } },
-    { "id": "tra_hop_com", "group": "optional", "location": "com_hanh", "name": "Trả các hộp cơm dùng chung", "hours": 1,
-      "maxTimes": 1, "effects": { "rep.HANH": 4, "promise_status": { "id": "tra_hop_com", "status": "done" } } }
-  ]
+    {
+      "id": "ca_kho",
+      "group": "work",
+      "location": "ben_xe_6",
+      "name": "Ca kho khu công nghiệp",
+      "hours": 8,
+      "pay": 320000,
+      "window": [
+        6,
+        18
+      ],
+      "effects": {
+        "fatigue": 25
+      }
+    },
+    {
+      "id": "ca_phu_quan",
+      "group": "work",
+      "location": "com_hanh",
+      "name": "Ca phụ quán Cơm Hạnh",
+      "hours": 4,
+      "pay": 160000,
+      "effects": {
+        "fatigue": 12,
+        "rep.HANH": 3
+      }
+    },
+    {
+      "id": "giao_com",
+      "group": "work",
+      "location": "com_hanh",
+      "name": "Giao cơm trưa",
+      "hours": 3,
+      "pay": 150000,
+      "window": [
+        10,
+        14
+      ],
+      "effects": {
+        "fatigue": 10,
+        "rep.HANH": 2
+      }
+    },
+    {
+      "id": "sua_do_le",
+      "group": "work",
+      "location": "tiem_sau",
+      "name": "Sửa đồ lẻ ở bàn chú Sáu",
+      "hours": 3,
+      "pay": 180000,
+      "effects": {
+        "fatigue": 10,
+        "rep.SAU": 2
+      }
+    },
+    {
+      "id": "ben_can_b",
+      "group": "work",
+      "location": "ben_can",
+      "name": "Làm cùng tổ ở Bến Cạn",
+      "hours": 6,
+      "note": "Tiến độ hợp đồng +1, chưa có tiền ngay",
+      "require": {
+        "route": "B"
+      },
+      "effects": {
+        "fatigue": 15,
+        "progress": 1,
+        "rep.TRAM": 2
+      }
+    },
+    {
+      "id": "ben_can_c",
+      "group": "work",
+      "location": "ben_can",
+      "name": "Điều phối và làm ở Bến Cạn",
+      "hours": 8,
+      "note": "Tiến độ hợp đồng +1, chưa có tiền ngay",
+      "require": {
+        "route": "C"
+      },
+      "effects": {
+        "fatigue": 22,
+        "progress": 1,
+        "rep.PHUC": 2
+      }
+    },
+    {
+      "id": "nghi",
+      "group": "life",
+      "location": "xom_bo_me",
+      "name": "Nghỉ ở phòng",
+      "hours": 1,
+      "perDay": 4,
+      "rest": true,
+      "effects": {
+        "fatigue": -18,
+        "mood": 5
+      }
+    },
+    {
+      "id": "com_voi_ba",
+      "group": "life",
+      "location": "xom_bo_me",
+      "name": "Ăn cơm với bà, không mở sổ",
+      "hours": 1,
+      "rest": true,
+      "effects": {
+        "fatigue": -5,
+        "rep.BA_TU": 3,
+        "satiety": 55,
+        "mood": 8
+      },
+      "cost": 20000,
+      "perDay": 3
+    },
+    {
+      "id": "phu_xom_don_do",
+      "group": "life",
+      "location": "xom_bo_me",
+      "name": "Phụ xóm phân loại đồ",
+      "hours": 2,
+      "effects": {
+        "fatigue": 6,
+        "rep.DUYEN": 3,
+        "flag.phuXom": true
+      }
+    },
+    {
+      "id": "tra_da",
+      "group": "life",
+      "location": "cho_cau_nho",
+      "name": "Ngồi trà đá với hàng xóm",
+      "hours": 1,
+      "cost": 10000,
+      "rest": true,
+      "effects": {
+        "fatigue": -5,
+        "mood": 10
+      },
+      "perDay": 3
+    },
+    {
+      "id": "xem_bang_tin",
+      "group": "life",
+      "location": "cho_cau_nho",
+      "name": "Xem bảng tin cho thuê phòng",
+      "hours": 1,
+      "effects": {
+        "flag.xemBangTin": true
+      },
+      "maxTimes": 1
+    },
+    {
+      "id": "tap_bao_gia",
+      "group": "optional",
+      "location": "ben_can",
+      "name": "Tập câu báo giá với Trâm",
+      "hours": 1,
+      "days": [
+        18,
+        18
+      ],
+      "require": {
+        "route": [
+          "B",
+          "C"
+        ]
+      },
+      "maxTimes": 1,
+      "effects": {
+        "rep.TRAM": 4,
+        "flag.tapBaoGia": true
+      }
+    },
+    {
+      "id": "tap_bao_gia_a",
+      "group": "optional",
+      "location": "tiem_sau",
+      "name": "Tập câu báo giá với chú Sáu",
+      "hours": 1,
+      "days": [
+        18,
+        18
+      ],
+      "require": {
+        "route": "A"
+      },
+      "maxTimes": 1,
+      "effects": {
+        "rep.SAU": 4,
+        "flag.tapBaoGia": true
+      }
+    },
+    {
+      "id": "may_chan_doan",
+      "group": "optional",
+      "location": "xom_bo_me",
+      "name": "Xem máy chẩn đoán mô phỏng với Linh",
+      "hours": 1,
+      "days": [
+        19,
+        19
+      ],
+      "maxTimes": 1,
+      "effects": {
+        "fatigue": -3,
+        "respect": 1,
+        "rep.LINH": 3
+      }
+    },
+    {
+      "id": "doi_chieu",
+      "group": "optional",
+      "location": "tiem_sau",
+      "name": "Đối chiếu phần đã chia với chú Sáu và Trâm",
+      "hours": 1,
+      "days": [
+        20,
+        20
+      ],
+      "require": {
+        "route": [
+          "B",
+          "C"
+        ]
+      },
+      "maxTimes": 1,
+      "effects": {
+        "rep.SAU": 3,
+        "rep.TRAM": 3,
+        "flag.doiChieu": true
+      }
+    },
+    {
+      "id": "chau_hung",
+      "group": "optional",
+      "location": "xom_bo_me",
+      "name": "Nghe bà kể chuyện chậu húng",
+      "hours": 1,
+      "days": [
+        21,
+        21
+      ],
+      "maxTimes": 1,
+      "rest": true,
+      "effects": {
+        "fatigue": -5,
+        "rep.BA_TU": 5,
+        "flag.nghe_chuyen_hung": true
+      }
+    },
+    {
+      "id": "goi_me_linh",
+      "group": "optional",
+      "location": "xom_bo_me",
+      "name": "Nghe cuộc gọi của mẹ Linh",
+      "hours": 1,
+      "days": [
+        22,
+        22
+      ],
+      "maxTimes": 1,
+      "effects": {
+        "respect": 1,
+        "rep.LINH": 2
+      }
+    },
+    {
+      "id": "tra_hop_com",
+      "group": "optional",
+      "location": "com_hanh",
+      "name": "Trả các hộp cơm dùng chung",
+      "hours": 1,
+      "maxTimes": 1,
+      "effects": {
+        "rep.HANH": 4,
+        "promise_status": {
+          "id": "tra_hop_com",
+          "status": "done"
+        }
+      }
+    },
+    {
+      "id": "com_phan",
+      "group": "life",
+      "location": "com_hanh",
+      "name": "Ăn cơm phần tại quán",
+      "hours": 0.5,
+      "cost": 35000,
+      "perDay": 3,
+      "effects": {
+        "satiety": 65,
+        "mood": 5
+      },
+      "note": "Bữa nóng, no lâu · quán mở 6–21 giờ",
+      "window": [
+        6,
+        21
+      ]
+    },
+    {
+      "id": "banh_mi",
+      "group": "life",
+      "location": "cho_cau_nho",
+      "name": "Ăn bánh mì ở chợ",
+      "hours": 0.25,
+      "cost": 15000,
+      "perDay": 4,
+      "effects": {
+        "satiety": 30
+      },
+      "note": "Ăn nhanh, tiện đường",
+      "window": [
+        6,
+        20
+      ]
+    },
+    {
+      "id": "tam",
+      "group": "life",
+      "location": "xom_bo_me",
+      "name": "Tắm và thay quần áo",
+      "hours": 0.5,
+      "perDay": 2,
+      "effects": {
+        "hygiene": 80,
+        "mood": 8,
+        "fatigue": -3
+      },
+      "note": "Nước đã tính trong sinh hoạt chung"
+    },
+    {
+      "id": "ngu_trua",
+      "group": "life",
+      "location": "xom_bo_me",
+      "name": "Chợp mắt buổi trưa",
+      "hours": 1.5,
+      "perDay": 1,
+      "window": [
+        11,
+        16
+      ],
+      "rest": true,
+      "effects": {
+        "fatigue": -28,
+        "mood": 8
+      },
+      "note": "Nghỉ tại phòng · vẫn tiếp tục ngày hiện tại"
+    }
+  ],
+  "needs": {
+    "hygienePerHour": 1.5,
+    "hungerPerHour": 4.0
+  }
 }

@@ -21,7 +21,10 @@ func _ready() -> void:
 		for arg in args:
 			if arg.begins_with("--demo-route="):
 				route = arg.substr(13)
-		game.new_game(route)
+		if args.has("--pilot"):
+			game.new_pilot()
+		else:
+			game.new_game(route)
 		var guard := 0
 		while not game.s.queue.is_empty() and guard < 10:
 			guard += 1
@@ -40,6 +43,7 @@ func _ready() -> void:
 	var saved = _read(SAVE_PATH)
 	if saved is Dictionary and not saved.is_empty():
 		game.s = saved
+		game.migrate_save()
 	game.changed.connect(_save)
 	game.notes_changed.connect(func() -> void: _write(NOTES_PATH, game.notes))
 

@@ -10,6 +10,8 @@ signal notes_changed
 const WEEKDAYS := ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"]
 const GROUPS := {"work": "Kiếm tiền", "life": "Sinh hoạt", "optional": "Việc tùy chọn"}
 const ROUTES := ["A", "B", "C"]
+const Street := preload("res://scripts/street_life.gd")
+const Wardrobe := preload("res://scripts/wardrobe.gd")
 const PROMISE_STATUS := {"open": "Đang giữ", "done": "Đã xong", "late": "Báo trễ", "overdue": "Quá hạn", "renegotiated": "Thỏa thuận lại"}
 const FAMILY_KIND := {"support": "Hỗ trợ", "pressure": "Ép quyết định", "conceal": "Che giấu", "time_lost": "Bớt giờ ở nhà"}
 
@@ -47,6 +49,8 @@ func new_game(route: String) -> void:
 	s = {
 		"day": int(cfg.sliceStartDay), "used": 0.0, "route": route,
 		"cash": int(p.cash), "fatigue": float(p.fatigue), "warn_days": 0, "rest_skips": 0,
+		"satiety": 65.0, "hygiene": 80.0, "mood": 70.0, "save_version": 2,
+		"appearance": {"hair":"28231e", "shirt":"969084", "pants":"657b8c"},
 		"progress": int(p.progress), "progress_need": int(p.progressNeed),
 		"receivables": [], "payables": [], "promises": [], "family": [],
 		"respect": 0, "linh": {"wish": p.get("linhWish", "xa"), "decision": "", "contact": ""},
@@ -55,6 +59,8 @@ func new_game(route: String) -> void:
 		"queue": [], "log": [], "history": [], "choices": [], "over": {},
 		"stats": {"earned": 0, "spent": 0, "start_cash": int(p.cash)},
 	}
+	Wardrobe.migrate(s)
+	Street.migrate(s)
 	for r in p.receivables:
 		_add_receivable(r)
 	for x in p.payables:
@@ -65,6 +71,24 @@ func new_game(route: String) -> void:
 	_morning()
 	_commit()
 
+
+func new_pilot() -> void:
+	new_game("A")
+	s.mode = "pilot"
+	s.day = 1
+	s.cash = 180000
+	s.fatigue = 15.0
+	s.queue = []
+	s.receivables = []
+	s.payables = []
+	s.promises = []
+	s.log = []
+	s.stats = {"earned":0,"spent":0,"start_cash":180000}
+	add_log("Ngày đầu: ghé Tiệm Sáu lúc 8:00 nhận sửa quạt. Dành 500.000đ dự phòng trước hết ngày 5.","event")
+	_commit()
+
+func run_end_day() -> int:
+	return 5 if s.get("mode","") == "pilot" else int(cfg.sliceEndDay)
 
 func reset() -> void:
 	s = {}
@@ -143,7 +167,8 @@ func projected_cash(target: int) -> int:
 			continue
 		total += int(r.amount)
 	total -= payable_sum(target - 1)
-	total -= int(cfg.livingCostPerDay) * maxi(0, target - day())
+	# Dự trù bữa ăn riêng; đây là ước tính, không tự trừ tiền ăn lần nữa.
+	total -= (int(cfg.livingCostPerDay) + int(cfg.get("foodBudgetPerDay", 60000))) * maxi(0, target - day())
 	return total
 
 
@@ -189,6 +214,48 @@ func spend(n: int, why: String) -> int:
 
 func add_fatigue(d: float) -> void:
 	s["fatigue"] = clampf(float(s.fatigue) + d, 0.0, float(cfg.fatigue.max))
+
+
+## Bổ sung nhu cầu cho ván lưu từ bản trước, giữ nguyên tiền và tiến độ.
+func migrate_save() -> void:
+	if not s.get("appearance") is Dictionary:
+		s["appearance"] = {"hair":"28231e", "shirt":"969084", "pants":"657b8c"}
+	for key in {"satiety": 65.0, "hygiene": 80.0, "mood": 70.0}:
+		if not s.has(key):
+			s[key] = {"satiety": 65.0, "hygiene": 80.0, "mood": 70.0}[key]
+	Wardrobe.migrate(s)
+	Street.migrate(s)
+
+
+func set_appearance(colors: Dictionary) -> void:
+	if not is_started():
+		return
+	var clean := {}
+	for part in ["hair", "shirt", "pants"]:
+		var value := str(colors.get(part, ""))
+		if not Color.html_is_valid(value):
+			return
+		clean[part] = Color(value).to_html(false)
+	s["appearance"] = clean
+	changed.emit()
+
+
+func adjust_need(key: String, amount: float) -> void:
+	s[key] = clampf(float(s.get(key, 70.0)) + amount, 0.0, 100.0)
+
+
+## Mọi thời gian thức (kể cả chờ và hội thoại) đều tiêu hao nhu cầu.
+func elapse(hours: float, working := false) -> void:
+	var elapsed := clampf(hours, 0.0, hours_left())
+	var needs: Dictionary = cfg.needs
+	var hungry_hours := maxf(0.0, elapsed - maxf(0.0, float(s.satiety) - 20.0) / float(needs.hungerPerHour))
+	adjust_need("satiety", -elapsed * float(needs.hungerPerHour))
+	adjust_need("hygiene", -elapsed * float(needs.hygienePerHour) * (1.8 if working else 1.0))
+	adjust_need("mood", -hungry_hours * 1.5)
+	add_fatigue(hungry_hours * 2.0)
+	if working and float(s.mood) < 25.0:
+		add_fatigue(elapsed)
+	s["used"] = float(s.used) + elapsed
 
 
 func add_rep(k: String, d: float) -> void:
@@ -258,7 +325,9 @@ func apply_effects(eff: Dictionary) -> void:
 				else:
 					spend(-int(v), label)
 			"hours":
-				s["used"] = float(s.used) + float(v)
+				elapse(float(v))
+			"satiety", "hygiene", "mood":
+				adjust_need(key, float(v))
 			"fatigue":
 				add_fatigue(float(v))
 			"progress":
@@ -396,6 +465,8 @@ func action_money(a: Dictionary) -> int:
 
 
 func is_hidden(a: Dictionary) -> bool:
+	if s.get("mode","") == "pilot" and (a.group != "life" or a.id in ["xem_bang_tin","phu_xom_don_do"]):
+		return true
 	if a.has("days") and (day() < int(a.days[0]) or day() > int(a.days[1])):
 		return true
 	if a.has("require") and a.require.has("route") and check({"route": a.require.route}) != "":
@@ -423,7 +494,7 @@ func actions_at(location: String) -> Array:
 
 ## {"ok": bool, "reason": String, "start": giờ bắt đầu nếu làm được}
 func action_status(a: Dictionary) -> Dictionary:
-	if is_over() or not s.queue.is_empty():
+	if not is_started() or a.is_empty() or is_over() or not s.queue.is_empty():
 		return {"ok": false, "reason": ""}
 	var reason := check(a.get("require", {}))
 	if reason != "":
@@ -455,7 +526,8 @@ func do_action(id: String) -> void:
 		return
 	var start: float = st.start
 	var finish := start + float(a.hours)
-	s["used"] = finish - float(cfg.dayStart)
+	elapse(start - clock())
+	elapse(float(a.hours), a.group == "work")
 	if a.has("cost"):
 		spend(int(a.cost), str(a.name))
 	var label := "%s %s" % [hh(start), a.name]
@@ -479,7 +551,7 @@ func do_action(id: String) -> void:
 func walk(hours: float) -> void:
 	if not is_started() or is_over() or not s.queue.is_empty() or hours <= 0.0:
 		return
-	s["used"] = minf(float(s.used) + hours, day_end() - float(cfg.dayStart))
+	elapse(hours)
 	_commit()
 
 
@@ -491,19 +563,9 @@ func is_out_of_time() -> bool:
 func sleep_outside() -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
-<<<<<<< HEAD
-	add_fatigue(float(cfg.fatigue.sleepOutside))
 	add_log("Không kịp về xóm trọ, ngủ gục ngoài đường.", "warn")
-	finish_day()
-=======
-	add_log("Không kịp về phòng trọ, ngủ gục ngoài đường.", "warn")
-	finish_day(false)
-	# Trừ sau khi ngủ, nếu không phần hồi sức khi ngủ sẽ xóa mất hình phạt.
->>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
+	finish_day(true)
 	if not is_over():
-		var pen: Dictionary = cfg.get("sleepOutside", {})
-		adj("health", float(pen.get("health", 0)))
-		adj("mood", float(pen.get("mood", 0)))
 		s.queue.push_front({"id": "ngu_gat", "data": {}})
 		_commit()
 
@@ -604,7 +666,10 @@ func _events_for_day(d: int) -> Array:
 
 
 func _morning() -> void:
-	s.queue.append_array(_events_for_day(day()))
+	if s.get("mode","") == "pilot":
+		Street.morning(self)
+	else:
+		s.queue.append_array(_events_for_day(day()))
 
 
 # ---------------------------------------------------------------- cuối ngày
@@ -620,24 +685,42 @@ func night_preview() -> Dictionary:
 			due_recv.append(r.label)
 	return {
 		"living": int(cfg.livingCostPerDay), "free_hours": hours_left(),
-		"recover": -(float(cfg.fatigue.sleep) + hours_left() * float(cfg.fatigue.freeHour)),
+		"recover": sleep_recovery(),
+		"sleep_hours": minf(9.0, 24.0 - clock() + float(cfg.dayStart)),
 		"due_pay": due_pay, "due_recv": due_recv,
-		"slice_end": day() >= int(cfg.sliceEndDay),
+		"slice_end": day() >= run_end_day(),
 	}
 
 
-func finish_day() -> void:
+func sleep_recovery() -> float:
+	var recovery := minf(9.0, 24.0 - clock() + float(cfg.dayStart)) * 5.0
+	if float(s.satiety) < 20.0:
+		recovery *= 0.65
+	if float(s.hygiene) < 25.0:
+		recovery *= 0.85
+	return minf(float(s.fatigue), recovery)
+
+
+func finish_day(outside := false) -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
 	var tonight := []
-	spend(int(cfg.livingCostPerDay), "Sinh hoạt cả nhà")
+	spend(int(cfg.livingCostPerDay), "Sinh hoạt chung (không gồm bữa ăn của An)")
 
 	# Mệt: đếm ngày ở mức cảnh báo và những lần bỏ qua cơ hội nghỉ, rồi hồi qua đêm.
 	if fatigue_warn():
 		s["warn_days"] = int(s.warn_days) + 1
 		if not s.today.get("rested", false):
 			s["rest_skips"] = int(s.rest_skips) + 1
-	add_fatigue(float(cfg.fatigue.sleep) + hours_left() * float(cfg.fatigue.freeHour))
+	if outside:
+		add_fatigue(float(cfg.fatigue.sleepOutside))
+		adjust_need("mood", -12.0)
+		adjust_need("hygiene", -15.0)
+	else:
+		add_fatigue(-sleep_recovery())
+		adjust_need("mood", 12.0 if float(s.satiety) >= 20.0 else -5.0)
+	adjust_need("satiety", -16.0)
+	adjust_need("hygiene", -5.0)
 
 	# Khoản phải thu đến hạn. Đợt nghiệm thu chỉ về khi đủ tiến độ.
 	for r in s.receivables:
@@ -683,7 +766,7 @@ func finish_day() -> void:
 		"proj26": projected_cash(int(cfg.housingDeadline)), "actions": s.today.list.duplicate(),
 	})
 
-	if day() >= int(cfg.sliceEndDay):
+	if day() >= run_end_day():
 		s["queue"] = tonight
 		s["over"] = {"kind": "slice"}
 		_commit()

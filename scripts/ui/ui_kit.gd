@@ -3,22 +3,22 @@ extends RefCounted
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 
-const PAPER := Color("f5f6fb")
-const CARD := Color("ffffff")
-const LINE := Color("d3d8eb")
-const INK := Color("1c2145")
-const INK_SOFT := Color("596086")
-const TIM := Color("6a3db8")
-const TIM_SOFT := Color("eee7fb")
-const STAMP := Color("c0352b")
-const GOOD := Color("2d7a4c")
-const WARN := Color("a5690f")
-const GOLD := Color("f2c14e")
+const PAPER := Color("262823")
+const CARD := Color("1c201df5")
+const LINE := Color("56594b")
+const INK := Color("e8e2d2")
+const INK_SOFT := Color("b7b6a6")
+const TIM := Color("c4ad76")
+const TIM_SOFT := Color("3b3e31")
+const STAMP := Color("e08c75")
+const GOOD := Color("a3b995")
+const WARN := Color("d5b576")
+const GOLD := Color("d3bd86")
 ## Nền tối trong suốt cho HUD đè lên cảnh 3D, giống bảng mục tiêu của Nobody.
-const HUD_BG := Color(0.08, 0.09, 0.14, 0.78)
+const HUD_BG := Color(0.07, 0.085, 0.07, 0.84)
 const HUD_TEXT := Color("f3f1ea")
 const HUD_SOFT := Color("b9bccb")
-const LOG_COLORS := {"plus": "2d7a4c", "minus": "c0352b", "warn": "a5690f", "event": "6a3db8", "info": "1c2145"}
+const LOG_COLORS := {"plus": "a3b995", "minus": "e08c75", "warn": "d5b576", "event": "c4ad76", "info": "e8e2d2"}
 
 
 static func make_theme() -> Theme:
@@ -53,7 +53,7 @@ static func box(bg: Color, border: Color, radius := 8, pad := 12) -> StyleBoxFla
 	sb.bg_color = bg
 	sb.border_color = border
 	sb.set_border_width_all(1)
-	sb.set_corner_radius_all(radius)
+	sb.set_corner_radius_all(mini(radius, 3))
 	sb.set_content_margin_all(pad)
 	return sb
 
@@ -185,6 +185,8 @@ static func effects_text(game, a: Dictionary) -> String:
 		var mark := "+" if v > 0 else "−"
 		if key == "fatigue":
 			out.append("Mệt %s%d" % [mark, int(absf(v))])
+		elif key in ["satiety", "hygiene", "mood"]:
+			out.append("%s %s%d" % [{"satiety": "No", "hygiene": "Sạch", "mood": "Tinh thần"}[key], mark, int(absf(v))])
 		elif key == "progress":
 			out.append("Tiến độ +%d" % int(v))
 		elif key == "respect":
@@ -225,6 +227,7 @@ static func ledger_bbcode(game) -> String:
 		return ""
 	var s: Dictionary = game.s
 	var lines := ["[b]Phải thu[/b]"]
+	lines.push_front("Dự kiến tiền nhà đã dự trù 60k/ngày cho bữa ăn của An.\n")
 	for r in s.receivables:
 		var state := "đã nhận" if r.status == "collected" else "ngày %d" % int(r.due)
 		var mark := "" if r.status == "collected" else ("  (cần nghiệm thu)" if r.get("needsProgress", false) else "")

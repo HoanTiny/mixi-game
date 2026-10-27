@@ -62,6 +62,7 @@ func refresh() -> void:
 
 
 func _start() -> void:
+	_box.add_child(UI.choice("Bắt đầu ngày 1–5", "Sống ở khu phố · học sửa đồ · dành 500.000đ dự phòng", "", game.new_pilot))
 	var p: Dictionary = game.story.slice
 	_head(p.eyebrow, p.title, "", p.text, "")
 	_box.add_child(UI.label(p.pick, 11, UI.INK_SOFT))
@@ -84,10 +85,10 @@ func _event() -> void:
 func _night() -> void:
 	var n: Dictionary = game.night_preview()
 	var lines := [
-		"Sinh hoạt cả nhà: −%s" % GameLogic.fmt_money(n.living),
-		"Ngủ và %s giờ còn trống: Mệt −%d" % [GameLogic.num(n.free_hours), int(n.recover)],
+		"Sinh hoạt chung: −%s (không gồm bữa ăn của An)" % GameLogic.fmt_money(n.living),
+		"Ngủ tới 6:00 · hồi Mệt %d · No bụng −16 · Vệ sinh −5" % int(n.recover),
+		"Bụng đói hoặc người bẩn sẽ khiến giấc ngủ kém hồi sức.",
 	]
-<<<<<<< HEAD
 	if int(n.due_pay) > 0:
 		lines.append("Đến hạn trả tối nay: %s" % GameLogic.fmt_money(n.due_pay))
 	for label in n.due_recv:
@@ -99,19 +100,17 @@ func _night() -> void:
 	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Đi ngủ?", "", "\n".join(lines), "")
 	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1) if not n.slice_end else "Xem tổng kết", "", _end_day))
 	_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
-=======
-	if n.milestone_tonight:
-		lines.append("Tối nay xét mốc tiền %s. Tiền ăn được trừ trước, tiền bốc vác được cộng trước khi xét." % GameLogic.fmt_money(game.next_milestone().amount))
-	_head("Ngày %d · %s" % [game.day(), GameLogic.hh(minf(game.clock(), 22.0))], "Tối nay làm gì?", "", "\n".join(lines), "")
-	_box.add_child(UI.choice("Đi ngủ", "Sang ngày %d" % (game.day() + 1), "", _end_day.bind(false)))
-	_box.add_child(UI.choice(shift.name, "+%s · Sức khỏe %d · Tinh thần %d" % [GameLogic.fmt_money(int(shift.pay)), int(shift.health), int(shift.mood)], "", _end_day.bind(true)))
-	# Hết giờ thì không quay lại được nữa, chỉ còn ngủ hoặc làm ca đêm.
-	if not game.is_out_of_time():
-		_box.add_child(UI.choice("Quay lại", "Tiếp tục ngày %d" % game.day(), "", _cancel_night))
->>>>>>> 16f8961582ba92b62b4b1e298eb9ceea8b2ccda5
 
 
 func _report() -> void:
+	if game.s.get("mode", "") == "pilot":
+		_head("NĂM NGÀY ĐẦU", "Khoản dự phòng của An", "", "Tiền còn: %s / 500.000đ\n%s" % [game.fmt_money(game.s.cash), game.Street.status(game)], "")
+		_box.add_child(UI.wrap("Đạt mục tiêu" if game.s.cash >= 500000 else "Chưa đủ dự phòng — thử đổi lịch làm và chi phí linh kiện.",18,UI.INK))
+		_box.add_child(UI.wrap("Thu: %s · Chi: %s\nKhoản chưa trả: %s\nĐơn đang làm vẫn được ghi trong kết quả; tiền công chỉ nhận khi trả khách." % [game.fmt_money(game.s.stats.earned),game.fmt_money(game.s.stats.spent),game.fmt_money(game.payable_sum(999))],14,UI.INK_SOFT))
+		for day in game.s.history:
+			_box.add_child(UI.wrap("Ngày %d · còn %s · Mệt %d · %d hoạt động" % [day.day,game.fmt_money(day.cash),day.fatigue,day.actions.size()],13,UI.INK_SOFT))
+		_box.add_child(UI.choice("Chơi lại / chọn lát cắt cũ", "", "", GameState.restart))
+		return
 	var r: Dictionary = game.slice_report()
 	var deadline := int(game.cfg.housingDeadline)
 	_box.add_child(UI.label("TỔNG KẾT LÁT CẮT NGÀY 18–22 · TUYẾN %s" % r.route, 12, UI.TIM))

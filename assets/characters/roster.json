@@ -1,0 +1,56 @@
+{
+  "status": "All 8 NPC references ready; 3D generation blocked by Higgsfield zero credits",
+  "generator": "Built-in image_gen",
+  "style_reference": "an/reference-v1.png",
+  "common_prompt": "Create a single original character production reference for a grounded Vietnamese urban life-simulation game. Use the attached An reference ONLY to match the realistic visual quality, neutral studio setup and full-body framing; create a completely different person described below, not An's face. Full-body single FRONT view, relaxed neutral A-pose, arms 25 degrees away from torso, hands separated from hips, fingers visible, feet apart, entire shoes visible, centered with generous margins on a plain medium-gray background. Realistic human anatomy and age-appropriate proportions, natural cloth drape, subtle fabric weave, seams and wear, convincing face and hands. Soft neutral even diffuse lighting without strong baked shadows. Realistic textured 3D game-character reference, not cartoon, not primitive shapes, not plastic or doll-like, no exaggerated head or muscularity. Exactly one person, no text, UI, scenery, floor platform, logo, watermark or extra views. This is an image-to-3D source reference, not a screenshot of implemented gameplay. Character: ",
+  "characters": [
+    {
+      "id": "linh",
+      "name": "Linh",
+      "age": 20,
+      "description": "A 20-year-old Vietnamese woman studying refrigeration repair, slim ordinary adult build, youthful distinct oval face, black hair tied in a practical low ponytail, faded pale blue work-study shirt with sleeves rolled to forearms, charcoal straight-leg work trousers and worn gray canvas sneakers. No makeup glamour, no apron or bags."
+    },
+    {
+      "id": "ba_tu",
+      "name": "Bà Tư",
+      "age": 70,
+      "description": "A 70-year-old Vietnamese grandmother, short slender older build, naturally aged face with wrinkles, gentle alert eyes, gray hair gathered in a small low bun, faded dark plum floral long-sleeved everyday blouse, loose black ankle-length trousers, plain brown closed-toe soft slip-on shoes. Stand upright enough for rigging, no cane or props, dignified ordinary appearance."
+    },
+    {
+      "id": "hanh",
+      "name": "Chị Hạnh",
+      "age": 38,
+      "description": "A 38-year-old Vietnamese woman running a neighborhood rice-meal shop, sturdy medium build, round distinctive face, black hair tied up, faded rust-orange short-sleeved blouse under a worn muted beige waist apron with a pocket, dark brown straight trousers, practical black closed-toe slip-on shoes. Apron close to body, modest everyday workwear, no props."
+    },
+    {
+      "id": "sau",
+      "name": "Chú Sáu",
+      "age": 59,
+      "description": "A 59-year-old Vietnamese motorbike repairman, lean wiry build, weathered angular face, sparse short salt-and-pepper hair, faint mustache, faded navy short-sleeve mechanic shirt with two chest pockets and subtle grease marks, old charcoal loose work trousers, worn brown closed work shoes. No hat or tools, hands relaxed visible."
+    },
+    {
+      "id": "minh",
+      "name": "Minh",
+      "age": 31,
+      "description": "A 31-year-old Vietnamese delivery driver and father, medium athletic everyday build, square friendly distinct face, short black hair, worn olive-gray lightweight zip jacket partially open over muted dark blue T-shirt, faded charcoal denim trousers, dusty black athletic shoes. No helmet, logo, backpack or parcel."
+    },
+    {
+      "id": "duyen",
+      "name": "Cô Duyên",
+      "age": 54,
+      "description": "A 54-year-old Vietnamese woman managing a rental courtyard, average slightly stocky build, mature defined cheekbones, shoulder-length black hair with a little gray tied back, modest muted moss-brown long-sleeved button blouse, dark straight trousers, plain brown low-heeled closed shoes. Everyday practical clothing with subtle wear, no jewelry or props."
+    },
+    {
+      "id": "tram",
+      "name": "Trâm",
+      "age": 33,
+      "description": "A 33-year-old Vietnamese female electrician, average fit build with natural shoulders, confident distinctive oval face, short dark hair tucked behind ears, worn muted teal long-sleeved work shirt with sleeves rolled to forearms, charcoal utility trousers with flat pockets, scuffed dark brown safety work boots. No hardhat, belt tools, gloves or handheld props."
+    },
+    {
+      "id": "phuc",
+      "name": "Anh Phúc",
+      "age": 43,
+      "description": "A 43-year-old Vietnamese man representing a row of small restaurants, slightly heavy middle-aged everyday build with a modest belly, broad distinctive face, neat short black hair with receding temples, faded beige short-sleeved polo with no branding, dark khaki straight trousers, brown belt and worn brown leather closed slip-on shoes. Ordinary modest small-business owner, no luxury accessories."
+    }
+  ]
+}
