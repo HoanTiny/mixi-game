@@ -15,6 +15,8 @@
 - **Ẩn nhà kiểu Nobody** (`AreaBuilder.update_cut`, `ray_cap`): bỏ hẳn lưới chấm bi. Chỉ căn nào bị tia từ máy quay tới đầu, ngực, gối của An xuyên qua mới bị cắt tầng như nhà búp bê: tầng trên, ban công, mái ẩn dần, còn tầng trệt (3,4 m) với mái hiên, biển hiệu; vẫn chắn thì thấp hơn nhưng không dưới 1 m; An đứng lọt trong lô thì còn 1 m. Nhà sau lưng An (An đi trên vỉa hè trước mặt tiền) không bao giờ bị cắt. Mặt cắt là sàn nâu sẫm. Máy quay đặt `near = 0.1`.
 - Sông Hồng bờ uốn lượn, bãi bồi cát vàng ở bờ Phúc Tân; đáy hồ là phố Hàng Khay nối sang Tràng Tiền.
 
+**Bản 1.2.1 · bản đồ M vẽ tay** (`street_map.gd`, `_organic`): nhà là đa giác méo, dãy nhà ống cắt thành căn to nhỏ lùi lệch, xoay nghiêng, có chái cơi nới; mái màu rải ngẫu nhiên có nhiễu sáng tối, bóng đổ lệch, nóc và mái chảy hay gờ ngói, viền sẫm. Đường lượn chậm, phình ra thắt lại, đầu đường bo tròn, chỗ giao đường lớn vạt rộng. Sông, hồ bờ cong méo (hồ Gươm méo theo thùy), bãi cát lồi lõm ven sông Hồng. Ngõ ngách ngoằn ngoèo đâm vào giữa khối nhà, có ngõ cụt. Cây mọc theo cụm, mỗi tán một cỡ, một sắc. Hình tính một lần theo tọa độ thế giới (chừng 50 ms), phóng, dời chỉ chiếu lại; chỉ là hình minh họa, phố 3D không đổi.
+
 **Bản 1.2 · giai đoạn 4, việc làm và hoạt động mới** (chỉ có trên map phố cổ `hn_pho_co`; map khác không có chỗ thì bỏ qua):
 - **Bảy chỗ mới:**
   - bãi bốc vác sát chợ Long Biên;

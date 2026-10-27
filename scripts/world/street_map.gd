@@ -6,6 +6,7 @@ extends Control
 
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
+const AreaData := preload("res://scripts/realmap/area_data.gd")
 const PAD := 10.0
 const TOP := 22.0
 const STREET_COLORS := {"duong": Color("8b8780"), "cho": Color("a08a70"), "bo_ke": Color("8f8b84"), "hem": Color("b9b2a3"),
@@ -463,71 +464,75 @@ func _draw_real_static() -> void:
 			"grass":
 				col = Color("8fb07a")
 		_poly(c, _pts(c, p.poly), col)
-	# Sông, hồ: viền bờ sáng như nét vẽ tay; quanh hồ một vòng đường dạo.
-	for w in city.data.water:
-		var pts := _pts(c, w.poly)
+	var o := _organic()
+	var detail := s > 0.55
+	# Sông, hồ: bờ cong méo tự nhiên, viền bờ sáng như nét vẽ tay; bãi cát lồi lõm ven sông; quanh hồ một vòng đường dạo.
+	for wp in o.water:
+		var pts := _pts(c, wp.p)
 		_poly(c, pts, WATER)
-		if pts.size() >= 3:
-			c.draw_polyline(pts + PackedVector2Array([pts[0]]), Color("9cc4d4"), maxf(1.5, 1.2 * s), true)
-		if str(w.name).begins_with("Hồ"):
-			for ring in Geometry2D.offset_polygon(w.poly, 3.5):
+		c.draw_polyline(pts + PackedVector2Array([pts[0]]), Color("9cc4d4"), maxf(1.5, 1.2 * s), true)
+		if wp.lake:
+			for ring in Geometry2D.offset_polygon(wp.p, 3.5):
 				var rp := _pts(c, ring)
 				c.draw_polyline(rp + PackedVector2Array([rp[0]]), Color("efe3c6"), maxf(2.0, 2.2 * s), true)
-	# Cây: tán tròn hai sắc xanh có viền tối.
-	var tr := maxf(1.6, 2.2 * s)
-	for i in city.data.trees.size():
-		var tp := to_map(city.data.trees[i])
-		c.draw_circle(tp, tr + 0.8, Color(0.12, 0.22, 0.15, 0.7))
-		c.draw_circle(tp, tr, TREE_A if i % 3 == 0 else TREE_B)
-	# Nhà: tô theo khu, viền tối, nóc mái sáng dọc chiều dài căn.
-	for i in city.data.buildings.size():
-		var bd: Dictionary = city.data.buildings[i]
-		var pts := _pts(c, bd.poly)
-		if pts.size() < 3:
-			continue
-		var kind := str(bd.kind)
-		var cen := _centroid(bd.poly)
-		var col: Color = ROOFS[(i * 7 + int(cen.x)) % ROOFS.size()]
-		if kind == "market":
-			col = MARKET
-		elif kind == "viaduct":
-			col = Color("8a4a32")
-		elif kind == "islet":
-			col = Color("9a9480")
-		elif kind == "temple":
-			col = Color("b5523a")
-		elif kind in ["office", "apartments"]:
-			col = Color("8796a8")
-		elif kind in ["villa", "bank", "retail"] or (cen.y > 40.0 and cen.x > 5.0):
-			col = FRENCH[i % FRENCH.size()]
-		elif NIGHT_ZONE.has_point(cen):
-			col = NIGHT.lightened(0.08 * (i % 3))
-		_poly(c, pts, col)
-		c.draw_polyline(pts + PackedVector2Array([pts[0]]), col.darkened(0.4), 1.0)
-		if kind == "market":
-			_stalls(c, bd.poly, col)
-		elif NIGHT_ZONE.has_point(cen) and kind == "house":
-			c.draw_polyline(pts + PackedVector2Array([pts[0]]), Color("e05ab0", 0.55), 1.0)
-		elif pts.size() == 4 and s > 0.6 and kind in ["house", "villa"]:
-			_ridge(c, pts, col)
+	for sb in o.sand:
+		var pts := _pts(c, sb)
+		_poly(c, pts, SAND)
+		c.draw_polyline(pts + PackedVector2Array([pts[0]]), SAND.darkened(0.18), 1.0, true)
+	# Nhà: đa giác méo, cắt thành nhiều căn to nhỏ khác nhau; bóng đổ lệch xuống dưới phải, rồi mái (màu rải ngẫu
+	# nhiên, gờ mái, nóc), viền sẫm nham nhở như nét cọ.
+	var sh := Vector2(1.0, 1.25) * s * 0.9
+	for bd in o.bld:
+		_poly(c, _pts_off(bd.p, sh), Color(0.16, 0.1, 0.06, 0.38))
+	for bd in o.bld:
+		var pts := _pts(c, bd.p)
+		_poly(c, pts, bd.c)
+		c.draw_polyline(pts + PackedVector2Array([pts[0]]), (bd.c as Color).darkened(0.5), 1.2 if detail else 1.0, true)
+		if bd.kind == "market":
+			_stalls(c, bd.p, bd.c)
+		elif detail:
+			for seg in bd.roof:
+				c.draw_line(to_map(seg[0]), to_map(seg[1]), seg[2], 1.0, true)
 	# Chợ Long Biên (lô địa điểm): mái cam có ô sạp.
 	if city.locs.has("cho_cau_nho"):
 		var q := _loc_quad("cho_cau_nho")
 		_poly(c, _pts(c, q), MARKET)
 		_stalls(c, q, MARKET)
-	# Đường: viền, lòng đường; ngõ nhạt hơn. Vẽ rộng hơn thật một chút cho tên phố nằm gọn trong lòng đường.
+	# Ngõ ngách: đường nứt hẹp ngoằn ngoèo xuyên vào giữa các khối nhà, có ngõ cụt.
+	if detail:
+		for al in o.alleys:
+			var pts := _pts(c, al)
+			c.draw_polyline(pts, Color("5a4e40"), maxf(2.2, 2.0 * s) + 1.5, true)
+			c.draw_polyline(pts, Color("8f8474"), maxf(1.6, 2.0 * s), true)
+	# Đường: lòng đường phình ra thắt lại, lượn nhẹ; đầu đường bo tròn nên chỗ giao nhau không vuông thành sắc cạnh.
 	var roads: Array = city.data.roads.duplicate()
 	roads.sort_custom(func(x, y) -> bool: return float(x.width) < float(y.width))
+	var strips: Array = o.roads
+	strips.sort_custom(func(x, y) -> bool: return float(x.r.width) < float(y.r.width))
 	for pass_i in 2:
-		for r in roads:
-			if str(r.name).begins_with("Cầu Long Biên"):
-				continue
-			var w := _road_px(r)
-			var pts := _pts(c, r.line)
-			if pass_i == 0:
-				c.draw_polyline(pts, ROAD_EDGE, w + (3.0 if not r.small else 2.0), true)
-			else:
-				c.draw_polyline(pts, LANE_FILL if r.small else ROAD_FILL, w, true)
+		for st in strips:
+			var r: Dictionary = st.r
+			var w := _road_px(r) + ((3.0 if not r.small else 2.0) if pass_i == 0 else 0.0)
+			var col: Color = ROAD_EDGE if pass_i == 0 else (LANE_FILL if r.small else ROAD_FILL)
+			var strip := _strip_px(st.l, st.f, w)
+			_poly(c, strip, col)
+			for e in [st.l[0], st.l[st.l.size() - 1]]:
+				c.draw_circle(to_map(e), w / 2.0, col)
+		if pass_i == 0:
+			# Chỗ giao nhau của đường lớn: vạt góc thành khoảng rộng tròn.
+			for j in o.joints:
+				c.draw_circle(to_map(j[0]), j[1] * s * 0.5 + 3.0, ROAD_EDGE)
+		else:
+			for j in o.joints:
+				c.draw_circle(to_map(j[0]), j[1] * s * 0.5, ROAD_FILL)
+	# Cây: từng cụm ven đường, trong vườn hoa, xen giữa khe nhà; mỗi tán một cỡ, một sắc, viền tối, chấm sáng.
+	for t in o.trees:
+		var tp := to_map(t[0])
+		var tr := maxf(1.2, 2.0 * s) * float(t[1])
+		c.draw_circle(tp + Vector2(0.5, 0.8) * maxf(1.0, s), tr + 0.6, Color(0.1, 0.18, 0.12, 0.55))
+		c.draw_circle(tp, tr, t[2])
+		if detail:
+			c.draw_circle(tp - Vector2(tr, tr) * 0.3, tr * 0.38, (t[2] as Color).lightened(0.22))
 	# Cầu cạn đường sắt trên dãy vòm, cầu Long Biên, cầu Thê Húc, Tháp Rùa.
 	for lm in landmarks:
 		match str(lm.get("kind", "")):
@@ -558,6 +563,423 @@ func _draw_real_static() -> void:
 			placed.append(Rect2(dp + Vector2(-60, -14), Vector2(120, 46)))
 		_area_names(c, font, landmarks, placed)
 		_street_names(c, font, roads, placed)
+
+
+## Hình vẽ tay của bản đồ minh họa, tính một lần theo tọa độ thế giới (phóng, dời chỉ chiếu lại):
+## - bld: căn nhà đa giác méo {p, c, kind, roof: [[a, b, màu]]}, dãy nhà ống cắt thành nhiều căn to nhỏ, lùi lệch;
+## - water: sông, hồ bờ cong méo {p, lake}; sand: bãi cát lồi lõm ven sông Hồng;
+## - roads: {r, l: đường tâm lượn nhẹ, f: hệ số bề ngang từng điểm}; joints: [chỗ giao đường lớn, bề ngang];
+## - alleys: ngõ ngách ngoằn ngoèo; trees: [chỗ, cỡ, màu] theo cụm.
+const ROOF_MIX := [Color("8c583a"), Color("a36a4f"), Color("d9822b"), Color("bfa07a"), Color("735d4d"), Color("9b6b4a")]
+var _org: Dictionary = {}
+
+
+func _organic() -> Dictionary:
+	if not _org.is_empty():
+		return _org
+	var city = world.city
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20241
+	var o := {"bld": [], "water": [], "sand": [], "roads": [], "joints": [], "alleys": [], "trees": []}
+	for i in city.data.buildings.size():
+		var bd: Dictionary = city.data.buildings[i]
+		var kind := str(bd.kind)
+		var base: PackedVector2Array = bd.poly
+		if base.size() < 3:
+			continue
+		var cen := _centroid(base)
+		var parts: Array = _split_house(base, rng) if kind == "house" and base.size() == 4 else [base]
+		if kind == "house":
+			parts = _jostle(parts, rng)
+		for part in parts:
+			var col := _roof_col(kind, cen, rng)
+			var amp := 0.5 if kind == "house" else (0.3 if kind in ["villa", "temple", "islet"] else 0.15)
+			o.bld.append({"p": _wobble(part, rng, amp), "c": col, "kind": kind,
+				"roof": _roof_lines(part, col, rng) if kind in ["house", "villa", "temple"] and part.size() == 4 else []})
+	for w in city.data.water:
+		var lake := str(w.name).begins_with("Hồ")
+		var shore := _resample(w.poly, 6.0)
+		if lake:
+			shore = _lobes(shore, rng)
+		o.water.append({"p": _smooth(_wobble(shore, rng, 2.4 if lake else 2.2), 2), "lake": lake})
+		if not lake:
+			o.sand = _sand_bars(w.poly, rng)
+	for r in city.data.roads:
+		if str(r.name).begins_with("Cầu Long Biên"):
+			continue
+		var line := _resample_line(r.line, 7.0)
+		var wob := PackedVector2Array()
+		var f := PackedFloat32Array()
+		var ph := rng.randf() * TAU
+		# Lượn chậm theo chiều dài (một hai khúc cong), đầu đường giữ đúng chỗ để còn nối vào đường khác.
+		var amp := 1.7 if not r.small else 0.9
+		var waves := clampf(r.line[0].distance_to(r.line[r.line.size() - 1]) / 90.0, 0.6, 2.5)
+		for k in line.size():
+			var t := float(k) / maxf(line.size() - 1, 1)
+			var dir := (line[mini(k + 1, line.size() - 1)] - line[maxi(k - 1, 0)]).normalized()
+			var fade := smoothstep(0.0, 0.12, t) * smoothstep(1.0, 0.88, t)
+			wob.append(line[k] + dir.orthogonal() * (sin(t * PI * waves + ph) + 0.35 * sin(t * PI * waves * 3.1 + ph * 2.0)) * amp * fade)
+			f.append(1.0 + 0.13 * sin(t * 7.1 + ph * 1.7) + 0.06 * sin(t * 17.0 + ph))
+		o.roads.append({"r": r, "l": wob, "f": f})
+	o.joints = _joints(city.data.roads)
+	o.alleys = _alleys(city, rng)
+	o.trees = _trees_org(city, rng, o.alleys)
+	_org = o
+	return o
+
+
+func _pts_off(poly: PackedVector2Array, off: Vector2) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for q in poly:
+		out.append(to_map(q) + off)
+	return out
+
+
+## Dải đa giác của đường: bề ngang w điểm ảnh nhân hệ số từng điểm (phình ra, thắt lại).
+func _strip_px(line: PackedVector2Array, f: PackedFloat32Array, w: float) -> PackedVector2Array:
+	var left := PackedVector2Array()
+	var right := PackedVector2Array()
+	for k in line.size():
+		var p := to_map(line[k])
+		var d := (to_map(line[mini(k + 1, line.size() - 1)]) - to_map(line[maxi(k - 1, 0)])).normalized()
+		var n := d.orthogonal() * w * 0.5 * f[k]
+		left.append(p + n)
+		right.append(p - n)
+	right.reverse()
+	return left + right
+
+
+## Hồ: méo theo vài thùy lồi lõm quanh tâm (đầu bắc thuôn, bờ đông phình, một vịnh nhỏ), không còn hình bầu dục đều.
+static func _lobes(poly: PackedVector2Array, rng: RandomNumberGenerator) -> PackedVector2Array:
+	var c := _centroid(poly)
+	var p1 := rng.randf() * TAU
+	var p2 := rng.randf() * TAU
+	var out := PackedVector2Array()
+	for q in poly:
+		var d := q - c
+		var a := d.angle()
+		var k := 1.0 + 0.07 * sin(2.0 * a + p1) + 0.06 * sin(3.0 * a + p2) + 0.035 * sin(5.0 * a + p1 * 1.7)
+		out.append(c + d * k)
+	return out
+
+
+static func _resample(poly: PackedVector2Array, step: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for i in poly.size():
+		var a := poly[i]
+		var b := poly[(i + 1) % poly.size()]
+		var n := maxi(1, int(a.distance_to(b) / step))
+		for k in n:
+			out.append(a.lerp(b, float(k) / n))
+	return out
+
+
+static func _resample_line(line: PackedVector2Array, step: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for i in line.size() - 1:
+		var n := maxi(1, int(line[i].distance_to(line[i + 1]) / step))
+		for k in n:
+			out.append(line[i].lerp(line[i + 1], float(k) / n))
+	out.append(line[line.size() - 1])
+	return out
+
+
+## Méo đa giác: chia cạnh dài thành đoạn ngắn, xô lệch mỗi đỉnh một chút theo hướng ngẫu nhiên.
+static func _wobble(poly: PackedVector2Array, rng: RandomNumberGenerator, amp: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for i in poly.size():
+		var a := poly[i]
+		var b := poly[(i + 1) % poly.size()]
+		var len := a.distance_to(b)
+		var n := maxi(1, int(len / 4.5))
+		var nrm := (b - a).normalized().orthogonal()
+		for k in n:
+			var q := a.lerp(b, float(k) / n)
+			var j := rng.randf_range(-amp, amp)
+			out.append(q + nrm * j * (0.6 if k > 0 else 1.0) + Vector2(rng.randf_range(-amp, amp), rng.randf_range(-amp, amp)) * (0.5 if k == 0 else 0.2))
+	return out
+
+
+## Làm tròn góc (Chaikin): mỗi vòng thay mỗi cạnh bằng hai điểm 1/4, 3/4.
+static func _smooth(poly: PackedVector2Array, iters: int) -> PackedVector2Array:
+	var cur := poly
+	for it in iters:
+		var nxt := PackedVector2Array()
+		for i in cur.size():
+			var a := cur[i]
+			var b := cur[(i + 1) % cur.size()]
+			nxt.append(a.lerp(b, 0.25))
+			nxt.append(a.lerp(b, 0.75))
+		cur = nxt
+	return cur
+
+
+## Dãy nhà ống dài: cắt thành 2–4 căn bề ngang khác nhau, mỗi căn lùi sau lệch một chút, mặt tiền nhô thụt.
+static func _split_house(q: PackedVector2Array, rng: RandomNumberGenerator) -> Array:
+	var e0 := q[0].distance_to(q[1])
+	var e1 := q[1].distance_to(q[2])
+	# a0-a1 là cạnh dọc dãy (cạnh dài hơn khi nhà nằm ngang; nhà ống thường mặt tiền hẹp, sâu: cắt theo chiều sâu).
+	var long_first := e0 >= e1
+	var p0 := q[0] if long_first else q[1]
+	var p1 := q[1] if long_first else q[2]
+	var p2 := q[2] if long_first else q[3]
+	var p3 := q[3] if long_first else q[0]
+	var len := maxf(e0, e1)
+	if len < 7.0 or rng.randf() < 0.3:
+		return [q]
+	var cuts := [0.0]
+	var t := 0.0
+	while true:
+		t += rng.randf_range(0.22, 0.5)
+		if t > 0.85:
+			break
+		cuts.append(t)
+	cuts.append(1.0)
+	var out := []
+	for k in cuts.size() - 1:
+		var ta: float = cuts[k]
+		var tb: float = cuts[k + 1]
+		var back := rng.randf_range(0.0, 0.28)
+		var front := rng.randf_range(-0.04, 0.06)
+		var a0 := p0.lerp(p1, ta)
+		var a1 := p0.lerp(p1, tb)
+		var b1 := p3.lerp(p2, tb)
+		var b0 := p3.lerp(p2, ta)
+		out.append(PackedVector2Array([a0.lerp(b0, front), a1.lerp(b1, front), b1.lerp(a1, back), b0.lerp(a0, back)]))
+	return out
+
+
+## Căn nhà xô lệch: xoay ±3° quanh giữa mặt tiền; chừng một phần tư căn có chái nhỏ cơi nới phía sau.
+static func _jostle(parts: Array, rng: RandomNumberGenerator) -> Array:
+	var out := []
+	for q in parts:
+		if q.size() != 4:
+			out.append(q)
+			continue
+		var pivot: Vector2 = (q[0] + q[1]) / 2.0
+		var ang := rng.randf_range(-0.05, 0.05)
+		var r := PackedVector2Array()
+		for v in q:
+			r.append(pivot + (v - pivot).rotated(ang))
+		out.append(r)
+		if rng.randf() < 0.25:
+			var back_mid: Vector2 = (r[2] + r[3]) / 2.0
+			var along: Vector2 = (r[2] - r[3]).normalized()
+			var out_dir: Vector2 = (back_mid - pivot).normalized()
+			var hw := r[2].distance_to(r[3]) * rng.randf_range(0.2, 0.35)
+			var dep := rng.randf_range(1.2, 2.6)
+			var off := along * rng.randf_range(-0.25, 0.25) * r[2].distance_to(r[3])
+			var b0 := back_mid + off - along * hw
+			var b1 := back_mid + off + along * hw
+			out.append(PackedVector2Array([b0 - out_dir * 0.3, b1 - out_dir * 0.3, b1 + out_dir * dep, b0 + out_dir * dep]))
+	return out
+
+
+func _roof_col(kind: String, cen: Vector2, rng: RandomNumberGenerator) -> Color:
+	var col: Color = ROOF_MIX[rng.randi() % ROOF_MIX.size()]
+	match kind:
+		"market":
+			col = MARKET
+		"viaduct":
+			col = Color("8a4a32")
+		"islet":
+			col = Color("9a9480")
+		"temple":
+			col = Color("b5523a")
+		"office", "apartments":
+			col = Color("8796a8")
+		_:
+			if kind in ["villa", "bank", "retail"] or (cen.y > 40.0 and cen.x > 5.0):
+				col = FRENCH[rng.randi() % FRENCH.size()]
+			elif NIGHT_ZONE.has_point(cen):
+				col = col.lerp(NIGHT, 0.6)
+	# Nhiễu sáng tối từng mái như nét cọ.
+	var k := rng.randf_range(-0.09, 0.09)
+	return col.lightened(k) if k > 0.0 else col.darkened(-k)
+
+
+## Mái: nóc dọc chiều dài căn; mái chéo bốn góc (mái chảy) hay gờ ngói song song nửa mái (mái dốc một bên).
+static func _roof_lines(q: PackedVector2Array, col: Color, rng: RandomNumberGenerator) -> Array:
+	var e0 := q[0].distance_to(q[1])
+	var e1 := q[1].distance_to(q[2])
+	var a := (q[0] + q[3]) / 2.0 if e0 >= e1 else (q[0] + q[1]) / 2.0
+	var b := (q[1] + q[2]) / 2.0 if e0 >= e1 else (q[3] + q[2]) / 2.0
+	var short := minf(e0, e1)
+	var dir := (b - a).normalized()
+	var ra := a + dir * short * 0.4
+	var rb := b - dir * short * 0.4
+	var hi := col.lightened(0.22)
+	var lo := col.darkened(0.28)
+	var out := [[ra, rb, hi]]
+	if rng.randf() < 0.55:
+		# Mái chảy: bốn đường chéo từ đầu nóc xuống góc.
+		var near_a := [q[0], q[3]] if e0 >= e1 else [q[0], q[1]]
+		var near_b := [q[1], q[2]] if e0 >= e1 else [q[3], q[2]]
+		for c in near_a:
+			out.append([ra, c, lo])
+		for c in near_b:
+			out.append([rb, c, lo])
+	else:
+		# Gờ ngói: vạch ngang nửa mái phía nắng.
+		var side := dir.orthogonal() * short * 0.45
+		var k := 1.2
+		var len := a.distance_to(b)
+		while k < len - 0.6:
+			var m := a + dir * k
+			out.append([m, m + side, lo])
+			k += 1.3
+	return out
+
+
+## Bãi cát lồi lõm bám bờ tây sông Hồng (bờ Phúc Tân), vài bãi nhỏ bờ đông.
+static func _sand_bars(river: PackedVector2Array, rng: RandomNumberGenerator) -> Array:
+	var bb := Geo.bounds(river)
+	var out := []
+	var z := bb.position.y + rng.randf_range(10.0, 30.0)
+	while z < bb.end.y - 20.0:
+		var len := rng.randf_range(24.0, 48.0)
+		var west := rng.randf() < 0.75
+		var edge := _bank_x(river, z + len / 2.0, west)
+		if edge < INF:
+			var reach := rng.randf_range(4.0, 10.0) * (1.0 if west else -1.0)
+			var pts := PackedVector2Array()
+			var n := 12
+			for k in n + 1:
+				var t := float(k) / n
+				var zz := z + len * t
+				var bx := _bank_x(river, zz, west)
+				if bx == INF:
+					continue
+				pts.append(Vector2(bx - (1.5 if west else -1.5), zz))
+			for k in range(n, -1, -1):
+				var t := float(k) / n
+				var zz := z + len * t
+				var bx := _bank_x(river, zz, west)
+				if bx == INF:
+					continue
+				var bulge := sin(t * PI) * (0.75 + 0.25 * sin(t * 9.0 + z))
+				pts.append(Vector2(bx + reach * bulge, zz))
+			if pts.size() >= 6:
+				out.append(_smooth(pts, 1))
+		z += len + rng.randf_range(15.0, 55.0)
+	return out
+
+
+## Hoành độ bờ sông ở tung độ z (bờ tây: nhỏ nhất, bờ đông: lớn nhất) theo các cạnh đa giác.
+static func _bank_x(poly: PackedVector2Array, z: float, west: bool) -> float:
+	var best := INF if west else -INF
+	for i in poly.size():
+		var a := poly[i]
+		var b := poly[(i + 1) % poly.size()]
+		if (a.y - z) * (b.y - z) > 0.0 or absf(b.y - a.y) < 1e-6:
+			continue
+		var x := a.x + (b.x - a.x) * (z - a.y) / (b.y - a.y)
+		best = minf(best, x) if west else maxf(best, x)
+	return best if absf(best) < 1e8 else INF
+
+
+## Chỗ giao nhau giữa hai đường lớn (không phải ngõ): đầu một đường nằm trên thân đường kia.
+static func _joints(roads: Array) -> Array:
+	var out := []
+	for r in roads:
+		if r.small or r.bridge or r.line.size() < 2:
+			continue
+		for e in [r.line[0], r.line[r.line.size() - 1]]:
+			for q in roads:
+				if is_same(q, r) or q.small or q.bridge:
+					continue
+				for k in q.line.size() - 1:
+					if Geo.seg_dist(e, q.line[k], q.line[k + 1]) < float(q.width) * 0.6:
+						out.append([e, maxf(float(r.width), float(q.width)) * 1.35])
+	return out
+
+
+## Ngõ ngách: từ mép đường lớn, nhỏ đâm vào trong khối nhà vài đoạn gấp khúc; gặp đường khác thì nối, không thì cụt.
+func _alleys(city, rng: RandomNumberGenerator) -> Array:
+	var out := []
+	var b: Rect2 = city.bounds
+	for r in city.data.roads:
+		if r.bridge or str(r.name).begins_with("Cầu") or str(r.name).begins_with("Vòng") or str(r.name).begins_with("Đường dạo"):
+			continue
+		var line: PackedVector2Array = r.line
+		for i in line.size() - 1:
+			var a := line[i]
+			var e := line[i + 1]
+			var len := a.distance_to(e)
+			var dir := (e - a).normalized()
+			var k := rng.randf_range(6.0, 16.0)
+			while k < len - 6.0:
+				if rng.randf() < 0.42:
+					var side := 1.0 if rng.randf() < 0.5 else -1.0
+					var n := dir.orthogonal() * side
+					var p := a + dir * k + n * (float(r.width) / 2.0 + AreaData.sidewalk(r) + 0.3)
+					var pts := PackedVector2Array([p])
+					var head := n.rotated(rng.randf_range(-0.35, 0.35))
+					for seg in rng.randi_range(2, 4):
+						var q := p + head * rng.randf_range(4.0, 9.0)
+						if not b.has_point(q) or _in_open(city, q):
+							break
+						pts.append(q)
+						p = q
+						if _near_road(city, q, r):
+							break
+						head = head.rotated(rng.randf_range(-0.8, 0.8))
+					if pts.size() >= 2:
+						out.append(pts)
+				k += rng.randf_range(11.0, 22.0)
+	return out
+
+
+static func _in_open(city, q: Vector2) -> bool:
+	for w in city.data.water:
+		if Geometry2D.is_point_in_polygon(q, w.poly):
+			return true
+	for p in city.data.parks:
+		if Geometry2D.is_point_in_polygon(q, p.poly):
+			return true
+	return false
+
+
+static func _near_road(city, q: Vector2, skip: Dictionary) -> bool:
+	for r in city.data.roads:
+		if is_same(r, skip):
+			continue
+		for k in r.line.size() - 1:
+			if Geo.seg_dist(q, r.line[k], r.line[k + 1]) < float(r.width) / 2.0 + 1.0:
+				return true
+	return false
+
+
+## Cây theo cụm: cây có sẵn xô lệch, mọc thêm một hai cây con quanh; cụm cây trong vườn hoa; cây lọt khe nhà ở đầu ngõ.
+func _trees_org(city, rng: RandomNumberGenerator, alleys: Array) -> Array:
+	var greens := [TREE_A, TREE_B, Color("5f9e5a"), Color("2f5c40")]
+	var out := []
+	for t in city.data.trees:
+		var c: Vector2 = t + Vector2(rng.randf_range(-1.6, 1.6), rng.randf_range(-1.6, 1.6))
+		out.append([c, rng.randf_range(0.75, 1.35), greens[rng.randi() % greens.size()]])
+		if rng.randf() < 0.4:
+			for k in rng.randi_range(1, 2):
+				out.append([c + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, 3.6), rng.randf_range(0.55, 0.9), greens[rng.randi() % greens.size()]])
+	for p in city.data.parks:
+		if not str(p.kind) in ["park", "garden", "grass"]:
+			continue
+		var bb := Geo.bounds(p.poly)
+		var clusters := int(bb.get_area() / 900.0)
+		for k in clusters:
+			var c := bb.position + Vector2(rng.randf() * bb.size.x, rng.randf() * bb.size.y)
+			if not Geometry2D.is_point_in_polygon(c, p.poly):
+				continue
+			for m in rng.randi_range(2, 5):
+				var q := c + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(0.0, 5.0)
+				var wet := false
+				for w in city.data.water:
+					wet = wet or Geometry2D.is_point_in_polygon(q, w.poly)
+				if not wet and Geometry2D.is_point_in_polygon(q, p.poly):
+					out.append([q, rng.randf_range(0.7, 1.4), greens[rng.randi() % greens.size()]])
+	for al in alleys:
+		if rng.randf() < 0.25:
+			out.append([al[al.size() - 1] + Vector2(rng.randf_range(-1, 1), rng.randf_range(-1, 1)), rng.randf_range(0.6, 0.95), greens[rng.randi() % greens.size()]])
+	return out
 
 
 func _road_px(r: Dictionary) -> float:
