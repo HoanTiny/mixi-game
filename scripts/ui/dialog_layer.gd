@@ -618,7 +618,7 @@ func _ending_chapter(cards: Array, keep_label: String, diary_label: String) -> v
 	if h.state == "reserved":
 		place = "%s (đã đặt cọc, %s)" % [place, {2: "dọn sau giỗ", 3: "dọn mùng một tháng Tám", 4: "dọn mùng một tháng Chín"}.get(ch, "dọn mùng một tháng Mười")]
 	elif h.place == "di_nam":
-		place = "Ở nhờ nhà dì Năm"
+		place = "Ở nhờ nhà dì Nga"
 	_box.add_child(UI.wrap("Chỗ ở: %s · Tuyến %s · Tiền mặt: %s" % [place, str(game.s.route), GameLogic.fmt_money(int(game.s.cash))], 14, UI.INK))
 	for c in cards:
 		var table: Dictionary = c[1] if c[1] is Dictionary else st.get(str(c[1]), {})

@@ -84,7 +84,8 @@ def main():
         if old is not None:
             walk(old, new, "", errs)
         for p, s in strings(new):
-            if p.rsplit(".", 1)[-1].startswith("_"):
+            key = re.sub(r"\[\d+\]$", "", p).rsplit(".", 1)[-1]
+            if key.startswith("_") or (key in CODE_KEYS and CODE_RE.match(s)):
                 continue
             for pat in CAM:
                 m = re.search(pat, s)

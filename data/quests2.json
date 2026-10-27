@@ -1,9 +1,9 @@
 {
  "_ghi_chu": "Việc nhờ của chương 2, cùng cú pháp với quests.json. \"home\" là chỗ ở hiện tại.",
  "items": {
-  "bao_cat": "Mười hai bao cát xúc ở Bờ Me",
+  "bao_cat": "Mười hai bao cát xúc ở Phúc Tân",
   "thuoc_mat": "Hai lọ thuốc nhỏ mắt của bà",
-  "tu_radio": "Cái tụ 470µF cho radio",
+  "tu_radio": "Cái tụ 470µF cho cái đài",
   "pin_troi": "Thùng pin không tem của Kha",
   "pin_tem": "Nửa thùng pin có tem"
  },
@@ -21,27 +21,27 @@
     "flag.baoCat": true,
     "rep.DUYEN": 4,
     "rep.ONG_BA": 2,
-    "diary": "Xúc cát ở công trường Bờ Me, chở về chèn trước cửa cả dãy. Cát của xóm cũ, chèn trước cửa nhà mới."
+    "diary": "Xúc cát ở công trường Phúc Tân, chở về chèn trước cửa cả dãy. Cát của xóm cũ, chèn trước cửa nhà mới."
    },
-   "reward_text": "Mười hai bao cát chèn trước cửa sáu nhà. Cô Bảy đi kiểm từng nhà, gõ gõ lên bao cát như gõ cửa. Ông Ba nói không cần, mà vẫn để An chèn hai bao trước cửa nhà ông.",
+   "reward_text": "Mười hai bao cát chèn trước cửa sáu nhà. Cô Bích đi kiểm từng nhà, gõ gõ lên bao cát như gõ cửa. Ông Bảo nói không cần, mà vẫn để An chèn hai bao trước cửa nhà ông.",
    "fail": {
     "rep.DUYEN": -1,
     "flag.khongBaoCat": true
    },
-   "fail_text": "Đống cát ở Bờ Me đã bị xe chở đi đổ nền. Cô Duyên nhắn xin lỗi. Cả hẻm chèn cửa bằng giẻ với tấm ván.",
+   "fail_text": "Đống cát ở Phúc Tân đã bị xe chở đi đổ nền. Cô Duyên nhắn xin lỗi. Cả ngõ chèn cửa bằng giẻ với tấm ván.",
    "steps": [
     {
      "kind": "visit",
      "loc": "xom_bo_me",
      "hours": 1.5,
-     "text": "Tới công trường xóm cũ Bờ Me xúc cát (cô Duyên chừa một đống ở góc sân)",
+     "text": "Đến công trường xóm cũ Phúc Tân xúc cát (cô Duyên để dành một đống ở góc sân)",
      "scene": {
       "title": "Đống cát góc sân",
       "who": "Cô Duyên",
-      "text": "Xóm cũ giờ là một bãi nền đổ dở. Tám cánh cửa phòng trọ đã tháo, chỉ còn cái cây góc sân. Cô Duyên đội nón lá đứng chờ, chỉ đống cát: \"Chủ đất nói cát dư thì đổ. Cô nói cát dư thì cho.\" Có xẻng, có bao, mà xe ba gác thì không.",
+      "text": "Xóm cũ giờ là một bãi nền đổ dở. Tám cánh cửa phòng trọ đã tháo, chỉ còn cái cây góc sân. Cô Duyên đội nón lá đứng chờ, chỉ đống cát: \"Chủ đất nói cát thừa thì đổ. Cô nói cát thừa thì cho.\" Có xẻng, có bao, mà xe ba gác thì không.",
       "choices": [
        {
-        "label": "Gọi Minh chở giùm bằng xe ba gác, trả tiền xăng",
+        "label": "Gọi Minh chở hộ bằng xe ba gác, trả tiền xăng",
         "hint": "−80.000đ · Minh +2",
         "effects": {
          "cash": -80000,
@@ -49,7 +49,7 @@
          "rep.MINH": 2,
          "item.bao_cat": 1,
          "fatigue": 10,
-         "log": "Minh tới sau giờ đón Bắp, chở một chuyến là hết đống cát."
+         "log": "Minh đến sau giờ đón cu Bin, chở một chuyến là hết đống cát."
         }
        },
        {
@@ -96,17 +96,17 @@
    "offer": false,
    "deadline_days": 0,
    "deadline_hour": 18,
-   "reward_hint": "Bà Tư +3",
+   "reward_hint": "Bà Thoa +3",
    "reward": {
     "rep.BA_TU": 3,
     "flag.coThuocMat": true
    },
-   "reward_text": "Lọ thuốc nhỏ mắt có cái nắp màu hồng. Bà ngửa cổ, An nhỏ trật một giọt xuống má. Bà cười: \"Trúng má rồi con.\" Lần thứ hai thì trúng.",
+   "reward_text": "Lọ thuốc nhỏ mắt có cái nắp màu hồng. Bà ngửa cổ, An nhỏ chệch một giọt xuống mũi. Bà cười: \"Vào mũi rồi con.\" Lần thứ hai thì trúng.",
    "fail": {
     "rep.BA_TU": -2,
     "rep.MA": 1
    },
-   "fail_text": "Nhà thuốc ở chợ đã đóng cửa. Má chạy ra tiệm thuốc ngoài đường An Hòa, mua được lọ cuối cùng lúc bảy giờ tối.",
+   "fail_text": "Nhà thuốc ở chợ đã đóng cửa. Mẹ chạy ra hiệu thuốc ngoài phố Hàng Chiếu, mua được lọ cuối cùng lúc bảy giờ tối.",
    "steps": [
     {
      "kind": "visit",
@@ -118,10 +118,10 @@
      ],
      "effects": {
       "cash": -85000,
-      "cash_label": "Thuốc nhỏ mắt theo toa cho bà",
+      "cash_label": "Thuốc nhỏ mắt theo đơn cho bà",
       "item.thuoc_mat": 1
      },
-     "text": "Mua đúng hai lọ thuốc nhỏ mắt theo toa ở nhà thuốc chợ Cầu Nhỏ (trước 17:00)"
+     "text": "Mua đúng hai lọ thuốc nhỏ mắt theo đơn ở nhà thuốc chợ Long Biên (trước 17:00)"
     },
     {
      "kind": "visit",
@@ -132,7 +132,7 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Đem thuốc về nhỏ cho bà lần đầu"
+     "text": "Mang thuốc về nhỏ cho bà lần đầu"
     }
    ]
   },
@@ -149,9 +149,9 @@
     8,
     18
    ],
-   "intro": "Chị Hạnh chỉ cái máy bơm chìm dưới hố ga sau bếp. \"Mưa đầu mùa nó chạy, tới bữa nay thì nó đứng. Con nước rằm mà nó đứng là quán chị ngập tới ống quần. Em coi giùm chị trước con nước, chị trả đàng hoàng.\"",
-   "accept": "\"Dạ, em coi.\"",
-   "decline": "\"Tuần này em kẹt, chị gọi thợ khác giùm em.\"",
+   "intro": "Chị Hạnh chỉ cái máy bơm chìm dưới hố ga sau bếp. \"Mưa đầu mùa nó còn chạy, đến hôm nay thì nó đứng. Nước lên ngày rằm mà nó đứng là quán chị ngập đến ống quần. Em xem hộ chị trước đợt nước lên, chị trả đàng hoàng.\"",
+   "accept": "\"Vâng, em xem.\"",
+   "decline": "\"Tuần này em bận, chị gọi thợ khác hộ em.\"",
    "deadline_days": 1,
    "deadline_hour": 18,
    "reward_hint": "200 nghìn, chị Hạnh +5",
@@ -160,30 +160,30 @@
     "cash_label": "Chị Hạnh trả tiền sửa máy bơm",
     "rep.HANH": 5,
     "flag.bomHanh": true,
-    "diary": "Sửa máy bơm quán chị Hạnh: cái phao báo nước bị bọc ni lông quấn kẹt. Chị Hạnh trả tiền, còn gói cho bà hộp cháo cá."
+    "diary": "Sửa máy bơm quán chị Hạnh: cái phao báo nước bị túi ni lông quấn kẹt. Chị Hạnh trả tiền, còn gói cho bà hộp cháo cá."
    },
-   "reward_text": "Đêm con nước, quán chị Hạnh là quán duy nhất trên đường Chợ không ngập sàn. Chị nhắn cho An tấm hình cái máy bơm đang chạy, kèm ba chữ: \"Chạy êm ru.\"",
+   "reward_text": "Đêm nước lên, quán chị Hạnh là quán duy nhất trên phố Hàng Khoai không ngập sàn. Chị nhắn cho An tấm ảnh cái máy bơm đang chạy, kèm ba chữ: \"Chạy êm ru.\"",
    "fail": {
     "rep.HANH": -4
    },
-   "fail_text": "Quán chị Hạnh ngập tới ống quần. Chị không trách, chỉ nói: \"Lần sau không kịp thì nói chị sớm, chị gọi người khác.\"",
+   "fail_text": "Quán chị Hạnh ngập đến ống quần. Chị không trách, chỉ nói: \"Lần sau không kịp thì nói chị sớm, chị gọi người khác.\"",
    "steps": [
     {
      "kind": "visit",
      "loc": "com_hanh",
      "hours": 1.5,
-     "text": "Coi cái máy bơm chìm sau bếp quán chị Hạnh",
+     "text": "Xem cái máy bơm chìm sau bếp quán chị Hạnh",
      "scene": {
       "title": "Máy bơm đứng im",
       "who": "Chị Hạnh",
-      "text": "Cắm điện, máy bơm im re. Nhấc lên khỏi hố ga, cánh bơm quay trơn tay. Cái phao báo nước bên hông thì bị một miếng bọc ni lông quấn chặt, đứng yên ở vị trí \"cạn\".",
+      "text": "Cắm điện, máy bơm im lìm. Nhấc lên khỏi hố ga, cánh bơm quay trơn tay. Cái phao báo nước bên cạnh thì bị một miếng túi ni lông quấn chặt, đứng yên ở vị trí \"cạn\".",
       "choices": [
        {
         "label": "Gỡ miếng ni lông, thử phao, lắp lại",
         "hint": "Đúng bệnh thì xong nhanh",
         "effects": {
          "fatigue": 6,
-         "log": "Gỡ miếng ni lông khỏi phao, đổ nước vô hố, máy bơm rù rù chạy liền."
+         "log": "Gỡ miếng ni lông khỏi phao, đổ nước vào hố, máy bơm rù rù chạy ngay."
         }
        },
        {
@@ -212,8 +212,8 @@
   },
   {
    "id": "radio_ong_ba",
-   "title": "Cái radio của ông Ba",
-   "who": "Ông Ba",
+   "title": "Cái đài của ông Bảo",
+   "who": "Ông Bảo",
    "giver": "home",
    "days": [
     46,
@@ -227,31 +227,31 @@
     "flag.radioUot": true,
     "flag.ongBaDi": false
    },
-   "intro": "Ông Ba ngồi trước cửa, cái radio ướt để trên đùi, nắp lưng mở, mấy cục pin rỉ xanh. Ông không nhờ. Ông chỉ nói, như nói với con nước: \"Bốn chục năm nay sáng nào nó cũng hát. Bữa nay nó im.\"",
-   "accept": "\"Ông cho con mượn nó một bữa.\"",
-   "decline": "\"Để con hỏi tiệm điện tử giùm ông.\"",
+   "intro": "Ông Bảo ngồi trước cửa, cái đài ướt để trên đùi, nắp lưng mở, mấy viên pin gỉ xanh. Ông không nhờ. Ông chỉ nói, như nói với nước sông: \"Bốn chục năm nay sáng nào nó cũng hát. Hôm nay nó im.\"",
+   "accept": "\"Ông cho cháu mượn nó một hôm.\"",
+   "decline": "\"Để cháu hỏi thợ điện tử hộ ông.\"",
    "deadline_days": 3,
-   "reward_hint": "Ông Ba +8, sáng sáng có cải lương",
+   "reward_hint": "Ông Bảo +8, sáng sáng có chèo",
    "reward": {
     "rep.ONG_BA": 8,
     "rep.BA_TU": 2,
-    "diary": "Sửa xong cái radio của ông Ba: rửa mạch, thay tụ lọc nguồn, chỉnh lại kim dò đài. Sáu giờ sáng hôm sau bên vách lại có tiếng cải lương. Bà Tư kéo ghế ra cửa như nghe tiếng chuông chùa."
+    "diary": "Sửa xong cái đài của ông Bảo: rửa mạch, thay tụ lọc nguồn, chỉnh lại kim dò đài. Sáu giờ sáng hôm sau bên vách lại có tiếng chèo. Bà Thoa kéo ghế ra cửa như nghe tiếng chuông chùa."
    },
-   "reward_text": "Sáu giờ sáng hôm sau, bên vách có tiếng nhạc dạo vọng cổ. Ông Ba vặn lớn hơn mọi bữa một nấc. Bà Tư kéo ghế ra cửa, hai người già ngồi nghe hết một bài, không ai nói gì.",
+   "reward_text": "Sáu giờ sáng hôm sau, bên vách có tiếng nhạc dạo vọng cổ. Ông Bảo vặn to hơn mọi hôm một nấc. Bà Thoa kéo ghế ra cửa, hai người già ngồi nghe hết một bài, không ai nói gì.",
    "fail": {
     "rep.ONG_BA": -2
    },
-   "fail_text": "Ông Ba gói cái radio trong cái khăn, cất lên nóc tủ. Sáng ra bên vách im re.",
+   "fail_text": "Ông Bảo gói cái đài trong cái khăn, cất lên nóc tủ. Sáng ra bên vách im phăng phắc.",
    "steps": [
     {
      "kind": "visit",
      "loc": "home",
      "hours": 1,
-     "text": "Mở cái radio ra coi: rửa mạch, tìm chỗ hư",
+     "text": "Mở cái đài ra xem: rửa mạch, tìm chỗ hỏng",
      "scene": {
-      "title": "Mạch radio sau con nước",
-      "who": "Ông Ba",
-      "text": "Bên trong, bùn khô bám thành vệt trên mạch. Cái tụ lọc nguồn to nhất phồng đầu, chân rỉ. Ông Ba ngồi kế bên soi đèn pin, tay run mà giữ đèn rất yên.",
+      "title": "Mạch cái đài sau đợt nước lên",
+      "who": "Ông Bảo",
+      "text": "Bên trong, bùn khô bám thành vệt trên mạch. Cái tụ lọc nguồn to nhất phồng đầu, chân gỉ. Ông Bảo ngồi bên cạnh soi đèn pin, tay run mà giữ đèn rất yên.",
       "choices": [
        {
         "label": "Rửa mạch bằng cồn, phơi khô, ghi lại cái tụ cần thay",
@@ -266,7 +266,7 @@
         "hint": "Nhanh mà dễ chập",
         "goto": "stay",
         "effects": {
-         "log": "Bật lên nghe rè một tiếng rồi tắt ngúm. Ông Ba nhìn An như nhìn con nước."
+         "log": "Bật lên nghe rè một tiếng rồi tắt ngúm. Ông Bảo nhìn An như nhìn nước lên."
         }
        }
       ]
@@ -278,10 +278,10 @@
      "hours": 0.3,
      "effects": {
       "cash": -20000,
-      "cash_label": "Tụ lọc nguồn cho radio ông Ba",
+      "cash_label": "Tụ lọc nguồn cho cái đài ông Bảo",
       "item.tu_radio": 1
      },
-     "text": "Mua cái tụ 470µF ở sạp linh kiện chợ Cầu Nhỏ"
+     "text": "Mua cái tụ 470µF ở hàng linh kiện chợ Long Biên"
     },
     {
      "kind": "visit",
@@ -291,7 +291,7 @@
       "tu_radio": 1
      },
      "consume": true,
-     "text": "Hàn tụ mới, chỉnh kim dò đài cho ông Ba"
+     "text": "Hàn tụ mới, chỉnh kim dò đài cho ông Bảo"
     }
    ]
   },
@@ -314,7 +314,7 @@
      "khaCheGiup"
     ]
    },
-   "intro": "Kha lôi dưới gầm sạp ra một thùng các-tông: bốn chục cục pin không tem, mua rẻ của mối ở bến xe. \"Anh nói đúng. Em không muốn bán nữa. Mà em đi đòi đổi một mình thì ổng không đổi.\"",
+   "intro": "Kha lôi dưới gầm sạp ra một thùng các-tông: bốn chục viên pin không tem, mua rẻ của mối ở điểm xe buýt. \"Anh nói đúng. Em không muốn bán nữa. Mà em đi đòi đổi một mình thì ông ấy không đổi.\"",
    "accept": "\"Đi. Anh đi với em.\"",
    "decline": "\"Em tự đi đi, nói thẳng là được.\"",
    "deadline_days": 2,
@@ -324,7 +324,7 @@
     "flag.khaHocPhieu": true,
     "diary": "Cùng Kha đi đòi đổi lô pin không tem. Về sạp, nó in xấp phiếu nhận sửa có ô \"tình trạng máy\" và ô \"đã báo khách\". Chữ nó xấu, mà ô nào cũng điền."
    },
-   "reward_text": "Kha dán tờ giấy mới lên sạp: \"Pin có tem · có phiếu · nói trước giá.\" Chiều đó cô bán cá quay lại, mua thêm một cục pin dự phòng.",
+   "reward_text": "Kha dán tờ giấy mới lên sạp: \"Pin có tem · có phiếu · nói trước giá.\" Chiều đó cô bán cá quay lại, mua thêm một viên pin dự phòng.",
    "fail": {
     "rep.KHA": -2
    },
@@ -348,9 +348,9 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Mang thùng pin ra mối hàng ở bến xe số 6, đòi đổi pin có tem",
+     "text": "Mang thùng pin ra mối hàng ở điểm xe buýt Long Biên, đòi đổi pin có tem",
      "scene": {
-      "title": "Mối pin ở bến xe",
+      "title": "Mối pin ở điểm xe buýt",
       "who": "Kha",
       "text": "Ông chủ mối pin ngồi sau đống thùng, không ngẩng lên: \"Hàng bán rồi miễn đổi.\" Kha đứng sau lưng An, nắm chặt tờ phiếu nhập hàng viết tay.",
       "choices": [
@@ -390,7 +390,7 @@
       "pin_tem": 1
      },
      "consume": true,
-     "text": "Về sạp, cùng Kha ghi phiếu bảo hành cho từng cục pin"
+     "text": "Về sạp, cùng Kha ghi phiếu bảo hành cho từng viên pin"
     }
    ]
   }

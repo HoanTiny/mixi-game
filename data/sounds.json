@@ -40,7 +40,7 @@
     },
     {
       "path": "res://assets/sounds/rao_xoi.ogg",
-      "text": "Xôi nóng đây, xôi đậu xôi bắp!",
+      "text": "Xôi nóng đây, xôi đỗ xôi ngô!",
       "hours": [
         6,
         9
@@ -54,7 +54,7 @@
     },
     {
       "path": "res://assets/sounds/rao_ve_chai.ogg",
-      "text": "Ai ve chai đồng nát, mua đồ cũ hông?",
+      "text": "Ai đồng nát sắt vụn bán đi, đồ cũ bán đi!",
       "hours": [
         9,
         17
@@ -68,7 +68,7 @@
     },
     {
       "path": "res://assets/sounds/rao_che.ogg",
-      "text": "Chè đậu đỏ, chè bưởi đây!",
+      "text": "Chè đỗ đen, chè bưởi đây!",
       "hours": [
         16,
         21
@@ -82,7 +82,7 @@
     },
     {
       "path": "res://assets/sounds/rao_hu_tieu.ogg",
-      "text": "Hủ tiếu gõ đây!",
+      "text": "Phở nóng đây!",
       "hours": [
         18.5,
         22

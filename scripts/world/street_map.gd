@@ -251,7 +251,7 @@ func _draw() -> void:
 	draw_colored_polygon(tri, UI.GOLD)
 	draw_polyline(tri + PackedVector2Array([tri[0]]), Color(0, 0, 0, 0.7), 1.2)
 	# Tiêu đề: tên chỗ đang rê chuột, hay hướng dẫn.
-	var title := "Phường An Hòa · " + _open_hint() if not big else "Bản đồ phường An Hòa · " + _go_hint()
+	var title := "Phố cổ Hà Nội · " + _open_hint() if not big else "Bản đồ phố cổ Hà Nội · " + _go_hint()
 	var col := UI.HUD_SOFT
 	var show_id := _hover if _hover != "" else open
 	if show_id != "":
@@ -368,7 +368,7 @@ func _draw_real_static() -> void:
 			if biggest == null or Geo_area(w.poly) > Geo_area(biggest.poly):
 				biggest = w
 		if biggest != null:
-			_text_on(c, font, to_map(_centroid(biggest.poly)), "Rạch Bờ Me", 13, Color("cfe6ee"))
+			_text_on(c, font, to_map(_centroid(biggest.poly)), "Sông Hồng", 13, Color("cfe6ee"))
 		# Chỉ ghi tên đường lớn (không ghi tên hẻm), mỗi tên một lần, ở đoạn dài nhất.
 		var best := {}
 		for r in roads:

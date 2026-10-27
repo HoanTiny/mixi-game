@@ -9,7 +9,7 @@ Mọi người viết lại chữ phải theo đúng bảng dưới để năm c
 | Cũ | Mới | Ghi chú |
 |---|---|---|
 | Bà Tư (bà của An và Linh, 70 tuổi) | **bà Thoa** | An, Linh gọi là "bà"; người ngoài gọi "bà Thoa", "cụ Thoa". Tên ở nhãn, thẻ: "Bà Thoa". |
-| ông Tư (ông nội đã mất, có giỗ) | **ông Thịnh** | "giỗ ông", "giỗ ông Thịnh". |
+| ông Tư (chồng bà, ông ngoại của An và Linh, đã mất, có giỗ) | **ông Thịnh** | "giỗ ông", "giỗ ông Thịnh". Mẹ là con gái bà, nên là **ông ngoại** (không phải ông nội). |
 | Chú Sáu (chủ tiệm sửa xe, sửa đồ) | **chú Sơn** | "tiệm chú Sơn", "tiệm Sơn". |
 | dì Năm | **dì Nga** | "nhà dì Nga". |
 | Ông Ba (ông cụ hàng xóm ở chỗ mới, chương 2) | **ông Bảo** | |
@@ -105,3 +105,52 @@ to ngập phố, nước sông Hồng lên).
 - Độ dài mỗi chuỗi chừng như cũ (lệch không quá một phần năm), giữ giọng văn, nhịp câu, tính cách từng người.
 - Xong thì chạy `python3 tools/check_hanoi.py <file>`: phải báo OK (cấu trúc khớp bản gốc trong git, không còn từ
   cấm như Bờ Me, Bà Tư, chú Sáu, hẻm, má…).
+
+## 5. Quyết định thêm
+
+Những chỗ sổ tay chưa nói mà các file đã chọn khác nhau, nay thống nhất như sau. Mọi file phải theo đúng.
+
+### Người
+
+| Việc | Chốt |
+|---|---|
+| Quê Kha | **Thanh Hóa** (không phải Cà Mau). Mẹ Kha "từ Thanh Hóa ra"; Kha nói "giọng Thanh". Về quê: xe khách từ **bến xe Giáp Bát**, ba bốn tiếng. Từ Hà Nội nói "về/vào trong quê", từ quê gửi "ra". |
+| Ông Thịnh | Chồng bà Thoa, **ông ngoại** của An và Linh: Mẹ là con gái bà (hồi nhỏ bán bánh phụ bà; rằm tháng Bảy Mẹ "cài bông đỏ cho bà ngoại con"; Mẹ gọi "ông ngoại" khi nhắc cái kệ bếp ông đóng). Không viết "ông nội". |
+| Bé Bắp | **cu Bin** ("thằng Bin", "Bin"). Mèo vẫn tên Mun. |
+| Chú Sơn | Họ tên trên biên lai: **Lê Văn Sơn**. Tên tổ, biển hiệu: **"Sơn Sửa"**, **"Tiệm Sơn"**. "Sáu" chỉ còn là số, tháng, thứ (tháng Sáu, thứ Sáu, sáu giờ). |
+| Thơm | Quê **Nghệ An**. |
+| Ông Bảo | Hồi trẻ **chèo đò ngang qua sông Hồng, hồi chưa có cầu Chương Dương**. |
+| Xưng hô | Người ngoài lớn tuổi (chú Sơn, ông Bảo, cô Duyên, cô Bích, cô Tâm, cô Thắm, bà Bính, mẹ Kha, cô giáo khách hàng…) gọi An là **"cháu"**; An xưng **"cháu"**, gọi "chú", "ông", "cô", "bác". Người nhà (bà, Mẹ, dì Nga, bà Cả) gọi An là **"con"**. Với thầy Phong (thầy dạy lớp điện lạnh), An xưng **"em"**, thầy gọi "cậu". Linh ("anh"/"em") và bạn bè giữ như cũ. |
+
+### Đồ ăn, đồ vật
+
+| Việc | Chốt |
+|---|---|
+| Hàng của chị Lụa ở chợ đêm Long Biên | **bánh rán** (không phải bánh xèo, bánh cuốn). "rán bánh" (không "đổ bánh", "tráng bánh"); cái bánh Tín thích là cái **"già lửa"** (thay "cháy cạnh"); "chảo dầu", "bếp than rán bánh", "sạp bánh rán". |
+| Bánh nhà làm của bà Thoa (bà bán ba chục năm, mang đi biếu, làm cho giỗ, mừng thọ) | **bánh khúc** (không phải bánh bò, bánh đúc, bánh cốm, bánh rán). |
+| Áo của bà | **áo cánh** (không "áo bà ba"). |
+| Bộ ván ngựa | **cái phản gỗ**. |
+| Đèn Trung thu | **đèn ông sao**. |
+| radio | **đài** ("cái đài", "nghe đài", "mở đài"). Mã như `radio_ong_ba`, `tu_radio`, khóa `radio` giữ nguyên. |
+| cải lương | **chèo** ("đài hát chèo", vở "Quan Âm Thị Kính"). |
+| Tiệm game | **quán net** (hồi An mười ba tuổi: "quán điện tử"). |
+
+### Chỗ
+
+| Việc | Chốt |
+|---|---|
+| Đường Chợ Cầu Nhỏ | **phố Hàng Khoai**. |
+| Chợ vải, chợ lớn bà đi một mình | **chợ Mơ**. |
+| Tầng trệt | **tầng một** (tầng trên là tầng hai…). |
+| Trạm y tế | **trạm y tế phường**. |
+| Xe buýt trong thành phố | **"xe buýt"**, **"điểm xe buýt Long Biên"** (không ghi "xe buýt số 6"). Xe khách đi tỉnh (Nam Định, Giao Thủy, Thái Bình, Thanh Hóa) chạy từ **bến xe Giáp Bát**; ai đi từ điểm xe buýt Long Biên thì đi xe buýt ra Giáp Bát. |
+| Chỗ làm cũ / trung tâm bảo hành | **Điện máy Thăng Long**, "trung tâm Thăng Long" (không "Phương Nam"). |
+
+### Mùa, tiếng phố
+
+| Việc | Chốt |
+|---|---|
+| Gió chương 5 (tháng Chín) | **gió heo may** (thay "gió chướng"; không gọi là "gió mùa"). Tên chương: "Chương 5 · Tháng Chín gió heo may". |
+| Mực nước | "ngang thắt lưng" (không "ngang hông"). |
+| Tiếng rao, hàng rong | Người mua đồ cũ là **"Đồng nát"**, rao "Ai đồng nát sắt vụn bán đi, đồ cũ bán đi!"; hàng đêm là **"Phở đêm"**, rao "Phở nóng đây!" (thay hủ tiếu gõ). |
+| Tổ tình nguyện | **tổ an toàn điện mùa nước**. |

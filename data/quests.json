@@ -1,58 +1,58 @@
 {
  "_ghi_chu": "Việc nhờ nhiều bước kiểu Nobody. giver: địa điểm có người nhờ (hiện dấu ! trên phố). days, offer_window, when: lúc nào được nhờ. deadline_days/deadline_hour: hạn tính từ ngày nhận. Mỗi bước (steps) có kind: visit (tới loc bấm thẻ, có thể kèm window giờ, need_items, scene hộp thoại có lựa chọn; auto: tới nơi là xong), action (làm việc action đủ count lần, min_ratio chỉ tiêu trò chơi nhỏ, manual: phải tự làm), find (lục thùng rác trong khoảng x, chance ra đồ). within: số giờ phải xong bước kể từ lúc bắt đầu bước. Lựa chọn trong scene có goto: next (mặc định), stay (làm lại sau), end (thôi, không thưởng), fail, hoặc id của bước khác. Hiệu ứng và điều kiện dùng chung cú pháp với events.json. offer: false là việc không tự nhờ, chỉ mở từ một lựa chọn trong cảnh chính (hiệu ứng quest_start, có thể ghi đè deadline_hour).",
  "items": {
-  "quat": "Cái quạt đứng của cô bán trái cây",
-  "com_suat": "20 suất cơm cho dãy Bến Cạn",
-  "meo": "Con mèo Mun của bé Bắp",
+  "quat": "Cái quạt cây của cô bán hoa quả",
+  "com_suat": "20 suất cơm cho dãy Tạ Hiện",
+  "meo": "Con mèo Mun của cu Bin",
   "chau_hung": "Cái chậu mới cho cây húng",
   "ho_so": "Bộ hồ sơ thực tập của Linh",
   "com_tang_ca": "12 suất cơm tăng ca",
-  "bap": "Bé Bắp (đang dắt tay)"
+  "bap": "Cu Bin (đang dắt tay)"
  },
  "quests": [
   {
    "id": "quat_trai_cay",
-   "title": "Cái quạt của cô bán trái cây",
-   "who": "Chú Sáu",
+   "title": "Cái quạt của cô bán hoa quả",
+   "who": "Chú Sơn",
    "giver": "tiem_sau",
    "days": [
     2,
     2
    ],
-   "intro": "Cô bán trái cây cần cái quạt trước ca bán.",
-   "accept": "\"Để con coi thử.\"",
-   "decline": "\"Bữa nay con kẹt rồi chú.\"",
+   "intro": "Cô bán hoa quả cần cái quạt trước ca bán.",
+   "accept": "\"Để cháu xem thử.\"",
+   "decline": "\"Hôm nay cháu bận mất rồi chú ạ.\"",
    "deadline_days": 0,
    "deadline_hour": 15,
-   "reward_hint": "120 nghìn, chú Sáu +6",
+   "reward_hint": "120 nghìn, chú Sơn +6",
    "reward": {
     "cash": 120000,
-    "cash_label": "Cô bán trái cây trả tiền sửa quạt",
+    "cash_label": "Cô bán hoa quả trả tiền sửa quạt",
     "rep.SAU": 6,
     "flag.quatTot": true,
     "promise_status": {
      "id": "quat_truoc_trua",
      "status": "done"
     },
-    "diary": "Cái quạt của cô bán trái cây chạy lại. Cô trả tiền, còn dúi thêm hai trái xoài: \"Cho bà.\""
+    "diary": "Cái quạt của cô bán hoa quả chạy lại. Cô trả tiền, còn dúi thêm hai quả xoài: \"Cho bà.\""
    },
-   "reward_text": "Cô bán trái cây bật quạt, gió thổi bay mấy tờ giấy gói. \"Chạy êm hơn hồi mới mua!\" Cô dúi thêm cho An hai trái xoài. Chú Sáu chỉ hỏi một câu: \"Tụ hả?\" rồi gật gù.",
+   "reward_text": "Cô bán hoa quả bật quạt, gió thổi bay mấy tờ giấy gói. \"Chạy êm hơn lúc mới mua!\" Cô dúi thêm cho An hai quả xoài. Chú Sơn chỉ hỏi một câu: \"Tụ à?\" rồi gật gù.",
    "fail": {
     "rep.SAU": -5,
     "item.quat": -1,
     "flag.quatTre": true
    },
-   "fail_text": "Quá giờ hẹn, cô bán trái cây phải mượn tạm cái quạt của quán bên cạnh. Chú Sáu xin lỗi thay An. \"Lần sau không kịp thì nói sớm nghen con.\"",
+   "fail_text": "Quá giờ hẹn, cô bán hoa quả phải mượn tạm cái quạt của quán bên cạnh. Chú Sơn xin lỗi thay An. \"Lần sau không kịp thì nói sớm nhé cháu.\"",
    "steps": [
     {
      "kind": "visit",
      "loc": "tiem_sau",
      "hours": 1,
-     "text": "Coi cái quạt đứng ở bàn sửa của chú Sáu",
+     "text": "Xem cái quạt cây ở bàn sửa của chú Sơn",
      "scene": {
-      "title": "Cái quạt đứng kêu ù ù",
-      "who": "Chú Sáu",
-      "text": "Cắm điện vô, quạt kêu ù ù nhưng cánh đứng yên. Lấy tay đẩy nhẹ thì cánh quay, càng lúc càng nhanh. Trục quạt trơn, không kẹt.\nChú Sáu ngồi bên cạnh, khoanh tay chờ.",
+      "title": "Cái quạt cây kêu ù ù",
+      "who": "Chú Sơn",
+      "text": "Cắm điện vào, quạt kêu ù ù nhưng cánh đứng yên. Lấy tay đẩy nhẹ thì cánh quay, càng lúc càng nhanh. Trục quạt trơn, không kẹt.\nChú Sơn ngồi bên cạnh, khoanh tay chờ.",
       "choices": [
        {
         "label": "Thay cái tụ khởi động của quạt",
@@ -60,11 +60,11 @@
         "effects": {
          "item.quat": 1,
          "fatigue": 3,
-         "log": "Thay tụ mới, bật lên là cánh quay liền. Chú Sáu gật đầu, không nói gì."
+         "log": "Thay tụ mới, bật lên là cánh quay ngay. Chú Sơn gật đầu, không nói gì."
         }
        },
        {
-        "label": "Tra dầu vô bạc trục",
+        "label": "Tra dầu vào bạc trục",
         "hint": "Ít tốn, làm nhanh",
         "goto": "stay",
         "effects": {
@@ -73,12 +73,12 @@
         }
        },
        {
-        "label": "\"Con không chắc, chú coi lại giùm con.\"",
+        "label": "\"Cháu không chắc, chú xem lại hộ cháu.\"",
         "hint": "Thành thật, nhưng việc vẫn là của mình",
         "goto": "stay",
         "effects": {
          "rep.SAU": 2,
-         "log": "Chú Sáu chỉ vô cái tụ: \"Đẩy tay mới chạy thì nghĩ tới cái gì?\""
+         "log": "Chú Sơn chỉ vào cái tụ: \"Đẩy tay mới chạy thì nghĩ tới cái gì?\""
         }
        }
       ]
@@ -93,14 +93,14 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Vác quạt ra chợ Cầu Nhỏ trả cô bán trái cây trước giờ hẹn"
+     "text": "Vác quạt ra chợ Long Biên trả cô bán hoa quả trước giờ hẹn"
     }
    ],
    "offer": false
   },
   {
    "id": "com_ben_can",
-   "title": "Hai mươi suất cơm cho Bến Cạn",
+   "title": "Hai mươi suất cơm cho Tạ Hiện",
    "who": "Chị Hạnh",
    "giver": "com_hanh",
    "days": [
@@ -111,9 +111,9 @@
     6,
     18
    ],
-   "intro": "Chị Hạnh vừa nghe điện thoại xong. \"Anh Phúc đặt 20 suất trưa cho thợ với mấy quán dưới Bến Cạn. Em phụ chị một ca rửa bát cho kịp, rồi 10 giờ tới 12 giờ trưa ghé lấy cơm chở xuống đó. Cơm nguội là người ta không trả đủ đâu nghen.\"",
-   "accept": "\"Dạ, em nhận.\"",
-   "decline": "\"Em không chắc kịp, chị kiếm người khác giùm em.\"",
+   "intro": "Chị Hạnh vừa nghe điện thoại xong. \"Anh Phúc đặt 20 suất trưa cho thợ với mấy quán bên Tạ Hiện. Em phụ chị một ca rửa bát cho kịp, rồi 10 giờ đến 12 giờ trưa ghé lấy cơm chở sang đó. Cơm nguội là người ta không trả đủ đâu nhé.\"",
+   "accept": "\"Vâng, em nhận.\"",
+   "decline": "\"Em không chắc kịp, chị tìm người khác hộ em.\"",
    "decline_effects": {
     "rep.HANH": 1
    },
@@ -126,9 +126,9 @@
     "flag.comQuen": true,
     "rep.HANH": 5,
     "rep.PHUC": 2,
-    "diary": "Hai mươi suất cơm tới Bến Cạn còn bốc khói. Từ giờ ăn ở quán chị Hạnh có thêm chén canh."
+    "diary": "Hai mươi suất cơm đến Tạ Hiện còn bốc khói. Từ giờ ăn ở quán chị Hạnh có thêm bát canh."
    },
-   "reward_text": "Cơm tới nơi còn bốc khói. Anh Phúc đếm đủ 20 hộp, gật gù. Chị Hạnh nhắn: \"Được việc. Từ giờ ăn ở quán chị tính giá quen, có thêm chén canh.\"",
+   "reward_text": "Cơm tới nơi còn bốc khói. Anh Phúc đếm đủ 20 hộp, gật gù. Chị Hạnh nhắn: \"Được việc. Từ giờ ăn ở quán chị tính giá quen, có thêm bát canh.\"",
    "fail": {
     "rep.HANH": -6
    },
@@ -166,35 +166,35 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Chở cơm xuống dãy quán Bến Cạn trước khi nguội (30 phút)"
+     "text": "Chở cơm sang dãy quán Tạ Hiện trước khi nguội (30 phút)"
     }
    ]
   },
   {
    "id": "lon_cho",
    "title": "Mối hàng lon nhôm",
-   "who": "Cô Út ve chai",
+   "who": "Cô Thắm đồng nát",
    "giver": "cho_cau_nho",
    "days": [
     3,
     25
    ],
-   "intro": "Cô Út sạp ve chai ở chợ gõ gõ cái cân. \"Lò nhôm bên khu công nghiệp đang cần gấp. Trong hai ngày con gom cho cô đủ 12 lon nhôm, cô trả gấp đôi giá. Thùng rác dọc phố nhiều lắm.\"",
-   "accept": "\"Hai ngày 12 lon, con nhận.\"",
-   "decline": "\"Để con coi đã cô.\"",
+   "intro": "Cô Thắm hàng đồng nát ở chợ gõ gõ cái cân. \"Lò nhôm bên khu công nghiệp Bắc Thăng Long đang cần gấp. Trong hai ngày cháu gom cho cô đủ 12 lon nhôm, cô trả gấp đôi giá. Thùng rác dọc phố nhiều lắm.\"",
+   "accept": "\"Hai ngày 12 lon, cháu nhận.\"",
+   "decline": "\"Để cháu xem đã cô ạ.\"",
    "deadline_days": 2,
-   "reward_hint": "120 nghìn, sau này bán ve chai được giá hơn",
+   "reward_hint": "120 nghìn, sau này bán đồng nát được giá hơn",
    "reward": {
     "cash": 120000,
-    "cash_label": "Cô Út trả gấp đôi 12 lon nhôm",
+    "cash_label": "Cô Thắm trả gấp đôi 12 lon nhôm",
     "flag.veChaiQuen": true,
-    "diary": "Gom đủ mười hai lon cho cô Út ve chai. Giờ mình rành mấy cái thùng rác dọc phố hơn rành đường."
+    "diary": "Gom đủ mười hai lon cho cô Thắm đồng nát. Giờ mình thuộc mấy cái thùng rác dọc phố hơn thuộc đường."
    },
-   "reward_text": "Cô Út đếm đủ 12 lon. \"Được việc ghê. Từ giờ con đem gì tới cô cũng trả cao hơn người ta hai chục phần trăm.\"",
+   "reward_text": "Cô Thắm đếm đủ 12 lon. \"Được việc đấy. Từ giờ cháu mang gì đến cô cũng trả cao hơn người ta hai chục phần trăm.\"",
    "fail": {
     "fatigue": 2
    },
-   "fail_text": "Lò nhôm đã lấy hàng chỗ khác. Cô Út: \"Thôi, lần sau cô kêu con.\"",
+   "fail_text": "Lò nhôm đã lấy hàng chỗ khác. Cô Thắm: \"Thôi, lần sau cô gọi cháu.\"",
    "steps": [
     {
      "kind": "visit",
@@ -204,13 +204,13 @@
       "lon": 12
      },
      "consume": true,
-     "text": "Gom 12 lon nhôm (lục thùng rác dọc phố, phím E) rồi đem tới sạp. Đừng bán lon trước!"
+     "text": "Gom 12 lon nhôm (lục thùng rác dọc phố, phím E) rồi mang đến hàng cô Thắm. Đừng bán lon trước!"
     }
    ]
   },
   {
    "id": "meo_be_bap",
-   "title": "Con mèo Mun của bé Bắp",
+   "title": "Con mèo Mun của cu Bin",
    "who": "Minh",
    "giver": "com_hanh",
    "days": [
@@ -221,9 +221,9 @@
     7,
     17
    ],
-   "intro": "Minh gãi đầu. \"Con mèo Mun của thằng Bắp chạy mất từ tối qua. Nó khóc quá trời. Tao chạy đơn không kịp kiếm. Hồi trước con Mun hay lủi mấy thùng rác gần chợ Cầu Nhỏ. Mày đi ngang thì ngó giùm tao, chiều tao ghé quán lấy.\"",
-   "accept": "\"Để tao kiếm cho.\"",
-   "decline": "\"Tao không hứa được, bữa nay kín lịch.\"",
+   "intro": "Minh gãi đầu. \"Con mèo Mun của thằng Bin chạy mất từ tối qua. Nó khóc ghê lắm. Tao chạy đơn không kịp tìm. Trước con Mun hay lủi mấy thùng rác gần chợ Long Biên. Mày đi qua thì ngó hộ tao, chiều tao ghé quán lấy.\"",
+   "accept": "\"Để tao tìm cho.\"",
+   "decline": "\"Tao không hứa được, hôm nay kín lịch.\"",
    "decline_effects": {
     "rep.MINH": 1
    },
@@ -234,19 +234,19 @@
     "rep.MINH": 8,
     "fatigue": -4,
     "flag.minhNoMotLan": true,
-    "diary": "Tìm được con Mun sau thùng rác chợ. Minh chụp hình gửi vợ. Bắp hứa vẽ thêm mình vô cái xe chở cả xóm."
+    "diary": "Tìm được con Mun sau thùng rác chợ. Minh chụp ảnh gửi vợ. Cu Bin hứa vẽ thêm mình vào cái xe chở cả xóm."
    },
-   "reward_text": "Minh ôm con Mun, chụp hình gửi vợ. \"Thằng Bắp mà biết chắc nó vẽ thêm mày vô cái xe chở cả xóm.\" Rồi Minh nói nhỏ: \"Bữa nào rảnh tao bao mày ly cà phê.\"",
+   "reward_text": "Minh ôm con Mun, chụp ảnh gửi vợ. \"Thằng Bin mà biết chắc nó vẽ thêm mày vào cái xe chở cả xóm.\" Rồi Minh nói nhỏ: \"Hôm nào rảnh tao mời mày cốc cà phê.\"",
    "fail": {
     "rep.MINH": -3
    },
-   "fail_text": "Tối đó con Mun tự mò về, gầy nhom. Minh nhắn: \"Nó về rồi. Mà lần sau không chắc thì nói không chắc nghen.\"",
+   "fail_text": "Tối đó con Mun tự mò về, gầy nhom. Minh nhắn: \"Nó về rồi. Mà lần sau không chắc thì nói không chắc nhé.\"",
    "steps": [
     {
      "kind": "find",
      "chance": 0.45,
      "item": "meo",
-     "text": "Lục mấy thùng rác quanh chợ Cầu Nhỏ và đường Chợ tìm con Mun",
+     "text": "Lục mấy thùng rác quanh chợ Long Biên và phố Hàng Khoai tìm con Mun",
      "found_text": "Meo! Con Mun lấm lem chui ra từ sau thùng rác",
      "area": [
       -64,
@@ -275,7 +275,7 @@
   {
    "id": "chau_hung",
    "title": "Cái chậu cho cây húng",
-   "who": "Bà Tư",
+   "who": "Bà Thoa",
    "giver": "xom_bo_me",
    "days": [
     21,
@@ -285,21 +285,21 @@
     6,
     19
    ],
-   "intro": "Bà Tư chỉ cái chậu húng nứt chân. \"Cái chậu này bể rồi, bê qua chỗ mới chắc vỡ luôn. Con ra chợ coi giùm bà cái chậu mới. Mà bà muốn tự chọn, con đừng mua đại nghen.\"",
-   "accept": "\"Dạ, con ra chợ coi.\"",
-   "decline": "\"Để mấy bữa nữa bà ơi.\"",
+   "intro": "Bà Thoa chỉ cái chậu húng nứt chân. \"Cái chậu này vỡ rồi, bê sang chỗ mới chắc vỡ hẳn. Con ra chợ xem hộ bà cái chậu mới. Mà bà muốn tự chọn, con đừng mua bừa nhé.\"",
+   "accept": "\"Vâng, con ra chợ xem.\"",
+   "decline": "\"Để mấy hôm nữa bà ơi.\"",
    "deadline_days": 1,
-   "reward_hint": "Bà Tư +6",
+   "reward_hint": "Bà Thoa +6",
    "reward": {
     "rep.BA_TU": 6,
     "flag.chauHungMoi": true,
-    "diary": "Bà sang cây húng qua chậu mới, ém đất bằng tay, không cho ai phụ."
+    "diary": "Bà trồng cây húng sang chậu mới, ém đất bằng tay, không cho ai giúp."
    },
-   "reward_text": "Bà Tư sang cây húng qua chậu mới, ém đất bằng tay. \"Qua bên đó bà để ngay cửa. Ai đi ngang cũng thấy.\"",
+   "reward_text": "Bà Thoa trồng cây húng sang chậu mới, ém đất bằng tay. \"Sang bên đó bà để ngay cửa. Ai đi qua cũng thấy.\"",
    "fail": {
     "rep.BA_TU": -2
    },
-   "fail_text": "Bà Tư lấy dây kẽm buộc tạm cái chậu cũ. \"Thôi, để đó bà tính.\"",
+   "fail_text": "Bà Thoa lấy dây thép buộc tạm cái chậu cũ. \"Thôi, để đó bà tính.\"",
    "steps": [
     {
      "kind": "visit",
@@ -309,14 +309,14 @@
       6,
       19
      ],
-     "text": "Ra chợ Cầu Nhỏ coi chậu mới cho bà",
+     "text": "Ra chợ Long Biên xem chậu mới cho bà",
      "scene": {
-      "title": "Sạp đồ gốm ở chợ",
-      "who": "Chủ sạp",
-      "text": "Sạp có ba cái chậu vừa cỡ: một cái sành nâu 45 nghìn, một cái men xanh 60 nghìn, một cái nhựa giả gốm 20 nghìn. Bà dặn muốn tự chọn.",
+      "title": "Hàng đồ gốm ở chợ",
+      "who": "Chủ hàng",
+      "text": "Hàng có ba cái chậu vừa cỡ: một cái sành nâu 45 nghìn, một cái men xanh 60 nghìn, một cái nhựa giả gốm 20 nghìn. Bà dặn muốn tự chọn.",
       "choices": [
        {
-        "label": "Chụp hình gửi bà chọn, mua cái bà chọn",
+        "label": "Chụp ảnh gửi bà chọn, mua cái bà chọn",
         "hint": "Mất thêm chút thời gian, khoảng 45 nghìn",
         "require": {
          "cash_min": 45000
@@ -335,7 +335,7 @@
         }
        },
        {
-        "label": "Mua đại cái nhựa cho rẻ",
+        "label": "Mua bừa cái nhựa cho rẻ",
         "hint": "20 nghìn, nhưng bà dặn muốn tự chọn",
         "require": {
          "cash_min": 20000
@@ -367,7 +367,7 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Đem chậu về xóm trọ cho bà Tư"
+     "text": "Đem chậu về xóm trọ cho bà Thoa"
     }
    ]
   },
@@ -384,17 +384,17 @@
     6,
     18
    ],
-   "intro": "Linh đưa An cái USB. \"Chiều thứ Ba em lên trung tâm nghề nộp hồ sơ. Anh đi ngang tiệm photo ở chợ in giùm em hai bộ, tối em cần. Anh in đúng bản em gửi nghen, đừng sửa gì.\"",
-   "accept": "\"Ừ, tối anh đem về.\"",
-   "decline": "\"Bữa nay anh không ghé chợ được, em tự in nha.\"",
+   "intro": "Linh đưa An cái USB. \"Chiều thứ Ba em lên trung tâm nghề nộp hồ sơ. Anh đi qua hàng photo ở chợ in hộ em hai bộ, tối em cần. Anh in đúng bản em gửi nhé, đừng sửa gì.\"",
+   "accept": "\"Ừ, tối anh mang về.\"",
+   "decline": "\"Hôm nay anh không ghé chợ được, em tự in nhé.\"",
    "deadline_days": 0,
    "deadline_hour": 21,
    "reward_hint": "Linh +5",
    "reward": {
     "rep.LINH": 5,
-    "diary": "Đem hai bộ hồ sơ về cho Linh trước giờ hẹn. Em lật từng trang, kẹp vô bìa."
+    "diary": "Đem hai bộ hồ sơ về cho Linh trước giờ hẹn. Em lật từng trang, kẹp vào bìa."
    },
-   "reward_text": "Linh lật từng trang, kẹp vô bìa. \"Cảm ơn anh. Thứ Ba em tự đi nộp.\"",
+   "reward_text": "Linh lật từng trang, kẹp vào bìa. \"Cảm ơn anh. Thứ Ba em tự đi nộp.\"",
    "fail": {
     "rep.LINH": -3,
     "family": {
@@ -403,7 +403,7 @@
      "text": "Hứa in hồ sơ cho Linh mà không đem về kịp"
     }
    },
-   "fail_text": "Chín giờ tối, Linh tự chạy ra tiệm photo trước giờ đóng cửa. Em không trách, chỉ nói: \"Lần sau không kịp anh nhắn em.\"",
+   "fail_text": "Chín giờ tối, Linh tự chạy ra hàng photo trước giờ đóng cửa. Em không trách, chỉ nói: \"Lần sau không kịp anh nhắn em.\"",
    "steps": [
     {
      "kind": "visit",
@@ -413,11 +413,11 @@
       7,
       20
      ],
-     "text": "Ra tiệm photo ở chợ Cầu Nhỏ in hồ sơ cho Linh (7:00–20:00)",
+     "text": "Ra hàng photo ở chợ Long Biên in hồ sơ cho Linh (7:00–20:00)",
      "scene": {
-      "title": "Tiệm photo ở chợ",
-      "who": "Chú tiệm photo",
-      "text": "Chú tiệm photo mở file. Trang giới thiệu Linh viết ngắn, có một câu \"em muốn được đánh giá bằng việc em làm\". An thấy câu đó hơi cứng, định sửa cho mềm hơn.",
+      "title": "Hàng photo ở chợ",
+      "who": "Chú hàng photo",
+      "text": "Chú hàng photo mở file. Trang giới thiệu Linh viết ngắn, có một câu \"em muốn được đánh giá bằng việc em làm\". An thấy câu đó hơi cứng, định sửa cho mềm hơn.",
       "choices": [
        {
         "label": "In đúng bản Linh gửi",
@@ -448,7 +448,7 @@
           "kind": "pressure",
           "text": "Tự ý sửa hồ sơ thực tập của Linh"
          },
-         "log": "Tối về Linh đọc lại, im lặng một lúc rồi nói: \"Câu đó em viết vậy là có lý do.\""
+         "log": "Tối về Linh đọc lại, im lặng một lúc rồi nói: \"Câu đó em viết thế là có lý do.\""
         }
        }
       ]
@@ -486,8 +486,8 @@
     ]
    },
    "intro": "Trâm đưa An tờ phiếu kiểm tra của quán số ba. \"Trước khi ghi xong, em đo lại hết từng mục với chị. Mất thêm một tiếng, nhưng ngày 20 người ta ký mới yên.\"",
-   "accept": "\"Dạ, mình đo lại.\"",
-   "decline": "\"Em kẹt giờ, chị làm trước giùm em.\"",
+   "accept": "\"Vâng, mình đo lại.\"",
+   "decline": "\"Em vướng giờ, chị làm trước hộ em.\"",
    "decline_effects": {
     "rep.TRAM": -2
    },
@@ -513,14 +513,14 @@
      "scene": {
       "title": "Tờ phiếu của quán số ba",
       "who": "Trâm",
-      "text": "Còn hai mục chưa đo lại: ổ cắm sau bếp và dây đèn ngoài hiên. Chủ quán hối vì sắp tới giờ bán. Trâm nhìn An.",
+      "text": "Còn hai mục chưa đo lại: ổ cắm sau bếp và dây đèn ngoài hiên. Chủ quán giục vì sắp đến giờ bán. Trâm nhìn An.",
       "choices": [
        {
         "label": "Đo đủ hai mục, xin chủ quán chờ mười phút",
         "hint": "Mệt +4",
         "effects": {
          "fatigue": 4,
-         "log": "Ổ cắm sau bếp lỏng một đầu dây. Trâm siết lại, ghi vô phiếu."
+         "log": "Ổ cắm sau bếp lỏng một đầu dây. Trâm siết lại, ghi vào phiếu."
         }
        },
        {
@@ -557,14 +557,14 @@
     "cash_label": "Chị Hạnh trả công chở 12 suất cơm",
     "rep.HANH": 4,
     "flag.comKhachDeu": true,
-    "diary": "Chở mười hai suất cơm ra bến xe kịp giờ. Chị Hạnh nói người ta sẽ đặt tiếp."
+    "diary": "Chở mười hai suất cơm ra điểm xe buýt kịp giờ. Chị Hạnh nói người ta sẽ đặt tiếp."
    },
-   "reward_text": "Công nhân nhận cơm còn ấm, ký vô tờ giấy của chị Hạnh. Chị nhắn: \"Đúng giờ vậy là người ta đặt tiếp.\"",
+   "reward_text": "Công nhân nhận cơm còn ấm, ký vào tờ giấy của chị Hạnh. Chị nhắn: \"Đúng giờ vậy là người ta đặt tiếp.\"",
    "fail": {
     "rep.HANH": -5,
     "item.com_tang_ca": -1
    },
-   "fail_text": "Cơm tới trễ, mấy công nhân đã vào ca. Chị Hạnh phải gọi điện xin lỗi khách. \"Em báo giờ mà không giữ được thì lần sau báo giờ khác.\"",
+   "fail_text": "Cơm đến muộn, mấy công nhân đã vào ca. Chị Hạnh phải gọi điện xin lỗi khách. \"Em báo giờ mà không giữ được thì lần sau báo giờ khác.\"",
    "steps": [
     {
      "kind": "visit",
@@ -585,13 +585,13 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Chở cơm ra bến xe số 6 cho công nhân tăng ca (40 phút)"
+     "text": "Chở cơm ra điểm xe buýt Long Biên cho công nhân tăng ca (40 phút)"
     }
    ]
   },
   {
    "id": "don_bap",
-   "title": "Đón bé Bắp",
+   "title": "Đón cu Bin",
    "who": "Minh",
    "giver": "com_hanh",
    "offer": false,
@@ -599,22 +599,22 @@
     9,
     9
    ],
-   "intro": "Minh nhờ An đón bé Bắp.",
+   "intro": "Minh nhờ An đón cu Bin.",
    "deadline_days": 0,
    "deadline_hour": 18.5,
    "reward_hint": "Minh +10",
    "reward": {
     "rep.MINH": 10,
     "flag.donBapDungGio": true,
-    "diary": "Đón Bắp đúng giờ. Nó khoe huy hiệu bé ngoan, bắt mình đeo thử."
+    "diary": "Đón cu Bin đúng giờ. Nó khoe huy hiệu bé ngoan, bắt mình đeo thử."
    },
-   "reward_text": "Bé Bắp chạy ào vô quán, khoe cái huy hiệu bé ngoan. Minh tới sau mười phút, mồ hôi đầm đìa. \"Cảm ơn mày. Bữa nào mày cần chở đồ thì hẹn tao một giờ, tao tới đúng giờ đó.\"",
+   "reward_text": "Cu Bin chạy ào vào quán, khoe cái huy hiệu bé ngoan. Minh đến sau mười phút, mồ hôi đầm đìa. \"Cảm ơn mày. Hôm nào mày cần chở đồ thì hẹn tao một giờ, tao đến đúng giờ đó.\"",
    "fail": {
     "rep.MINH": -10,
     "item.bap": -1,
     "flag.thatHenMinh": true
    },
-   "fail_text": "Cô giáo gọi Minh: bé Bắp đứng chờ ở cổng trường. Minh bỏ đơn chạy về đón con. Tối đó Minh nhắn: \"Mày nhận rồi thì mày phải tới. Không tới được thì gọi tao.\"",
+   "fail_text": "Cô giáo gọi Minh: cu Bin đứng chờ ở cổng trường. Minh bỏ đơn chạy về đón con. Tối đó Minh nhắn: \"Mày nhận rồi thì mày phải đến. Không đến được thì gọi tao.\"",
    "steps": [
     {
      "kind": "visit",
@@ -627,7 +627,7 @@
      "effects": {
       "item.bap": 1
      },
-     "text": "Đón bé Bắp ở trường mẫu giáo cạnh bến xe số 6 (16:30–17:30)"
+     "text": "Đón cu Bin ở trường mầm non cạnh điểm xe buýt Long Biên (16:30–17:30)"
     },
     {
      "kind": "visit",
@@ -639,7 +639,7 @@
      },
      "consume": true,
      "carry": true,
-     "text": "Dắt Bắp về Cơm Hạnh chờ Minh (45 phút)"
+     "text": "Dắt cu Bin về Cơm Hạnh chờ Minh (45 phút)"
     }
    ]
   }

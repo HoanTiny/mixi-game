@@ -1,7 +1,7 @@
 {
  "_ghi_chu": "Việc nhờ của chương 4, cùng cú pháp với quests.json. \"home\" là chỗ ở hiện tại.",
  "items": {
-  "nan_tre": "Bó nan tre, dây kẽm và giấy kính đỏ"
+  "nan_tre": "Bó nan tre, dây thép và giấy kính đỏ"
  },
  "quests": [
   {
@@ -21,7 +21,7 @@
     "rep.MAI": 4,
     "diary": "Ba mươi hai cái quạt trần của trường quay đủ, tám phòng, trước khai giảng. Bốn buổi trong ba ngày, ngủ được mười tiếng cộng lại. Cô Mai trả bốn triệu, đếm hai lần."
    },
-   "reward_text": "Cô Mai đi một vòng tám phòng, bật từng công tắc. Ba mươi hai cái quạt quay đều. Cô ký phiếu, trả đủ bốn triệu, rồi nói: \"Anh làm một mình hả? Lần sau đừng.\"",
+   "reward_text": "Cô Mai đi một vòng tám phòng, bật từng công tắc. Ba mươi hai cái quạt quay đều. Cô ký phiếu, trả đủ bốn triệu, rồi nói: \"Anh làm một mình à? Lần sau đừng.\"",
    "fail": {
     "flag.treDonTruong": true,
     "flag.donTruongXong": true,
@@ -33,7 +33,7 @@
      "kind": "action",
      "action": "sua_quat_truong",
      "count": 4,
-     "text": "Làm 4 buổi ở trường cấp hai cuối đường Chợ trước tối ngày 94"
+     "text": "Làm 4 buổi ở trường cấp hai cuối phố Hàng Khoai trước tối ngày 94"
     }
    ]
   },
@@ -66,7 +66,7 @@
      "kind": "action",
      "action": "sua_quat_truong",
      "count": 2,
-     "text": "Làm 2 buổi ở trường cấp hai cuối đường Chợ trước tối ngày 94"
+     "text": "Làm 2 buổi ở trường cấp hai cuối phố Hàng Khoai trước tối ngày 94"
     }
    ]
   },
@@ -99,14 +99,14 @@
      "kind": "action",
      "action": "sua_quat_truong",
      "count": 2,
-     "text": "Làm 2 buổi ở trường cấp hai cuối đường Chợ trước tối ngày 94"
+     "text": "Làm 2 buổi ở trường cấp hai cuối phố Hàng Khoai trước tối ngày 94"
     }
    ]
   },
   {
    "id": "den_ong_sao",
-   "title": "Lồng đèn ông sao của bé Bắp",
-   "who": "Bé Bắp",
+   "title": "Đèn ông sao của cu Bin",
+   "who": "Cu Bin",
    "giver": "com_hanh",
    "offer": false,
    "deadline_days": 1,
@@ -117,13 +117,13 @@
     "rep.MINH": 4,
     "flag.denOngSao": true,
     "fatigue": -3,
-    "diary": "Làm lồng đèn ông sao với bé Bắp ở quán chị Hạnh: mình uốn nan, buộc kẽm, nó quét hồ dán giấy kính đỏ, lưỡi thè ra một bên."
+    "diary": "Làm đèn ông sao với cu Bin ở quán chị Hạnh: mình uốn nan, buộc dây thép, nó quét hồ dán giấy kính đỏ, lưỡi thè ra một bên."
    },
-   "reward_text": "Bắp giơ cái lồng đèn ông sao lên, xoay một vòng cho đỏ cả quán. Minh về kịp, đứng ngoài cửa quán chụp hình, gửi cho cả nhóm xe: \"Con tao làm.\"",
+   "reward_text": "Cu Bin giơ cái đèn ông sao lên, xoay một vòng cho đỏ cả quán. Minh về kịp, đứng ngoài cửa quán chụp ảnh, gửi cho cả nhóm xe: \"Con tao làm.\"",
    "fail": {
     "rep.MINH": -2
    },
-   "fail_text": "Tối mười bốn vẫn chưa xong cái lồng đèn. Chị Hạnh làm giùm Bắp phần còn lại.",
+   "fail_text": "Tối mười bốn vẫn chưa xong cái đèn ông sao. Chị Hạnh làm hộ cu Bin phần còn lại.",
    "steps": [
     {
      "kind": "visit",
@@ -131,10 +131,10 @@
      "hours": 0.5,
      "effects": {
       "cash": -30000,
-      "cash_label": "Nan tre, dây kẽm, giấy kính",
+      "cash_label": "Nan tre, dây thép, giấy kính",
       "item.nan_tre": 1
      },
-     "text": "Mua nan tre, dây kẽm, thêm giấy kính ở chợ Cầu Nhỏ"
+     "text": "Mua nan tre, dây thép, thêm giấy kính ở chợ Long Biên"
     },
     {
      "kind": "visit",
@@ -148,11 +148,11 @@
       "nan_tre": 1
      },
      "consume": true,
-     "text": "Về quán chị Hạnh, ngồi làm lồng đèn với Bắp (15:00–19:00)",
+     "text": "Về quán chị Hạnh, ngồi làm đèn ông sao với cu Bin (15:00–19:00)",
      "scene": {
       "title": "Năm cánh sao",
-      "who": "Bé Bắp",
-      "text": "An uốn nan tre thành năm cánh, buộc dây kẽm. Bắp quét hồ, dán giấy kính đỏ, lưỡi thè ra một bên. Một cánh dán lệch. Nó nhìn cánh lệch rất lâu.",
+      "who": "Cu Bin",
+      "text": "An uốn nan tre thành năm cánh, buộc dây thép. Cu Bin quét hồ, dán giấy kính đỏ, lưỡi thè ra một bên. Một cánh dán lệch. Nó nhìn cánh lệch rất lâu.",
       "choices": [
        {
         "label": "Để nguyên cánh lệch, khen nó dán khéo",
@@ -160,14 +160,14 @@
         "effects": {
          "rep.MINH": 2,
          "flag.canhLech": true,
-         "diary": "Bắp dán lệch một cánh lồng đèn, không cho sửa: \"Lệch là của con.\" Để nguyên. Cái lồng đèn năm cánh, một cánh nghiêng, đẹp nhất xóm."
+         "diary": "Cu Bin dán lệch một cánh đèn ông sao, không cho sửa: \"Lệch là của cháu.\" Để nguyên. Cái đèn ông sao năm cánh, một cánh nghiêng, đẹp nhất xóm."
         }
        },
        {
         "label": "Gỡ ra dán lại cho thẳng",
         "hint": "",
         "effects": {
-         "log": "Dán lại cánh cho thẳng. Bắp gật, mà không nói gì thêm."
+         "log": "Dán lại cánh cho thẳng. Cu Bin gật, mà không nói gì thêm."
         }
        }
       ]

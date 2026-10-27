@@ -28,19 +28,19 @@
     "payTiers": [[55, 1.0], [30, 0.7], [0, 0.5]],
     "slowBelow": 30
   },
-  "_items": "Hành trang trong bảng Nhân vật (phím C, scripts/ui/character_panel.gd): kind là hình vẽ biểu tượng (scripts/ui/item_icon.gd), rb của quần áo là thân người Rocketbox mặc bộ đó (ghép đầu An lên), when là điều kiện như check() (bỏ trống là luôn có). Ve chai lấy từ s.inv, đồ của việc nhờ từ s.qitems, kỷ vật từ keepsakes của chương.",
+  "_items": "Hành trang trong bảng Nhân vật (phím C, scripts/ui/character_panel.gd): kind là hình vẽ biểu tượng (scripts/ui/item_icon.gd), rb của quần áo là thân người Rocketbox mặc bộ đó (ghép đầu An lên), when là điều kiện như check() (bỏ trống là luôn có). Đồ đồng nát lấy từ s.inv, đồ của việc nhờ từ s.qitems, kỷ vật từ keepsakes của chương.",
   "items": {
     "tools": [
       {"id": "dien_thoai", "name": "Điện thoại cũ", "kind": "phone", "slot": "phone", "desc": "Màn nứt một góc, pin chai, sạc hai lần một ngày. Đủ để nghe gọi, nhắn tin và chạy app Giao Nhanh."},
-      {"id": "do_nghe", "name": "Túi đồ nghề", "kind": "toolbag", "slot": "tool", "desc": "Tua vít, kìm, đồng hồ đo, mỏ hàn, cuộn băng keo điện. Mười năm ở tiệm điện máy gói trong một cái túi vải."},
+      {"id": "do_nghe", "name": "Túi đồ nghề", "kind": "toolbag", "slot": "tool", "desc": "Tua vít, kìm, đồng hồ đo, mỏ hàn, cuộn băng dính điện. Mười năm ở tiệm điện máy gói trong một cái túi vải."},
       {"id": "cccd", "name": "Căn cước công dân", "kind": "card", "desc": "Làm lại năm ngoái. Đi xin việc, ký hợp đồng thuê phòng đều cần."},
       {"id": "quat_ban", "name": "Quạt bàn hỏng", "kind": "fan", "when": {"chapter": 1}, "desc": "Tiệm cũ cho thay tiền công tháng cuối. Cháy tụ, chưa có tiền mua tụ mới."},
       {"id": "xe_may", "name": "Chìa khóa xe máy", "kind": "key", "desc": "Chiếc Wave đời cũ mượn của người quen để chạy giao hàng. Đổ xăng thì tự lo."}
     ],
     "clothes": [
-      {"id": "ao_thun", "name": "Áo thun đen, quần jean", "kind": "tshirt", "rb": "Male_Adult_09", "desc": "Bộ mặc hằng ngày. Đi làm bẩn thì giặt ở chỗ ở."},
+      {"id": "ao_thun", "name": "Áo phông đen, quần bò", "kind": "tshirt", "rb": "Male_Adult_09", "desc": "Bộ mặc hằng ngày. Đi làm bẩn thì giặt ở chỗ ở."},
       {"id": "ao_so_mi", "name": "Áo sơ mi caro", "kind": "shirt", "rb": "Delivery_Male_01", "desc": "Bộ tươm tất nhất, để dành đi xin việc, đi gặp người ta."},
-      {"id": "ao_khoac", "name": "Áo khoác gió, quần jean", "kind": "jacket", "rb": "Male_Adult_07", "desc": "Mua lại ở sạp đồ cũ chợ Cầu Nhỏ. Chạy xe sáng sớm, chiều lất phất mưa đều cần."}
+      {"id": "ao_khoac", "name": "Áo khoác gió, quần bò", "kind": "jacket", "rb": "Male_Adult_07", "desc": "Mua lại ở hàng đồ cũ chợ Long Biên. Chạy xe sáng sớm, chiều lất phất mưa đều cần."}
     ]
   },
   "scrap": {
@@ -50,13 +50,13 @@
     "binHours": 0.25, "friendMult": 1.2, "dirty": {"clean": -6, "neat": -8}, "fatigue": 1
   },
   "delivery": {
-    "shops": {"com_hanh": "2 hộp cơm phần", "cho_cau_nho": "túi rau và trái cây ở chợ", "tiem_sau": "cái nồi cơm điện vừa sửa"},
+    "shops": {"com_hanh": "2 hộp cơm bình dân", "cho_cau_nho": "túi rau và hoa quả ở chợ", "tiem_sau": "cái nồi cơm điện vừa sửa"},
     "base": 12000, "perMeter": 60, "cookHours": 0.15, "slackFactor": 1.5, "slackHours": 0.2,
     "tip": [3000, 10000], "tipIfLeft": 0.35, "latePay": 0.6,
     "fatigue": 3, "lateFatigue": 2, "cancelFatigue": 2,
     "rush": [[10, 13.5], [17, 21]], "offerSec": [3, 7], "offPeakSec": [25, 45]
   },
-  "_minigames": "Ca làm việc 3D (scripts/work/work_site.gd), mỗi việc một bản đồ nhỏ riêng: bricks là kho khu công nghiệp, site là công trình điện ở Bến Cạn (cùng kiểu bưng xếp), dishes là quán cơm (bưng món, dọn bát), repair là tiệm sửa (quầy, bàn sửa, kệ linh kiện). seconds: giờ một ca; target: chỉ tiêu đủ công; minRatio: công tối thiểu khi thiếu chỉ tiêu.",
+  "_minigames": "Ca làm việc 3D (scripts/work/work_site.gd), mỗi việc một bản đồ nhỏ riêng: bricks là kho khu công nghiệp, site là công trình điện ở phố Tạ Hiện (cùng kiểu bưng xếp), dishes là quán cơm (bưng món, dọn bát), repair là tiệm sửa (quầy, bàn sửa, kệ linh kiện). seconds: giờ một ca; target: chỉ tiêu đủ công; minRatio: công tối thiểu khi thiếu chỉ tiêu.",
   "minigames": {
     "bricks": {
       "seconds": 90, "target": 6, "carry": 3, "minRatio": 0.5,
@@ -66,25 +66,25 @@
     },
     "site": {
       "seconds": 90, "target": 5, "carry": 3, "minRatio": 0.5,
-      "kicker": "CÔNG TRÌNH ĐIỆN BẾN CẠN", "heading": "Đưa vật tư tới từng điểm thi công", "unit": "món", "goalWord": "Xong điểm thi công", "doneWord": "Đủ vật tư, tổ đóng điện thử",
+      "kicker": "CÔNG TRÌNH ĐIỆN TẠ HIỆN", "heading": "Đưa vật tư tới từng điểm thi công", "unit": "món", "goalWord": "Xong điểm thi công", "doneWord": "Đủ vật tư, tổ đóng điện thử",
       "types": {"day": {"name": "Cuộn dây điện", "color": "e07a2f"}, "ong": {"name": "Ống luồn dây", "color": "b8bcc2"}, "cb": {"name": "Hộp CB", "color": "f2f0ea"}},
       "sizes": [2, 3, 4], "bonusPerBrick": 2500
     },
     "dishes": {
       "seconds": 90, "target": 7, "carry": 2, "minRatio": 0.5,
       "kicker": "QUÁN CƠM HẠNH", "heading": "Bưng cơm giờ trưa, dọn bát", "patience": 35, "spawnEvery": 6, "maxCustomers": 4, "eatSec": 4,
-      "items": {"com": {"name": "Cơm sườn", "color": "d9a35b"}, "canh": {"name": "Canh chua", "color": "e0703c"}, "tra": {"name": "Trà đá", "color": "c9a227"}},
+      "items": {"com": {"name": "Cơm sườn", "color": "d9a35b"}, "canh": {"name": "Canh cua", "color": "e0703c"}, "tra": {"name": "Trà đá", "color": "c9a227"}},
       "bonusPerExtra": 3000, "cleanBonus": 2000
     },
     "repair": {
       "seconds": 100, "target": 4, "minRatio": 0.5,
-      "kicker": "TIỆM SÁU", "heading": "Sửa đồ cho khách tới tiệm", "patience": 70, "spawnEvery": 10, "repairSec": 3, "bonusPerFix": 12000,
+      "kicker": "TIỆM CHÚ SƠN", "heading": "Sửa đồ cho khách tới tiệm", "patience": 70, "spawnEvery": 10, "repairSec": 3, "bonusPerFix": 12000,
       "parts": {"tu": {"name": "Tụ quạt", "color": "3f6fb5"}, "cau_chi": {"name": "Cầu chì nhiệt", "color": "e6e2d3"}, "phot": {"name": "Phốt bơm", "color": "2b2b2b"}, "ro_le": {"name": "Rơ le nhiệt", "color": "c0392b"}},
       "machines": [
         {"name": "Quạt bàn", "fault": "kêu ù ù, không quay", "part": "tu", "color": "6fa8c8"},
         {"name": "Nồi cơm điện", "fault": "không lên nguồn", "part": "cau_chi", "color": "e8e4da"},
         {"name": "Máy bơm", "fault": "rỉ nước ở trục", "part": "phot", "color": "3c8d5a"},
-        {"name": "Bàn ủi", "fault": "cắm điện không nóng", "part": "ro_le", "color": "8e44ad"}
+        {"name": "Bàn là", "fault": "cắm điện không nóng", "part": "ro_le", "color": "8e44ad"}
       ]
     }
   },
@@ -92,15 +92,15 @@
   "sliceStartDay": 18,
   "sliceEndDay": 22,
   "housing": {
-    "hem_dua": { "name": "Phòng Hẻm Dừa", "cost": 5000000, "deposit": 2200000, "loc": "hem_dua", "note": "Gần chợ và gần việc. Phòng nhỏ, ít chỗ phơi." },
-    "cau_tre": { "name": "Phòng Cầu Tre", "cost": 4200000, "deposit": 1800000, "loc": "cau_tre", "note": "Xa hơn nhưng thoáng, có hiên. Tốn thêm tiền xăng." },
-    "di_nam": { "name": "Ở tạm nhà dì Năm (7 ngày)", "cost": 500000, "temp": true, "loc": "nha_di_nam", "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được." }
+    "hem_dua": { "name": "Phòng ngõ Gạch", "cost": 5000000, "deposit": 2200000, "loc": "hem_dua", "note": "Gần chợ và gần việc. Phòng nhỏ, ít chỗ phơi." },
+    "cau_tre": { "name": "Phòng Ngọc Thụy", "cost": 4200000, "deposit": 1800000, "loc": "cau_tre", "note": "Xa hơn nhưng thoáng, có hiên. Tốn thêm tiền xăng." },
+    "di_nam": { "name": "Ở tạm nhà dì Nga (7 ngày)", "cost": 500000, "temp": true, "loc": "nha_di_nam", "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được." }
   },
-  "_map": "Map của màn phố: hn_an_hoa (dựng tay kiểu phố Hà Nội, tools/gen_hanoi_map.py), q8_tau_hu (khu thật Quận 8 ven kênh Tàu Hủ, data/maps/) hay an_hoa (phường vẽ tay đời đầu, data/map.json).",
-  "map": "hn_an_hoa",
+  "_map": "Map của màn phố: hn_pho_co (phố cổ Hà Nội tám khu tên thật, tools/gen_phocu_map.py), hn_an_hoa (dựng tay kiểu phố Hà Nội, tools/gen_hanoi_map.py), q8_tau_hu (khu thật Quận 8 ven kênh Tàu Hủ, data/maps/) hay an_hoa (phường vẽ tay đời đầu, data/map.json).",
+  "map": "hn_pho_co",
   "rainDays": [15, 29, 35, 41, 45, 52, 57, 64, 67, 71, 75, 80, 86, 96, 101, 106, 112, 118, 124, 129, 135, 136, 141, 147],
   "rainFlood": {"15": 1, "29": 2, "35": 1, "41": 1, "45": 2, "52": 2, "57": 1, "64": 1, "67": 1, "71": 1, "75": 2, "80": 1, "86": 1, "96": 1, "101": 1, "106": 2, "112": 1, "118": 1, "124": 1, "129": 1, "135": 2, "136": 2, "141": 1, "147": 1},
-  "_chapter2": "Chương 2 · Mùa mưa (ngày 31–60): tiền nhà tháng sau đến hạn tối ngày rentDue theo chỗ thuê dài hạn; độ thân thiết ban đầu của nhân vật mới; chênh lệch mổ mắt sớm cho bà; tiền riêng bà tự quyết góp; distantMarks: số ngày giấu hay ép người nhà trong chương 2 mà chưa nói thật với má thì má đi lặng lẽ (K5); livingCostPerDay: tiền sinh hoạt mỗi tối ở chương 2 (má về, nhà năm người); utilities: điện nước tháng đầu ở chỗ thuê mới, hạn ngày utilitiesDue.",
+  "_chapter2": "Chương 2 · Mùa mưa (ngày 31–60): tiền nhà tháng sau đến hạn tối ngày rentDue theo chỗ thuê dài hạn; độ thân thiết ban đầu của nhân vật mới; chênh lệch mổ mắt sớm cho bà; tiền riêng bà tự quyết góp; distantMarks: số ngày giấu hay ép người nhà trong chương 2 mà chưa nói thật với mẹ thì mẹ đi lặng lẽ (K5); livingCostPerDay: tiền sinh hoạt mỗi tối ở chương 2 (mẹ về, nhà năm người); utilities: điện nước tháng đầu ở chỗ thuê mới, hạn ngày utilitiesDue.",
   "chapter2": {
     "startDay": 31,
     "rentDue": 60,
@@ -113,7 +113,7 @@
     "utilities": 450000,
     "utilitiesDue": 45
   },
-  "_chapter3": "Chương 3 · Tháng Bảy mưa ngâu (ngày 61–90): tiền nhà tháng sau hạn tối ngày rentDue; tiền nhà chương 2 còn giấy hẹn thì trả nốt trước tối ngày oldRentDue; ở nhờ dì Năm thì góp stayShare; độ thân thiết ban đầu của nhân vật mới; livingCostPerDay khi má còn ở nhà, livingCostAlone khi má đi; utilities: điện nước tháng này, hạn ngày utilitiesDue; sang tiệm Sáu: cọc mặt bằng shopDeposit hạn tối ngày shopDepositDue, đợt đầu tiền đồ nghề toolsFirst hạn tối ngày toolsFirstDue (chia đều cho người góp); distantMarks: số ngày giấu hay ép người nhà trong chương 3 mà chưa có lần nói thật nào thì ra kết L5.",
+  "_chapter3": "Chương 3 · Tháng Bảy mưa ngâu (ngày 61–90): tiền nhà tháng sau hạn tối ngày rentDue; tiền nhà chương 2 còn giấy hẹn thì trả nốt trước tối ngày oldRentDue; ở nhờ dì Nga thì góp stayShare; độ thân thiết ban đầu của nhân vật mới; livingCostPerDay khi mẹ còn ở nhà, livingCostAlone khi mẹ đi; utilities: điện nước tháng này, hạn ngày utilitiesDue; sang tiệm chú Sơn: cọc mặt bằng shopDeposit hạn tối ngày shopDepositDue, đợt đầu tiền đồ nghề toolsFirst hạn tối ngày toolsFirstDue (chia đều cho người góp); distantMarks: số ngày giấu hay ép người nhà trong chương 3 mà chưa có lần nói thật nào thì ra kết L5.",
   "chapter3": {
     "startDay": 61,
     "rentDue": 90,
@@ -131,7 +131,7 @@
     "toolsFirstDue": 90,
     "distantMarks": 4
   },
-  "_chapter4": "Chương 4 · Tháng Tám trăng tròn (ngày 91–120): tiền nhà tháng sau hạn tối ngày rentDue; khoản tháng Bảy còn giấy hẹn thì trả nốt trước tối ngày oldDue; ở nhờ dì Năm thì góp stayShare; độ thân thiết ban đầu của nhân vật mới; livingCostPerDay khi má còn ở nhà, livingCostAlone khi má đi; utilities: điện nước tháng này, hạn ngày utilitiesDue; đã nhận tiệm Sáu: tiền mặt bằng tháng sau shopRent và đợt hai tiền đồ nghề toolsSecond (chia đều cho người góp), hạn tối ngày rentDue; distantMarks: số ngày giấu hay ép người nhà trong chương 4 mà chưa có lần nói thật nào thì ra kết M5.",
+  "_chapter4": "Chương 4 · Tháng Tám trăng tròn (ngày 91–120): tiền nhà tháng sau hạn tối ngày rentDue; khoản tháng Bảy còn giấy hẹn thì trả nốt trước tối ngày oldDue; ở nhờ dì Nga thì góp stayShare; độ thân thiết ban đầu của nhân vật mới; livingCostPerDay khi mẹ còn ở nhà, livingCostAlone khi mẹ đi; utilities: điện nước tháng này, hạn ngày utilitiesDue; đã nhận tiệm chú Sơn: tiền mặt bằng tháng sau shopRent và đợt hai tiền đồ nghề toolsSecond (chia đều cho người góp), hạn tối ngày rentDue; distantMarks: số ngày giấu hay ép người nhà trong chương 4 mà chưa có lần nói thật nào thì ra kết M5.",
   "chapter4": {
     "startDay": 91,
     "rentDue": 120,
@@ -153,9 +153,9 @@
     "shopRentId": "mat_bang_t9",
     "toolsId": "do_nghe_sau_2",
     "tools": 1000000,
-    "toolsLabel": "Đợt hai tiền đồ nghề trả chú Sáu"
+    "toolsLabel": "Đợt hai tiền đồ nghề trả chú Sơn"
   },
-  "_chapter5": "Chương 5 · Tháng Chín gió chướng (ngày 121–150), cùng cách với chapter4 (game_logic.start_next_chapter): moveIds là phòng mới đã trả đủ thì dọn vào sáng ngày đầu chương; oldIds là khoản tháng trước còn giấy hẹn, trả nốt trước tối ngày oldDue; utilId, stayId, shopRentId, toolsId là id các khoản mới. courseFee: học phí lớp điện lạnh buổi tối của An (trả khi ghi danh); shopRentRaise: phần cô Tám tăng tiền mặt bằng nếu An nhận giá mới; distantMarks: số ngày giấu hay ép người nhà trong chương 5 mà chưa có lần nói thật nào thì ra kết N5.",
+  "_chapter5": "Chương 5 · Tháng Chín gió heo may (ngày 121–150), cùng cách với chapter4 (game_logic.start_next_chapter): moveIds là phòng mới đã trả đủ thì dọn vào sáng ngày đầu chương; oldIds là khoản tháng trước còn giấy hẹn, trả nốt trước tối ngày oldDue; utilId, stayId, shopRentId, toolsId là id các khoản mới. courseFee: học phí lớp điện lạnh buổi tối của An (trả khi ghi danh); shopRentRaise: phần cô Tâm tăng tiền mặt bằng nếu An nhận giá mới; distantMarks: số ngày giấu hay ép người nhà trong chương 5 mà chưa có lần nói thật nào thì ra kết N5.",
   "chapter5": {
     "startDay": 121,
     "rentDue": 150,
@@ -179,7 +179,7 @@
     "stayId": "gop_di_nam_6",
     "shopRentId": "mat_bang_t10",
     "toolsId": "do_nghe_sau_3",
-    "toolsLabel": "Đợt cuối tiền đồ nghề trả chú Sáu"
+    "toolsLabel": "Đợt cuối tiền đồ nghề trả chú Sơn"
   },
   "endings": { "exhaustWarnDays": 4, "exhaustSkips": 3, "exhaustFatigue": 60, "distantMarks": 3, "ownTableCash": 600000 },
   "full": {
@@ -197,27 +197,27 @@
     "B": {
       "progressNeed": 3, "phase2Need": 3,
       "receivables": [
-        { "id": "hd_ky", "from": "Bến Cạn", "label": "Hợp đồng: 40% khi ký", "amount": 3360000, "due": 11 },
-        { "id": "hd_giua", "from": "Bến Cạn", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
-        { "id": "hd_cuoi", "from": "Bến Cạn", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
+        { "id": "hd_ky", "from": "Tạ Hiện", "label": "Hợp đồng: 40% khi ký", "amount": 3360000, "due": 11 },
+        { "id": "hd_giua", "from": "Tạ Hiện", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
+        { "id": "hd_cuoi", "from": "Tạ Hiện", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
       ],
       "payables": [
-        { "id": "vat_tu_1", "to": "", "label": "Vật tư đợt 1 ở sạp Cầu Nhỏ", "amount": 2400000, "due": 12 },
+        { "id": "vat_tu_1", "to": "", "label": "Vật tư đợt 1 ở chợ Long Biên", "amount": 2400000, "due": 12 },
         { "id": "van_chuyen", "to": "MINH", "label": "Minh chở vật tư, kiểm tra, dự phòng", "amount": 600000, "due": 15 },
-        { "id": "vat_tu_2", "to": "", "label": "Vật tư đợt 2 ở sạp Cầu Nhỏ", "amount": 1600000, "due": 19 },
+        { "id": "vat_tu_2", "to": "", "label": "Vật tư đợt 2 ở chợ Long Biên", "amount": 1600000, "due": 19 },
         { "id": "cong_doi", "to": "TRAM", "label": "Công Trâm và tổ đợt 1", "amount": 1200000, "due": 20 },
         { "id": "cong_doi_2", "to": "TRAM", "label": "Công Trâm và tổ đợt 2", "amount": 600000, "due": 27 }
       ],
       "promises": [
-        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
+        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy quán Tạ Hiện", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
       ]
     },
     "C": {
       "progressNeed": 4, "phase2Need": 4,
       "receivables": [
-        { "id": "hd_ky", "from": "Bến Cạn", "label": "Hợp đồng: 40% khi ký", "amount": 3360000, "due": 11 },
-        { "id": "hd_giua", "from": "Bến Cạn", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
-        { "id": "hd_cuoi", "from": "Bến Cạn", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
+        { "id": "hd_ky", "from": "Tạ Hiện", "label": "Hợp đồng: 40% khi ký", "amount": 3360000, "due": 11 },
+        { "id": "hd_giua", "from": "Tạ Hiện", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
+        { "id": "hd_cuoi", "from": "Tạ Hiện", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
       ],
       "payables": [
         { "id": "vat_tu_1", "to": "", "label": "Vật tư An ứng đợt 1", "amount": 2200000, "due": 12 },
@@ -227,14 +227,14 @@
         { "id": "cong_doi_2", "to": "TRAM", "label": "Thuê Trâm phần chuyên môn đợt 2", "amount": 400000, "due": 27 }
       ],
       "promises": [
-        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
+        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy quán Tạ Hiện", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
       ]
     }
   },
   "presets": {
     "A": {
       "name": "Tuyến A · Làm công",
-      "desc": "Không nhận gói lớn ở Bến Cạn. Sống bằng ca kho, ca phụ quán và sửa đồ lẻ, tiền trả ngay.",
+      "desc": "Không nhận gói lớn ở Tạ Hiện. Sống bằng ca kho, ca phụ quán và sửa đồ lẻ, tiền trả ngay.",
       "cash": 3050000,
       "fatigue": 40,
       "progress": 0,
@@ -251,7 +251,7 @@
     },
     "B": {
       "name": "Tuyến B · Tổ đội",
-      "desc": "Nhận hợp đồng Bến Cạn cùng nhóm: Trâm lo chuyên môn, Minh chở vật tư, chú Sáu góp chỗ và dụng cụ.",
+      "desc": "Nhận hợp đồng Tạ Hiện cùng nhóm: Trâm lo chuyên môn, Minh chở vật tư, chú Sơn góp chỗ và dụng cụ.",
       "cash": 2150000,
       "fatigue": 50,
       "progress": 2,
@@ -260,21 +260,21 @@
       "rep": { "LINH": 50, "BA_TU": 55, "HANH": 55, "SAU": 55, "MINH": 55, "DUYEN": 45, "TRAM": 55, "PHUC": 50 },
       "receivables": [
         { "id": "luong_cu_2", "from": "Tiệm cũ", "label": "Lương cũ đợt 2", "amount": 1800000, "due": 24 },
-        { "id": "hd_giua", "from": "Bến Cạn", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
-        { "id": "hd_cuoi", "from": "Bến Cạn", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
+        { "id": "hd_giua", "from": "Tạ Hiện", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
+        { "id": "hd_cuoi", "from": "Tạ Hiện", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
       ],
       "payables": [
-        { "id": "vat_tu_2", "to": "", "label": "Vật tư đợt 2 ở sạp Cầu Nhỏ", "amount": 600000, "due": 19 },
+        { "id": "vat_tu_2", "to": "", "label": "Vật tư đợt 2 ở chợ Long Biên", "amount": 600000, "due": 19 },
         { "id": "cong_doi", "to": "TRAM", "label": "Công Trâm và Minh đợt 1", "amount": 1200000, "due": 20 }
       ],
       "promises": [
         { "id": "tra_hop_com", "text": "Trả các hộp cơm dùng chung cho chị Hạnh", "to": "HANH", "due": 23 },
-        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
+        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy quán Tạ Hiện", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
       ]
     },
     "C": {
       "name": "Tuyến C · Dịch vụ riêng",
-      "desc": "An tự điều phối hợp đồng Bến Cạn, tự ứng vật tư, thuê Trâm cho phần chuyên môn.",
+      "desc": "An tự điều phối hợp đồng Tạ Hiện, tự ứng vật tư, thuê Trâm cho phần chuyên môn.",
       "cash": 1650000,
       "fatigue": 55,
       "progress": 2,
@@ -283,8 +283,8 @@
       "rep": { "LINH": 50, "BA_TU": 55, "HANH": 50, "SAU": 50, "MINH": 45, "DUYEN": 45, "TRAM": 50, "PHUC": 55 },
       "receivables": [
         { "id": "luong_cu_2", "from": "Tiệm cũ", "label": "Lương cũ đợt 2", "amount": 1800000, "due": 24 },
-        { "id": "hd_giua", "from": "Bến Cạn", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
-        { "id": "hd_cuoi", "from": "Bến Cạn", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
+        { "id": "hd_giua", "from": "Tạ Hiện", "label": "Hợp đồng đợt giữa (sau nghiệm thu)", "amount": 2520000, "due": 20, "needsProgress": true },
+        { "id": "hd_cuoi", "from": "Tạ Hiện", "label": "Hợp đồng đợt cuối", "amount": 2520000, "due": 32 }
       ],
       "payables": [
         { "id": "vat_tu_2", "to": "", "label": "Vật tư An ứng đợt 2", "amount": 1100000, "due": 19 },
@@ -292,7 +292,7 @@
       ],
       "promises": [
         { "id": "tra_hop_com", "text": "Trả các hộp cơm dùng chung cho chị Hạnh", "to": "HANH", "due": 23 },
-        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy Bến Cạn", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
+        { "id": "ban_giao_giua", "text": "Bàn giao giai đoạn giữa cho dãy quán Tạ Hiện", "to": "PHUC", "due": 20, "doneIf": "progress_ready" }
       ]
     }
   },
@@ -303,18 +303,18 @@
       "effects": { "fatigue": 12, "rep.HANH": 3 } },
     { "id": "giao_com", "group": "work", "location": "com_hanh", "name": "Giao cơm trưa", "hours": 3, "pay": 120000, "window": [10, 14],
       "effects": { "fatigue": 10, "rep.HANH": 2 } },
-    { "id": "sua_do_le", "minigame": "repair", "group": "work", "location": "tiem_sau", "name": "Sửa đồ lẻ ở bàn chú Sáu", "hours": 3, "pay": 130000,
+    { "id": "sua_do_le", "minigame": "repair", "group": "work", "location": "tiem_sau", "name": "Sửa đồ lẻ ở bàn chú Sơn", "hours": 3, "pay": 130000,
       "effects": { "fatigue": 10, "rep.SAU": 2 } },
-    { "id": "ben_can_b", "minigame": "site", "group": "work", "location": "ben_can", "name": "Làm cùng tổ ở Bến Cạn", "hours": 6, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
+    { "id": "ben_can_b", "minigame": "site", "group": "work", "location": "ben_can", "name": "Làm cùng tổ ở Tạ Hiện", "hours": 6, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
       "days": [11, 30], "require": { "route": "B" }, "effects": { "fatigue": 15, "progress": 1, "rep.TRAM": 2, "need.fed": 30 } },
-    { "id": "ben_can_c", "minigame": "site", "group": "work", "location": "ben_can", "name": "Điều phối và làm ở Bến Cạn", "hours": 8, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
+    { "id": "ben_can_c", "minigame": "site", "group": "work", "location": "ben_can", "name": "Điều phối và làm ở Tạ Hiện", "hours": 8, "note": "Tiến độ hợp đồng +1, chưa có tiền ngay. Quán bao cơm trưa",
       "days": [11, 30], "require": { "route": "C" }, "effects": { "fatigue": 22, "progress": 1, "rep.PHUC": 2, "need.fed": 35 } },
 
-    { "id": "an_com", "group": "life", "location": "com_hanh", "name": "Ăn dĩa cơm phần", "hours": 0.33, "cost": 30000, "perDay": 3, "hideIfFlag": "comQuen",
+    { "id": "an_com", "group": "life", "location": "com_hanh", "name": "Ăn đĩa cơm bình dân", "hours": 0.33, "cost": 30000, "perDay": 3, "hideIfFlag": "comQuen",
       "effects": { "need.fed": 60 } },
-    { "id": "an_com_quen", "group": "life", "location": "com_hanh", "name": "Cơm phần giá quen, thêm chén canh", "hours": 0.33, "cost": 22000, "perDay": 3, "showIfFlag": "comQuen",
+    { "id": "an_com_quen", "group": "life", "location": "com_hanh", "name": "Cơm bình dân giá quen, thêm bát canh", "hours": 0.33, "cost": 22000, "perDay": 3, "showIfFlag": "comQuen",
       "effects": { "need.fed": 65, "fatigue": -2 } },
-    { "id": "banh_mi", "group": "life", "location": "cho_cau_nho", "name": "Ổ bánh mì, vừa đi vừa ăn", "hours": 0.1, "cost": 15000, "perDay": 3, "window": [6, 10],
+    { "id": "banh_mi", "group": "life", "location": "cho_cau_nho", "name": "Cái bánh mì, vừa đi vừa ăn", "hours": 0.1, "cost": 15000, "perDay": 3, "window": [6, 10],
       "effects": { "need.fed": 40 } },
     { "id": "tam_rua", "group": "life", "location": "home", "name": "Tắm rửa", "hours": 0.25, "perDay": 3,
       "effects": { "need.clean": 100 } },
@@ -325,8 +325,8 @@
     { "id": "com_voi_ba", "group": "life", "location": "home", "name": "Ăn cơm với bà, không mở sổ", "hours": 1, "rest": true,
       "effects": { "fatigue": -5, "need.fed": 45, "rep.BA_TU": 3 } },
     { "id": "cau_long_linh", "group": "life", "location": "xom_bo_me", "name": "Đánh cầu lông với Linh ngoài sân", "hours": 1, "days": [4, 24], "window": [16, 20], "maxTimes": 1, "rest": true, "noRain": true,
-      "effects": { "fatigue": -6, "rep.LINH": 3, "log": "Thua Linh ba trái liền. Bà ngồi trên bậc thềm đếm điểm, đếm sai có lợi cho Linh.",
-        "diary": "Đánh cầu lông với Linh ngoài sân, thua ba trái liền. Linh nói anh già rồi. Bà đếm điểm sai, toàn sai có lợi cho Linh." } },
+      "effects": { "fatigue": -6, "rep.LINH": 3, "log": "Thua Linh liền ba quả. Bà ngồi trên bậc thềm đếm điểm, đếm sai có lợi cho Linh.",
+        "diary": "Đánh cầu lông với Linh ngoài sân, thua liền ba quả. Linh nói anh già rồi. Bà đếm điểm sai, toàn sai có lợi cho Linh." } },
     { "id": "phu_xom_don_do", "days": [1, 30], "group": "life", "location": "xom_bo_me", "name": "Phụ xóm phân loại đồ", "hours": 2,
       "effects": { "fatigue": 6, "rep.DUYEN": 3, "flag.phuXom": true } },
     { "id": "tra_da", "group": "life", "location": "cho_cau_nho", "name": "Ngồi trà đá với hàng xóm", "hours": 1, "cost": 10000, "rest": true,
@@ -342,31 +342,31 @@
     { "id": "noi_ro_viec", "group": "optional", "location": "xom_bo_me", "name": "Nói rõ chuyện mất việc với cả nhà", "hours": 1, "showIfPromise": "noi_ro_ngay5", "maxTimes": 1,
       "effects": { "promise_status": { "id": "noi_ro_ngay5", "status": "done" }, "flag.daNoiThat": true, "rep.LINH": 4,
         "family": { "who": "LINH", "kind": "support", "text": "Tự nói thật chuyện mất việc đúng hẹn" } } },
-    { "id": "hoi_di_nam", "group": "optional", "location": "nha_di_nam", "name": "Hỏi dì Năm phương án ở tạm", "hours": 1, "days": [3, 29], "maxTimes": 1,
-      "effects": { "housing_seen": "di_nam", "flag.hoiDiNam": true, "log": "Dì Năm: \"Ở thì ở, bảy ngày. Đồ đạc gửi bớt, nhà dì chật.\"" } },
+    { "id": "hoi_di_nam", "group": "optional", "location": "nha_di_nam", "name": "Hỏi dì Nga phương án ở tạm", "hours": 1, "days": [3, 29], "maxTimes": 1,
+      "effects": { "housing_seen": "di_nam", "flag.hoiDiNam": true, "log": "Dì Nga: \"Ở thì ở, bảy ngày. Đồ đạc gửi bớt, nhà dì chật.\"" } },
     { "id": "ba_xem_phong", "group": "optional", "location": "hem_dua", "name": "Dắt bà tới xem phòng, để bà tự đi thử bậc cửa", "hours": 1.5, "days": [5, 26], "maxTimes": 1,
-      "effects": { "rep.BA_TU": 5, "fatigue": 2, "family": { "who": "BA_TU", "kind": "support", "text": "Dắt bà tới tận nơi xem phòng Hẻm Dừa" } } },
-    { "id": "ba_xem_cau_tre", "group": "optional", "location": "cau_tre", "name": "Dắt bà tới xem hiên phòng Cầu Tre", "hours": 2, "days": [5, 26], "maxTimes": 1,
-      "effects": { "rep.BA_TU": 4, "fatigue": 4, "family": { "who": "BA_TU", "kind": "support", "text": "Dắt bà tới tận nơi xem phòng Cầu Tre" } } },
+      "effects": { "rep.BA_TU": 5, "fatigue": 2, "family": { "who": "BA_TU", "kind": "support", "text": "Dắt bà tới tận nơi xem phòng ngõ Gạch" } } },
+    { "id": "ba_xem_cau_tre", "group": "optional", "location": "cau_tre", "name": "Dắt bà tới xem hiên phòng Ngọc Thụy", "hours": 2, "days": [5, 26], "maxTimes": 1,
+      "effects": { "rep.BA_TU": 4, "fatigue": 4, "family": { "who": "BA_TU", "kind": "support", "text": "Dắt bà tới tận nơi xem phòng Ngọc Thụy" } } },
     { "id": "anh_cho_ba", "group": "optional", "location": "xom_bo_me", "name": "Đưa bà xem ảnh bậc cửa, chỗ phơi của phòng đã xem", "hours": 1, "days": [3, 25], "maxTimes": 1, "showIfSeenAny": true,
       "effects": { "rep.BA_TU": 4, "family": { "who": "BA_TU", "kind": "support", "text": "Đưa bà xem ảnh chỗ ở để cùng chọn" } } },
     { "id": "xem_hem_dua", "group": "optional", "location": "hem_dua", "name": "Xem phòng: bậc cửa, chỗ phơi, tiếng ồn", "hours": 1, "days": [3, 25], "maxTimes": 1, "hideIfSeen": "hem_dua",
-      "effects": { "housing_seen": "hem_dua", "fatigue": 3, "log": "Hẻm Dừa: phòng nhỏ, cửa sát mặt hẻm, bước ra là có người bán rau. Chỗ phơi chỉ đủ hai sào." } },
+      "effects": { "housing_seen": "hem_dua", "fatigue": 3, "log": "Ngõ Gạch: phòng nhỏ, cửa sát mặt ngõ, bước ra là có người bán rau. Chỗ phơi chỉ đủ hai sào." } },
     { "id": "xem_cau_tre", "group": "optional", "location": "cau_tre", "name": "Xem phòng: hiên, gió, đường ra chợ", "hours": 1, "days": [3, 25], "maxTimes": 1, "hideIfSeen": "cau_tre",
-      "effects": { "housing_seen": "cau_tre", "fatigue": 4, "log": "Cầu Tre: hiên rộng, gió mát. Đường ra chợ phải qua cầu, bà đi bộ sẽ mệt." } },
+      "effects": { "housing_seen": "cau_tre", "fatigue": 4, "log": "Ngọc Thụy: hiên rộng, gió mát. Đường ra chợ phải qua cầu Long Biên, bà đi bộ sẽ mệt." } },
     { "id": "doi_chieu_ca", "group": "optional", "location": "xom_bo_me", "name": "Gọi đồng nghiệp cũ đối chiếu lịch làm", "hours": 0.5, "days": [4, 6], "maxTimes": 1,
       "effects": { "flag.doiChieuCa": true, "log": "Đồng nghiệp cũ gửi ảnh bảng chấm công. Đủ 3.600.000đ, không thiếu ngày nào." } },
     { "id": "ba_mon_mang_theo", "group": "optional", "location": "xom_bo_me", "name": "Cả nhà đánh dấu ba món chắc chắn mang theo", "hours": 1, "days": [5, 6], "window": [17, 22], "maxTimes": 1, "rest": true,
       "effects": { "rep.BA_TU": 3, "rep.LINH": 3, "fatigue": -3, "flag.baMonMangTheo": true } },
     { "id": "tra_hop_giu_nhiet", "group": "optional", "location": "com_hanh", "name": "Mang hộp và túi giữ nhiệt trả lại quán", "hours": 0.5, "days": [6, 7], "maxTimes": 1,
-      "effects": { "rep.HANH": 3, "need.fed": 30, "log": "Chị Hạnh để riêng một phần cơm: \"Ăn đi, chị không trừ vô tiền công.\"" } },
-    { "id": "tra_do_nghe", "group": "optional", "location": "tiem_sau", "name": "Trả dụng cụ đã mượn của chú Sáu", "hours": 0.5, "showIfPromise": "tra_do_nghe", "maxTimes": 1,
+      "effects": { "rep.HANH": 3, "need.fed": 30, "log": "Chị Hạnh để riêng một phần cơm: \"Ăn đi, chị không trừ vào tiền công.\"" } },
+    { "id": "tra_do_nghe", "group": "optional", "location": "tiem_sau", "name": "Trả dụng cụ đã mượn của chú Sơn", "hours": 0.5, "showIfPromise": "tra_do_nghe", "maxTimes": 1,
       "effects": { "promise_status": { "id": "tra_do_nghe", "status": "done" }, "rep.SAU": 3 } },
-    { "id": "linh_tra_ma", "group": "optional", "location": "tiem_sau", "name": "Linh chỉ chú Sáu cách tra mã máy", "hours": 1, "days": [7, 9], "maxTimes": 1,
+    { "id": "linh_tra_ma", "group": "optional", "location": "tiem_sau", "name": "Linh chỉ chú Sơn cách tra mã máy", "hours": 1, "days": [7, 9], "maxTimes": 1,
       "effects": { "rep.SAU": 3, "rep.LINH": 3, "respect": 1 } },
     { "id": "so_xe_chung", "group": "optional", "location": "xom_bo_me", "name": "Ghi số xe chở đồ lên bảng chung (chủ xe đã đồng ý)", "hours": 0.5, "days": [8, 12], "maxTimes": 1,
       "require": { "flag.lichXom": true }, "effects": { "rep.DUYEN": 3, "flag.soXeChung": true } },
-    { "id": "hinh_bap", "group": "optional", "location": "com_hanh", "name": "Nhận tấm hình \"cái xe chở cả xóm\" bé Bắp vẽ", "hours": 0.25, "days": [9, 12], "maxTimes": 1,
+    { "id": "hinh_bap", "group": "optional", "location": "com_hanh", "name": "Nhận bức tranh \"cái xe chở cả xóm\" cu Bin vẽ", "hours": 0.25, "days": [9, 12], "maxTimes": 1,
       "require": { "rep.MINH": 48 }, "effects": { "flag.hinhBap": true, "fatigue": -3, "rep.MINH": 2 } },
     { "id": "ke_lai_du_kien", "group": "optional", "location": "xom_bo_me", "name": "Kể với cả nhà khoản lãi dự kiến và ngày tiền về", "hours": 1, "days": [11, 13], "window": [17, 22], "maxTimes": 1,
       "require": { "route": ["B", "C"] },
@@ -386,7 +386,7 @@
       "require": { "flag.giuQuat": true }, "effects": { "fatigue": -8 } },
     { "id": "dua_ba_di_cho", "group": "optional", "location": "cho_cau_nho", "name": "Đưa bà đi chợ như đã hứa", "hours": 2, "showIfPromise": "dua_ba_di_cho", "maxTimes": 1,
       "effects": { "promise_status": { "id": "dua_ba_di_cho", "status": "done" }, "rep.BA_TU": 5 } },
-    { "id": "nho_sau_khach", "group": "optional", "location": "tiem_sau", "name": "Nhờ chú Sáu nhận giúp một khách lẻ hôm nay", "hours": 0.5, "days": [27, 27], "maxTimes": 1,
+    { "id": "nho_sau_khach", "group": "optional", "location": "tiem_sau", "name": "Nhờ chú Sơn nhận giúp một khách lẻ hôm nay", "hours": 0.5, "days": [27, 27], "maxTimes": 1,
       "require": { "rep.SAU": 55 }, "effects": { "fatigue": -5, "rep.SAU": 1 } },
     { "id": "ban_do_cu", "group": "optional", "location": "xom_bo_me", "name": "Mỗi người tự chọn đồ của mình để bán bớt", "hours": 1, "days": [28, 28], "maxTimes": 1,
       "effects": { "cash": 120000, "cash_label": "Bán bớt đồ cũ (mỗi người tự quyết phần mình)", "rep.BA_TU": 2 } },
@@ -395,11 +395,11 @@
 
     { "id": "tap_bao_gia", "group": "optional", "location": "ben_can", "name": "Tập câu báo giá với Trâm", "hours": 1, "days": [18, 18],
       "require": { "route": ["B", "C"] }, "maxTimes": 1, "effects": { "rep.TRAM": 4, "flag.tapBaoGia": true } },
-    { "id": "tap_bao_gia_a", "group": "optional", "location": "tiem_sau", "name": "Tập câu báo giá với chú Sáu", "hours": 1, "days": [18, 18],
+    { "id": "tap_bao_gia_a", "group": "optional", "location": "tiem_sau", "name": "Tập câu báo giá với chú Sơn", "hours": 1, "days": [18, 18],
       "require": { "route": "A" }, "maxTimes": 1, "effects": { "rep.SAU": 4, "flag.tapBaoGia": true } },
     { "id": "may_chan_doan", "group": "optional", "location": "xom_bo_me", "name": "Xem máy chẩn đoán mô phỏng với Linh", "hours": 1, "days": [19, 19],
       "maxTimes": 1, "effects": { "fatigue": -3, "respect": 1, "rep.LINH": 3 } },
-    { "id": "doi_chieu", "group": "optional", "location": "tiem_sau", "name": "Đối chiếu phần đã chia với chú Sáu và Trâm", "hours": 1, "days": [20, 20],
+    { "id": "doi_chieu", "group": "optional", "location": "tiem_sau", "name": "Đối chiếu phần đã chia với chú Sơn và Trâm", "hours": 1, "days": [20, 20],
       "require": { "route": ["B", "C"] }, "maxTimes": 1, "effects": { "rep.SAU": 3, "rep.TRAM": 3, "flag.doiChieu": true } },
     { "id": "chau_hung", "group": "optional", "location": "xom_bo_me", "name": "Nghe bà kể chuyện chậu húng", "hours": 1, "days": [21, 21],
       "maxTimes": 1, "rest": true, "effects": { "fatigue": -5, "rep.BA_TU": 5, "flag.nghe_chuyen_hung": true } },

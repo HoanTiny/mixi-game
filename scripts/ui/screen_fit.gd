@@ -10,7 +10,7 @@ extends Node
 
 signal changed
 
-const TITLE := "Trước mùa mưa"
+const TITLE := "Trên Phố · Trước mùa mưa"
 const DESIGN_SIZE := Vector2(1280, 720)
 const COMPACT_SIZE := Vector2(1100, 520)
 const COMPACT_BELOW := 560.0

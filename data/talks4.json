@@ -10,14 +10,14 @@
      "flag.gapQuan": true
     },
     "title": "Danh sách năm đó",
-    "text": "Anh Quân lật điện thoại cho coi tấm hình chụp danh sách cho nghỉ năm đó: mười một cái tên, tên An đứng thứ bảy. \"Tao giữ hình này để nhớ. Lập danh sách theo ai lương cao. Mày lương cao vì mày giỏi.\"",
+    "text": "Anh Quân lật điện thoại cho xem tấm ảnh chụp danh sách cho nghỉ năm đó: mười một cái tên, tên An đứng thứ bảy. \"Tao giữ ảnh này để nhớ. Lập danh sách theo ai lương cao. Mày lương cao vì mày giỏi.\"",
     "choices": [
      {
       "label": "\"Em không giận anh. Em giận cái kiểu không báo trước.\"",
       "hint": "Anh Quân +3",
       "effects": {
        "rep.QUAN": 3,
-       "diary": "Anh Quân cho coi danh sách cho nghỉ năm đó, tên mình thứ bảy, xếp theo lương cao. Nói với anh: không giận anh, giận cái kiểu không báo trước. Anh gật: \"Ở trung tâm tao bắt ghi báo trước một tháng. Ghi rồi mới có người tin.\""
+       "diary": "Anh Quân cho xem danh sách cho nghỉ năm đó, tên mình thứ bảy, xếp theo lương cao. Nói với anh: không giận anh, giận cái kiểu không báo trước. Anh gật: \"Ở trung tâm tao bắt ghi báo trước một tháng. Ghi rồi mới có người tin.\""
       }
      },
      {
@@ -25,7 +25,7 @@
       "hint": "Anh Quân +1",
       "effects": {
        "rep.QUAN": 1,
-       "log": "Anh Quân xóa tấm hình ngay trước mặt."
+       "log": "Anh Quân xóa tấm ảnh ngay trước mặt."
       }
      }
     ]
@@ -38,7 +38,7 @@
      "rep.QUAN": 50
     },
     "title": "Thằng con lớp Ba",
-    "text": "Anh Quân mua hai cái lồng đèn điện ở sạp đầu chợ, rồi đứng ngắm cái lồng đèn ông sao cánh lệch của bé Bắp treo ở quán chị Hạnh. \"Thằng con tao lớp Ba. Nó xin làm lồng đèn, tao mua cho nó cái hát được. Nó cám ơn mà không cầm ra khỏi nhà.\"",
+    "text": "Anh Quân mua hai cái đèn lồng điện ở sạp đầu chợ, rồi đứng ngắm cái đèn ông sao cánh lệch của cu Bin treo ở quán chị Hạnh. \"Thằng con tao lớp Ba. Nó xin làm đèn ông sao, tao mua cho nó cái hát được. Nó cảm ơn mà không cầm ra khỏi nhà.\"",
     "choices": [
      {
       "label": "\"Tối nay anh ngồi làm với nó một cái. Lệch cũng được.\"",
@@ -46,14 +46,14 @@
       "effects": {
        "rep.QUAN": 3,
        "flag.quanLamDen": true,
-       "log": "Hôm sau anh Quân khoe tấm hình: một cái lồng đèn con cá, đuôi dán ngược."
+       "log": "Hôm sau anh Quân khoe tấm ảnh: một cái đèn lồng con cá, đuôi dán ngược."
       }
      },
      {
-      "label": "\"Con nít mà anh, lồng đèn nào cũng vui\"",
+      "label": "\"Trẻ con mà anh, đèn nào chả vui\"",
       "hint": "",
       "effects": {
-       "log": "Anh Quân cười, mà vẫn đứng nhìn cái lồng đèn cánh lệch thêm một lúc."
+       "log": "Anh Quân cười, mà vẫn đứng nhìn cái đèn ông sao cánh lệch thêm một lúc."
       }
      }
     ]
@@ -72,14 +72,14 @@
      "chapter": 4,
      "from_day": 93
     },
-    "text": "Anh Quân: \"Tao đi làm bằng xe buýt số 6. Ngồi xe nghe người ta nói chuyện, đỡ hơn ngồi xe hơi nghe radio.\""
+    "text": "Anh Quân: \"Tao đi làm bằng xe buýt. Ngồi xe nghe người ta nói chuyện, đỡ hơn ngồi ô tô nghe đài.\""
    },
    {
     "when": {
      "chapter": 4,
      "from_day": 100
     },
-    "text": "Anh Quân: \"Mấy đứa thợ trẻ ở trung tâm hỏi tao chú An là ai. Tao nói là thằng sửa quạt bằng tai.\""
+    "text": "Anh Quân: \"Mấy đứa thợ trẻ ở trung tâm hỏi tao chú An là ai. Tao bảo là thằng sửa quạt bằng tai.\""
    },
    {
     "when": {
@@ -93,7 +93,7 @@
      "chapter": 4,
      "flag.vaoTrungTam": true
     },
-    "text": "Anh Quân: \"Tháng sau mày vô thì nhớ đem theo cái mỏ lết khắc tên. Ở đây đồ nghề của công ty, mà đồ của mình thì cũng nên có một món.\""
+    "text": "Anh Quân: \"Tháng sau mày vào thì nhớ mang theo cái mỏ lết khắc tên. Ở đây đồ nghề của công ty, mà đồ của mình thì cũng nên có một món.\""
    }
   ]
  },
@@ -107,22 +107,22 @@
      "flag.donTruongXong": true
     },
     "title": "Sổ cơ sở vật chất",
-    "text": "Cô Mai mở cuốn sổ cơ sở vật chất của trường, trang nào cũng ghi \"đã sửa\" mà không ghi ai sửa, sửa gì. \"Năm năm nay tôi ký nghiệm thu mà không biết cái quạt nào thay tụ, cái nào chỉ lau. Anh ghi giùm tôi một trang mẫu được không?\"",
+    "text": "Cô Mai mở cuốn sổ cơ sở vật chất của trường, trang nào cũng ghi \"đã sửa\" mà không ghi ai sửa, sửa gì. \"Năm năm nay tôi ký nghiệm thu mà không biết cái quạt nào thay tụ, cái nào chỉ lau. Anh ghi hộ tôi một trang mẫu được không?\"",
     "choices": [
      {
-      "label": "Ghi một trang mẫu: phòng, quạt số mấy, hư gì, thay gì, ai làm, ngày nào",
+      "label": "Ghi một trang mẫu: phòng, quạt số mấy, hỏng gì, thay gì, ai làm, ngày nào",
       "hint": "Cô Mai +4",
       "effects": {
        "rep.MAI": 4,
        "flag.soTruong": true,
-       "diary": "Ghi giùm cô Mai một trang mẫu cho sổ cơ sở vật chất của trường: phòng, quạt số mấy, hư gì, thay gì, ai làm, ngày nào. Cô photo ra hai chục tờ, nói từ nay ai sửa gì ở trường cũng ghi theo trang này."
+       "diary": "Ghi hộ cô Mai một trang mẫu cho sổ cơ sở vật chất của trường: phòng, quạt số mấy, hỏng gì, thay gì, ai làm, ngày nào. Cô photo ra hai chục tờ, bảo từ nay ai sửa gì ở trường cũng ghi theo trang này."
       }
      },
      {
       "label": "\"Cô ghi 'đã sửa' là đủ rồi\"",
       "hint": "",
       "effects": {
-       "log": "Cô Mai gật, mà vẫn chép lại câu hỏi của mình vô góc sổ."
+       "log": "Cô Mai gật, mà vẫn chép lại câu hỏi của mình vào góc sổ."
       }
      }
     ]
@@ -137,23 +137,23 @@
      "rep.MAI": 45
     },
     "title": "Bài Vật lý của Tín",
-    "text": "Cô Mai đưa An coi bài kiểm tra Vật lý của Tín: chín điểm, câu vẽ mạch điện vẽ thêm cái CB ở đầu dây, ghi chú bằng bút chì \"nước + điện = CB\". \"Cái này không có trong sách. Tôi không trừ điểm.\"",
+    "text": "Cô Mai đưa An xem bài kiểm tra Vật lý của Tín: chín điểm, câu vẽ mạch điện vẽ thêm cái CB ở đầu dây, ghi chú bằng bút chì \"nước + điện = CB\". \"Cái này không có trong sách. Tôi không trừ điểm.\"",
     "choices": [
      {
-      "label": "\"Cô nói với nó câu đó giùm em. Cô nói nó tin hơn.\"",
+      "label": "\"Cô nói với nó câu đó hộ em. Cô nói nó tin hơn.\"",
       "hint": "Cô Mai +2 · Tín +2",
       "effects": {
        "rep.MAI": 2,
        "rep.TIN": 2,
-       "log": "Hôm sau Tín ghé tiệm, khoe: \"Cô Mai nói cái CB của con đúng mà sách chưa kịp in.\""
+       "log": "Hôm sau Tín ghé tiệm, khoe: \"Cô Mai bảo cái CB của con đúng mà sách chưa kịp in.\""
       }
      },
      {
-      "label": "Chụp hình bài kiểm tra gửi chị Lụa",
+      "label": "Chụp ảnh bài kiểm tra gửi chị Lụa",
       "hint": "Chị Lụa +3",
       "effects": {
        "rep.LUA": 3,
-       "log": "Chị Lụa trả lời bằng một tấm hình: bài kiểm tra dán lên vách sạp bánh xèo."
+       "log": "Chị Lụa trả lời bằng một tấm ảnh: bài kiểm tra dán lên vách sạp bánh rán."
       }
      }
     ]
@@ -165,7 +165,7 @@
      "chapter": 4,
      "from_day": 92
     },
-    "text": "Cô Mai: \"Trường có năm trăm đứa nhỏ, ba mươi hai cái quạt, một cái máy bơm. Tôi đếm hết, trừ tụi nhỏ.\""
+    "text": "Cô Mai: \"Trường có năm trăm đứa trẻ, ba mươi hai cái quạt, một cái máy bơm. Tôi đếm hết, trừ bọn trẻ.\""
    },
    {
     "when": {
@@ -179,7 +179,7 @@
      "chapter": 4,
      "flag.donTruongXong": true
     },
-    "text": "Cô Mai: \"Học trò hỏi tôi sao quạt phòng tôi quay êm hơn. Tôi nói tại tôi hỏi thợ có kịp không, chứ không hỏi thợ xong chưa.\""
+    "text": "Cô Mai: \"Học trò hỏi tôi sao quạt phòng tôi quay êm hơn. Tôi bảo tại tôi hỏi thợ có kịp không, chứ không hỏi thợ xong chưa.\""
    }
   ]
  },
@@ -193,11 +193,11 @@
      "flag.luaCam": false,
      "flag.tinVaoLop8": true
     },
-    "title": "Ngồi bàn chót",
-    "text": "Tín kể năm nay nó ngồi bàn chót, cạnh cửa sổ, nhìn ra được cái quạt trần chú An sửa. \"Cánh số ba quay hơi chậm hơn ba cánh kia. Con nghe ra.\"",
+    "title": "Ngồi bàn cuối",
+    "text": "Tín kể năm nay nó ngồi bàn cuối, cạnh cửa sổ, nhìn ra được cái quạt trần chú An sửa. \"Cánh số ba quay hơi chậm hơn ba cánh kia. Con nghe ra.\"",
     "choices": [
      {
-      "label": "\"Nghe ra là giỏi. Mà nghe giảng nữa nghen.\"",
+      "label": "\"Nghe ra là giỏi. Mà nghe giảng nữa nhé.\"",
       "hint": "Tín +2",
       "effects": {
        "rep.TIN": 2,
@@ -224,7 +224,7 @@
      "rep.TIN": 60
     },
     "title": "Cái thư không gửi",
-    "text": "Tín lấy trong cặp ra một tờ giấy gấp nhỏ: thư nó viết cho ba, không có địa chỉ để gửi. Trong thư nó kể nó biết hàn, biết đọc sơ đồ, biết cái CB. Nó không đưa An đọc, chỉ đưa coi rồi cất lại.",
+    "text": "Tín lấy trong cặp ra một tờ giấy gấp nhỏ: thư nó viết cho bố, không có địa chỉ để gửi. Trong thư nó kể nó biết hàn, biết đọc sơ đồ, biết cái CB. Nó không đưa An đọc, chỉ đưa xem rồi cất lại.",
     "choices": [
      {
       "label": "Không hỏi gì, chỉ nói: \"Khi nào em muốn gửi thì chú chỉ cách tìm địa chỉ\"",
@@ -232,11 +232,11 @@
       "effects": {
        "rep.TIN": 3,
        "flag.tinThuBa": true,
-       "diary": "Tín cho coi cái thư viết cho ba nó, không có địa chỉ để gửi. Không đọc, không hỏi. Nói khi nào em muốn gửi thì chú chỉ cách tìm. Nó gật, cất thư vô ngăn trong cùng của cặp, chung với cây tua vít bốn đầu."
+       "diary": "Tín cho xem cái thư viết cho bố nó, không có địa chỉ để gửi. Không đọc, không hỏi. Bảo khi nào em muốn gửi thì chú chỉ cách tìm. Nó gật, cất thư vào ngăn trong cùng của cặp, chung với cây tua vít bốn đầu."
       }
      },
      {
-      "label": "\"Đưa chú, chú tìm giùm\"",
+      "label": "\"Đưa chú, chú tìm hộ\"",
       "hint": "Tín −2",
       "effects": {
        "rep.TIN": -2,
@@ -261,7 +261,7 @@
      "flag.luaCam": false,
      "from_day": 102
     },
-    "text": "Tín: \"Má con nói Chủ Nhật được ra tiệm nếu tuần đó không trốn tiết. Tuần này con không trốn.\""
+    "text": "Tín: \"Mẹ con bảo Chủ Nhật được ra tiệm nếu tuần đó không trốn tiết. Tuần này con không trốn.\""
    },
    {
     "when": {
@@ -269,7 +269,7 @@
      "flag.luaCam": false,
      "from_day": 105
     },
-    "text": "Tín: \"Bắp làm lồng đèn cánh lệch mà khoe hoài. Con làm cánh thẳng mà không ai khen.\""
+    "text": "Tín: \"Bin làm đèn ông sao cánh lệch mà khoe mãi. Con làm cánh thẳng mà chả ai khen.\""
    },
    {
     "when": {
@@ -293,11 +293,11 @@
     "text": "Chị Lụa gói cho An hai cái bánh nướng nhân đậu xanh, loại rẻ nhất ở sạp đầu chợ. \"Không phải cảm ơn. Trung thu thì ai cũng có bánh. Tôi không muốn người ta nghĩ nhà tôi không có gì để cho.\"",
     "choices": [
      {
-      "label": "Nhận, ăn liền một miếng trước mặt chị",
+      "label": "Nhận, ăn ngay một miếng trước mặt chị",
       "hint": "Chị Lụa +3",
       "effects": {
        "rep.LUA": 3,
-       "log": "Chị Lụa nhìn An ăn hết miếng bánh rồi mới quay lại đổ bánh xèo."
+       "log": "Chị Lụa nhìn An ăn hết miếng bánh rồi mới quay lại rán bánh."
       }
      },
      {
@@ -332,7 +332,7 @@
      "chapter": 4,
      "flag.luaCam": true
     },
-    "text": "Chị Lụa gật đầu chào, đổ bánh tiếp."
+    "text": "Chị Lụa gật đầu chào, rán bánh tiếp."
    }
   ]
  },
@@ -345,24 +345,24 @@
      "from_day": 99,
      "flag.khamTaySau": true
     },
-    "title": "Cây mỏ hàn cất vô hộp",
-    "text": "Chú Sáu lau cây mỏ hàn lần cuối, quấn khăn, cất vô hộp gỗ. \"Bác sĩ nói đừng cầm. Mà cầm ba chục năm, tay nó nhớ. Con giữ cây này, đừng xài, để đó.\"",
+    "title": "Cây mỏ hàn cất vào hộp",
+    "text": "Chú Sơn lau cây mỏ hàn lần cuối, quấn khăn, cất vào hộp gỗ. \"Bác sĩ bảo đừng cầm. Mà cầm ba chục năm, tay nó nhớ. Cháu giữ cây này, đừng dùng, để đấy.\"",
     "choices": [
      {
       "label": "Nhận cái hộp, đặt lên kệ cao nhất trong tiệm",
-      "hint": "Chú Sáu +3",
+      "hint": "Chú Sơn +3",
       "effects": {
        "rep.SAU": 3,
        "flag.moHanChuSau": true,
-       "diary": "Chú Sáu cất cây mỏ hàn vô hộp gỗ, giao cho mình giữ, dặn đừng xài. Đặt cái hộp lên kệ cao nhất trong tiệm, chỗ chú ngồi ghế đẩu nhìn thấy được."
+       "diary": "Chú Sơn cất cây mỏ hàn vào hộp gỗ, giao cho mình giữ, dặn đừng dùng. Đặt cái hộp lên kệ cao nhất trong tiệm, chỗ chú ngồi ghế đẩu nhìn thấy được."
       }
      },
      {
       "label": "\"Chú giữ đi, tay chú còn nhớ thì chú còn cần\"",
-      "hint": "Chú Sáu +1",
+      "hint": "Chú Sơn +1",
       "effects": {
        "rep.SAU": 1,
-       "log": "Chú Sáu cười, cất hộp vô túi xách. \"Ừ. Để chú mang về Bến Tre ngắm.\""
+       "log": "Chú Sơn cười, cất hộp vào túi xách. \"Ừ. Để chú mang về Thái Bình ngắm.\""
       }
      }
     ]
@@ -375,23 +375,23 @@
      "flag.chuSauVeQue": true
     },
     "title": "Trang cuối sổ khách",
-    "text": "Chú Sáu mở cuốn sổ khách bìa da tới trang cuối, viết bằng tay trái run: \"Tiệm giao cho thằng An. Khách cũ ai cần thì hỏi nó.\" Chữ xiêu như cây dừa. Chú đưa cây bút cho An. \"Con ký dưới. Ký thì khách tin.\"",
+    "text": "Chú Sơn mở cuốn sổ khách bìa da đến trang cuối, viết bằng tay trái run: \"Tiệm giao cho thằng An. Khách cũ ai cần thì hỏi nó.\" Chữ xiêu như cành bàng. Chú đưa cây bút cho An. \"Cháu ký dưới. Ký thì khách tin.\"",
     "choices": [
      {
       "label": "Ký dưới, ghi thêm: \"Báo giá trước khi sửa\"",
-      "hint": "Chú Sáu +3",
+      "hint": "Chú Sơn +3",
       "effects": {
        "rep.SAU": 3,
        "flag.kySoChuSau": true,
-       "log": "Chú Sáu đọc dòng An ghi thêm, gật: \"Câu đó chú nói ba chục năm mà chưa ghi.\""
+       "log": "Chú Sơn đọc dòng An ghi thêm, gật: \"Câu đấy chú nói ba chục năm mà chưa ghi.\""
       }
      },
      {
       "label": "Ký tên thôi",
-      "hint": "Chú Sáu +1",
+      "hint": "Chú Sơn +1",
       "effects": {
        "rep.SAU": 1,
-       "log": "Chú Sáu thổi khô mực, gấp sổ."
+       "log": "Chú Sơn thổi khô mực, gấp sổ."
       }
      }
     ]
@@ -403,21 +403,21 @@
      "chapter": 4,
      "from_day": 91
     },
-    "text": "Chú Sáu: \"Tiệm bây giờ có bảng giá, có phiếu, có giấy. Hồi chú chỉ có cái miệng.\""
+    "text": "Chú Sơn: \"Tiệm bây giờ có bảng giá, có phiếu, có giấy. Hồi chú chỉ có cái miệng.\""
    },
    {
     "when": {
      "chapter": 4,
      "flag.chuSauVeQue": true
     },
-    "text": "Chú Sáu: \"Bến Tre có dừa, có sông, không có cái chợ nào ồn như chợ này. Chú sợ ngủ không được vì yên quá.\""
+    "text": "Chú Sơn: \"Thái Bình có lúa, có sông, chả có cái chợ nào ồn như chợ này. Chú sợ ngủ không được vì yên quá.\""
    },
    {
     "when": {
      "chapter": 4,
      "from_day": 110
     },
-    "text": "Chú Sáu: \"Cái ghế đẩu đó đừng sơn. Sơn rồi người ta tưởng ghế mới.\""
+    "text": "Chú Sơn: \"Cái ghế đẩu đấy đừng sơn. Sơn rồi người ta tưởng ghế mới.\""
    }
   ]
  },
@@ -431,14 +431,14 @@
      "flag.gopKha": true
     },
     "title": "Góc gần cửa sổ",
-    "text": "Kha dán băng keo chia góc lần thứ hai, dịch ra ba phân về phía góc của An. \"Góc em có hai cái ổ cắm, góc anh có bốn. Em dịch ra chút cho đủ chỗ cắm sạc. Anh chịu không? Không chịu thì em gỡ.\"",
+    "text": "Kha dán băng dính chia góc lần thứ hai, dịch ra ba phân về phía góc của An. \"Góc em có hai cái ổ cắm, góc anh có bốn. Em dịch ra tí cho đủ chỗ cắm sạc. Anh chịu không? Không chịu thì em gỡ.\"",
     "choices": [
      {
-      "label": "\"Chịu. Mà ghi vô giấy góp vốn, khỏi mai mốt cãi\"",
+      "label": "\"Chịu. Mà ghi vào giấy góp vốn, kẻo sau này cãi\"",
       "hint": "Kha +3",
       "effects": {
        "rep.KHA": 3,
-       "log": "Kha ghi thêm một dòng vô tờ giấy góp vốn: \"Góc Kha dịch 3 phân, An đồng ý.\" Ghi xong nó cười: \"Ba phân mà cũng ghi.\""
+       "log": "Kha ghi thêm một dòng vào tờ giấy góp vốn: \"Góc Kha dịch 3 phân, An đồng ý.\" Ghi xong nó cười: \"Ba phân mà cũng ghi.\""
       }
      },
      {
@@ -457,15 +457,15 @@
      "chapter": 4,
      "from_day": 105
     },
-    "title": "Bánh nướng gửi Cà Mau",
-    "text": "Kha gói hai hộp bánh nướng gửi xe về Cà Mau cho má. \"Năm ngoái em gửi tiền, má không ăn bánh. Năm nay em gửi bánh, kèm cái thiệp. Thiệp em tự viết, xấu lắm.\"",
+    "title": "Bánh nướng gửi Thanh Hóa",
+    "text": "Kha gói hai hộp bánh nướng gửi xe về Thanh Hóa cho mẹ. \"Năm ngoái em gửi tiền, mẹ không ăn bánh. Năm nay em gửi bánh, kèm cái thiệp. Thiệp em tự viết, xấu lắm.\"",
     "choices": [
      {
-      "label": "\"Xấu thì má mới biết là của em\"",
+      "label": "\"Xấu thì mẹ mới biết là của em\"",
       "hint": "Kha +3",
       "effects": {
        "rep.KHA": 3,
-       "log": "Tối đó Kha gửi hình: má nó cầm cái thiệp, đeo kính lão, đọc sát mặt."
+       "log": "Tối đấy Kha gửi ảnh: mẹ nó cầm cái thiệp, đeo kính lão, đọc sát mặt."
       }
      },
      {
@@ -493,14 +493,14 @@
      "from_day": 103,
      "flag.gopKha": true
     },
-    "text": "Kha: \"Anh Quân bên trung tâm có hỏi em về làm. Em nói em có góc rồi.\""
+    "text": "Kha: \"Anh Quân bên trung tâm có hỏi em về làm. Em bảo em có góc rồi.\""
    },
    {
     "when": {
      "chapter": 4,
      "from_day": 110
     },
-    "text": "Kha: \"Ghi giấy riết em quen. Giờ mua ổ bánh mì em cũng muốn xin phiếu.\""
+    "text": "Kha: \"Ghi giấy mãi em quen. Giờ mua cái bánh mì em cũng muốn xin phiếu.\""
    }
   ]
  },
@@ -514,15 +514,15 @@
      "flag.chiaDonTruong": true
     },
     "title": "Lần đầu chia việc",
-    "text": "Trâm đưa An xấp phiếu kiểm quạt của tổ, ghi đủ từng ô. \"Tổ của chị toàn được chia phần dơ: chui trần, đi dây âm. Lần này anh chia bốn phòng đàng hoàng. Tổ chị bàn nhau từ tối qua.\"",
+    "text": "Trâm đưa An xấp phiếu kiểm quạt của tổ, ghi đủ từng ô. \"Tổ của chị toàn được chia phần bẩn: chui trần, đi dây âm. Lần này anh chia bốn phòng tử tế. Tổ chị bàn nhau từ tối qua.\"",
     "choices": [
      {
-      "label": "\"Lần sau có đơn lớn, mình lại chia vậy\"",
+      "label": "\"Lần sau có đơn lớn, mình lại chia thế\"",
       "hint": "Trâm +3",
       "effects": {
        "rep.TRAM": 3,
        "flag.henChiaViec": true,
-       "log": "Trâm ghi vô sổ tay của tổ: \"Đơn lớn · chia với An.\""
+       "log": "Trâm ghi vào sổ tay của tổ: \"Đơn lớn · chia với An.\""
       }
      },
      {
@@ -550,14 +550,14 @@
      "flag.denDungChuan": true,
      "from_day": 105
     },
-    "text": "Trâm: \"Đêm Trung thu chị ghé sân kho coi dây đèn. Có cái CB ở gốc cây là biết ai làm.\""
+    "text": "Trâm: \"Đêm Trung thu chị ghé sân kho xem dây đèn. Có cái CB ở gốc cây là biết ai làm.\""
    },
    {
     "when": {
      "chapter": 4,
      "flag.linhVeGan": true
     },
-    "text": "Trâm: \"Linh ghi phiếu kỹ hơn chị hồi mới vô nghề. Đừng nói với em nó.\""
+    "text": "Trâm: \"Linh ghi phiếu kỹ hơn chị hồi mới vào nghề. Đừng nói với em nó.\""
    }
   ]
  },
@@ -572,23 +572,23 @@
      "flag.maDaDi": false
     },
     "title": "Tấm bảng góc máy may",
-    "text": "Má đưa An tấm bìa các-tông, chữ má viết nghiêng đều: \"Sửa quần áo · Lên lai · Báo giá trước khi sửa\". \"Má học câu cuối của con. Mà má viết đẹp hơn.\"",
+    "text": "Mẹ đưa An tấm bìa các-tông, chữ mẹ viết nghiêng đều: \"Sửa quần áo · Lên gấu · Báo giá trước khi sửa\". \"Mẹ học câu cuối của con. Mà mẹ viết đẹp hơn.\"",
     "choices": [
      {
       "label": "Treo tấm bảng lên, ngay cạnh bảng giá của mình",
-      "hint": "Má +3",
+      "hint": "Mẹ +3",
       "effects": {
        "rep.MA": 3,
        "flag.bangMa": true,
-       "log": "Hai tấm bảng treo cạnh nhau, chữ má đẹp hơn thật."
+       "log": "Hai tấm bảng treo cạnh nhau, chữ mẹ đẹp hơn thật."
       }
      },
      {
-      "label": "\"Má viết đẹp vậy thì viết giùm con luôn\"",
-      "hint": "Má +2",
+      "label": "\"Mẹ viết đẹp thế thì viết hộ con luôn\"",
+      "hint": "Mẹ +2",
       "effects": {
        "rep.MA": 2,
-       "log": "Má viết lại bảng giá cho An, sửa luôn một lỗi chính tả."
+       "log": "Mẹ viết lại bảng giá cho An, sửa luôn một lỗi chính tả."
       }
      }
     ]
@@ -601,7 +601,7 @@
      "flag.maVe": true,
      "flag.maDaDi": false
     },
-    "text": "Má: \"Ở xưởng có con bé mới vô, tay run như má hồi mười sáu. Má cho nó may lai quần trước, áo sau.\""
+    "text": "Mẹ: \"Ở xưởng có con bé mới vào, tay run như mẹ hồi mười sáu. Mẹ cho nó may gấu quần trước, áo sau.\""
    },
    {
     "when": {
@@ -609,7 +609,7 @@
      "flag.maDaDi": true,
      "flag.maVeTrungThu": true
     },
-    "text": "Má: \"Rằm tháng Tám năm nào ở Long An má cũng ăn bánh nướng một mình. Năm nay má mua hai cái.\""
+    "text": "Mẹ: \"Rằm tháng Tám năm nào ở Nam Định mẹ cũng ăn bánh nướng một mình. Năm nay mẹ mua hai cái.\""
    }
   ]
  },
@@ -622,7 +622,7 @@
      "from_day": 104
     },
     "title": "Liên thông",
-    "text": "Linh đưa An tờ thông báo tuyển sinh liên thông cao đẳng hệ vừa làm vừa học. \"Em chưa nộp. Em muốn anh đọc, mà em không muốn anh nói em nên nộp hay không. Anh đọc rồi nói cái gì anh thấy lạ thôi.\"",
+    "text": "Linh đưa An tờ thông báo tuyển sinh liên thông cao đẳng hệ vừa làm vừa học. \"Em chưa nộp. Em muốn anh đọc, mà em không muốn anh bảo em nên nộp hay không. Anh đọc rồi nói cái gì anh thấy lạ thôi.\"",
     "choices": [
      {
       "label": "Đọc kỹ, chỉ ra ba chỗ lạ (lệ phí, giờ học, chỗ học), không khuyên",
@@ -633,9 +633,9 @@
        "family": {
         "who": "LINH",
         "kind": "support",
-        "text": "Đọc giùm Linh tờ tuyển sinh mà không khuyên"
+        "text": "Đọc hộ Linh tờ tuyển sinh mà không khuyên"
        },
-       "log": "Linh ghi ba chỗ lạ vô sổ, gạch dưới chữ \"lệ phí\". \"Để em hỏi trường.\""
+       "log": "Linh ghi ba chỗ lạ vào sổ, gạch dưới chữ \"lệ phí\". \"Để em hỏi trường.\""
       }
      },
      {
@@ -646,9 +646,9 @@
        "family": {
         "who": "LINH",
         "kind": "pressure",
-        "text": "Quyết giùm Linh chuyện học liên thông"
+        "text": "Quyết hộ Linh chuyện học liên thông"
        },
-       "log": "Linh gấp tờ thông báo lại: \"Em nói đừng nói nộp hay không mà.\""
+       "log": "Linh gấp tờ thông báo lại: \"Em bảo đừng nói nộp hay không cơ mà.\""
       }
      }
     ]
@@ -680,26 +680,26 @@
      "from_day": 101,
      "flag.baTuGoi": true
     },
-    "title": "Chị Hai nói nhiều",
-    "text": "Bà Tư cầm điện thoại, ra hiệu đừng nói lớn: bà đang nghe chị Hai kể chuyện cái vườn bông súng. Gọi xong bà nói: \"Hồi trước nhờ con bấm, bà chỉ dám nói năm phút. Giờ bà tự bấm, nói tới hết pin.\"",
+    "title": "Chị Cả nói nhiều",
+    "text": "Bà Thoa cầm điện thoại, ra hiệu đừng nói to: bà đang nghe chị Cả kể chuyện cái ao hoa súng. Gọi xong bà bảo: \"Hồi trước nhờ con bấm, bà chỉ dám nói năm phút. Giờ bà tự bấm, nói đến hết pin.\"",
     "choices": [
      {
       "label": "Mua cho bà cái sạc dự phòng",
-      "hint": "−150.000đ · Bà Tư +3",
+      "hint": "−150.000đ · Bà Thoa +3",
       "effects": {
        "cash": -150000,
        "cash_label": "Sạc dự phòng cho bà",
        "rep.BA_TU": 3,
-       "log": "Bà dán miếng băng keo đỏ lên cái sạc luôn, cho đồng bộ."
+       "log": "Bà dán miếng băng dính đỏ lên cái sạc luôn, cho đồng bộ."
       }
      },
      {
-      "label": "Ngồi nghe bà kể lại chuyện vườn bông súng",
-      "hint": "Bà Tư +2 · nghỉ",
+      "label": "Ngồi nghe bà kể lại chuyện ao hoa súng",
+      "hint": "Bà Thoa +2 · nghỉ",
       "effects": {
        "rep.BA_TU": 2,
        "fatigue": -3,
-       "log": "Bà kể lại chuyện vườn bông súng, kể đúng như chị Hai kể, thêm vô hai chỗ."
+       "log": "Bà kể lại chuyện ao hoa súng, kể đúng như chị Cả kể, thêm vào hai chỗ."
       }
      }
     ]
@@ -711,15 +711,15 @@
      "from_day": 114
     },
     "title": "Tết này",
-    "text": "Bà Tư đếm trên đầu ngón tay: Tết này nhà mình có bao nhiêu người ăn cơm. Bà, An, Linh, má nếu má về, ông Ba nếu ông chịu qua, thằng Tín nếu má nó cho. \"Bà chưa đếm ra được con số. Mà bà muốn đếm từ bây giờ.\"",
+    "text": "Bà Thoa đếm trên đầu ngón tay: Tết này nhà mình có bao nhiêu người ăn cơm. Bà, An, Linh, mẹ nếu mẹ về, ông Bảo nếu ông chịu sang, thằng Tín nếu mẹ nó cho. \"Bà chưa đếm ra được con số. Mà bà muốn đếm từ bây giờ.\"",
     "choices": [
      {
       "label": "Lấy giấy ghi tên từng người, dán lên tủ cạnh hai cột vạch",
-      "hint": "Bà Tư +3",
+      "hint": "Bà Thoa +3",
       "effects": {
        "rep.BA_TU": 3,
        "flag.danhSachTet": true,
-       "diary": "Bà đếm trên đầu ngón tay ai ăn Tết ở nhà mình. Lấy giấy ghi tên từng người, dán lên cánh tủ cạnh hai cột vạch. Có tên nào chưa chắc thì bà kêu ghi bằng bút chì."
+       "diary": "Bà đếm trên đầu ngón tay ai ăn Tết ở nhà mình. Lấy giấy ghi tên từng người, dán lên cánh tủ cạnh hai cột vạch. Có tên nào chưa chắc thì bà bảo ghi bằng bút chì."
       }
      },
      {
@@ -738,21 +738,21 @@
      "chapter": 4,
      "flag.daMo": true
     },
-    "text": "Bà Tư: \"Tháng Tám trời trong, bà thấy được ngọn cây góc sân kho từ đầu hẻm.\""
+    "text": "Bà Thoa: \"Tháng Tám trời trong, bà thấy được ngọn cây góc sân kho từ đầu ngõ.\""
    },
    {
     "when": {
      "chapter": 4,
      "from_day": 100
     },
-    "text": "Bà Tư: \"Bánh nướng bây giờ ngọt quá. Hồi xưa bà làm bánh dẻo nhân đậu, ít đường mà ai cũng xin.\""
+    "text": "Bà Thoa: \"Bánh nướng bây giờ ngọt quá. Hồi xưa bà làm bánh dẻo nhân đậu, ít đường mà ai cũng xin.\""
    },
    {
     "when": {
      "chapter": 4,
      "flag.chuSauVeQue": true
     },
-    "text": "Bà Tư: \"Chú Sáu về quê thì sáng ai ngồi ghế đẩu? Con ngồi đi. Ngồi cho ghế quen hơi.\""
+    "text": "Bà Thoa: \"Chú Sơn về quê thì sáng ai ngồi ghế đẩu? Con ngồi đi. Ngồi cho ghế quen hơi.\""
    }
   ]
  },
@@ -766,24 +766,24 @@
      "flag.ongBaDi": false
     },
     "title": "Bậc ngồi bằng ván cái hiên",
-    "text": "Ông Ba ngồi trên tấm ván cái hiên cũ, giờ là cái bậc ngồi trước nhà. Vết dao khắc năm 1976 quay lên trên. \"Bà nhà tui ngồi tấm ván này lặt rau. Giờ tui ngồi. Mai mốt ai ngồi thì người đó đọc cái số này rồi hỏi.\"",
+    "text": "Ông Bảo ngồi trên tấm ván cái hiên cũ, giờ là cái bậc ngồi trước nhà. Vết dao khắc năm 1976 quay lên trên. \"Bà nhà tôi ngồi tấm ván này nhặt rau. Giờ tôi ngồi. Sau này ai ngồi thì người đó đọc cái số này rồi hỏi.\"",
     "choices": [
      {
       "label": "Hỏi ông chuyện năm 1976 thêm một lần",
-      "hint": "Ông Ba +3 · nghỉ",
+      "hint": "Ông Bảo +3 · nghỉ",
       "effects": {
        "rep.ONG_BA": 3,
        "fatigue": -3,
-       "log": "Ông Ba kể lần thứ năm, mỗi lần dài thêm một đoạn. Lần này có chiếc đò chở mười hai người."
+       "log": "Ông Bảo kể lần thứ năm, mỗi lần dài thêm một đoạn. Lần này có chiếc đò chở mười hai người."
       }
      },
      {
-      "label": "Phủ cho tấm ván một lớp dầu bóng để khỏi mục",
-      "hint": "Ông Ba +2",
+      "label": "Phủ cho tấm ván một lớp dầu bóng cho khỏi mục",
+      "hint": "Ông Bảo +2",
       "effects": {
        "rep.ONG_BA": 2,
        "hours": 1,
-       "log": "Phủ dầu bóng, chừa vết dao khắc ra. Ông Ba gật: \"Chừa cái số ra là đúng.\""
+       "log": "Phủ dầu bóng, chừa vết dao khắc ra. Ông Bảo gật: \"Chừa cái số ra là đúng.\""
       }
      }
     ]
@@ -795,21 +795,21 @@
      "chapter": 4,
      "flag.ongBaKy": true
     },
-    "text": "Ông Ba: \"Radio ở chỗ mới bắt sóng tốt hơn. Mà không ai gõ vách trả lời.\""
+    "text": "Ông Bảo: \"Đài ở chỗ mới bắt sóng tốt hơn. Mà chả ai gõ tường trả lời.\""
    },
    {
     "when": {
      "chapter": 4,
      "flag.ongBaGiuNha": true
     },
-    "text": "Ông Ba: \"Búa máy nện từ sáu giờ. Tui dậy từ năm giờ. Tui thắng.\""
+    "text": "Ông Bảo: \"Búa máy nện từ sáu giờ. Tôi dậy từ năm giờ. Tôi thắng.\""
    },
    {
     "when": {
      "chapter": 4,
      "from_day": 105
     },
-    "text": "Ông Ba: \"Trung thu năm nay bà Tư cho tui miếng bánh nướng. Tui cho lại bả cái radio nghe chung.\""
+    "text": "Ông Bảo: \"Trung thu năm nay bà Thoa cho tôi miếng bánh nướng. Tôi cho lại bà ấy cái đài nghe chung.\""
    }
   ]
  },
@@ -823,10 +823,10 @@
      "to_day": 104
     },
     "title": "Ba chục hộp bánh",
-    "text": "Chị Hạnh nhận đặt ba chục hộp bánh nướng cho tổ dân phố tặng người già hai hẻm, mà con chị bệnh, chiều không đi giao được. \"Em chở giùm chị. Chị trả công đàng hoàng, đừng có nói 'thôi chị'.\"",
+    "text": "Chị Hạnh nhận đặt ba chục hộp bánh nướng cho tổ dân phố tặng người già hai ngõ, mà con chị ốm, chiều không đi giao được. \"Em chở hộ chị. Chị trả công tử tế, đừng có nói 'thôi chị'.\"",
     "choices": [
      {
-      "label": "Chở ba chục hộp, lấy công đàng hoàng",
+      "label": "Chở ba chục hộp, lấy công tử tế",
       "hint": "2 giờ · +120.000đ · Chị Hạnh +3",
       "effects": {
        "hours": 2,
@@ -834,7 +834,7 @@
        "cash": 120000,
        "cash_label": "Chị Hạnh trả công chở bánh Trung thu",
        "rep.HANH": 3,
-       "diary": "Chở ba chục hộp bánh nướng cho chị Hạnh tới nhà người già hai hẻm, lấy công đàng hoàng. Nhà nào cũng mời vô uống trà. Uống mười một ly."
+       "diary": "Chở ba chục hộp bánh nướng cho chị Hạnh đến nhà người già hai ngõ, lấy công tử tế. Nhà nào cũng mời vào uống trà. Uống mười một chén."
       }
      },
      {
@@ -853,14 +853,14 @@
      "chapter": 4,
      "from_day": 100
     },
-    "text": "Chị Hạnh: \"Rằm tháng Tám chị nấu chè đậu xanh, phần thằng Bắp hai chén.\""
+    "text": "Chị Hạnh: \"Rằm tháng Tám chị nấu chè đậu xanh, phần thằng Bin hai bát.\""
    },
    {
     "when": {
      "chapter": 4,
      "flag.chuSauVeQue": true
     },
-    "text": "Chị Hạnh: \"Chú Sáu gửi chị giữ chìa khóa dự phòng của tiệm. Chị cột vô chùm chìa của quán.\""
+    "text": "Chị Hạnh: \"Chú Sơn gửi chị giữ chìa khóa dự phòng của tiệm. Chị buộc vào chùm chìa của quán.\""
    }
   ]
  },
@@ -872,24 +872,24 @@
      "chapter": 4,
      "from_day": 95
     },
-    "title": "Bắp lớp Một",
-    "text": "Minh khoe tấm hình Bắp ngày đầu lớp Một: áo trắng rộng thùng thình, cặp to bằng nửa người, đứng dưới cây đèn học chú An sửa. \"Nó nói cô hỏi ba làm nghề gì. Nó nói ba chạy xe, chú An sửa đèn.\"",
+    "title": "Bin lớp Một",
+    "text": "Minh khoe tấm ảnh Bin ngày đầu lớp Một: áo trắng rộng thùng thình, cặp to bằng nửa người, đứng dưới cây đèn học chú An sửa. \"Nó kể cô hỏi bố làm nghề gì. Nó bảo bố chạy xe, chú An sửa đèn.\"",
     "choices": [
      {
       "label": "\"Nói với nó chú An còn sửa quạt nữa\"",
       "hint": "Minh +2",
       "effects": {
        "rep.MINH": 2,
-       "log": "Hôm sau Bắp sửa lại với cô: \"Chú An sửa đèn với quạt.\""
+       "log": "Hôm sau Bin sửa lại với cô: \"Chú An sửa đèn với quạt.\""
       }
      },
      {
-      "label": "Xin tấm hình in ra dán ở tiệm",
+      "label": "Xin tấm ảnh in ra dán ở tiệm",
       "hint": "Minh +3",
       "effects": {
        "rep.MINH": 3,
        "flag.hinhBap": true,
-       "log": "Tấm hình Bắp dán cạnh bảng giá, khách nào cũng hỏi đứa nhỏ là ai."
+       "log": "Tấm ảnh Bin dán cạnh bảng giá, khách nào cũng hỏi thằng bé là ai."
       }
      }
     ]
@@ -901,14 +901,14 @@
      "chapter": 4,
      "from_day": 100
     },
-    "text": "Minh: \"Mùa Trung thu tao chở bánh muốn gãy lưng. Ai cũng tặng bánh, không ai ăn bánh.\""
+    "text": "Minh: \"Mùa Trung thu tao chở bánh muốn gãy lưng. Ai cũng tặng bánh, chả ai ăn bánh.\""
    },
    {
     "when": {
      "chapter": 4,
      "flag.denOngSao": true
     },
-    "text": "Minh: \"Bắp đòi làm lồng đèn nữa. Lần này nó đòi con cá.\""
+    "text": "Minh: \"Bin đòi làm đèn lồng nữa. Lần này nó đòi con cá.\""
    }
   ]
  },
@@ -922,10 +922,10 @@
      "flag.denDungChuan": true
     },
     "title": "Cái CB ở gốc cây",
-    "text": "Cô Duyên gõ cái hộp CB gắn ở gốc cây góc sân kho. \"Đêm rằm có mưa lắc rắc. Cô đứng ngay đây, thấy nước chảy theo máng xối, mà đèn không tắt. Cô định gỡ cái này ra, mà thôi, để đó cho Tết.\"",
+    "text": "Cô Duyên gõ cái hộp CB gắn ở gốc cây góc sân kho. \"Đêm rằm có mưa lâm thâm. Cô đứng ngay đây, thấy nước chảy theo máng nước, mà đèn không tắt. Cô định gỡ cái này ra, mà thôi, để đấy cho Tết.\"",
     "choices": [
      {
-      "label": "\"Để đó luôn cô. Tết giăng đèn thì cắm vô đây\"",
+      "label": "\"Để đấy luôn cô. Tết giăng đèn thì cắm vào đây\"",
       "hint": "Cô Duyên +3",
       "effects": {
        "rep.DUYEN": 3,
@@ -934,11 +934,11 @@
       }
      },
      {
-      "label": "\"Cô gỡ cất cũng được, Tết con lắp lại\"",
+      "label": "\"Cô gỡ cất cũng được, Tết cháu lắp lại\"",
       "hint": "Cô Duyên +1",
       "effects": {
        "rep.DUYEN": 1,
-       "log": "Cô Duyên vẫn để đó."
+       "log": "Cô Duyên vẫn để đấy."
       }
      }
     ]
@@ -957,7 +957,7 @@
      "chapter": 4,
      "flag.denDungChuan": true
     },
-    "text": "Cô Duyên: \"Tổ dân phố ghi tên con vô danh sách 'người làm đèn Trung thu'. Danh sách đó năm sau còn dài hơn danh sách 'người biết điện'.\""
+    "text": "Cô Duyên: \"Tổ dân phố ghi tên cháu vào danh sách 'người làm đèn Trung thu'. Danh sách đấy năm sau còn dài hơn danh sách 'người biết điện'.\""
    }
   ]
  },
@@ -974,7 +974,7 @@
      ]
     },
     "title": "Hết mùa mưa",
-    "text": "Anh Phúc đưa An tờ giấy tổng kết bảo trì mùa mưa dãy quán Bến Cạn: mười bảy lần kiểm, không lần nào chập. \"Năm quán muốn ký tiếp cho mùa khô, ít buổi hơn, giá thấp hơn. Mùa khô thì ít hư, mà ít hư thì người ta quên mình.\"",
+    "text": "Anh Phúc đưa An tờ giấy tổng kết bảo trì mùa mưa dãy năm quán bia Tạ Hiện: mười bảy lần kiểm, không lần nào chập. \"Năm quán muốn ký tiếp cho mùa khô, ít buổi hơn, giá thấp hơn. Mùa khô thì ít hỏng, mà ít hỏng thì người ta quên mình.\"",
     "choices": [
      {
       "label": "Ký tiếp, thêm dòng kiểm định kỳ mỗi tháng một lần",
@@ -1006,7 +1006,7 @@
       "C"
      ]
     },
-    "text": "Anh Phúc: \"Mùa khô Bến Cạn bán nước mía đông. Máy ép nước mía hư là cả dãy kêu.\""
+    "text": "Anh Phúc: \"Mùa khô phố Tạ Hiện bán bia hơi đông. Máy làm lạnh bia hỏng là cả dãy kêu.\""
    }
   ]
  }

@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Lên Phố: 30 Ngày"
+config/name="Trên Phố"
 config/description="Game mô phỏng 2.5D: 30 ngày lập nghiệp ở thành phố."
 run/main_scene="res://scenes/world.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")

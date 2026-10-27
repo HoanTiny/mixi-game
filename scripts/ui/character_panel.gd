@@ -277,7 +277,7 @@ func _items(tab: String) -> Array:
 				var n := int(game.s.inv[k])
 				var price := int(game.cfg.scrap[k].price)
 				out.append({"id": k, "name": str(game.cfg.scrap[k].name).substr(0, 1).to_upper() + str(game.cfg.scrap[k].name).substr(1), "kind": ItemIcon.kind_for(k), "count": n,
-					"group": "Ve chai", "desc": "%d cái · khoảng %s. Bán ở sạp ve chai của cô Út, chợ Cầu Nhỏ." % [n, GameLogic.fmt_money(n * price)]})
+					"group": "Đồng nát", "desc": "%d cái · khoảng %s. Bán ở sạp đồng nát của cô Thắm, chợ Long Biên." % [n, GameLogic.fmt_money(n * price)]})
 		"keep":
 			for k in game.s.get("qitems", {}):
 				out.append({"id": k, "name": game.item_name(k), "kind": ItemIcon.kind_for(k), "count": int(game.s.qitems[k]),
@@ -350,7 +350,7 @@ func _refresh_items() -> void:
 	_item_btn.visible = false
 	if chosen.is_empty():
 		_item_title.text = ""
-		_item_desc.text = {"scrap": "Chưa có ve chai. Lục thùng rác dọc vỉa hè (đứng gần, bấm E) để nhặt chai, lon, bìa giấy.",
+		_item_desc.text = {"scrap": "Chưa có đồ đồng nát. Lục thùng rác dọc vỉa hè (đứng gần, bấm E) để nhặt chai, lon, bìa giấy.",
 			"keep": "Chưa có gì. Đồ người ta nhờ mang và những món kỷ niệm sẽ nằm ở đây."}.get(_tab, "")
 		return
 	_item_title.text = "【%s】%s" % [chosen.group, chosen.name]
@@ -564,7 +564,7 @@ func _build_right(row: HBoxContainer) -> void:
 	top.add_child(bars)
 	var specs := [["rested", "Tỉnh táo", "moon", "100 trừ Mệt. Ngủ ở chỗ ở, nghỉ, ngồi trà đá để lại sức."],
 		["mood", "Tâm trạng", "heart", "Nghỉ ngơi, trà đá, ăn cơm với bà, nói chuyện với người quen thì vui lên; việc bẩn, ngủ ngoài đường thì xuống."],
-		["fed", "No bụng", "bowl", "Ăn ở Cơm Hạnh, bánh mì ở chợ Cầu Nhỏ buổi sáng. Nhịn tới 0 thì Mệt tăng nhanh."],
+		["fed", "No bụng", "bowl", "Ăn ở Cơm Hạnh, bánh mì ở chợ Long Biên buổi sáng. Nhịn tới 0 thì Mệt tăng nhanh."],
 		["clean", "Vệ sinh cá nhân", "drop", "Tắm ở chỗ ở. Việc bẩn (ca kho, phụ quán, lục rác) làm bẩn người."],
 		["neat", "Quần áo", "tshirt", "Giặt đồ ở chỗ ở. Quần áo nhàu bẩn thì người ta ngại."]]
 	for sp in specs:

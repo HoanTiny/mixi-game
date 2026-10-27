@@ -7,7 +7,7 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const SETTINGS := "user://settings.json"
-const VERSION := "Bản thử nghiệm 0.9"
+const VERSION := "Bản 1.0 · phố cổ Hà Nội"
 const BRUSH := preload("res://assets/fonts/SedgwickAveDisplay-Regular.ttf")
 const HAND := preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CREAM := Color("ece3d3")
@@ -253,7 +253,7 @@ func _build_title() -> void:
 	stroke.size = Vector2(700, 150)
 	title_box.add_child(stroke)
 	var big := Label.new()
-	big.text = "TRƯỚC MÙA MƯA"
+	big.text = "TRÊN PHỐ"
 	big.add_theme_font_override("font", BRUSH)
 	big.add_theme_font_size_override("font_size", 92)
 	big.add_theme_color_override("font_color", CREAM)
@@ -266,7 +266,7 @@ func _build_title() -> void:
 	big.rotation = -0.035
 	title_box.add_child(big)
 	var sub := Label.new()
-	sub.text = "Ba mươi ngày ở xóm Bờ Me"
+	sub.text = "Trước mùa mưa · ba mươi ngày ở phố cổ Hà Nội"
 	sub.add_theme_font_override("font", HAND)
 	sub.add_theme_font_size_override("font_size", 28)
 	sub.add_theme_color_override("font_color", GOLDEN)
@@ -663,8 +663,8 @@ func _open_settings() -> void:
 
 func _open_about() -> void:
 	var v := _modal_panel("Giới thiệu", 620.0)
-	v.add_child(_modal_text("Trước mùa mưa là game mô phỏng đời sống: An, 27 tuổi, vừa mất việc ở tiệm điện máy, cả nhà còn ba mươi ngày để dọn khỏi xóm trọ Bờ Me trước mùa mưa. Kiếm tiền bằng các việc làm có thật ngoài phố, lo ăn ngủ tắm giặt, nói chuyện với hàng xóm, và chọn: lo một mình, hay để người khác cùng lo.", 16))
-	v.add_child(_modal_text("Phố dựng theo bản đồ thật ven kênh Tàu Hủ (OpenStreetMap, Open Buildings). Người: Microsoft Rocketbox (MIT). Đồ vật, vật liệu: Poly Haven (CC0). Chữ: Sedgwick Ave Display, Patrick Hand (SIL OFL). Làm bằng Godot.", 14))
+	v.add_child(_modal_text("Trên Phố là game mô phỏng đời sống ở phố cổ Hà Nội. Truyện chính Trước mùa mưa: An, 27 tuổi, vừa mất việc ở tiệm điện máy, cả nhà còn ba mươi ngày để dọn khỏi xóm trọ Phúc Tân ngoài đê sông Hồng trước mùa mưa. Kiếm tiền bằng các việc làm có thật ngoài phố, lo ăn ngủ tắm giặt, nói chuyện với hàng xóm, và chọn: lo một mình, hay để người khác cùng lo.", 16))
+	v.add_child(_modal_text("Phố dựng theo phố cổ Hà Nội (tên phố thật, bố cục giản lược); bản đồ thật ven kênh Tàu Hủ từ OpenStreetMap, Open Buildings. Người: Microsoft Rocketbox (MIT). Đồ vật, vật liệu: Poly Haven (CC0). Chữ: Sedgwick Ave Display, Patrick Hand (SIL OFL). Làm bằng Godot.", 14))
 	var close := _dark_button("Đóng", _close_modal)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(close)

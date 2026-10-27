@@ -576,11 +576,11 @@ func _build_tiem() -> void:
 	# Tủ đồ nghề, xe dụng cụ, máy chờ sửa xếp góc.
 	_prop(WP.model("metal_tool_chest", 1.2), 5.6, -4.9, 0.0, 0.9, 0.6)
 	_prop(WP.model("industrial_storage_cart", 0.8), 3.9, -4.9, 0.0, 1.4, 0.9)
-	var waiting := ["Quạt bàn", "Nồi cơm điện", "Máy bơm", "Quạt bàn", "Bàn ủi"]
+	var waiting := ["Quạt bàn", "Nồi cơm điện", "Máy bơm", "Quạt bàn", "Bàn là"]
 	for i in waiting.size():
 		_place_item(waiting[i], Vector3(4.6 + (i % 3) * 0.6, 0.0, -0.8 + (i / 3) * 0.7), _rng.randf_range(-0.5, 0.5))
 	_blocks.append(Rect2(4.2, -1.2, 1.9, 1.4))
-	_sign("SÁU SỬA ĐIỆN\nbáo giá trước khi sửa", 1.0, -5.48, 3.0, Color("1f4f8a"))
+	_sign("SƠN SỬA ĐIỆN\nbáo giá trước khi sửa", 1.0, -5.48, 3.0, Color("1f4f8a"))
 	_idlers.append(_person(Character.LOOKS.get("SAU", {}), 5.5, -3.6, -0.6))
 	for x in [-3.0, 1.0, 5.0]:
 		_lamp(x, -1.5)
@@ -751,7 +751,7 @@ func _repair_act(s: Dictionary) -> void:
 					return
 				var want := "part:" + str(m.part)
 				if not _carry.has(want):
-					_note("Không phải hư chỗ này. Máy cần %s." % _type_name(str(m.part)).to_lower())
+					_note("Không phải hỏng chỗ này. Máy cần %s." % _type_name(str(m.part)).to_lower())
 					return
 				_carry.erase(want)
 				m["part_ok"] = true

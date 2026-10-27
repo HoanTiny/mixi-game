@@ -1,4 +1,15 @@
-# Trước mùa mưa
+# Trên Phố · Trước mùa mưa
+
+**Bản 1.0: truyện chuyển sang phố cổ Hà Nội, dùng tên thật.** An, 27 tuổi, vừa mất việc ở Điện máy Thăng Long. Cả nhà có 30 ngày để dọn khỏi **xóm trọ Phúc Tân** (ngõ 25 Phúc Tân, ngoài đê sông Hồng) trước mùa mưa; truyện đi tiếp năm chương, 150 ngày. Cốt truyện, lựa chọn, con số giữ nguyên; người, đất, giọng nói đổi theo [docs/HA_NOI.md](docs/HA_NOI.md):
+- **Người:** bà Thoa (bà ngoại của An, Linh), ông Thịnh (ông ngoại đã mất), chú Sơn tiệm sửa xe, dì Nga, ông Bảo, cô Bích tổ trưởng, cô Tâm chủ mặt bằng, bà Cả, bà Bính, cô Thắm đồng nát, cu Bin, Mẹ. Kha quê Thanh Hóa; chị Lụa bán bánh rán ở chợ Long Biên.
+- **Đất:** chợ Long Biên dưới chân cầu Long Biên, điểm xe buýt Long Biên (xe đưa công nhân ra khu công nghiệp Bắc Thăng Long), tiệm chú Sơn trong vòm cầu đường sắt phố Gầm Cầu, Cơm Hạnh cuối phố Hàng Chiếu sau lưng chợ Đồng Xuân, nhà dì Nga phố Hàng Chiếu, dãy năm quán bia Tạ Hiện, gác xép ngõ Gạch (cây bàng đầu ngõ), phòng Ngọc Thụy bên kia sông. Quê Nam Định, Giao Thủy, Thái Bình; xe khách đi từ bến xe Giáp Bát.
+- **Giọng Hà Nội:** ngõ, mẹ, bố, vào, không, nhé, thế, đấy, bát, đĩa, cốc… Công cụ `python3 tools/check_hanoi.py data/<file>.json` so cấu trúc với bản gốc trong git và báo từ miền Nam còn sót.
+
+**Map phố cổ tám khu** (`"map": "hn_pho_co"`, sinh bằng `python3 tools/gen_phocu_map.py` ra `data/maps/hn_pho_co.json` và `hn_pho_co_story.json`), tên phố thật, bố cục giản lược từ bắc xuống nam: (1) cầu Long Biên, đoạn cầu sắt bắc qua sông Hồng, chợ đầu mối Long Biên; (2) bãi Phúc Tân ngoài đê Trần Nhật Duật, ngõ 25–131 Phúc Tân, bãi đồng nát; (3) dãy vòm cầu đường sắt Phùng Hưng – Gầm Cầu (sửa xe, hàn tiện); (4) chợ Đồng Xuân ba đầu hồi, phố Hàng Chiếu, ngõ chợ, kho shipper; (5) mê cung ngõ Hàng Buồm, Hàng Bạc, Mã Mây, Đinh Liệt, ngõ Gạch (gác xép, quán net, cầm đồ); (6) phố Tạ Hiện, Lương Ngọc Quyến (quán bia đêm); (7) quảng trường Đông Kinh Nghĩa Thục, hồ Hoàn Kiếm có Tháp Rùa, đền Ngọc Sơn, cầu Thê Húc; (8) phố Tràng Tiền, Tràng Tiền Plaza, phố Pháp quanh Lý Thái Tổ. Công trình nhận diện dựng riêng trong `scripts/world/landmarks.gd` (dàn thép cầu nóc cong từng nhịp, mặt cầu cạn có hai đường ray, ô vòm, đầu hồi chợ, Tháp Rùa, lan can đỏ cầu Thê Húc, chữ lớn tên khu hiện khi tới gần hay thu nhỏ). Map cũ vẫn chọn được: `hn_an_hoa`, `q8_tau_hu`, `an_hoa`.
+
+Phần dưới đây là ghi chép từ các bản trước, còn dùng tên cũ miền Nam (bà Tư, chú Sáu, Bờ Me, Cầu Nhỏ…); bảng đổi tên ở [docs/HA_NOI.md](docs/HA_NOI.md).
+
+## Ghi chép các bản trước
 
 Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh phường An Hòa của thành phố hư cấu Bình Giang. An, 27 tuổi, vừa mất việc ở tiệm điện máy. Cả nhà có 30 ngày để dọn khỏi xóm trọ Bờ Me và tìm chỗ ở mới; chơi tiếp 30 ngày nữa ở chỗ mới khi mùa mưa tới và má An về nhà sau mười sáu năm, rồi tháng Bảy mưa ngâu khi chú Sáu muốn sang lại tiệm, rồi tháng Tám trăng tròn với tháng đầu của cái tiệm. Thiết kế đầy đủ nằm trong [docs/](docs/README.md).
 

@@ -667,11 +667,11 @@ func _special(name: String) -> void:
 			var n := tiem_partners()
 			s.flags["tiemChung"] = n > 1
 			s.flags["tiemMotMinh"] = n == 1
-			_add_payable({"id": "coc_tiem", "to": "", "label": "Cọc mặt bằng tiệm Sáu cho cô Tám" + (" (phần của An)" if n > 1 else ""),
+			_add_payable({"id": "coc_tiem", "to": "", "label": "Cọc mặt bằng tiệm Sơn cho cô Tâm" + (" (phần của An)" if n > 1 else ""),
 				"amount": round_k(float(c3.shopDeposit) / n), "due": int(c3.shopDepositDue)})
-			_add_payable({"id": "do_nghe_sau", "to": "SAU", "label": "Đợt đầu tiền đồ nghề trả chú Sáu" + (" (phần của An)" if n > 1 else ""),
+			_add_payable({"id": "do_nghe_sau", "to": "SAU", "label": "Đợt đầu tiền đồ nghề trả chú Sơn" + (" (phần của An)" if n > 1 else ""),
 				"amount": round_k(float(c3.toolsFirst) / n), "due": int(c3.toolsFirstDue)})
-			add_log("Nhận sang tiệm Sáu" + (" chung với %d người" % (n - 1) if n > 1 else " một mình"), "event")
+			add_log("Nhận sang tiệm Sơn" + (" chung với %d người" % (n - 1) if n > 1 else " một mình"), "event")
 		"linh_decides3":
 			# Linh tự chọn chỗ làm sau thực tập. Biết An lén đóng học phí giùm mà hai anh em chưa nói lại được với nhau thì em
 			# ở lại công ty cho đủ tiền trả lại; tiền học bậc hai đã xoay được (em tự làm thêm, hay An góp mà em đồng ý) thì em
@@ -756,7 +756,7 @@ func _take_housing(k: String, owed: bool) -> void:
 	var cost := housing_cost(k)
 	var name := str(cfg.housing[k].name)
 	if owed and int(s.cash) < cost:
-		_add_payable({"id": "gop_di_nam", "to": "", "label": "Góp tiền ở nhờ nhà dì Năm", "amount": cost, "due": 33})
+		_add_payable({"id": "gop_di_nam", "to": "", "label": "Góp tiền ở nhờ nhà dì Nga", "amount": cost, "due": 33})
 	else:
 		spend(cost, "Vào ở: " + name)
 	h["state"] = "signed"
@@ -1251,7 +1251,7 @@ func _rent_due() -> int:
 ## Những người đã nhận lời góp tiệm Sáu (cờ gopKha, gopTram, gopMa), để ghi trong cảnh.
 func _partners_text() -> String:
 	var names := []
-	for pair in [["gopKha", "Kha"], ["gopTram", "Trâm"], ["gopMa", "má"]]:
+	for pair in [["gopKha", "Kha"], ["gopTram", "Trâm"], ["gopMa", "mẹ"]]:
 		if s.get("flags", {}).get(pair[0], false):
 			names.append(pair[1])
 	return "chưa có ai" if names.is_empty() else ", ".join(names)
@@ -1479,7 +1479,7 @@ func _contract_phase2() -> void:
 	if c.is_empty() or s.flags.get("thuHep", false):
 		return
 	s["progress_need"] = int(s.progress_need) + int(c.phase2Need)
-	_add_promise({"id": "ban_giao_cuoi", "text": "Bàn giao giai đoạn cuối cho dãy Bến Cạn", "to": "PHUC", "due": 27, "doneIf": "progress_ready"})
+	_add_promise({"id": "ban_giao_cuoi", "text": "Bàn giao giai đoạn cuối cho dãy Tạ Hiện", "to": "PHUC", "due": 27, "doneIf": "progress_ready"})
 	add_log("Giai đoạn cuối: cần thêm %d buổi làm, bàn giao trước tối ngày 27" % int(c.phase2Need), "event")
 
 
@@ -1488,7 +1488,7 @@ func _end_full() -> void:
 	var h := housing()
 	if h.state != "signed":
 		var where := "di_nam"
-		add_log("Chưa chốt được phòng: cả nhà sang ở nhờ nhà dì Năm như đã hỏi từ trước", "warn")
+		add_log("Chưa chốt được phòng: cả nhà sang ở nhờ nhà dì Nga như đã hỏi từ trước", "warn")
 		_take_housing(where, true)
 		s.flags["tamTuDong"] = true
 	var key := ending_key()
@@ -1576,7 +1576,7 @@ func start_chapter3() -> void:
 		if util > 0:
 			_add_payable({"id": "dien_nuoc_t3", "to": "", "label": "Điện nước tháng này", "amount": util, "due": int(c3.get("utilitiesDue", 75))})
 	else:
-		_add_payable({"id": "gop_di_nam_4", "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Năm tháng này", "amount": int(c3.get("stayShare", 600000)), "due": int(c3.rentDue)})
+		_add_payable({"id": "gop_di_nam_4", "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Nga tháng này", "amount": int(c3.get("stayShare", 600000)), "due": int(c3.rentDue)})
 	if has_needs():
 		s["needs_t"] = float(cfg.dayStart)
 	add_log(str(story3.get("title", "Chương 3")), "event")
@@ -1704,11 +1704,11 @@ func start_next_chapter(n: int) -> void:
 		if util > 0:
 			_add_payable({"id": str(c.utilId), "to": "", "label": "Điện nước tháng này", "amount": util, "due": int(c.get("utilitiesDue", int(s.day) + 14))})
 	else:
-		_add_payable({"id": str(c.stayId), "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Năm tháng này", "amount": int(c.get("stayShare", 600000)), "due": int(c.rentDue)})
+		_add_payable({"id": str(c.stayId), "to": "", "label": "Góp tiền chợ ở nhờ nhà dì Nga tháng này", "amount": int(c.get("stayShare", 600000)), "due": int(c.rentDue)})
 	if c.has("shopRentId") and (s.flags.get("tiemChung", false) or s.flags.get("tiemMotMinh", false)):
 		var parts := tiem_partners()
 		var share := " (phần của An)" if parts > 1 else ""
-		_add_payable({"id": str(c.shopRentId), "to": "", "label": "Tiền mặt bằng tiệm tháng sau cho cô Tám" + share,
+		_add_payable({"id": str(c.shopRentId), "to": "", "label": "Tiền mặt bằng tiệm tháng sau cho cô Tâm" + share,
 			"amount": round_k(float(c.shopRent) / parts), "due": int(c.rentDue)})
 		if int(c.get("tools", 0)) > 0:
 			_add_payable({"id": str(c.toolsId), "to": "SAU", "label": str(c.toolsLabel) + share,
@@ -2701,7 +2701,7 @@ func sell_scrap() -> int:
 	var v := scrap_value()
 	if v <= 0:
 		return 0
-	earn(v, "Bán ve chai")
+	earn(v, "Bán đồng nát")
 	s["inv"] = {}
 	_commit()
 	return v

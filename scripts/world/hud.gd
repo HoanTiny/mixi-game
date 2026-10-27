@@ -306,7 +306,7 @@ func set_prompt(id: String) -> void:
 	_prompt_id = id
 	if id.begins_with("bin:"):
 		var lock: String = game.scrap_lock(id.substr(4))
-		_prompt_label.text = _key("E") + "Lục thùng rác tìm ve chai" if lock == "" else "Thùng rác · " + lock
+		_prompt_label.text = _key("E") + "Lục thùng rác tìm đồ đồng nát" if lock == "" else "Thùng rác · " + lock
 	elif id != "":
 		_prompt_label.text = _key("E") + "Vào " + str(world.location_info(id).name)
 	_fill_quick(id)
@@ -1507,12 +1507,12 @@ func _fill_objectives(s: Dictionary) -> void:
 			if p.id == "ban_giao_cuoi" and p.status == "open":
 				final_open = true
 		if final_open:
-			_objective("Bàn giao giai đoạn cuối Bến Cạn trước tối ngày 27", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], "current")
+			_objective("Bàn giao giai đoạn cuối Tạ Hiện trước tối ngày 27", "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)], "current")
 		elif game.day() <= 22:
 			var sub := "Tiến độ %d/%d buổi" % [int(s.progress), int(s.progress_need)]
 			if state == "current" and int(s.progress) >= int(s.progress_need):
 				sub += " · đủ rồi; làm thêm thì tính cho giai đoạn cuối"
-			_objective("Nghiệm thu đợt giữa Bến Cạn tối ngày 20", sub, state)
+			_objective("Nghiệm thu đợt giữa Tạ Hiện tối ngày 20", sub, state)
 	if game.day() <= 22:
 		var linh_state := "done" if s.linh.decision != "" else ("current" if game.day() >= 19 else "normal")
 		_objective("Nghe Linh nói về chỗ thực tập (ngày 22)", "Quyết định là của Linh", linh_state)
@@ -1536,7 +1536,7 @@ func _refresh_objectives2(s: Dictionary) -> void:
 			rent = x
 	var title := "Tiền nhà tháng sau" if game.has_long_home() else "Phần còn lại phòng mới, dọn sau giỗ"
 	if rent == null and not game.has_long_home():
-		_objective("Đặt cọc phòng mới trước giỗ ông", "Ở nhờ dì Năm tới sau giỗ · cọc Hẻm Dừa hay Cầu Tre, dọn sau ngày %d" % due, "current")
+		_objective("Đặt cọc phòng mới trước giỗ ông", "Ở nhờ dì Nga tới sau giỗ · cọc ngõ Gạch hay Ngọc Thụy, dọn sau ngày %d" % due, "current")
 	elif rent != null and rent.status == "pending":
 		# Dự kiến đã trừ tiền sinh hoạt mỗi tối và các khoản phải trả khác tới ngày đóng.
 		var proj: int = game.projected_cash(due)
@@ -1561,11 +1561,11 @@ func _refresh_objectives2(s: Dictionary) -> void:
 	elif f.get("moDoi", false):
 		_objective("Bà chọn để sau Tết mới mổ", "Quyết định là của bà", "done")
 	elif game.day() <= 36:
-		_objective("Đưa bà đi khám mắt sáng ngày 36", "Bệnh viện mắt thành phố, đi xe buýt ở bến xe số 6", "current" if game.day() >= 35 else "normal")
+		_objective("Đưa bà đi khám mắt sáng ngày 36", "Bệnh viện mắt thành phố, đi xe buýt ở bến xe Giáp Bát", "current" if game.day() >= 35 else "normal")
 	else:
 		_objective("Cả nhà bàn chuyện mổ mắt (ngày 40)", "Người quyết là bà", "current" if game.day() >= 38 else "normal")
 	if f.get("maVe", false) and not s.has("ma"):
-		_objective("Má đang ở nhà", "Đi hay ở là quyết định của má", "normal")
+		_objective("Mẹ đang ở nhà", "Đi hay ở là quyết định của mẹ", "normal")
 	var due_today := 0
 	for p in s.promises:
 		if p.status == "open" and int(p.due) == game.day():
@@ -1580,26 +1580,26 @@ func _refresh_objectives2(s: Dictionary) -> void:
 ## Chương 3: tiền nhà tháng sau, cọc tiệm Sáu, nợ còn lại của tháng trước, Vu Lan, Linh, ông Ba, chuyến về quê.
 func _refresh_objectives3(s: Dictionary) -> void:
 	var f: Dictionary = s.flags
-	var rows := [["tien_nha_t3", "Tiền nhà tháng sau", 84], ["coc_tiem", "Cọc mặt bằng tiệm Sáu", 83],
-		["do_nghe_sau", "Đợt đầu tiền đồ nghề trả chú Sáu", 84], ["tien_nha_t2", "Tiền nhà tháng trước còn hẹn", 64],
-		["phong_moi", "Phần còn lại phòng mới còn hẹn", 64], ["gop_di_nam_3", "Góp tiền chợ nhà dì Năm còn hẹn", 64],
-		["gop_di_nam_4", "Góp tiền chợ ở nhờ nhà dì Năm", 84], ["phong_moi_t8", "Phần còn lại phòng mới, dọn mùng 1 tháng Tám", 84]]
+	var rows := [["tien_nha_t3", "Tiền nhà tháng sau", 84], ["coc_tiem", "Cọc mặt bằng tiệm Sơn", 83],
+		["do_nghe_sau", "Đợt đầu tiền đồ nghề trả chú Sơn", 84], ["tien_nha_t2", "Tiền nhà tháng trước còn hẹn", 64],
+		["phong_moi", "Phần còn lại phòng mới còn hẹn", 64], ["gop_di_nam_3", "Góp tiền chợ nhà dì Nga còn hẹn", 64],
+		["gop_di_nam_4", "Góp tiền chợ ở nhờ nhà dì Nga", 84], ["phong_moi_t8", "Phần còn lại phòng mới, dọn mùng 1 tháng Tám", 84]]
 	if game.check({"home": "di_nam", "housing_state": "signed"}) == "" and game.day() <= 86:
-		_objective("Đặt cọc phòng mới trong tháng Bảy", "Ở nhờ dì Năm tới hết tháng · cọc Hẻm Dừa hay Cầu Tre, dọn mùng một tháng Tám",
+		_objective("Đặt cọc phòng mới trong tháng Bảy", "Ở nhờ dì Nga tới hết tháng · cọc ngõ Gạch hay Ngọc Thụy, dọn mùng một tháng Tám",
 			"current" if game.day() >= 80 else "normal")
 	_payable_objectives(s, rows)
 	if f.get("tiemKhongNhan", false):
-		_objective("Tiệm Sáu: không nhận", "Tiệm về tay người khác, mình giữ nhịp làm cũ", "done")
+		_objective("Tiệm Sơn: không nhận", "Tiệm về tay người khác, mình giữ nhịp làm cũ", "done")
 	elif not (f.get("tiemChung", false) or f.get("tiemMotMinh", false)) and f.get("henTinhTiem", false):
-		_objective("Chú Sáu mời sang tiệm", "Quyết trước tối ngày 80 · cọc mặt bằng 3.000.000đ, đồ nghề trả dần", "current" if game.day() >= 78 else "normal")
+		_objective("Chú Sơn mời sang tiệm", "Quyết trước tối ngày 80 · cọc mặt bằng 3.000.000đ, đồ nghề trả dần", "current" if game.day() >= 78 else "normal")
 	if game.day() <= 75:
 		_objective("Rằm tháng Bảy · Vu Lan (tối ngày 75)", "Bông hồng cài áo ở chùa đầu đường", "current" if game.day() >= 73 else "normal")
 	if not s.has("linh3") and game.day() <= 82:
 		_objective("Linh chọn chỗ làm sau thực tập (ngày 82)", "Người quyết là Linh", "normal")
 	if not s.has("ong_ba3") and not f.get("ongBaDi", false) and game.day() <= 88:
-		_objective("Ông Ba và cái hiên gỗ", "Họp dân ngày 78 · hạn ký đợt một ngày 85 · ông quyết", "current" if game.day() >= 77 else "normal")
+		_objective("Ông Bảo và cái hiên gỗ", "Họp dân ngày 78 · hạn ký đợt một ngày 85 · ông quyết", "current" if game.day() >= 77 else "normal")
 	if (f.get("huaVeQue", false) or f.get("linhDuaBa", false)) and not f.get("veQue", false) and game.day() <= 84:
-		_objective("Bà về quê mừng thọ bà Hai (sáng ngày 84)", "%s đưa bà đi · xe ở bến xe số 6" % ("An" if f.get("huaVeQue", false) else "Linh"),
+		_objective("Bà về quê mừng thọ bà Cả (sáng ngày 84)", "%s đưa bà đi · xe ở bến xe Giáp Bát" % ("An" if f.get("huaVeQue", false) else "Linh"),
 			"current" if game.day() >= 83 else "normal")
 	var due_today := 0
 	for p in s.promises:
@@ -1607,7 +1607,7 @@ func _refresh_objectives3(s: Dictionary) -> void:
 			due_today += 1
 	if due_today > 0:
 		_objective("Lời hứa đến hạn hôm nay: %d" % due_today, "Mở Sổ để xem", "current")
-	_objective("Đêm cuối tháng Bảy (tối ngày 90)", "Sáng mùng một tháng Tám chú Sáu giao chìa khóa tiệm", "current" if game.day() >= 88 else "normal")
+	_objective("Đêm cuối tháng Bảy (tối ngày 90)", "Sáng mùng một tháng Tám chú Sơn giao chìa khóa tiệm", "current" if game.day() >= 88 else "normal")
 	_quest_objectives()
 
 
@@ -1640,12 +1640,12 @@ func _payable_objectives(s: Dictionary, rows: Array) -> void:
 func _refresh_objectives4(s: Dictionary) -> void:
 	var f: Dictionary = s.flags
 	_payable_objectives(s, [["tien_nha_t4", "Tiền nhà tháng sau", 114], ["mat_bang_t9", "Tiền mặt bằng tiệm tháng sau", 114],
-		["do_nghe_sau_2", "Đợt hai tiền đồ nghề trả chú Sáu", 114], ["dien_nuoc_t4", "Điện nước tháng này", 103],
-		["tien_nha_t3", "Tiền nhà tháng trước còn hẹn", 94], ["coc_tiem", "Cọc mặt bằng tiệm Sáu còn hẹn", 94],
-		["do_nghe_sau", "Đợt đầu tiền đồ nghề còn hẹn", 94], ["gop_di_nam_4", "Góp tiền chợ nhà dì Năm còn hẹn", 94],
-		["gop_di_nam_5", "Góp tiền chợ ở nhờ nhà dì Năm", 114], ["phong_moi_t9", "Phần còn lại phòng mới, dọn mùng 1 tháng Chín", 114]])
+		["do_nghe_sau_2", "Đợt hai tiền đồ nghề trả chú Sơn", 114], ["dien_nuoc_t4", "Điện nước tháng này", 103],
+		["tien_nha_t3", "Tiền nhà tháng trước còn hẹn", 94], ["coc_tiem", "Cọc mặt bằng tiệm Sơn còn hẹn", 94],
+		["do_nghe_sau", "Đợt đầu tiền đồ nghề còn hẹn", 94], ["gop_di_nam_4", "Góp tiền chợ nhà dì Nga còn hẹn", 94],
+		["gop_di_nam_5", "Góp tiền chợ ở nhờ nhà dì Nga", 114], ["phong_moi_t9", "Phần còn lại phòng mới, dọn mùng 1 tháng Chín", 114]])
 	if game.check({"home": "di_nam", "housing_state": "signed"}) == "" and game.day() <= 116:
-		_objective("Đặt cọc phòng mới trong tháng Tám", "Ở nhờ dì Năm tới hết tháng · cọc Hẻm Dừa hay Cầu Tre, dọn mùng một tháng Chín",
+		_objective("Đặt cọc phòng mới trong tháng Tám", "Ở nhờ dì Nga tới hết tháng · cọc ngõ Gạch hay Ngọc Thụy, dọn mùng một tháng Chín",
 			"current" if game.day() >= 110 else "normal")
 	if f.get("treDonTruong", false):
 		_objective("Đơn quạt của trường: trễ", "Ba phòng chưa có quạt sáng khai giảng", "failed")
@@ -1656,7 +1656,7 @@ func _refresh_objectives4(s: Dictionary) -> void:
 	if game.day() <= 105:
 		_objective("Rằm tháng Tám · Trung thu (tối ngày 105)", "Sân kho trên nền xóm cũ", "current" if game.day() >= 103 else "normal")
 	if f.get("chuSauVeQue", false) and game.day() <= 119:
-		_objective("Chú Sáu về Bến Tre (sáng ngày 119)", "Chuyến xe sáu giờ ở bến xe số 6", "current" if game.day() >= 118 else "normal")
+		_objective("Chú Sơn về Thái Bình (sáng ngày 119)", "Chuyến xe sáu giờ ở bến xe Giáp Bát", "current" if game.day() >= 118 else "normal")
 	var due_today := 0
 	for p in s.promises:
 		if p.status == "open" and int(p.due) == game.day():
@@ -1672,26 +1672,26 @@ func _refresh_objectives4(s: Dictionary) -> void:
 func _refresh_objectives5(s: Dictionary) -> void:
 	var f: Dictionary = s.flags
 	_payable_objectives(s, [["tien_nha_t5", "Tiền nhà tháng sau", 144], ["mat_bang_t10", "Tiền mặt bằng tiệm tháng sau", 144],
-		["mat_bang_tang", "Phần tăng tiền mặt bằng của cô Tám", 144], ["do_nghe_sau_3", "Đợt cuối tiền đồ nghề trả chú Sáu", 144],
+		["mat_bang_tang", "Phần tăng tiền mặt bằng của cô Tâm", 144], ["do_nghe_sau_3", "Đợt cuối tiền đồ nghề trả chú Sơn", 144],
 		["dien_nuoc_t5", "Điện nước tháng này", 133], ["tien_nha_t4", "Tiền nhà tháng trước còn hẹn", 124],
 		["mat_bang_t9", "Tiền mặt bằng tháng trước còn hẹn", 124], ["do_nghe_sau_2", "Đợt hai tiền đồ nghề còn hẹn", 124],
-		["gop_di_nam_5", "Góp tiền chợ nhà dì Năm còn hẹn", 124], ["gop_di_nam_6", "Góp tiền chợ ở nhờ nhà dì Năm", 144],
+		["gop_di_nam_5", "Góp tiền chợ nhà dì Nga còn hẹn", 124], ["gop_di_nam_6", "Góp tiền chợ ở nhờ nhà dì Nga", 144],
 		["phong_moi_t10", "Phần còn lại phòng mới, dọn mùng 1 tháng Mười", 144]])
 	if game.check({"home": "di_nam", "housing_state": "signed"}) == "" and game.day() <= 146:
-		_objective("Đặt cọc phòng mới trong tháng Chín", "Ở nhờ dì Năm tới hết tháng · cọc Hẻm Dừa hay Cầu Tre, dọn mùng một tháng Mười",
+		_objective("Đặt cọc phòng mới trong tháng Chín", "Ở nhờ dì Nga tới hết tháng · cọc ngõ Gạch hay Ngọc Thụy, dọn mùng một tháng Mười",
 			"current" if game.day() >= 140 else "normal")
 	if f.get("dauLung", false) and not f.get("khamLung", false):
-		_objective("Cái lưng của An: chưa đi khám", "Phòng khám phường ở chợ Cầu Nhỏ · đau mà gồng thì tới lúc gãy", "current")
+		_objective("Cái lưng của An: chưa đi khám", "Trạm y tế phường gần chợ Long Biên · đau mà gồng thì tới lúc gãy", "current")
 	elif f.get("khamLung", false):
 		_objective("Cái lưng của An: đã khám", "Không khiêng một mình đồ trên hai chục ký", "done")
 	if f.get("hocXong", false):
 		_objective("Lớp điện lạnh buổi tối", "Đã học xong, có giấy chứng nhận", "done")
 	if f.get("ongBaNamVien", false) and not f.get("ongBaXuatVien", false) and game.day() <= 140:
-		_objective("Ông Ba nằm viện", "Phòng chung tầng ba bệnh viện quận · trực đêm chia với anh Tài", "normal")
+		_objective("Ông Bảo nằm viện", "Phòng chung tầng ba bệnh viện quận · trực đêm chia với anh Tài", "normal")
 	if game.day() <= 136:
 		_objective("Rằm tháng Chín · triều cường (ngày 135–136)", "Kê máy của khách lên kệ, coi nhà người già", "current" if game.day() >= 133 else "normal")
 	if game.day() <= 145:
-		_objective("Má tròn năm mươi tuổi (tối ngày 145)", "Hỏi má muốn gì, hay tự lo một bữa", "current" if game.day() >= 142 else "normal")
+		_objective("Mẹ tròn năm mươi tuổi (tối ngày 145)", "Hỏi mẹ muốn gì, hay tự lo một bữa", "current" if game.day() >= 142 else "normal")
 	var due_today := 0
 	for p in s.promises:
 		if p.status == "open" and int(p.due) == game.day():
@@ -1772,7 +1772,7 @@ func _refresh_skills(s: Dictionary) -> void:
 			inv.append("%d %s" % [int(s.inv[k]), game.cfg.scrap[k].name])
 	if not inv.is_empty():
 		lines.append("")
-		lines.append("[b]Ve chai[/b]: %s (≈ %s)" % [", ".join(inv), GameLogic.fmt_k(game.scrap_value())])
+		lines.append("[b]Đồng nát[/b]: %s (≈ %s)" % [", ".join(inv), GameLogic.fmt_k(game.scrap_value())])
 	var carry := []
 	for k in s.get("qitems", {}):
 		carry.append(game.item_name(k))
@@ -1850,7 +1850,7 @@ func _refresh_location() -> void:
 				found += 1
 	if loc.get("scrap", false):
 		var v: int = game.scrap_value()
-		_loc_cards.add_child(UI.choice("Bán hết ve chai", ("Được " + GameLogic.fmt_k(v)) if v > 0 else "", "Chưa nhặt được gì, lục thùng rác dọc phố (%s)" % ("chạm lời nhắc" if ScreenFit.touch else "phím E") if v <= 0 else "",
+		_loc_cards.add_child(UI.choice("Bán hết đồng nát", ("Được " + GameLogic.fmt_k(v)) if v > 0 else "", "Chưa nhặt được gì, lục thùng rác dọc phố (%s)" % ("chạm lời nhắc" if ScreenFit.touch else "phím E") if v <= 0 else "",
 			func() -> void:
 				var got: int = game.sell_scrap()
 				if got > 0:

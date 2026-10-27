@@ -403,7 +403,9 @@ func _commit_flat() -> void:
 			add_child(mi)
 			continue
 		if key == "water":
-			m.roughness = 0.3
+			# Ánh nắng phản chiếu nhẹ: mặt nước rộng (sông Hồng, hồ Gươm) nhìn từ trên cao không bạc trắng.
+			m.roughness = 0.5
+			m.metallic_specular = 0.18
 			mi.material_override = m
 		else:
 			mi.material_override = _flat_focus_material()

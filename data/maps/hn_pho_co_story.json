@@ -1,0 +1,458 @@
+{
+ "_ghi_chu": "Đặt truyện lên map phố cổ dựng tay (data/maps/hn_pho_co.json, sinh bằng tools/gen_phocu_map.py). locations: at là giữa nhà, road là phố quay mặt ra, inset là khoảng lùi khỏi mép đường. landmarks: công trình mốc dựng thêm trên màn phố (scripts/world/landmarks.gd).",
+ "map": "hn_pho_co",
+ "displayName": "Phố cổ Hà Nội",
+ "walkHoursPerMeter": 0.001,
+ "locations": {
+  "xom_bo_me": {
+   "at": [
+    170,
+    -133
+   ],
+   "w": 13,
+   "d": 10,
+   "road": "Ngõ 25 Phúc Tân"
+  },
+  "cho_cau_nho": {
+   "at": [
+    155,
+    -190
+   ],
+   "w": 26,
+   "d": 14,
+   "road": "Cầu Long Biên"
+  },
+  "ben_xe_6": {
+   "at": [
+    113,
+    -175
+   ],
+   "w": 7,
+   "d": 3,
+   "road": "Phố Trần Nhật Duật",
+   "inset": 0.0
+  },
+  "tiem_sau": {
+   "at": [
+    71,
+    -199
+   ],
+   "w": 9,
+   "d": 11,
+   "road": "Phố Gầm Cầu"
+  },
+  "com_hanh": {
+   "at": [
+    97,
+    -142
+   ],
+   "w": 8,
+   "d": 11,
+   "road": "Phố Hàng Chiếu"
+  },
+  "nha_di_nam": {
+   "at": [
+    80,
+    -142
+   ],
+   "w": 7,
+   "d": 10,
+   "road": "Phố Hàng Chiếu"
+  },
+  "hem_dua": {
+   "at": [
+    -164,
+    -48
+   ],
+   "w": 5.5,
+   "d": 8,
+   "road": "Ngõ Gạch"
+  },
+  "ben_can": {
+   "at": [
+    70,
+    -40
+   ],
+   "w": 24,
+   "d": 10,
+   "road": "Phố Tạ Hiện"
+  },
+  "cau_tre": {
+   "at": [
+    245,
+    -150
+   ],
+   "w": 9,
+   "d": 9,
+   "road": "Phố Ngọc Thụy"
+  }
+ },
+ "names": {
+  "Cầu Long Biên": "Cầu Long Biên",
+  "Ngõ 105 Phúc Tân": "Ngõ 105 Phúc Tân",
+  "Ngõ 131 Phúc Tân": "Ngõ 131 Phúc Tân",
+  "Ngõ 25 Phúc Tân": "Ngõ 25 Phúc Tân",
+  "Ngõ 51 Phúc Tân": "Ngõ 51 Phúc Tân",
+  "Ngõ 79 Phúc Tân": "Ngõ 79 Phúc Tân",
+  "Ngõ Chợ Đồng Xuân": "Ngõ Chợ Đồng Xuân",
+  "Ngõ Cầu Gỗ": "Ngõ Cầu Gỗ",
+  "Ngõ Gạch": "Ngõ Gạch",
+  "Ngõ Hàng Bạc": "Ngõ Hàng Bạc",
+  "Ngõ Hàng Đào": "Ngõ Hàng Đào",
+  "Ngõ Lê Thái Tổ": "Ngõ Lê Thái Tổ",
+  "Ngõ Lương Ngọc Quyến": "Ngõ Lương Ngọc Quyến",
+  "Ngõ Mã Mây": "Ngõ Mã Mây",
+  "Phố Cầu Gỗ": "Phố Cầu Gỗ",
+  "Phố Gầm Cầu": "Phố Gầm Cầu",
+  "Phố Hàng Buồm": "Phố Hàng Buồm",
+  "Phố Hàng Bạc": "Phố Hàng Bạc",
+  "Phố Hàng Chiếu": "Phố Hàng Chiếu",
+  "Phố Hàng Đào": "Phố Hàng Đào",
+  "Phố Hàng Đậu": "Phố Hàng Đậu",
+  "Phố Lê Thái Tổ": "Phố Lê Thái Tổ",
+  "Phố Lý Thái Tổ": "Phố Lý Thái Tổ",
+  "Phố Lương Ngọc Quyến": "Phố Lương Ngọc Quyến",
+  "Phố Mã Mây": "Phố Mã Mây",
+  "Phố Ngọc Thụy": "Phố Ngọc Thụy",
+  "Phố Phùng Hưng": "Phố Phùng Hưng",
+  "Phố Phúc Tân": "Phố Phúc Tân",
+  "Phố Tràng Tiền": "Phố Tràng Tiền",
+  "Phố Trần Nhật Duật": "Phố Trần Nhật Duật",
+  "Phố Tạ Hiện": "Phố Tạ Hiện",
+  "Phố Đinh Liệt": "Phố Đinh Liệt",
+  "Phố Đinh Tiên Hoàng": "Phố Đinh Tiên Hoàng",
+  "Vòng xuyến Đông Kinh Nghĩa Thục": "Vòng xuyến Đông Kinh Nghĩa Thục"
+ },
+ "fallbackNames": [
+  "Phố cổ"
+ ],
+ "descriptions": {
+  "ben_xe_6": "Điểm xe buýt Long Biên trên đê Trần Nhật Duật, sát chân cầu: xe đưa rước công nhân ra khu công nghiệp Bắc Thăng Long đón ở đây. Trung tâm nghề của Linh cũng đi xe ở đây.",
+  "cho_cau_nho": "Chợ Long Biên dưới chân cầu Long Biên, ngoài đê: chợ đầu mối rau quả, xe tải nông sản về từ nửa đêm, sạp vật tư, hàng đồ cũ, sạp đồng nát của cô Thắm và quán trà đá có bảng tin cho thuê phòng.",
+  "com_hanh": "Quán cơm bình dân của chị Hạnh ở cuối phố Hàng Chiếu, sau lưng chợ Đồng Xuân, cho người làm ca, người kéo xe thồ, shipper. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.",
+  "tiem_sau": "Tiệm chú Sơn trong một vòm cầu đường sắt bên phố Gầm Cầu: sửa xe máy, thêm một bàn sửa đồ điện gia dụng. Tàu chạy qua trên đầu thì cả tiệm rung.",
+  "xom_bo_me": "Tám phòng trọ quanh khoảng sân trong ngõ 25 Phúc Tân, ngoài đê, sau lưng là bãi sông Hồng; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
+  "hem_dua": "Gác xép trong ngõ Gạch rẽ ra từ phố Hàng Buồm, đầu ngõ có cây bàng, quanh là quán net, tiệm cầm đồ. Phòng nhỏ, trần thấp, cửa sát mặt ngõ, ít chỗ phơi.",
+  "cau_tre": "Bên kia sông, phải đi qua cầu Long Biên. Dãy nhà trên phố Ngọc Thụy, lưng quay ra sông; phòng thoáng, có hiên rộng, đi làm xa hơn.",
+  "nha_di_nam": "Nhà dì Nga trên phố Hàng Chiếu, gần chợ Đồng Xuân và điểm xe buýt. Ở tạm được bảy ngày, phải gửi bớt đồ.",
+  "ben_can": "Dãy năm quán bia hơi vỉa hè phố Tạ Hiện, chung lối đi và đường điện cũ chằng chịt. Hợp đồng sửa điện của anh Phúc."
+ },
+ "landmarks": [
+  {
+   "kind": "thap_rua",
+   "pos": [
+    -62,
+    188
+   ]
+  },
+  {
+   "kind": "red_bridge",
+   "a": [
+    -3,
+    112
+   ],
+   "b": [
+    -21,
+    116
+   ]
+  },
+  {
+   "kind": "truss",
+   "a": [
+    184,
+    -200
+   ],
+   "b": [
+    244,
+    -200
+   ],
+   "w": 9.0,
+   "h": 9.0,
+   "spans": 2
+  },
+  {
+   "kind": "viaduct_top",
+   "a": [
+    -240,
+    -205
+   ],
+   "b": [
+    113,
+    -205
+   ],
+   "y": 7.4,
+   "w": 14.0
+  },
+  {
+   "kind": "arches",
+   "a": [
+    -240,
+    -197.9
+   ],
+   "b": [
+    113,
+    -197.9
+   ],
+   "h": 5.2,
+   "step": 6.0
+  },
+  {
+   "kind": "gables",
+   "a": [
+    -80,
+    -141.9
+   ],
+   "b": [
+    8,
+    -141.9
+   ],
+   "n": 3,
+   "h": 13.5,
+   "col": "d8c39b"
+  },
+  {
+   "kind": "label",
+   "text": "CẦU LONG BIÊN",
+   "pos": [
+    214,
+    -200
+   ],
+   "y": 13
+  },
+  {
+   "kind": "label",
+   "text": "CHỢ LONG BIÊN",
+   "pos": [
+    155,
+    -192
+   ],
+   "y": 9
+  },
+  {
+   "kind": "label",
+   "text": "BÃI PHÚC TÂN",
+   "pos": [
+    160,
+    -70
+   ],
+   "y": 10
+  },
+  {
+   "kind": "label",
+   "text": "VÒM CẦU PHÙNG HƯNG",
+   "pos": [
+    -160,
+    -205
+   ],
+   "y": 11
+  },
+  {
+   "kind": "label",
+   "text": "CHỢ ĐỒNG XUÂN",
+   "pos": [
+    -36,
+    -142
+   ],
+   "y": 17
+  },
+  {
+   "kind": "label",
+   "text": "PHỐ TẠ HIỆN",
+   "pos": [
+    60,
+    -48
+   ],
+   "y": 9
+  },
+  {
+   "kind": "label",
+   "text": "PHỐ HÀNG BẠC",
+   "pos": [
+    -140,
+    -20
+   ],
+   "y": 9
+  },
+  {
+   "kind": "label",
+   "text": "QUẢNG TRƯỜNG ĐÔNG KINH NGHĨA THỤC",
+   "pos": [
+    -60,
+    64
+   ],
+   "y": 9
+  },
+  {
+   "kind": "label",
+   "text": "HỒ HOÀN KIẾM",
+   "pos": [
+    -60,
+    140
+   ],
+   "y": 8
+  },
+  {
+   "kind": "label",
+   "text": "THÁP RÙA",
+   "pos": [
+    -62,
+    188
+   ],
+   "y": 12
+  },
+  {
+   "kind": "label",
+   "text": "ĐỀN NGỌC SƠN",
+   "pos": [
+    -28,
+    118
+   ],
+   "y": 10
+  },
+  {
+   "kind": "label",
+   "text": "TRÀNG TIỀN PLAZA",
+   "pos": [
+    60,
+    262
+   ],
+   "y": 25
+  },
+  {
+   "kind": "label",
+   "text": "PHỐ PHÁP",
+   "pos": [
+    60,
+    150
+   ],
+   "y": 9
+  },
+  {
+   "kind": "label",
+   "text": "NGỌC THỤY",
+   "pos": [
+    250,
+    -120
+   ],
+   "y": 8
+  }
+ ],
+ "questAreas": {
+  "meo_be_bap": {
+   "around": "cho_cau_nho",
+   "radius": 80
+  }
+ },
+ "vendorRoutes": {
+  "banh_mi": [
+   [
+    115,
+    -84
+   ],
+   [
+    115,
+    30
+   ],
+   [
+    10,
+    36
+   ],
+   [
+    -115,
+    36
+   ],
+   [
+    -115,
+    -126
+   ],
+   [
+    115,
+    -126
+   ],
+   [
+    115,
+    -84
+   ]
+  ],
+  "xoi": [
+   [
+    150,
+    -170
+   ],
+   [
+    150,
+    70
+   ],
+   [
+    150,
+    -170
+   ]
+  ],
+  "ve_chai": [
+   [
+    124,
+    -140
+   ],
+   [
+    180,
+    -140
+   ],
+   [
+    180,
+    0
+   ],
+   [
+    124,
+    0
+   ],
+   [
+    124,
+    -140
+   ]
+  ],
+  "che": [
+   [
+    -120,
+    44
+   ],
+   [
+    0,
+    44
+   ],
+   [
+    0,
+    250
+   ],
+   [
+    -120,
+    250
+   ],
+   [
+    -120,
+    44
+   ]
+  ],
+  "hu_tieu": [
+   [
+    60,
+    -24
+   ],
+   [
+    60,
+    -72
+   ],
+   [
+    -120,
+    -72
+   ],
+   [
+    -120,
+    -24
+   ],
+   [
+    60,
+    -24
+   ]
+  ]
+ }
+}

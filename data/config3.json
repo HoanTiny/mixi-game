@@ -27,7 +27,7 @@
    "id": "trong_tiem_chieu", "minigame": "repair",
    "group": "work",
    "location": "tiem_sau",
-   "name": "Trông tiệm Sáu buổi chiều (chia đôi tiền công)",
+   "name": "Trông tiệm chú Sơn buổi chiều (chia đôi tiền công)",
    "hours": 5,
    "pay": 260000,
    "perDay": 1,
@@ -48,13 +48,13 @@
     "fatigue": 14,
     "rep.SAU": 1
    },
-   "desc": "Chú Sáu ngồi coi, An làm tay. Khách của tiệm, tiền công chia đôi, ghi sổ."
+   "desc": "Chú Sơn ngồi trông, An làm tay. Khách của tiệm, tiền công chia đôi, ghi sổ."
   },
   {
    "id": "day_tin",
    "group": "optional",
    "location": "tiem_sau",
-   "name": "Chỉ Tín tháo ráp một món đã rút điện",
+   "name": "Chỉ Tín tháo lắp một món đã rút điện",
    "hours": 1,
    "window": [
     14,
@@ -79,7 +79,7 @@
    "id": "goi_ma_chu_nhat",
    "group": "optional",
    "location": "home",
-   "name": "Gọi video cho má tối cuối tuần",
+   "name": "Gọi video cho mẹ tối cuối tuần",
    "hours": 0.5,
    "window": [
     18,
@@ -104,13 +104,13 @@
     "rep.MA": 2,
     "fatigue": -2
    },
-   "desc": "Má hỏi chuyện bà trước, chuyện tiền sau."
+   "desc": "Mẹ hỏi chuyện bà trước, chuyện tiền sau."
   },
   {
    "id": "coc_hem_dua_t8",
    "group": "optional",
    "location": "hem_dua",
-   "name": "Đặt cọc phòng Hẻm Dừa, hẹn dọn mùng 1 tháng Tám",
+   "name": "Đặt cọc phòng ngõ Gạch, hẹn dọn mùng 1 tháng Tám",
    "hours": 1,
    "days": [
     61,
@@ -130,11 +130,11 @@
     "payable": {
      "id": "phong_moi_t8",
      "to": "",
-     "label": "Phần còn lại phòng Hẻm Dừa (dọn mùng 1 tháng Tám)",
+     "label": "Phần còn lại phòng ngõ Gạch (dọn mùng 1 tháng Tám)",
      "amount": 2800000,
      "due": 90
     },
-    "diary": "Đặt cọc phòng Hẻm Dừa, hẹn dọn vô mùng một tháng Tám, qua tháng cô hồn cho bà yên bụng. Còn hai triệu tám, hạn tối ngày 90."
+    "diary": "Đặt cọc phòng ngõ Gạch, hẹn dọn vào mùng một tháng Tám, qua tháng cô hồn cho bà yên bụng. Còn hai triệu tám, hạn tối ngày 90."
    },
    "desc": "Chủ phòng giữ chỗ tới hết tháng Bảy. Phần còn lại trả trước tối ngày 90."
   },
@@ -142,7 +142,7 @@
    "id": "coc_cau_tre_t8",
    "group": "optional",
    "location": "cau_tre",
-   "name": "Đặt cọc phòng Cầu Tre, hẹn dọn mùng 1 tháng Tám",
+   "name": "Đặt cọc phòng Ngọc Thụy, hẹn dọn mùng 1 tháng Tám",
    "hours": 1,
    "days": [
     61,
@@ -162,11 +162,11 @@
     "payable": {
      "id": "phong_moi_t8",
      "to": "",
-     "label": "Phần còn lại phòng Cầu Tre (dọn mùng 1 tháng Tám)",
+     "label": "Phần còn lại phòng Ngọc Thụy (dọn mùng 1 tháng Tám)",
      "amount": 2400000,
      "due": 90
     },
-    "diary": "Đặt cọc phòng Cầu Tre, hẹn dọn vô mùng một tháng Tám, qua tháng cô hồn cho bà yên bụng. Còn hai triệu tư, hạn tối ngày 90."
+    "diary": "Đặt cọc phòng Ngọc Thụy, hẹn dọn vào mùng một tháng Tám, qua tháng cô hồn cho bà yên bụng. Còn hai triệu tư, hạn tối ngày 90."
    },
    "desc": "Chủ phòng giữ chỗ tới hết tháng Bảy. Phần còn lại trả trước tối ngày 90."
   }

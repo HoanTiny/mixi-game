@@ -15,6 +15,7 @@ const Audio := preload("res://scripts/world/audio.gd")
 const TubeHouse := preload("res://scripts/world/tube_house.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
 const RealCity := preload("res://scripts/world/real_city.gd")
+const Landmarks := preload("res://scripts/world/landmarks.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
 const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
@@ -34,31 +35,31 @@ var home: String = HOME
 ## tube: dựng thành nhà ống (floors tầng, sign chữ biển hiệu, units số căn liền nhau, shop tầng trệt buôn bán).
 ## shelter: mái che trạm xe. stalls: sạp chợ, ghế trà đá · line: dây phơi đồ trước cửa · scrap: chỗ bán ve chai.
 const LOCATIONS := {
-	"ben_xe_6": {"name": "Bến xe số 6", "desc": "Trạm xe đưa rước công nhân ở đầu đường An Hòa, sát cổng khu công nghiệp. Trung tâm nghề của Linh cũng đi xe ở đây.", "color": "3c7d6b", "shelter": true, "h": 3.0},
-	"cho_cau_nho": {"name": "Chợ Cầu Nhỏ", "desc": "Chợ ở đầu Cầu Nhỏ: sạp vật tư, hàng đồ cũ, tiệm photo, sạp ve chai của cô Út và quán trà đá có bảng tin cho thuê phòng.",
-		"tube": {"floors": 2, "sign": "CHỢ CẦU NHỎ", "units": 3}, "color": "c8503f", "stalls": true, "scrap": true,
-		"npcs": [{"name": "Cô Út ve chai", "id": "", "color": "6b4f3a"}]},
-	"com_hanh": {"name": "Cơm Hạnh", "desc": "Quán cơm phần cho người làm ca trên đường An Hòa. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.",
+	"ben_xe_6": {"name": "Điểm xe buýt Long Biên", "desc": "Điểm xe buýt Long Biên trên đê Trần Nhật Duật, sát chân cầu: xe đưa rước công nhân ra khu công nghiệp Bắc Thăng Long đón ở đây. Trung tâm nghề của Linh cũng đi xe ở đây.", "color": "3c7d6b", "shelter": true, "h": 3.0},
+	"cho_cau_nho": {"name": "Chợ Long Biên", "desc": "Chợ Long Biên dưới chân cầu Long Biên, ngoài đê: chợ đầu mối rau quả, xe tải nông sản về từ nửa đêm, sạp vật tư, hàng đồ cũ, sạp đồng nát của cô Thắm và quán trà đá có bảng tin cho thuê phòng.",
+		"tube": {"floors": 2, "sign": "CHỢ LONG BIÊN", "units": 3}, "color": "c8503f", "stalls": true, "scrap": true,
+		"npcs": [{"name": "Cô Thắm đồng nát", "id": "", "color": "6b4f3a"}]},
+	"com_hanh": {"name": "Cơm Hạnh", "desc": "Quán cơm bình dân của chị Hạnh trong ngõ chợ Đồng Xuân, cho người làm ca, người kéo xe thồ, shipper. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.",
 		"tube": {"floors": 3, "sign": "CƠM HẠNH"}, "color": "e39a66",
 		"npcs": [{"name": "Chị Hạnh", "id": "HANH", "color": "c0603a"}, {"name": "Minh", "id": "MINH", "color": "2f5f8a"}]},
-	"tiem_sau": {"name": "Tiệm Sáu Sửa", "desc": "Tiệm sửa xe trên đường An Hòa, gần đầu Hẻm 42, có thêm một bàn sửa đồ gia dụng.",
-		"tube": {"floors": 3, "sign": "SÁU SỬA XE · ĐỒ ĐIỆN"}, "color": "6f8fa8",
-		"npcs": [{"name": "Chú Sáu", "id": "SAU", "color": "3f5f7a"}]},
-	"xom_bo_me": {"name": "Xóm trọ Bờ Me", "desc": "Tám phòng quanh khoảng sân nhìn ra rạch, vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
-		"tube": {"floors": 3, "sign": "XÓM TRỌ BỜ ME", "units": 3}, "color": "eadcae", "line": true,
-		"npcs": [{"name": "Bà Tư", "id": "BA_TU", "color": "8a6f9a"}, {"name": "Linh", "id": "LINH", "color": "d9776b"}, {"name": "Cô Duyên", "id": "DUYEN", "color": "b5577a"}]},
-	# Ba chỗ ở mới: Hẻm Dừa gần chợ và gần việc, Cầu Tre bên kia rạch (đi xa hơn), nhà dì Năm ở đầu đường.
-	"hem_dua": {"name": "Phòng Hẻm Dừa", "desc": "Hẻm cụt rẽ ra từ đường Chợ, đầu hẻm có cây dừa. Phòng nhỏ, cửa sát mặt hẻm, ít chỗ phơi.",
+	"tiem_sau": {"name": "Tiệm Sơn Sửa", "desc": "Tiệm chú Sơn trong một vòm cầu đường sắt bên phố Gầm Cầu: sửa xe máy, thêm một bàn sửa đồ điện gia dụng. Tàu chạy qua trên đầu thì cả tiệm rung.",
+		"tube": {"floors": 3, "sign": "SƠN SỬA XE · ĐỒ ĐIỆN"}, "color": "6f8fa8",
+		"npcs": [{"name": "Chú Sơn", "id": "SAU", "color": "3f5f7a"}]},
+	"xom_bo_me": {"name": "Xóm trọ Phúc Tân", "desc": "Tám phòng trọ quanh khoảng sân trong ngõ 51 Phúc Tân, ngoài đê, sau lưng là bãi sông Hồng; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
+		"tube": {"floors": 3, "sign": "XÓM TRỌ PHÚC TÂN", "units": 3}, "color": "eadcae", "line": true,
+		"npcs": [{"name": "Bà Thoa", "id": "BA_TU", "color": "8a6f9a"}, {"name": "Linh", "id": "LINH", "color": "d9776b"}, {"name": "Cô Duyên", "id": "DUYEN", "color": "b5577a"}]},
+	# Ba chỗ ở mới: gác xép ngõ Gạch gần chợ và gần việc, Ngọc Thụy bên kia sông (đi xa hơn), nhà dì Nga trên phố Hàng Chiếu.
+	"hem_dua": {"name": "Gác xép ngõ Gạch", "desc": "Gác xép trong ngõ Gạch rẽ ra từ phố Hàng Buồm, đầu ngõ có cây bàng, quanh là quán net, tiệm cầm đồ. Phòng nhỏ, trần thấp, cửa sát mặt ngõ, ít chỗ phơi.",
 		"tube": {"floors": 3, "sign": "PHÒNG CHO THUÊ", "shop": false}, "color": "d8c39a", "home": "hem_dua",
 		"npcs": [{"name": "Cô chủ phòng", "id": "", "color": "9a6a8a"}]},
-	"cau_tre": {"name": "Phòng Cầu Tre", "desc": "Bên kia rạch, qua Cầu Tre. Dãy nhà lưng quay ra kênh; phòng thoáng, có hiên rộng, đi làm xa hơn.",
-		"tube": {"floors": 2, "sign": "PHÒNG TRỌ CẦU TRE", "shop": false}, "color": "a9c4a0", "home": "cau_tre",
+	"cau_tre": {"name": "Phòng Ngọc Thụy", "desc": "Bên kia sông, phải đi qua cầu Long Biên. Dãy nhà trên phố Ngọc Thụy, lưng quay ra sông; phòng thoáng, có hiên rộng, đi làm xa hơn.",
+		"tube": {"floors": 2, "sign": "PHÒNG TRỌ NGỌC THỤY", "shop": false}, "color": "a9c4a0", "home": "cau_tre",
 		"npcs": [{"name": "Chú chủ nhà", "id": "", "color": "5a6a7a"}]},
-	"nha_di_nam": {"name": "Nhà dì Năm", "desc": "Nhà dì Năm ở đầu đường An Hòa, gần trạm xe. Ở tạm được bảy ngày, phải gửi bớt đồ.",
+	"nha_di_nam": {"name": "Nhà dì Nga", "desc": "Nhà dì Nga trên phố Hàng Chiếu, gần chợ Đồng Xuân và điểm xe buýt. Ở tạm được bảy ngày, phải gửi bớt đồ.",
 		"tube": {"floors": 2, "sign": "", "shop": false}, "color": "e0b08a", "home": "di_nam",
-		"npcs": [{"name": "Dì Năm", "id": "", "color": "7a5a4a"}]},
-	"ben_can": {"name": "Dãy quán Bến Cạn", "desc": "Năm quán ven rạch cuối đường Bờ Me, chung lối đi và hạ tầng điện cũ. Hợp đồng của anh Phúc.",
-		"tube": {"floors": 2, "sign": "DÃY QUÁN BẾN CẠN", "units": 5}, "color": "9c9a93",
+		"npcs": [{"name": "Dì Nga", "id": "", "color": "7a5a4a"}]},
+	"ben_can": {"name": "Dãy quán bia Tạ Hiện", "desc": "Dãy năm quán bia hơi vỉa hè phố Tạ Hiện, chung lối đi và đường điện cũ chằng chịt. Hợp đồng sửa điện của anh Phúc.",
+		"tube": {"floors": 2, "sign": "BIA HƠI TẠ HIỆN", "units": 5}, "color": "9c9a93",
 		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
 }
 const SPEED := 6.0
@@ -1304,6 +1305,7 @@ func _build_real() -> void:
 	_build_lamp_pools()
 	_build_real_traffic()
 	_build_real_canal()
+	Landmarks.build(self, city.story.get("landmarks", []), font)
 	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra. Đứng chắn trước An thì thu nhỏ như cây thường.
 	if city.locs.has("hem_dua"):
 		var rng := RandomNumberGenerator.new()

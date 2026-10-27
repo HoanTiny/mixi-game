@@ -2,13 +2,13 @@
  "_ghi_chu": "Việc nhờ của chương 3, cùng cú pháp với quests.json. \"home\" là chỗ ở hiện tại.",
  "items": {
   "nut_tay_cam": "Hai cái nút bấm tay cầm chơi game",
-  "giay_phep_76": "Tờ giấy phép cất nhà năm 1976 của ông Ba",
+  "giay_phep_76": "Tờ giấy phép xây nhà năm 1976 của ông Bảo",
   "ban_sao_76": "Ba bản sao giấy phép năm 1976",
   "hoa_vu_lan": "Bó hoa hồng và đồ cúng rằm",
-  "quat_ve_chai": "Cái quạt bàn cũ mua lại ở sạp ve chai",
+  "quat_ve_chai": "Cái quạt bàn cũ mua lại ở hàng đồng nát",
   "quat_mung_tho": "Cái quạt bàn đã sửa, lau sạch, làm quà mừng thọ",
-  "den_cu": "Cây đèn bàn cũ ở sạp đồ cũ",
-  "den_hoc": "Cây đèn học đã thay bóng, thay dây"
+  "den_cu": "Cái đèn bàn cũ ở hàng đồ cũ",
+  "den_hoc": "Cái đèn học đã thay bóng, thay dây"
  },
  "quests": [
   {
@@ -28,9 +28,9 @@
     "flag.tinOTiem": true,
     "flag.luaCam": false
    },
-   "intro": "Tín đặt cái tay cầm chơi game lên bàn, hai cái nút lún, một sợi dây đứt chân. \"Chú chỉ con sửa cái này được không? Con không nhờ chú sửa giùm. Con muốn tự sửa.\"",
+   "intro": "Tín đặt cái tay cầm chơi game lên bàn, hai cái nút lún, một sợi dây đứt chân. \"Chú chỉ cháu sửa cái này được không? Cháu không nhờ chú sửa hộ. Cháu muốn tự sửa.\"",
    "accept": "\"Được. Mình sửa chung, em cầm mỏ hàn, chú cầm tay em.\"",
-   "decline": "\"Để tuần sau nghen, tuần này chú kẹt.\"",
+   "decline": "\"Để tuần sau nhé, tuần này chú bận.\"",
    "deadline_days": 4,
    "reward_hint": "Tín +6, Tín học ghi phiếu nhận sửa",
    "reward": {
@@ -43,7 +43,7 @@
    "fail": {
     "rep.TIN": -2
    },
-   "fail_text": "Tín tự hàn cái tay cầm ở tiệm net bằng cây mỏ hàn mượn, hàn dính hai chân. Nó cất cái tay cầm vô cặp, không nhắc nữa.",
+   "fail_text": "Tín tự hàn cái tay cầm ở quán net bằng cái mỏ hàn mượn, hàn dính hai chân. Nó cất cái tay cầm vào cặp, không nhắc nữa.",
    "steps": [
     {
      "kind": "visit",
@@ -51,10 +51,10 @@
      "hours": 0.5,
      "effects": {
       "cash": -20000,
-      "cash_label": "Hai nút bấm tay cầm ở sạp linh kiện",
+      "cash_label": "Hai nút bấm tay cầm ở hàng linh kiện",
       "item.nut_tay_cam": 1
      },
-     "text": "Mua hai cái nút bấm ở sạp linh kiện chợ Cầu Nhỏ"
+     "text": "Mua hai cái nút bấm ở hàng linh kiện chợ Long Biên"
     },
     {
      "kind": "visit",
@@ -70,24 +70,24 @@
      "consume": true,
      "text": "Về tiệm, rút điện, cùng Tín hàn lại cái tay cầm",
      "scene": {
-      "title": "Cây mỏ hàn đầu tiên",
+      "title": "Cái mỏ hàn đầu tiên",
       "who": "Tín",
-      "text": "Tín cầm cây mỏ hàn bằng cả hai tay, run như chú Sáu. An đặt tay mình lên tay nó. Mùi nhựa thông bốc lên. Giọt thiếc đầu tiên tròn như hạt đậu, bám đúng chân nút.",
+      "text": "Tín cầm cái mỏ hàn bằng cả hai tay, run như chú Sơn. An đặt tay mình lên tay nó. Mùi nhựa thông bốc lên. Giọt thiếc đầu tiên tròn như hạt đậu, bám đúng chân nút.",
       "choices": [
        {
         "label": "Để nó tự hàn chân thứ hai, mình chỉ nhìn",
         "hint": "Tín +3",
         "effects": {
          "rep.TIN": 3,
-         "log": "Chân thứ hai Tín tự hàn, hơi lem, mà dính chắc. Nó thổi phù phù cho nguội như thổi bánh xèo."
+         "log": "Chân thứ hai Tín tự hàn, hơi lem, mà dính chắc. Nó thổi phù phù cho nguội như thổi củ khoai nướng."
         }
        },
        {
-        "label": "Hàn giùm cho nhanh",
+        "label": "Hàn hộ cho nhanh",
         "hint": "Tín −1",
         "effects": {
          "rep.TIN": -1,
-         "log": "Hàn giùm hai chân còn lại trong một phút. Tín nhìn, gật, mà không nói gì."
+         "log": "Hàn hộ hai chân còn lại trong một phút. Tín nhìn, gật, mà không nói gì."
         }
        }
       ]
@@ -97,8 +97,8 @@
   },
   {
    "id": "giay_to_ong_ba",
-   "title": "Giấy tờ nhà ông Ba",
-   "who": "Ông Ba",
+   "title": "Giấy tờ nhà ông Bảo",
+   "who": "Ông Bảo",
    "giver": "home",
    "days": [
     73,
@@ -111,22 +111,22 @@
    "when": {
     "flag.giayToOngBa": true
    },
-   "intro": "Ông Ba gói tờ giấy phép năm 1976 trong một cái bao ni lông, gói hai lớp. \"Con mang ra tiệm photo sao giùm ông ba bản. Bản chánh ông giữ, ông không đưa ai hết.\"",
-   "accept": "\"Dạ, con đi liền.\"",
-   "decline": "\"Để con chụp hình là được rồi ông.\"",
+   "intro": "Ông Bảo gói tờ giấy phép năm 1976 trong một cái túi ni lông, gói hai lớp. \"Cháu mang ra hàng photo sao hộ ông ba bản. Bản chính ông giữ, ông không đưa ai cả.\"",
+   "accept": "\"Vâng, cháu đi ngay.\"",
+   "decline": "\"Để cháu chụp ảnh là được rồi ông ạ.\"",
    "deadline_days": 4,
    "deadline_hour": 8,
-   "reward_hint": "Ông Ba +4 · có bản sao nộp ở buổi họp",
+   "reward_hint": "Ông Bảo +4 · có bản sao nộp ở buổi họp",
    "reward": {
     "rep.ONG_BA": 4,
     "flag.banSao76": true,
-    "diary": "Sao tờ giấy phép năm 1976 làm ba bản ở tiệm photo chợ Cầu Nhỏ, mang bản chánh về trả ông Ba. Ông đếm lại ba bản sao, gật, rồi cất bản chánh vô hộp thiếc, khóa luôn."
+    "diary": "Sao tờ giấy phép năm 1976 làm ba bản ở hàng photo chợ Long Biên, mang bản chính về trả ông Bảo. Ông đếm lại ba bản sao, gật, rồi cất bản chính vào hộp sắt, khóa luôn."
    },
-   "reward_text": "Ông Ba cầm ba bản sao đưa ra ánh sáng, so từng nét bút chì với bản chánh. \"Giống y. Mấy cái máy bây giờ giỏi thiệt.\"",
+   "reward_text": "Ông Bảo cầm ba bản sao đưa ra ánh sáng, so từng nét bút chì với bản chính. \"Giống hệt. Mấy cái máy bây giờ giỏi thật.\"",
    "fail": {
     "rep.ONG_BA": -1
    },
-   "fail_text": "Tới sáng họp dân mà bản sao vẫn chưa có. Ông Ba ôm bản chánh tới nhà lồng chợ, ôm khư khư không chịu đưa ai.",
+   "fail_text": "Đến sáng họp dân mà bản sao vẫn chưa có. Ông Bảo ôm bản chính đến buổi họp, ôm khư khư không chịu đưa ai.",
    "steps": [
     {
      "kind": "visit",
@@ -135,7 +135,7 @@
      "effects": {
       "item.giay_phep_76": 1
      },
-     "text": "Nhận tờ giấy phép năm 1976 từ tay ông Ba"
+     "text": "Nhận tờ giấy phép năm 1976 từ tay ông Bảo"
     },
     {
      "kind": "visit",
@@ -154,7 +154,7 @@
       "cash_label": "Photo ba bản giấy phép năm 1976",
       "item.ban_sao_76": 1
      },
-     "text": "Ra tiệm photo ở chợ Cầu Nhỏ sao ba bản"
+     "text": "Ra hàng photo ở chợ Long Biên sao ba bản"
     },
     {
      "kind": "visit",
@@ -165,14 +165,14 @@
       "ban_sao_76": 1
      },
      "consume": true,
-     "text": "Mang bản chánh về trả ông Ba, giữ ba bản sao cho buổi họp"
+     "text": "Mang bản chính về trả ông Bảo, giữ ba bản sao cho buổi họp"
     }
    ]
   },
   {
    "id": "hoa_vu_lan",
    "title": "Hoa Vu Lan",
-   "who": "Bà Tư",
+   "who": "Bà Thoa",
    "giver": "home",
    "days": [
     73,
@@ -182,18 +182,18 @@
     6,
     20
    ],
-   "intro": "Bà đưa tờ giấy ghi chữ to: \"Hoa hồng đỏ, hoa hồng trắng, một nải chuối, nhang.\" \"Rằm này bà muốn nhà mình có hoa cúng, có hoa cài. Con mua giùm bà trước năm giờ chiều rằm, trễ là chợ hết hoa.\"",
-   "accept": "\"Dạ, để con mua.\"",
+   "intro": "Bà đưa tờ giấy ghi chữ to: \"Hoa hồng đỏ, hoa hồng trắng, một nải chuối, hương.\" \"Rằm này bà muốn nhà mình có hoa cúng, có hoa cài. Con mua hộ bà trước năm giờ chiều rằm, muộn là chợ hết hoa.\"",
+   "accept": "\"Vâng, để con mua.\"",
    "decline": "\"Ở chùa người ta phát hoa mà bà.\"",
    "deadline_days": 2,
    "deadline_hour": 17,
-   "reward_hint": "Bà Tư +4",
+   "reward_hint": "Bà Thoa +4",
    "reward": {
     "rep.BA_TU": 4,
     "flag.hoaVuLan": true,
-    "diary": "Mua hoa hồng, nải chuối, bó nhang cho bà trước năm giờ chiều rằm. Bà cắm hoa lên bàn thờ, chừa riêng một bông trắng, một bông đỏ trong ly nước: \"Bông trắng của bà, bông đỏ của con.\""
+    "diary": "Mua hoa hồng, nải chuối, bó hương cho bà trước năm giờ chiều rằm. Bà cắm hoa lên bàn thờ, để riêng một bông trắng, một bông đỏ trong cốc nước: \"Bông trắng của bà, bông đỏ của con.\""
    },
-   "reward_text": "Bà cắm bó hồng lên bàn thờ, chừa một bông trắng, một bông đỏ trong ly nước để tối đi chùa cài. Bà nói hoa chợ Cầu Nhỏ năm nay đắt, mà thơm.",
+   "reward_text": "Bà cắm bó hồng lên bàn thờ, để một bông trắng, một bông đỏ trong cốc nước để tối đi chùa cài. Bà nói hoa chợ Long Biên năm nay đắt, mà thơm.",
    "fail": {
     "rep.BA_TU": -1
    },
@@ -209,10 +209,10 @@
      ],
      "effects": {
       "cash": -120000,
-      "cash_label": "Hoa hồng, chuối, nhang cúng rằm",
+      "cash_label": "Hoa hồng, chuối, hương cúng rằm",
       "item.hoa_vu_lan": 1
      },
-     "text": "Mua hoa hồng, nải chuối, nhang ở chợ Cầu Nhỏ (trước 17:00)"
+     "text": "Mua hoa hồng, nải chuối, hương ở chợ Long Biên (trước 17:00)"
     },
     {
      "kind": "visit",
@@ -229,7 +229,7 @@
   {
    "id": "quat_mung_tho",
    "title": "Cái quạt mừng thọ",
-   "who": "Bà Tư",
+   "who": "Bà Thoa",
    "giver": "home",
    "days": [
     71,
@@ -245,18 +245,18 @@
      "linhDuaBa"
     ]
    },
-   "intro": "Bà ngồi đếm tiền riêng trong cái khăn tay. \"Bà muốn mang cho chị Hai một món đồ xài được. Nhà chỉ nóng mà cái quạt hư hoài. Con kiếm giùm bà một cái quạt cũ rồi sửa lại, bà trả tiền.\"",
-   "accept": "\"Dạ. Bà trả tiền quạt, con trả tiền công.\"",
+   "intro": "Bà ngồi đếm tiền riêng trong cái khăn tay. \"Bà muốn mang cho chị Cả một món đồ dùng được. Nhà chị ấy nóng mà cái quạt hỏng mãi. Con tìm hộ bà một cái quạt cũ rồi sửa lại, bà trả tiền.\"",
+   "accept": "\"Vâng. Bà trả tiền quạt, con trả tiền công.\"",
    "decline": "\"Bà mua quạt mới cho chắc.\"",
    "deadline_days": 12,
    "deadline_hour": 21,
-   "reward_hint": "Bà Tư +4 · có quà mừng thọ",
+   "reward_hint": "Bà Thoa +4 · có quà mừng thọ",
    "reward": {
     "rep.BA_TU": 4,
     "flag.quatMungTho": true,
-    "diary": "Mua lại cái quạt bàn cũ ở sạp ve chai bằng tiền riêng của bà, về tiệm thay tụ, tra dầu, lau sạch tới bóng. Bà bật thử, ngồi trước quạt nhắm mắt: \"Gió này chị Hai chịu.\""
+    "diary": "Mua lại cái quạt bàn cũ ở hàng đồng nát bằng tiền riêng của bà, về tiệm thay tụ, tra dầu, lau sạch đến bóng. Bà bật thử, ngồi trước quạt nhắm mắt: \"Gió này chị Cả ưng.\""
    },
-   "reward_text": "Bà bật cái quạt, gió thổi tung mấy sợi tóc bạc. Bà lấy giấy báo gói lại, cột dây, ghi lên giấy bằng chữ to bằng ngón tay: \"Chị Hai.\"",
+   "reward_text": "Bà bật cái quạt, gió thổi tung mấy sợi tóc bạc. Bà lấy giấy báo gói lại, buộc dây, ghi lên giấy bằng chữ to bằng ngón tay: \"Chị Cả.\"",
    "fail": {
     "rep.BA_TU": -1
    },
@@ -273,7 +273,7 @@
      "effects": {
       "item.quat_ve_chai": 1
      },
-     "text": "Mua lại một cái quạt bàn cũ ở sạp ve chai của cô Út (tiền riêng của bà)"
+     "text": "Mua lại một cái quạt bàn cũ ở hàng đồng nát của cô Thắm (tiền riêng của bà)"
     },
     {
      "kind": "visit",
@@ -303,7 +303,7 @@
   },
   {
    "id": "den_hoc_bap",
-   "title": "Đèn học cho bé Bắp",
+   "title": "Đèn học cho cu Bin",
    "who": "Minh",
    "giver": "com_hanh",
    "days": [
@@ -314,7 +314,7 @@
     10,
     19
    ],
-   "intro": "Minh kể bé Bắp đòi có cái đèn học \"như bạn Mít\". \"Đèn mới hai trăm mấy. Tao nghe nói mày sửa được đèn cũ. Mày làm giùm tao một cây, tao trả công, không nhờ không.\"",
+   "intro": "Minh kể cu Bin đòi có cái đèn học \"như bạn Mít\". \"Đèn mới hai trăm mấy. Tao nghe nói mày sửa được đèn cũ. Mày làm hộ tao một cái, tao trả công, không nhờ không.\"",
    "accept": "\"Được. Trước ngày khai giảng có đèn.\"",
    "decline": "\"Mua đèn mới cho chắc Minh.\"",
    "deadline_days": 6,
@@ -322,16 +322,16 @@
    "reward_hint": "120.000đ · Minh +5",
    "reward": {
     "cash": 120000,
-    "cash_label": "Minh trả công sửa đèn học cho Bắp",
+    "cash_label": "Minh trả công sửa đèn học cho cu Bin",
     "rep.MINH": 5,
     "flag.denBap": true,
-    "diary": "Sửa cây đèn bàn cũ thành đèn học cho bé Bắp: thay bóng LED, thay dây, thêm cái công tắc bấm. Minh trả công đàng hoàng. Bắp bật tắt hai chục lần, rồi vẽ ngay dưới đèn một tấm hình: \"tiệm của chú An\", có cái ghế đẩu."
+    "diary": "Sửa cái đèn bàn cũ thành đèn học cho cu Bin: thay bóng LED, thay dây, thêm cái công tắc bấm. Minh trả công đàng hoàng. Cu Bin bật tắt hai chục lần, rồi vẽ ngay dưới đèn một bức tranh: \"tiệm của chú An\", có cái ghế đẩu."
    },
-   "reward_text": "Bé Bắp bật tắt cây đèn hai chục lần. Minh đếm tiền công trả đủ, không thiếu một đồng: \"Lần sau mày nhờ tao chở đồ, tao tính tiền lại.\"",
+   "reward_text": "Cu Bin bật tắt cái đèn hai chục lần. Minh đếm tiền công trả đủ, không thiếu một đồng: \"Lần sau mày nhờ tao chở đồ, tao tính tiền lại.\"",
    "fail": {
     "rep.MINH": -2
    },
-   "fail_text": "Tới hẹn mà đèn chưa xong. Minh mua cây đèn mới ở chợ, nhắn: \"Không sao. Mà lần sau không kịp thì nói sớm.\"",
+   "fail_text": "Đến hẹn mà đèn chưa xong. Minh mua cái đèn mới ở chợ, nhắn: \"Không sao. Mà lần sau không kịp thì nói sớm.\"",
    "steps": [
     {
      "kind": "visit",
@@ -343,10 +343,10 @@
      ],
      "effects": {
       "cash": -40000,
-      "cash_label": "Cây đèn bàn cũ và bóng LED",
+      "cash_label": "Cái đèn bàn cũ và bóng LED",
       "item.den_cu": 1
      },
-     "text": "Mua một cây đèn bàn cũ và bóng LED ở sạp đồ cũ chợ Cầu Nhỏ"
+     "text": "Mua một cái đèn bàn cũ và bóng LED ở hàng đồ cũ chợ Long Biên"
     },
     {
      "kind": "visit",
@@ -369,7 +369,7 @@
       "den_hoc": 1
      },
      "consume": true,
-     "text": "Mang cây đèn qua quán chị Hạnh giao cho Minh"
+     "text": "Mang cái đèn sang quán chị Hạnh giao cho Minh"
     }
    ]
   }

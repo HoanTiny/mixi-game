@@ -71,13 +71,13 @@
     "fatigue": 12,
     "rep.ONG_BA": 1
    },
-   "desc": "Ngày nước lên, hẻm nào cũng có máy bơm không chạy, cầu dao nhảy."
+   "desc": "Ngày nước lên, ngõ nào cũng có máy bơm không chạy, cầu dao nhảy."
   },
   {
    "id": "bao_tri_ben_can", "minigame": "site",
    "group": "work",
    "location": "ben_can",
-   "name": "Bảo trì dãy quán Bến Cạn sau mưa",
+   "name": "Bảo trì dãy quán Tạ Hiện sau mưa",
    "hours": 4,
    "pay": 260000,
    "days": [
@@ -97,13 +97,13 @@
    "effects": {
     "fatigue": 14
    },
-   "desc": "Kiểm ổ điện, máng xối, cầu dao năm quán sau mỗi trận mưa."
+   "desc": "Kiểm ổ điện, ống máng, cầu dao năm quán sau mỗi trận mưa."
   },
   {
    "id": "radio_ong_ba",
    "group": "life",
    "location": "home",
-   "name": "Ngồi nghe radio cải lương với ông Ba",
+   "name": "Ngồi nghe đài hát chèo với ông Bảo",
    "hours": 1,
    "window": [
     6,
@@ -125,7 +125,7 @@
    "id": "co_tuong",
    "group": "life",
    "location": "home",
-   "name": "Đánh một ván cờ tướng với ông Ba",
+   "name": "Đánh một ván cờ tướng với ông Bảo",
    "hours": 1,
    "window": [
     16,
@@ -147,7 +147,7 @@
    "id": "com_ma_nau",
    "group": "life",
    "location": "home",
-   "name": "Ăn cơm má nấu",
+   "name": "Ăn cơm mẹ nấu",
    "hours": 1,
    "window": [
     17,
@@ -207,7 +207,7 @@
     "rep.BA_TU": 3,
     "rep.ONG_BA": 4,
     "flag.chaoOngBa": true,
-    "diary": "Chiều mới dẫn bà đi chào hàng xóm, trễ hơn đã nói nửa ngày mà vẫn trong ngày. Ông Ba hỏi: \"Bà Tư bán bánh bò hả? Mai làm một dĩa tui nếm thử.\""
+    "diary": "Chiều mới dẫn bà đi chào hàng xóm, muộn hơn đã nói nửa ngày mà vẫn trong ngày. Ông Bảo hỏi: \"Bà Thoa bán bánh khúc à? Mai làm một đĩa tôi nếm thử.\""
    }
   },
   {
@@ -225,13 +225,13 @@
    "effects": {
     "rep.BA_TU": 1
    },
-   "desc": "Sau mổ: bốn lần mỗi ngày, rửa tay trước, không để nước vô mắt. Má nhỏ hai lần, An nhỏ được lần nào hay lần đó."
+   "desc": "Sau mổ: bốn lần mỗi ngày, rửa tay trước, không để nước vào mắt. Mẹ nhỏ hai lần, An nhỏ được lần nào hay lần đó."
   },
   {
    "id": "coc_hem_dua",
    "group": "optional",
    "location": "hem_dua",
-   "name": "Đặt cọc phòng Hẻm Dừa, hẹn dọn sau giỗ",
+   "name": "Đặt cọc phòng ngõ Gạch, hẹn dọn sau giỗ",
    "hours": 1,
    "days": [
     41,
@@ -251,18 +251,18 @@
     "payable": {
      "id": "phong_moi",
      "to": "",
-     "label": "Phần còn lại phòng Hẻm Dừa (dọn sau giỗ)",
+     "label": "Phần còn lại phòng ngõ Gạch (dọn sau giỗ)",
      "amount": 2800000,
      "due": 60
     },
-    "diary": "Đặt cọc phòng Hẻm Dừa, hẹn dọn vô sau giỗ ông. Còn hai triệu tám, hạn tối ngày 60."
+    "diary": "Đặt cọc phòng ngõ Gạch, hẹn dọn vào sau giỗ ông. Còn hai triệu tám, hạn tối ngày 60."
    }
   },
   {
    "id": "coc_cau_tre",
    "group": "optional",
    "location": "cau_tre",
-   "name": "Đặt cọc phòng Cầu Tre, hẹn dọn sau giỗ",
+   "name": "Đặt cọc phòng Ngọc Thụy, hẹn dọn sau giỗ",
    "hours": 1,
    "days": [
     41,
@@ -282,11 +282,11 @@
     "payable": {
      "id": "phong_moi",
      "to": "",
-     "label": "Phần còn lại phòng Cầu Tre (dọn sau giỗ)",
+     "label": "Phần còn lại phòng Ngọc Thụy (dọn sau giỗ)",
      "amount": 2400000,
      "due": 60
     },
-    "diary": "Đặt cọc phòng Cầu Tre, hẹn dọn vô sau giỗ ông. Còn hai triệu tư, hạn tối ngày 60."
+    "diary": "Đặt cọc phòng Ngọc Thụy, hẹn dọn vào sau giỗ ông. Còn hai triệu tư, hạn tối ngày 60."
    }
   },
   {
@@ -346,7 +346,7 @@
    "id": "dien_cho", "minigame": "site",
    "group": "work",
    "location": "cho_cau_nho",
-   "name": "Đi lại điện dãy sạp chợ với tổ Trâm",
+   "name": "Đi lại điện các dãy hàng chợ với tổ Trâm",
    "hours": 6,
    "pay": 300000,
    "days": [
@@ -362,7 +362,7 @@
     "fatigue": 18,
     "rep.TRAM": 1
    },
-   "desc": "Dây đi trên cao, cầu dao từng dãy, ổ cắm ngang hông. Có hợp đồng, trả theo buổi."
+   "desc": "Dây đi trên cao, cầu dao từng dãy, ổ cắm ngang eo. Có hợp đồng, trả theo buổi."
   },
   {
    "id": "don_mua_het",
@@ -385,7 +385,7 @@
    "effects": {
     "fatigue": 15
    },
-   "desc": "Mười bốn khách hẹn \"trong tuần\". Ai cũng gọi hỏi tới chưa."
+   "desc": "Mười bốn khách hẹn \"trong tuần\". Ai cũng gọi hỏi đến chưa."
   },
   {
    "id": "don_mua",
@@ -446,14 +446,14 @@
      "status": "done"
     },
     "rep.HANH": 2,
-    "log": "Trả hộp cháo cho chị Hạnh, trong hộp có mấy trái chôm chôm của bà gửi."
+    "log": "Trả hộp cháo cho chị Hạnh, trong hộp có mấy quả nhãn của bà gửi."
    }
   },
   {
    "id": "ban_sau_thu_bay", "minigame": "repair",
    "group": "work",
    "location": "tiem_sau",
-   "name": "Ngồi bàn chú Sáu ngày thứ Bảy (chia đôi tiền công)",
+   "name": "Ngồi bàn chú Sơn ngày thứ Bảy (chia đôi tiền công)",
    "hours": 5,
    "pay": 260000,
    "days": [

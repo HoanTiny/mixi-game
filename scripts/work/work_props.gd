@@ -239,7 +239,7 @@ static func item(key: String) -> Node3D:
 			return rice_cooker()
 		"Máy bơm":
 			return pump()
-		"Bàn ủi":
+		"Bàn là":
 			return iron()
 	return model("cardboard_box_01", 0.5)
 
