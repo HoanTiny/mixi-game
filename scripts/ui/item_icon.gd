@@ -170,6 +170,16 @@ func _draw() -> void:
 			draw_circle(Vector2(64, 40), 28, Color("2b2b2e"))
 			draw_circle(Vector2(30, 30), 3, Color("f2d27a"))
 			draw_circle(Vector2(78, 76), 2.5, Color("f2d27a"))
+		"heart":
+			draw_circle(Vector2(34, 38), 18, Color("e85d75"))
+			draw_circle(Vector2(66, 38), 18, Color("e85d75"))
+			draw_colored_polygon(PackedVector2Array([Vector2(17, 46), Vector2(83, 46), Vector2(50, 86)]), Color("e85d75"))
+			draw_circle(Vector2(30, 32), 5, Color(1, 1, 1, 0.5))
+		"bolt":
+			draw_colored_polygon(PackedVector2Array([Vector2(58, 6), Vector2(22, 56), Vector2(46, 56), Vector2(38, 94), Vector2(78, 40),
+				Vector2(54, 40)]), Color("f2c14e"))
+			draw_polyline(PackedVector2Array([Vector2(58, 6), Vector2(22, 56), Vector2(46, 56), Vector2(38, 94), Vector2(78, 40),
+				Vector2(54, 40), Vector2(58, 6)]), Color(0.3, 0.2, 0.05), 3)
 		# Biểu tượng nét mảnh trên thanh trên cùng (màu tint).
 		"person":
 			draw_arc(Vector2(50, 32), 15, 0, TAU, 24, tint, 6)

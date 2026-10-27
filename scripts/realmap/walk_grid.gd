@@ -53,6 +53,15 @@ func _init(data, bounds: Rect2) -> void:
 			_block_line(rd.line, float(rd.width) / 2.0, false)
 
 
+## Chặn mọi ô ngoài khung r (mép map của truyện): không đi, không tìm đường ra ngoài chỗ đã dựng.
+func block_outside(r: Rect2) -> void:
+	var reg := grid.region
+	for x in range(reg.position.x, reg.end.x):
+		for y in range(reg.position.y, reg.end.y):
+			if not r.has_point(Vector2(x + 0.5, y + 0.5)):
+				grid.set_point_solid(Vector2i(x, y), true)
+
+
 ## Chặn thêm một đa giác sau khi dựng lưới (nhà của địa điểm trong truyện).
 func block_poly(poly: PackedVector2Array) -> void:
 	_block_poly(poly)

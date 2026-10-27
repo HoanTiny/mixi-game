@@ -563,6 +563,7 @@ func _build_right(row: HBoxContainer) -> void:
 	bars.add_theme_constant_override("separation", 6)
 	top.add_child(bars)
 	var specs := [["rested", "Tỉnh táo", "moon", "100 trừ Mệt. Ngủ ở chỗ ở, nghỉ, ngồi trà đá để lại sức."],
+		["mood", "Tâm trạng", "heart", "Nghỉ ngơi, trà đá, ăn cơm với bà, nói chuyện với người quen thì vui lên; việc bẩn, ngủ ngoài đường thì xuống."],
 		["fed", "No bụng", "bowl", "Ăn ở Cơm Hạnh, bánh mì ở chợ Cầu Nhỏ buổi sáng. Nhịn tới 0 thì Mệt tăng nhanh."],
 		["clean", "Vệ sinh cá nhân", "drop", "Tắm ở chỗ ở. Việc bẩn (ca kho, phụ quán, lục rác) làm bẩn người."],
 		["neat", "Quần áo", "tshirt", "Giặt đồ ở chỗ ở. Quần áo nhàu bẩn thì người ta ngại."]]
@@ -607,7 +608,7 @@ func _refresh_status() -> void:
 	_face.queue_redraw()
 	var mult: float = game.pay_mult()
 	_pd_label.text = "Phong độ %d\n%s" % [int(pd), "đủ lương" if mult >= 1.0 else "%d%% lương" % int(mult * 100.0)]
-	var vals := {"rested": 100.0 - float(game.s.fatigue), "fed": game.need("fed"), "clean": game.need("clean"), "neat": game.need("neat")}
+	var vals := {"rested": 100.0 - float(game.s.fatigue), "mood": game.need("mood"), "fed": game.need("fed"), "clean": game.need("clean"), "neat": game.need("neat")}
 	for k in _bars:
 		var x: float = vals[k]
 		UI.set_bar(_bars[k].bar, x, 100.0, UI.level_color(x / 100.0))

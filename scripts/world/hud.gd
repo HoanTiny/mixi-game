@@ -10,6 +10,7 @@ const CharacterPanel := preload("res://scripts/ui/character_panel.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
 const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const MoodRing := preload("res://scripts/ui/mood_ring.gd")
+const Joystick := preload("res://scripts/ui/joystick.gd")
 ## Ca làm việc 3D theo trường minigame của việc trong config.json (bricks, site, dishes, repair): mỗi việc một bản đồ
 ## nhỏ riêng, An tự đi lại làm.
 const WorkSite := preload("res://scripts/work/work_site.gd")
@@ -85,6 +86,17 @@ var _tb_cash: Label
 var _tb_left: Label
 var _tb_left_sub: Label
 var _tb_icons := {}
+## Bảng sinh tồn góc trên bên trái: giờ, buổi, ngày, tiền mặt, thanh Thể lực, Tâm trạng, Độ no.
+var _stats: PanelContainer
+var _st_clock: Label
+var _st_day: Label
+var _st_cash: Label
+var _st_bars := {}
+## Cần điều khiển ảo, nút Chạy (chỉ màn cảm ứng); null trên máy tính.
+var joystick: Control = null
+## Hành động nhanh ở lời nhắc trước cửa địa điểm (phím 1–3 hay chạm): id việc theo thứ tự.
+var _quick: VBoxContainer
+var _quick_ids: Array = []
 ## Vòng Phong độ góc dưới bên trái, các biểu tượng nhu cầu đang thiếu bên cạnh.
 var _mood: Control
 var _mood_needs: HBoxContainer
@@ -118,7 +130,10 @@ func _ready() -> void:
 	gap.custom_minimum_size.y = 34
 	var top := _pass(HBoxContainer.new(), rows)
 	_top_row = top
-	_build_objectives(top)
+	var top_left := _pass(VBoxContainer.new(), top)
+	top_left.add_theme_constant_override("separation", 6)
+	_build_stats(top_left)
+	_build_objectives(top_left)
 	_spacer(top)
 	_map = StreetMap.new()
 	_map.world = world
@@ -168,6 +183,17 @@ func _ready() -> void:
 
 	_build_topbar(root)
 	_build_mood(root)
+	if ScreenFit.touch:
+		joystick = Joystick.new()
+		joystick.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		joystick.position = Vector2(18, -170)
+		root.add_child(joystick)
+		# Màn cảm ứng: góc dưới trái dành cho cần điều khiển, vòng Phong độ sang góc dưới phải.
+		_mood.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+		_mood.offset_left = -116.0
+		_mood.offset_right = -32.0
+		_mood.offset_top = -150.0
+		_mood.offset_bottom = -66.0
 	# Tối nhẹ bốn góc màn hình cho mắt dồn vào An và người quanh đó ở giữa.
 	var vig := ColorRect.new()
 	vig.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -283,6 +309,7 @@ func set_prompt(id: String) -> void:
 		_prompt_label.text = _key("E") + "Lục thùng rác tìm ve chai" if lock == "" else "Thùng rác · " + lock
 	elif id != "":
 		_prompt_label.text = _key("E") + "Vào " + str(world.location_info(id).name)
+	_fill_quick(id)
 	_update_prompt()
 
 
@@ -299,6 +326,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_C, KEY_I]:
 		open_character()
 		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_1, KEY_2, KEY_3] \
+			and _prompt.visible and _quick.visible and not blocking():
+		var i: int = int(event.keycode - KEY_1)
+		if i < _quick_ids.size():
+			_perform(str(_quick_ids[i]))
+			get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if _loc_id != "":
@@ -416,8 +450,15 @@ func _build_prompt(parent: Control) -> void:
 	_prompt.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
 			world.interact())
+	var pv := VBoxContainer.new()
+	pv.add_theme_constant_override("separation", 2)
+	_prompt.add_child(pv)
 	_prompt_label = UI.label("", 16, UI.HUD_TEXT)
-	_prompt.add_child(_prompt_label)
+	pv.add_child(_prompt_label)
+	_quick = VBoxContainer.new()
+	_quick.add_theme_constant_override("separation", 0)
+	_quick.visible = false
+	pv.add_child(_quick)
 	_prompt.visible = false
 
 
@@ -469,7 +510,8 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 		var now := lerpf(start, finish, t)
 		_work_bar.value = t
 		_work_clock.text = GameLogic.hh(now)
-		_clock_label.text = "%s  ·  đang bận" % GameLogic.hh(now), 0.0, 1.0, seconds)
+		_clock_label.text = "%s  ·  đang bận" % GameLogic.hh(now)
+		_st_clock.text = GameLogic.hh(now), 0.0, 1.0, seconds)
 	tw.tween_callback(func() -> void:
 		_working = false
 		_work.visible = false
@@ -1059,6 +1101,8 @@ func _build_topbar(root: Control) -> void:
 	_topbar.add_child(left)
 	_tb_day = _outlined(UI.label("", 16, UI.HUD_TEXT))
 	left.add_child(_tb_day)
+	# Ngày giờ, tiền đã sang bảng sinh tồn góc trên trái: nửa trái thanh trên cùng để trống cho gọn.
+	left.visible = false
 	var cash := HBoxContainer.new()
 	cash.add_theme_constant_override("separation", 8)
 	left.add_child(cash)
@@ -1129,6 +1173,128 @@ func _build_topbar(root: Control) -> void:
 	medal.add_child(_tb_left_sub)
 
 
+func _build_stats(parent: Control) -> void:
+	_stats = PanelContainer.new()
+	_stats.add_theme_stylebox_override("panel", UI.box(Color(0.06, 0.06, 0.08, 0.62), Color(1, 1, 1, 0.08), 8, 10))
+	_stats.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_stats.mouse_filter = Control.MOUSE_FILTER_PASS
+	_stats.tooltip_text = "Bấm để mở bảng Nhân vật (C)"
+	_stats.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
+			open_character())
+	parent.add_child(_stats)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 4)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stats.add_child(v)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 10)
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(top)
+	_st_clock = UI.label("", 24, UI.HUD_TEXT)
+	top.add_child(_st_clock)
+	var day_col := VBoxContainer.new()
+	day_col.add_theme_constant_override("separation", -2)
+	day_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(day_col)
+	_st_day = UI.label("", 12, UI.HUD_SOFT)
+	day_col.add_child(_st_day)
+	var cash_row := HBoxContainer.new()
+	cash_row.add_theme_constant_override("separation", 6)
+	cash_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	day_col.add_child(cash_row)
+	var ci := ItemIcon.new("cash", UI.GOLD)
+	ci.custom_minimum_size = Vector2(18, 18)
+	cash_row.add_child(ci)
+	_st_cash = UI.label("", 15, UI.GOLD)
+	cash_row.add_child(_st_cash)
+	var specs := [["stamina", "Thể lực", "bolt", "100 trừ Mệt. Ngủ, nghỉ, ngồi trà đá để hồi; chạy nhanh (Shift) và làm việc nặng thì tụt."],
+		["mood", "Tâm trạng", "heart", "Nghỉ ngơi, trà đá, ăn cơm với bà, nói chuyện với người quen thì vui lên; việc bẩn, ngủ ngoài đường thì xuống."],
+		["fed", "Độ no", "bowl", "Ăn ở quán cơm, bánh mì buổi sáng. Đói tới 0 thì Mệt tăng nhanh."]]
+	for sp in specs:
+		var r := HBoxContainer.new()
+		r.add_theme_constant_override("separation", 6)
+		r.mouse_filter = Control.MOUSE_FILTER_PASS
+		r.tooltip_text = sp[3]
+		v.add_child(r)
+		var ic := ItemIcon.new(sp[2])
+		ic.custom_minimum_size = Vector2(18, 18)
+		r.add_child(ic)
+		var l := UI.label(sp[1], 12, UI.HUD_SOFT)
+		l.custom_minimum_size.x = 66
+		r.add_child(l)
+		var b := UI.bar(8)
+		b.custom_minimum_size = Vector2(120, 8)
+		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		r.add_child(b)
+		var n := UI.label("", 12, UI.HUD_TEXT)
+		n.custom_minimum_size.x = 26
+		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		r.add_child(n)
+		_st_bars[sp[0]] = {"bar": b, "num": n}
+
+
+func _refresh_stats(s: Dictionary) -> void:
+	var hour: float = game.clock()
+	var part := "Sáng" if hour < 11.0 else ("Trưa" if hour < 13.5 else ("Chiều" if hour < 18.0 else "Tối"))
+	_st_clock.text = GameLogic.hh(minf(hour, 22.0))
+	_st_day.text = "%s · Ngày %d, %s" % [part, game.day(), game.weekday_name()]
+	_st_cash.text = GameLogic.fmt_money(int(s.cash))
+	var vals := {"stamina": 100.0 - float(s.fatigue), "mood": game.need("mood"), "fed": game.need("fed")}
+	for k in _st_bars:
+		var x: float = vals[k]
+		UI.set_bar(_st_bars[k].bar, x, 100.0, UI.level_color(x / 100.0))
+		(_st_bars[k].num as Label).text = str(int(x))
+
+
+## Hành động nhanh trước cửa địa điểm: tối đa ba việc sinh hoạt (ăn, tắm, nghỉ…) làm được ngay, ghi giá, tác dụng,
+## thời gian; việc chưa làm được thì ghi lý do. Phím 1–3 hay bấm, khỏi mở bảng địa điểm.
+func _fill_quick(id: String) -> void:
+	for c in _quick.get_children():
+		c.queue_free()
+	_quick_ids.clear()
+	if id == "" or id == "-" or id.begins_with("bin:") or not game.is_started():
+		_quick.visible = false
+		return
+	var picks: Array = []
+	for a in game.actions_at(id):
+		if str(a.group) == "life":
+			picks.append(a)
+	picks.sort_custom(func(x, y) -> bool: return bool(game.action_status(x).ok) and not bool(game.action_status(y).ok))
+	for a in picks.slice(0, 3):
+		var st: Dictionary = game.action_status(a)
+		var parts := [str(a.name)]
+		if int(a.get("cost", 0)) > 0:
+			parts.append("−" + GameLogic.fmt_money(int(a.cost)))
+		var eff: String = UI.effects_text(game, a)
+		if eff != "":
+			parts.append(eff)
+		if a.get("rest", false):
+			parts.append("Tâm trạng +%d" % int(game.cfg.needs.get("moodRest", 0)))
+		parts.append("%d phút" % int(round(float(a.hours) * 60.0)))
+		var b := Button.new()
+		b.flat = true
+		b.focus_mode = Control.FOCUS_NONE
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.add_theme_font_size_override("font_size", 13)
+		var n := _quick_ids.size() + 1
+		if st.ok:
+			b.text = "[%d]  %s" % [n, "  ·  ".join(parts)]
+			b.add_theme_color_override("font_color", UI.HUD_TEXT)
+			b.add_theme_color_override("font_hover_color", UI.GOLD)
+			var aid := str(a.id)
+			b.pressed.connect(func() -> void: _perform(aid))
+			_quick_ids.append(str(a.id))
+		else:
+			b.text = "      %s  ·  %s" % [str(a.name), str(st.reason) if str(st.reason) != "" else "chưa làm được"]
+			b.add_theme_color_override("font_color", Color(UI.HUD_SOFT, 0.7))
+			b.disabled = true
+			b.add_theme_color_override("font_disabled_color", Color(UI.HUD_SOFT, 0.7))
+		_quick.add_child(b)
+	_quick.visible = _quick.get_child_count() > 0
+
+
 func _build_mood(root: Control) -> void:
 	_mood = MoodRing.new()
 	_mood.custom_minimum_size = Vector2(84, 84)
@@ -1170,9 +1336,9 @@ func _refresh_topbar(s: Dictionary) -> void:
 	var pd: float = game.phong_do()
 	_mood.set("value", pd)
 	_mood.set("word", MoodRing.word_for(pd))
-	_mood.tooltip_text = "Phong độ %d · %s\nMệt %d/100 · No bụng %d · Vệ sinh %d · Quần áo %d\nBấm để mở bảng Nhân vật" % [
+	_mood.tooltip_text = "Phong độ %d · %s\nMệt %d/100 · Tâm trạng %d · No bụng %d · Vệ sinh %d · Quần áo %d\nBấm để mở bảng Nhân vật" % [
 		int(pd), "đủ lương" if game.pay_mult() >= 1.0 else "chỉ được %d%% lương" % int(game.pay_mult() * 100.0),
-		int(s.fatigue), int(game.need("fed")), int(game.need("clean")), int(game.need("neat"))]
+		int(s.fatigue), int(game.need("mood")), int(game.need("fed")), int(game.need("clean")), int(game.need("neat"))]
 	_mood.queue_redraw()
 	for c in _mood_needs.get_children():
 		c.queue_free()
@@ -1200,8 +1366,10 @@ func _tool_button(text: String, on_press: Callable) -> Button:
 
 func _refresh() -> void:
 	var started: bool = game.is_started()
-	for p in [_objectives, _topbar, _mood]:
+	for p in [_objectives, _topbar, _mood, _stats]:
 		p.visible = started
+	if joystick != null:
+		joystick.visible = started
 	for p in [_status, _bottom, _map]:
 		p.visible = false
 	if not started:
@@ -1238,6 +1406,9 @@ func _refresh() -> void:
 	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working
 	_end_day_btn.text = "Về nhà" if game.chapter() >= 2 else "Về xóm trọ"
 	_refresh_topbar(s)
+	_refresh_stats(s)
+	if _prompt_id != "-":
+		_fill_quick(_prompt_id)
 	_refresh_skills(s)
 	_log_text.text = UI.log_bbcode(game)
 	_refresh_location()

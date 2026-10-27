@@ -63,6 +63,8 @@ func _init(map_id: String) -> void:
 	_index_roads()
 	_place_locations()
 	grid = WalkGrid.new(data, bounds)
+	# Mép map: không đi ra ngoài phần đã dựng (ngoài đó trống trơn).
+	grid.block_outside(bounds.grow(-2.0))
 	_block_locations()
 	_place_homes()
 	_place_bins()

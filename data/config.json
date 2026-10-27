@@ -5,6 +5,8 @@
   "lateFatigue": 5,
   "livingCostPerDay": 120000,
   "walkHoursPerMeter": 0.0022,
+  "_idleMinutesPerSecond": "Đồng hồ kết hợp: đứng chơi trên phố (không mở bảng, không làm việc) thì mỗi giây thật giờ trong game trôi chừng này phút; đi bộ, làm việc tính giờ như cũ.",
+  "idleMinutesPerSecond": 0.4,
   "workSecondsPerHour": 0.35,
   "fatigue": {
     "warn": 70,
@@ -16,11 +18,13 @@
   "chatRep": 1,
   "talkHours": 0.5,
   "needs": {
-    "start": {"fed": 70, "clean": 80, "neat": 80},
-    "perHour": {"fed": -6, "clean": -2, "neat": -1},
-    "overnight": {"fed": -20, "clean": -10, "neat": -5},
+    "_mood": "Tâm trạng (mood): tự giảm theo giờ, một đêm ngủ ở nhà hồi lại; nghỉ ngơi, trà đá, ăn cơm với bà (việc có rest) +moodRest, nói chuyện với người quen +moodTalk, việc bẩn moodDirtyWork, ngủ ngoài đường moodSleepOutside. Góp một phần vào Phong độ (weights.mood).",
+    "start": {"fed": 70, "clean": 80, "neat": 80, "mood": 65},
+    "perHour": {"fed": -6, "clean": -2, "neat": -1, "mood": -1.2},
+    "overnight": {"fed": -20, "clean": -10, "neat": -5, "mood": 8},
+    "moodRest": 12, "moodTalk": 5, "moodDirtyWork": -3, "moodSleepOutside": -15,
     "starveFatiguePerHour": 3,
-    "weights": {"fed": 0.35, "clean": 0.2, "neat": 0.15, "rested": 0.3},
+    "weights": {"fed": 0.3, "clean": 0.17, "neat": 0.13, "rested": 0.28, "mood": 0.12},
     "payTiers": [[55, 1.0], [30, 0.7], [0, 0.5]],
     "slowBelow": 30
   },

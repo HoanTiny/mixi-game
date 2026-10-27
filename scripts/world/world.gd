@@ -64,6 +64,14 @@ const LOCATIONS := {
 const SPEED := 6.0
 ## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
 const RIDE_SPEED := 1.8
+## Chạy nhanh (giữ Shift, nút Chạy trên màn cảm ứng): nhanh gấp SPRINT lần, mỗi mét chỉ tốn RUN_TIME giờ đi bộ, cứ
+## RUN_FATIGUE_M mét thì Mệt +1; trong ngõ hẹp không chạy được, còn đi chậm lại LANE_SLOW lần vì chật người, xe.
+const SPRINT := 1.65
+const RUN_TIME := 0.6
+const RUN_FATIGUE_M := 70.0
+const LANE_SLOW := 0.82
+## Kéo màn hình để nhìn quanh: máy quay lệch khỏi An tối đa PAN_MAX mét, An đi lại thì máy quay trôi về.
+const PAN_MAX := 80.0
 const RIDE_TIME := 0.35
 ## Camera góc chơi xa (nhìn cả dãy phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức, lăn tiếp ra
 ## xa là nhìn toàn cảnh (CAM_FAR).
@@ -140,6 +148,13 @@ var _last_day := -1
 var _walk_t := 0.0
 ## Quãng đường đã đi nhưng chưa quy ra giờ; cộng dồn rồi trừ giờ theo từng nấc 5 phút.
 var _walk_meters := 0.0
+var _run_meters := 0.0
+var _pan := Vector3.ZERO
+var _panning := false
+var _lane := false
+var _lane_t := 0.0
+## Giây thật đứng chơi chưa tính vào giờ trong game (đồng hồ kết hợp: đứng yên giờ vẫn trôi chậm).
+var _idle_t := 0.0
 var _night_prompt_day := -1
 var _mat_cache := {}
 
@@ -1488,12 +1503,23 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			_press_at = event.position
-		elif _press_at != null and not _pinched and event.position.distance_to(_press_at) < 14.0 * ScreenFit.dpr:
+		elif _press_at != null and not _pinched and not _panning and event.position.distance_to(_press_at) < 14.0 * ScreenFit.dpr:
 			_pending_click = event.position
 		if not event.pressed:
 			_press_at = null
+			_panning = false
+	elif event is InputEventMouseMotion:
+		# Kéo quá 14 điểm ảnh (chuột trái, một ngón) hay giữ chuột phải, chuột giữa mà kéo: nhìn quanh.
+		var right: bool = event.button_mask & (MOUSE_BUTTON_MASK_RIGHT | MOUSE_BUTTON_MASK_MIDDLE) != 0
+		var left: bool = event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0 and _press_at != null and not _pinched
+		if left and not _panning and event.position.distance_to(_press_at) >= 14.0 * ScreenFit.dpr:
+			_panning = true
+		if right or (left and _panning):
+			_pan_by(event.relative)
 	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
 		interact()
+	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE:
+		recenter()
 
 
 ## Phím E, hay chạm vào lời nhắc ở giữa màn hình: lục thùng rác đang đứng cạnh, không thì vào địa điểm gần nhất.
@@ -1570,18 +1596,30 @@ func _process(delta: float) -> void:
 			key_dir.z -= 1
 		if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
 			key_dir.z += 1
+		# Cần điều khiển ảo: trên màn là hướng bắc (máy quay nhìn về bắc, không xoay), đẩy nhẹ thì đi chậm hơn.
+		if hud.joystick != null and hud.joystick.vector != Vector2.ZERO:
+			var jv: Vector2 = hud.joystick.vector
+			key_dir += Vector3(jv.x, 0, jv.y) / maxf(jv.length(), 0.001) * minf(jv.length() * 1.3, 1.0)
+	_update_lane(delta)
 	_update_ride()
 	var step := Vector3.ZERO
 	if key_dir != Vector3.ZERO:
 		_target = null
 		_target_loc = ""
-		step = _slide(key_dir.normalized() * _speed() * delta)
+		step = _slide(key_dir.limit_length(1.0) * _speed() * delta)
 	elif _target != null:
 		step = _follow_path(_speed() * delta)
 	if step != Vector3.ZERO:
 		player.position += step
 		player.position.y = lerpf(player.position.y, city.ground_y(Vector2(player.position.x, player.position.z)), clampf(delta * 12.0, 0.0, 1.0))
-		_add_walk(step.length() * (RIDE_TIME if _riding else (RainLayer.WADE_COST if _wading() else 1.0)))
+		var run := sprinting()
+		_add_walk(step.length() * (RIDE_TIME if _riding else (RainLayer.WADE_COST if _wading() else (RUN_TIME if run else 1.0))))
+		if run:
+			_run_meters += step.length()
+			if _run_meters >= RUN_FATIGUE_M:
+				_run_meters -= RUN_FATIGUE_M
+				game.add_fatigue(1.0)
+		_idle_t = 0.0
 		if not _riding:
 			audio.step(delta)
 		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
@@ -1596,8 +1634,12 @@ func _process(delta: float) -> void:
 		player_body.position.y = 0.0
 	for c in idlers:
 		c.animate(delta, 0.0)
+	_tick_idle(delta, step)
 
-	var cam_goal := player.position + cam_offset()
+	# Đã kéo màn hình nhìn chỗ khác: An đi tiếp thì máy quay trôi về An.
+	if step != Vector3.ZERO and not _panning:
+		_pan = _pan.lerp(Vector3.ZERO, clampf(delta * 2.5, 0.0, 1.0))
+	var cam_goal := player.position + _pan + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, minf(zoom, 1.0)), 0), Vector3.UP)
 	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút), hai tầng bóng cho đỡ lần vẽ; góc chơi giữ bốn tầng để mặt
@@ -1621,7 +1663,8 @@ func _process(delta: float) -> void:
 
 	_update_trail()
 	_update_tags(delta)
-	RenderingServer.global_shader_parameter_set("focus_depth", camera.position.distance_to(player.position + Vector3(0, 1, 0)) if zoom <= 1.0 else 0.0)
+	# Kéo màn hình nhìn chỗ khác thì thôi làm sẫm tiền cảnh (An không còn ở giữa khung).
+	RenderingServer.global_shader_parameter_set("focus_depth", camera.position.distance_to(player.position + Vector3(0, 1, 0)) if zoom <= 1.0 and _pan.length() < 6.0 else 0.0)
 	_update_traffic(delta)
 	if real:
 		_update_boats(delta)
@@ -1630,6 +1673,34 @@ func _process(delta: float) -> void:
 	if _rain != null and _rain.visible:
 		_rain.position = player.position + Vector3(0, 11, 2)
 	_check_day_end()
+
+
+## Đồng hồ kết hợp: đứng chơi trên phố (không bảng nào mở, không đang làm) thì giờ trong game vẫn trôi chậm,
+## idleMinutesPerSecond phút mỗi giây thật; đi bộ, làm việc tính giờ như cũ.
+func _tick_idle(delta: float, step: Vector3) -> void:
+	if step != Vector3.ZERO or not game.is_started() or game.is_over() or not game.s.queue.is_empty() \
+			or hud.blocking() or hud._panel_open():
+		return
+	_idle_t += delta
+	if _idle_t >= 5.0:
+		game.walk(_idle_t * float(game.cfg.get("idleMinutesPerSecond", 0.0)) / 60.0)
+		_idle_t = 0.0
+
+
+## Kéo màn hình (chuột trái, phải hay giữa; một ngón trên màn cảm ứng) dời máy quay để nhìn quanh. rel là điểm ảnh.
+func _pan_by(rel: Vector2) -> void:
+	var off := cam_offset()
+	var dist := off.length()
+	var per_px := 2.0 * dist * tan(deg_to_rad(camera.fov) / 2.0) / maxf(get_viewport().get_visible_rect().size.y, 1.0)
+	var pitch_sin := clampf(off.y / dist, 0.3, 1.0)
+	_pan.x -= rel.x * per_px
+	_pan.z -= rel.y * per_px / pitch_sin
+	_pan = _pan.limit_length(PAN_MAX)
+
+
+## Space: đưa máy quay về An ngay.
+func recenter() -> void:
+	_pan = Vector3.ZERO
 
 
 ## Đi bằng phím: chỉ bước vào chỗ đi được, chạm tường thì trượt dọc theo tường.
@@ -1827,6 +1898,11 @@ func _update_cutaway(delta := 0.0) -> void:
 ## Phong độ thấp thì lê bước, đi chậm hẳn.
 func _speed() -> float:
 	var v := SPEED * (RIDE_SPEED if _riding else 1.0)
+	if not _riding:
+		if _lane:
+			v *= LANE_SLOW
+		elif sprinting():
+			v *= SPRINT
 	if _wading():
 		v *= RainLayer.WADE_SPEED
 	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
@@ -1842,6 +1918,28 @@ func _speed() -> float:
 				v *= 0.8
 				break
 	return v
+
+
+## Đang chạy nhanh: giữ Shift hay bật nút Chạy, không đi xe, không ở trong ngõ, chưa quá mệt.
+func sprinting() -> bool:
+	if _riding or _lane or not game.is_started():
+		return false
+	if float(game.s.fatigue) >= float(game.cfg.fatigue.max):
+		return false
+	return Input.is_key_pressed(KEY_SHIFT) or (hud.joystick != null and hud.joystick.sprint)
+
+
+## An đang trong ngõ hẹp (đường nhỏ dưới 5 m gần nhất): xét lại mỗi 0,3 giây.
+func _update_lane(delta: float) -> void:
+	_lane_t -= delta
+	if _lane_t > 0.0:
+		return
+	_lane_t = 0.3
+	if not real:
+		_lane = false
+		return
+	var nr: Dictionary = city._nearest_road(Vector2(player.position.x, player.position.z), 1.0)
+	_lane = not nr.is_empty() and bool(nr.road.small) and float(nr.road.width) < 5.0 and float(nr.d) < float(nr.road.width) / 2.0 + 2.0
 
 
 ## Có đơn giao hàng thì An lên xe máy (đội mũ bảo hiểm, ngồi tư thế lái, hai tay nắm tay lái); giao xong hay hủy đơn

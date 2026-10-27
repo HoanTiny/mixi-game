@@ -1043,6 +1043,11 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 		add_log("Phong độ kém, chỉ được %d%% tiền công" % int(pay_mult() * 100.0), "warn")
 	for k in a.get("dirty", {}):
 		need_adj(k, float(a.dirty[k]))
+	if has_needs():
+		if a.get("rest", false):
+			need_adj("mood", float(cfg.needs.get("moodRest", 0)))
+		if a.has("dirty"):
+			need_adj("mood", float(cfg.needs.get("moodDirtyWork", 0)))
 	if pay > 0:
 		earn(pay, label)
 	else:
@@ -1077,6 +1082,8 @@ func sleep_outside() -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
 	add_fatigue(float(cfg.fatigue.sleepOutside))
+	if has_needs():
+		need_adj("mood", float(cfg.needs.get("moodSleepOutside", 0)))
 	add_log("Không kịp về xóm trọ, ngủ gục ngoài đường.", "warn")
 	finish_day()
 	if not is_over():
@@ -2195,6 +2202,9 @@ func talk(npc: String) -> void:
 		return
 	s["used"] = float(s.used) + float(cfg.get("talkHours", 0.5))
 	s.today["talk_" + npc] = 1
+	# Nói chuyện với người quen (mạch chuyện hay tán gẫu) thì vui lên.
+	if has_needs():
+		need_adj("mood", float(cfg.needs.get("moodTalk", 0)))
 	if not s.has("talks_done"):
 		s["talks_done"] = []
 	var who := rep_name(npc)
@@ -2224,12 +2234,13 @@ func has_needs() -> bool:
 
 
 func need(k: String) -> float:
-	return float(s.needs.get(k, 100.0)) if has_needs() else 100.0
+	return float(s.needs.get(k, cfg.needs.start.get(k, 100.0))) if has_needs() else 100.0
 
 
 func need_adj(k: String, d: float) -> void:
 	if has_needs():
-		s.needs[k] = clampf(float(s.needs.get(k, 0.0)) + d, 0.0, 100.0)
+		# Bản lưu cũ chưa có chỉ số mới (tâm trạng): bắt đầu từ mức đầu ván.
+		s.needs[k] = clampf(float(s.needs.get(k, cfg.needs.start.get(k, 100.0))) + d, 0.0, 100.0)
 
 
 ## Đói, bẩn dần theo giờ đã trôi; nhịn tới 0 thì Mệt tăng nhanh.
@@ -2253,7 +2264,8 @@ func phong_do() -> float:
 		return 100.0
 	var w: Dictionary = cfg.needs.weights
 	var rested := 100.0 - float(s.fatigue)
-	return need("fed") * float(w.fed) + need("clean") * float(w.clean) + need("neat") * float(w.neat) + rested * float(w.rested)
+	return need("fed") * float(w.fed) + need("clean") * float(w.clean) + need("neat") * float(w.neat) + rested * float(w.rested) \
+		+ need("mood") * float(w.get("mood", 0.0))
 
 
 ## Hệ số tiền công theo phong độ: đủ thì 100%, kém thì 70%, tệ thì 50%.
