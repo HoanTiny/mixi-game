@@ -101,10 +101,10 @@ static func pallet() -> Node3D:
 	return n
 
 
-## Bao gạo 50 kg: bao dứa trắng ngà, hơi phồng.
-static func sack() -> Node3D:
+## Bao gạo 50 kg: bao dứa trắng ngà, hơi phồng (col: bao lưới rau, bao khoai, bao dép màu khác).
+static func sack(col := Color("ddd3b8")) -> Node3D:
 	var n := Node3D.new()
-	var weave := plain(Color("ddd3b8"), 0.95)
+	var weave := plain(col, 0.95)
 	box(n, Vector3(0.42, 0.16, 0.66), weave, Vector3.ZERO)
 	var mi := MeshInstance3D.new()
 	var sm := SphereMesh.new()
@@ -184,6 +184,21 @@ static func dish(kind: String) -> Node3D:
 			var glass := plain(Color(0.85, 0.75, 0.45, 0.75), 0.1)
 			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			cyl(n, 0.04, 0.12, glass, Vector3(0, 0.06, 0), Vector3.UP, 0.05)
+		"bia":
+			# Cốc bia hơi thủy tinh xanh, bọt trắng.
+			var glass := plain(Color(0.78, 0.62, 0.22, 0.85), 0.1)
+			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			cyl(n, 0.05, 0.15, glass, Vector3(0, 0.075, 0), Vector3.UP, 0.06)
+			cyl(n, 0.06, 0.03, plain(Color("f6f1e4"), 0.9), Vector3(0, 0.16, 0))
+		"lac", "nem":
+			# Đĩa nhựa, lạc rang nâu hay nem chua rán vàng.
+			cyl(n, 0.11, 0.015, plain(Color("f4f4f0"), 0.3), Vector3(0, 0.008, 0))
+			for i in 5:
+				var a := TAU * i / 5.0
+				if kind == "nem":
+					box(n, Vector3(0.07, 0.03, 0.03), plain(Color("d08a3a"), 0.7), Vector3(cos(a) * 0.05, 0.03, sin(a) * 0.05), a)
+				else:
+					box(n, Vector3(0.025, 0.02, 0.02), plain(Color("9a5a2a"), 0.8), Vector3(cos(a) * 0.04, 0.025, sin(a) * 0.04), a)
 		_:
 			cyl(n, 0.06, 0.08, plain(Color("f4f4f0"), 0.25), Vector3(0, 0.04, 0), Vector3.UP, 0.1)
 			cyl(n, 0.095, 0.01, plain(Color("2f6fb0"), 0.3), Vector3(0, 0.08, 0))
@@ -192,6 +207,12 @@ static func dish(kind: String) -> Node3D:
 			if kind == "com":
 				box(n, Vector3(0.08, 0.025, 0.05), plain(Color("8a4a24"), 0.6), Vector3(0.02, 0.08, 0))
 	return n
+
+
+## Tô màu mọi mặt lưới của một mô hình (thùng nhựa đỏ đựng cà chua…).
+static func _tint(n: Node, c: Color) -> void:
+	for ch in n.find_children("*", "MeshInstance3D", true, false):
+		(ch as MeshInstance3D).material_override = plain(c, 0.6)
 
 
 ## Chồng bát dơ: ba tô úp lên nhau, dính vụn.
@@ -229,8 +250,25 @@ static func item(key: String) -> Node3D:
 			return pipes()
 		"cb":
 			return model("power_box_01", 0.7)
-		"com", "canh", "tra":
+		"com", "canh", "tra", "bia", "lac", "nem":
 			return dish(key)
+		# Chợ đầu mối, chợ Đồng Xuân (bốc vác, xe thồ).
+		"rau":
+			return sack(Color("6f9a4a"))
+		"cu":
+			return sack(Color("b89a6a"))
+		"qua":
+			var crate := model("plastic_crate_03", 1.2)
+			_tint(crate, Color("c0503a"))
+			return crate
+		"vai":
+			var n := Node3D.new()
+			cyl(n, 0.13, 0.7, plain(Color("b04a6a"), 0.9), Vector3(0, 0.13, 0), Vector3.RIGHT)
+			return n
+		"dep":
+			return sack(Color("4a6ab0"))
+		"thung":
+			return model("cardboard_box_01", 0.9)
 		"dirty":
 			return dirty_stack()
 		"Quạt bàn":
@@ -246,4 +284,5 @@ static func item(key: String) -> Node3D:
 
 ## Chiều cao một món khi chồng lên nhau.
 static func item_h(key: String) -> float:
-	return {"mi": 0.34, "nuoc": 0.33, "gao": 0.2, "day": 0.44, "ong": 0.1, "cb": 0.35, "dirty": 0.2}.get(key, 0.14)
+	return {"mi": 0.34, "nuoc": 0.33, "gao": 0.2, "day": 0.44, "ong": 0.1, "cb": 0.35, "dirty": 0.2, "rau": 0.2, "cu": 0.2,
+		"qua": 0.33, "vai": 0.26, "dep": 0.2, "thung": 0.3}.get(key, 0.14)

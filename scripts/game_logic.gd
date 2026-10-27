@@ -583,6 +583,32 @@ func apply_effects(eff: Dictionary) -> void:
 
 func _special(name: String) -> void:
 	match name:
+		"ve_so":
+			# Một tờ 10.000đ: chừng 1/100 trúng 500.000đ, 1/12 trúng 20.000đ; kết quả cố định theo ngày và số tờ đã mua.
+			var rng := RandomNumberGenerator.new()
+			rng.seed = hash([day(), count("mua_ve_so"), int(s.get("seed", 7))])
+			var r := rng.randf()
+			if r < 0.01:
+				earn(500000, "Vé số trúng giải")
+				need_adj("mood", 15.0)
+				add_log("Dò vé số buổi chiều: trúng 500.000đ!", "event")
+			elif r < 0.093:
+				earn(20000, "Vé số trúng giải an ủi")
+				need_adj("mood", 4.0)
+			else:
+				need_adj("mood", 1.0)
+				add_log("Dò vé số buổi chiều: trượt", "event")
+		"cam_do":
+			# Cầm đồng hồ: 500.000đ ngay, mười ngày sau chuộc 560.000đ (tới hạn có đủ tiền thì tự chuộc).
+			var pid := "chuoc_dong_ho_%d" % day()
+			earn(500000, "Cầm đồng hồ ở tiệm ngõ Gạch")
+			_add_payable({"id": pid, "to": "", "label": "Chuộc đồng hồ ở tiệm cầm đồ ngõ Gạch", "amount": 560000, "due": day() + 10})
+			add_log("Hẹn chuộc đồng hồ: 560.000đ trước hết ngày %d" % (day() + 10), "warn")
+		"chuoc_do":
+			var x = _pending_payable("chuoc_dong_ho")
+			if x != null and int(s.cash) >= int(x.amount):
+				x["status"] = "paid"
+				spend(int(x.amount), str(x.label))
 		"end_game":
 			s["end_now"] = true
 		"fix_broken":
@@ -952,6 +978,10 @@ func is_hidden(a: Dictionary) -> bool:
 		return true
 	if a.has("hideIfFlag") and s.flags.get(a.hideIfFlag, false):
 		return true
+	if a.has("hideIfPayable") and _pending_payable(str(a.hideIfPayable)) != null:
+		return true
+	if a.has("showIfPayable") and _pending_payable(str(a.showIfPayable)) == null:
+		return true
 	if a.get("noRain", false) and s.today.get("rain", false):
 		return true
 	if a.get("onlyRain", false) and not s.today.get("rain", false):
@@ -1063,6 +1093,33 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	s.today.list.append(id)
 	_quest_on_action(id, result)
 	_commit()
+	if a.has("sleepAway"):
+		sleep_away(str(a.sleepAway), str(a.get("location", "")))
+
+
+## Ngủ qua đêm ngoài nhà (giường tầng, quán net, ghế đá; cfg.sleepAway): Mệt, Tâm trạng cộng thêm, sang ngày mới,
+## sáng dậy ở chỗ đã ngủ (wake_at, world.gd đặt An ở đó), sự kiện sáng hôm sau kể lại đêm qua.
+func sleep_away(kind: String, loc: String) -> void:
+	if not is_started() or is_over() or not s.queue.is_empty():
+		return
+	var c: Dictionary = cfg.get("sleepAway", {}).get(kind, {})
+	add_fatigue(float(c.get("fatigue", 0)))
+	if has_needs():
+		need_adj("mood", float(c.get("mood", 0)))
+	add_log(str(c.get("log", "Ngủ qua đêm ngoài nhà")), "event")
+	s["wake_at"] = loc
+	finish_day()
+	if not is_over() and c.has("event"):
+		s.queue.push_front({"id": str(c.event), "data": {}})
+		_commit()
+
+
+## Khoản phải trả còn chờ trả có mã bắt đầu bằng prefix (cầm đồ mỗi lần một mã riêng).
+func _pending_payable(prefix: String):
+	for x in s.payables:
+		if str(x.id).begins_with(prefix) and x.status == "pending":
+			return x
+	return null
 
 
 ## Thời gian trôi khi đi bộ trên phố. Không vượt quá giờ đi ngủ.

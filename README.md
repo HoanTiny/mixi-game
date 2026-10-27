@@ -15,6 +15,32 @@
 - **Ẩn nhà kiểu Nobody** (`AreaBuilder.update_cut`, `ray_cap`): bỏ hẳn lưới chấm bi. Chỉ căn nào bị tia từ máy quay tới đầu, ngực, gối của An xuyên qua mới bị cắt tầng như nhà búp bê: tầng trên, ban công, mái ẩn dần, còn tầng trệt (3,4 m) với mái hiên, biển hiệu; vẫn chắn thì thấp hơn nhưng không dưới 1 m; An đứng lọt trong lô thì còn 1 m. Nhà sau lưng An (An đi trên vỉa hè trước mặt tiền) không bao giờ bị cắt. Mặt cắt là sàn nâu sẫm. Máy quay đặt `near = 0.1`.
 - Sông Hồng bờ uốn lượn, bãi bồi cát vàng ở bờ Phúc Tân; đáy hồ là phố Hàng Khay nối sang Tràng Tiền.
 
+**Bản 1.2 · giai đoạn 4, việc làm và hoạt động mới** (chỉ có trên map phố cổ `hn_pho_co`; map khác không có chỗ thì bỏ qua):
+- **Bảy chỗ mới:**
+  - bãi bốc vác sát chợ Long Biên;
+  - điểm thuê xe thồ đầu Hàng Chiếu sau chợ Đồng Xuân;
+  - nhà trọ giường tầng ngõ 79 Phúc Tân;
+  - quán net Hàng Bạc;
+  - tiệm cầm đồ ngõ Gạch;
+  - đại lý vé số Mã Mây;
+  - ghế đá hồ Gươm, có đường dạo bờ bắc hồ, ghế đá và bàn cờ.
+
+  Trên bản đồ M có biểu tượng theo loại, thêm loại "Dịch vụ".
+- **Việc làm:**
+  - Bốc vác ca tối 18–22 giờ, 260.000đ. Trò chơi nhỏ: dỡ bao bắp cải, sọt cà chua, bao khoai.
+  - Kéo xe thồ chợ Đồng Xuân, 220.000đ, thuê xe 20.000đ. Trò chơi nhỏ: chất cuộn vải, bao dép, thùng hàng.
+  - Chạy bàn quán bia Tạ Hiện ca tối, 190.000đ. Trò chơi nhỏ: bưng bia hơi, lạc rang, nem chua rán.
+  - Phát tờ rơi quanh hồ, 120.000đ.
+  - Chạy xe ôm công nghệ, 240.000đ, thuê xe 50.000đ.
+  - Thu mua đồng nát cùng cô Thắm, 110.000đ.
+- **Trò chơi nhỏ mới:** dùng lại cảnh có sẵn, khóa `kind` trong `minigames`, kèm hàng, chữ, biển riêng.
+- **Ngủ ngoài nhà** (`sleepAway`, `GameLogic.sleep_away`): giường tầng 30.000đ, gục ở quán net 40.000đ, ghế đá hồ Gươm không mất tiền. Mỗi chỗ cộng Mệt, trừ Tâm trạng khác nhau, sáng dậy ở chính chỗ đó, có cảnh kể lại đêm qua.
+- **Dịch vụ:**
+  - Cầm đồng hồ lấy 500.000đ, mười ngày sau chuộc 560.000đ. Tới hạn đủ tiền thì tự chuộc, không đủ thì mất đồng hồ.
+  - Vé số 10.000đ một tờ: chừng 1% trúng 500.000đ, 8% trúng 20.000đ.
+  - Quán net: đọc tin, tìm việc, chơi một ván cho khuây.
+- **Hoạt động:** dưỡng sinh 6–8 giờ sáng với các cụ, đánh cờ tướng, ngồi ghế đá hóng gió. Đều bớt Mệt hoặc lên Tâm trạng.
+
 Phần dưới đây là ghi chép từ các bản trước, còn dùng tên cũ miền Nam (bà Tư, chú Sáu, Bờ Me, Cầu Nhỏ…); bảng đổi tên ở [docs/HA_NOI.md](docs/HA_NOI.md).
 
 ## Ghi chép các bản trước

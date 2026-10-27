@@ -58,6 +58,9 @@
   },
   "_minigames": "Ca làm việc 3D (scripts/work/work_site.gd), mỗi việc một bản đồ nhỏ riêng: bricks là kho khu công nghiệp, site là công trình điện ở phố Tạ Hiện (cùng kiểu bưng xếp), dishes là quán cơm (bưng món, dọn bát), repair là tiệm sửa (quầy, bàn sửa, kệ linh kiện). seconds: giờ một ca; target: chỉ tiêu đủ công; minRatio: công tối thiểu khi thiếu chỉ tiêu.",
   "minigames": {
+    "boc_vac": {"kind": "bricks", "seconds": 90, "target": 6, "carry": 3, "minRatio": 0.5, "kicker": "CHỢ ĐẦU MỐI LONG BIÊN", "heading": "Dỡ rau quả từ xe tải xuống sạp đầu mối", "unit": "bao", "goalWord": "Đủ sạp", "doneWord": "Đủ sạp! Xe khác vào bãi", "types": {"rau": {"name": "Bao bắp cải", "color": "6f9a4a"}, "qua": {"name": "Sọt cà chua", "color": "c0503a"}, "cu": {"name": "Bao khoai tây", "color": "b89a6a"}}, "sizes": [2, 3, 4], "bonusPerBrick": 2200},
+    "xe_tho": {"kind": "bricks", "seconds": 90, "target": 6, "carry": 3, "minRatio": 0.5, "kicker": "CHỢ ĐỒNG XUÂN", "heading": "Chất hàng từ kho lên xe thồ cho từng sạp", "unit": "kiện", "goalWord": "Đủ chuyến", "doneWord": "Đủ chuyến! Kéo xe ra sạp", "types": {"vai": {"name": "Cuộn vải", "color": "b04a6a"}, "dep": {"name": "Bao dép", "color": "4a6ab0"}, "thung": {"name": "Thùng hàng khô", "color": "c9a46a"}}, "sizes": [2, 3, 4], "bonusPerBrick": 2000},
+    "bia_ta_hien": {"kind": "dishes", "seconds": 90, "target": 8, "carry": 2, "minRatio": 0.5, "kicker": "QUÁN BIA TẠ HIỆN", "heading": "Bưng bia, đồ nhắm ca tối, dọn cốc", "sign": "BIA HƠI TẠ HIỆN\nbia hơi 15k · lạc rang 20k · nem chua rán 40k", "patience": 30, "spawnEvery": 5, "maxCustomers": 4, "eatSec": 4, "items": {"bia": {"name": "Cốc bia hơi", "color": "e0b040"}, "lac": {"name": "Đĩa lạc rang", "color": "b07a4a"}, "nem": {"name": "Nem chua rán", "color": "d07a3a"}}, "bonusPerExtra": 3000, "cleanBonus": 2000},
     "bricks": {
       "seconds": 90, "target": 6, "carry": 3, "minRatio": 0.5,
       "kicker": "KHO KHU CÔNG NGHIỆP", "heading": "Xếp hàng lên pallet", "unit": "thùng", "goalWord": "Đầy pallet", "doneWord": "Đầy pallet! Xe nâng chở đi",
@@ -72,7 +75,7 @@
     },
     "dishes": {
       "seconds": 90, "target": 7, "carry": 2, "minRatio": 0.5,
-      "kicker": "QUÁN CƠM HẠNH", "heading": "Bưng cơm giờ trưa, dọn bát", "patience": 35, "spawnEvery": 6, "maxCustomers": 4, "eatSec": 4,
+      "kicker": "QUÁN CƠM HẠNH", "heading": "Bưng cơm giờ trưa, dọn bát", "sign": "CƠM HẠNH\ncơm sườn 35k · canh cua 20k · trà đá 3k", "patience": 35, "spawnEvery": 6, "maxCustomers": 4, "eatSec": 4,
       "items": {"com": {"name": "Cơm sườn", "color": "d9a35b"}, "canh": {"name": "Canh cua", "color": "e0703c"}, "tra": {"name": "Trà đá", "color": "c9a227"}},
       "bonusPerExtra": 3000, "cleanBonus": 2000
     },
@@ -296,7 +299,30 @@
       ]
     }
   },
+  "_sleepAway": "Ngủ qua đêm ngoài nhà (việc có sleepAway): Mệt, Tâm trạng cộng thêm, sự kiện sáng hôm sau. Sáng dậy ở chỗ đã ngủ.",
+  "sleepAway": {
+    "giuong": {"fatigue": 4, "mood": -3, "event": "ngu_giuong_tang", "log": "Ngủ giường tầng ở nhà trọ Phúc Tân"},
+    "net": {"fatigue": 10, "mood": -6, "event": "ngu_quan_net", "log": "Gục xuống bàn ngủ qua đêm ở quán net"},
+    "ghe_da": {"fatigue": 14, "mood": -8, "event": "ngu_ghe_da", "log": "Ngủ lại trên ghế đá ven hồ Gươm"}
+  },
   "actions": [
+    {"id": "boc_vac_toi", "group": "work", "location": "bai_boc_vac", "name": "Bốc vác ca tối: dỡ rau quả xuống chợ đầu mối", "hours": 4, "pay": 260000, "window": [18, 22], "minigame": "boc_vac", "note": "Xe hàng các tỉnh về từ chập tối, trả công theo ca", "dirty": {"clean": -20, "neat": -15}, "effects": {"fatigue": 26}},
+    {"id": "keo_xe_tho", "group": "work", "location": "xe_tho", "name": "Kéo xe thồ giao hàng chợ Đồng Xuân", "hours": 4, "pay": 220000, "cost": 20000, "window": [6, 18], "minigame": "xe_tho", "note": "Thuê xe 20.000đ, trả công theo chuyến", "dirty": {"clean": -12, "neat": -10}, "effects": {"fatigue": 22}},
+    {"id": "chay_ban_ta_hien", "group": "work", "location": "ben_can", "name": "Chạy bàn, rửa cốc quán bia Tạ Hiện ca tối", "hours": 4, "pay": 190000, "window": [17, 22], "minigame": "bia_ta_hien", "dirty": {"clean": -8, "neat": -8}, "effects": {"fatigue": 14}},
+    {"id": "phat_to_roi", "group": "work", "location": "ho_guom", "name": "Phát tờ rơi quanh hồ Gươm", "hours": 3, "pay": 120000, "window": [8, 20], "effects": {"fatigue": 10, "need.mood": -2}},
+    {"id": "xe_om", "group": "work", "location": "ben_xe_6", "name": "Chạy xe ôm công nghệ (thuê xe máy theo ngày)", "hours": 4, "pay": 240000, "cost": 50000, "window": [7, 21], "note": "Thuê xe 50.000đ, cuốc xe quanh phố cổ", "effects": {"fatigue": 14}},
+    {"id": "thu_dong_nat", "group": "work", "location": "cho_cau_nho", "name": "Đạp xe đi thu mua đồng nát cùng cô Thắm", "hours": 3, "pay": 110000, "window": [7, 17], "dirty": {"clean": -15, "neat": -10}, "effects": {"fatigue": 12}},
+    {"id": "ngu_giuong_tang", "group": "life", "location": "nha_tro_giuong", "name": "Thuê giường tầng ngủ qua đêm", "hours": 0.1, "cost": 30000, "window": [19, 22], "sleepAway": "giuong", "note": "Hết ngày, sáng dậy ở nhà trọ"},
+    {"id": "net_tim_viec", "group": "life", "location": "quan_net", "name": "Lên mạng đọc tin, tìm việc", "hours": 1, "cost": 10000, "effects": {"need.mood": 5}},
+    {"id": "net_choi_game", "group": "life", "location": "quan_net", "name": "Chơi một ván game cho khuây", "hours": 1, "cost": 12000, "effects": {"need.mood": 10, "fatigue": 2}},
+    {"id": "ngu_quan_net", "group": "life", "location": "quan_net", "name": "Gục xuống bàn ngủ qua đêm ở quán net", "hours": 0.1, "cost": 40000, "window": [20, 22], "sleepAway": "net", "note": "Hết ngày, sáng dậy ở quán net"},
+    {"id": "cam_dong_ho", "group": "life", "location": "cam_do", "name": "Cầm chiếc đồng hồ đeo tay (nhận 500.000đ, mười ngày chuộc 560.000đ)", "hours": 0.25, "hideIfPayable": "chuoc_dong_ho", "effects": {"special": "cam_do"}},
+    {"id": "chuoc_dong_ho", "group": "life", "location": "cam_do", "name": "Chuộc lại chiếc đồng hồ (560.000đ)", "hours": 0.25, "showIfPayable": "chuoc_dong_ho", "require": {"cash_min": 560000}, "effects": {"special": "chuoc_do"}},
+    {"id": "mua_ve_so", "group": "life", "location": "ve_so", "name": "Mua một tờ vé số", "hours": 0.1, "cost": 10000, "effects": {"special": "ve_so"}},
+    {"id": "duong_sinh", "group": "life", "location": "ho_guom", "name": "Tập dưỡng sinh với các cụ", "hours": 1, "window": [6, 8], "rest": true, "effects": {"fatigue": -6, "need.mood": 6}},
+    {"id": "co_tuong", "group": "life", "location": "ho_guom", "name": "Ngồi xem, đánh một ván cờ tướng", "hours": 1, "window": [8, 21], "effects": {"need.mood": 8}},
+    {"id": "hong_gio_ho", "group": "life", "location": "ho_guom", "name": "Ngồi ghế đá hóng gió hồ", "hours": 1, "rest": true, "effects": {"fatigue": -5, "need.mood": 6}},
+    {"id": "ngu_ghe_da", "group": "life", "location": "ho_guom", "name": "Ngủ lại trên ghế đá ven hồ", "hours": 0.1, "window": [20, 22], "sleepAway": "ghe_da", "note": "Hết ngày, không mất tiền nhưng ngủ không ngon"},
     { "id": "ca_kho", "group": "work", "location": "ben_xe_6", "name": "Ca kho khu công nghiệp (có suất cơm ca)", "hours": 8, "pay": 300000, "window": [6, 18], "minigame": "bricks", "dirty": { "clean": -15, "neat": -12 },
       "effects": { "fatigue": 28, "need.fed": 35 } },
     { "id": "ca_phu_quan", "group": "work", "location": "com_hanh", "name": "Ca phụ quán Cơm Hạnh (bưng cơm, rửa bát)", "hours": 4, "pay": 160000, "minigame": "dishes", "dirty": { "clean": -10, "neat": -10 },

@@ -354,7 +354,7 @@ func _build_quan() -> void:
 		var k: String = items[i]
 		var x := -4.2 + i * 3.2
 		# Nồi cơm lớn, nồi canh, thùng trà đá trên quầy; vài tô bày sẵn.
-		var big: Node3D = WP.rice_cooker() if k == "com" else (WP.model("pot_enamel_01", 3.0) if k == "canh" else WP.model("plastic_crate_03", 1.4))
+		var big: Node3D = WP.rice_cooker() if k == "com" else (WP.model("pot_enamel_01", 3.0) if k == "canh" else (WP.model("barrel_03", 0.9) if k == "bia" else WP.model("plastic_crate_03", 1.4)))
 		_prop(big, x - 0.45, -4.75, 0.0, 0.0, 0.0, 0.95)
 		for j in 3:
 			_place_item(k, Vector3(x + 0.2 + j * 0.25, 0.95, -4.4))
@@ -387,7 +387,7 @@ func _build_quan() -> void:
 		_prop(WP.model("plastic_crate_01", 1.4), -6.8, 4.6 - i * 0.65, 0.0)
 	_blocks.append(Rect2(-7.2, 3.0, 0.8, 2.0))
 	_prop(WP.model("potted_plant_04", 3.0), 7.0, 5.2)
-	_sign("CƠM HẠNH\ncơm sườn 35k · canh chua 20k · trà đá 3k", -1.0, -5.98, 5.2, Color("b8322a"))
+	_sign(str(cfg.get("sign", "CƠM HẠNH\ncơm sườn 35k · canh cua 20k · trà đá 3k")), -1.0, -5.98, 5.2, Color("b8322a"))
 	for x in [-4.5, 0.0, 4.5]:
 		_lamp(x, 1.5)
 

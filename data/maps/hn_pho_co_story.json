@@ -85,6 +85,72 @@
    "w": 9,
    "d": 9,
    "road": "Phố Ngọc Thụy"
+  },
+  "bai_boc_vac": {
+   "at": [
+    131,
+    -165
+   ],
+   "w": 8,
+   "d": 6,
+   "road": "Phố Trần Nhật Duật",
+   "inset": 0.0
+  },
+  "xe_tho": {
+   "at": [
+    -100,
+    -138.5
+   ],
+   "w": 6,
+   "d": 4,
+   "road": "Phố Hàng Chiếu",
+   "inset": 0.0
+  },
+  "nha_tro_giuong": {
+   "at": [
+    166,
+    -57
+   ],
+   "w": 12,
+   "d": 10,
+   "road": "Ngõ 79 Phúc Tân"
+  },
+  "quan_net": {
+   "at": [
+    -100,
+    -30
+   ],
+   "w": 6,
+   "d": 10,
+   "road": "Phố Hàng Bạc"
+  },
+  "cam_do": {
+   "at": [
+    -175.5,
+    -62
+   ],
+   "w": 5,
+   "d": 8,
+   "road": "Ngõ Gạch"
+  },
+  "ve_so": {
+   "at": [
+    7,
+    -100
+   ],
+   "w": 4,
+   "d": 6,
+   "road": "Phố Mã Mây"
+  },
+  "ho_guom": {
+   "at": [
+    -60,
+    92.5
+   ],
+   "w": 8,
+   "d": 3,
+   "road": "Đường dạo Hồ Gươm",
+   "inset": 0.0
   }
  },
  "names": {
@@ -122,7 +188,8 @@
   "Phố Tạ Hiện": "Phố Tạ Hiện",
   "Phố Đinh Liệt": "Phố Đinh Liệt",
   "Phố Đinh Tiên Hoàng": "Phố Đinh Tiên Hoàng",
-  "Vòng xuyến Đông Kinh Nghĩa Thục": "Vòng xuyến Đông Kinh Nghĩa Thục"
+  "Vòng xuyến Đông Kinh Nghĩa Thục": "Vòng xuyến Đông Kinh Nghĩa Thục",
+  "Đường dạo Hồ Gươm": "Đường dạo Hồ Gươm"
  },
  "fallbackNames": [
   "Phố cổ"
@@ -134,6 +201,13 @@
   "tiem_sau": "Tiệm chú Sơn trong một vòm cầu đường sắt bên phố Gầm Cầu: sửa xe máy, thêm một bàn sửa đồ điện gia dụng. Tàu chạy qua trên đầu thì cả tiệm rung.",
   "xom_bo_me": "Tám phòng trọ quanh khoảng sân trong ngõ 25 Phúc Tân, ngoài đê, sau lưng là bãi sông Hồng; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
   "hem_dua": "Gác xép trong ngõ Gạch rẽ ra từ phố Hàng Buồm, đầu ngõ có cây bàng, quanh là quán net, tiệm cầm đồ. Phòng nhỏ, trần thấp, cửa sát mặt ngõ, ít chỗ phơi.",
+  "bai_boc_vac": "Bãi xe tải nông sản sát chợ Long Biên: tối nào xe rau, xe quả từ các tỉnh cũng về, cần người bốc dỡ xuống chợ đầu mối, trả công theo ca.",
+  "xe_tho": "Điểm thuê xe thồ đầu phố Hàng Chiếu, sau lưng chợ Đồng Xuân: kéo hàng từ kho ra các sạp trong chợ, trả theo chuyến.",
+  "nha_tro_giuong": "Nhà trọ giường tầng trong ngõ 79 Phúc Tân, 30.000đ một đêm: phòng chung mười hai giường, quạt trần, tủ khóa nhỏ, người làm thuê ngủ lại qua đêm.",
+  "quan_net": "Quán net phố Hàng Bạc mở thâu đêm: lên mạng tìm việc, đọc tin, chơi một ván, hay gục xuống bàn ngủ qua đêm cho rẻ.",
+  "cam_do": "Tiệm cầm đồ trong ngõ Gạch: cầm đồ lấy tiền ngay, hẹn mười ngày chuộc, có lãi.",
+  "ve_so": "Đại lý vé số đầu phố Mã Mây: vé 10.000đ một tờ, chiều mở thưởng.",
+  "ho_guom": "Dãy ghế đá ven hồ Gươm, đầu đường dạo phía Đông Kinh Nghĩa Thục: sáng sớm các cụ tập dưỡng sinh, ngày nào cũng có mấy bàn cờ tướng, tối người ngồi hóng gió, có người ngủ lại.",
   "cau_tre": "Bên kia sông, phải đi qua cầu Long Biên. Dãy nhà trên phố Ngọc Thụy, lưng quay ra sông; phòng thoáng, có hiên rộng, đi làm xa hơn.",
   "nha_di_nam": "Nhà dì Nga trên phố Hàng Chiếu, gần chợ Đồng Xuân và điểm xe buýt. Ở tạm được bảy ngày, phải gửi bớt đồ.",
   "ben_can": "Dãy năm quán bia hơi vỉa hè phố Tạ Hiện, chung lối đi và đường điện cũ chằng chịt. Hợp đồng sửa điện của anh Phúc."

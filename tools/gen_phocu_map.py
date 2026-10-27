@@ -146,11 +146,12 @@ def build():
     ngo_lnq = g.road("Ngõ Lương Ngọc Quyến", [(90, -75), (90, -20)], 2.8, "service", small=True)
     ngo_cg = g.road("Ngõ Cầu Gỗ", [(-225, 5), (-120, 5)], 2.6, "service", small=True)
     ngo_lt = g.road("Ngõ Lê Thái Tổ", [(-225, 120), (-125, 120)], 3.0, "service", small=True)
+    g.road("Đường dạo Hồ Gươm", [(-100, 96), (-20, 96)], 3.0, "pedestrian", small=True)
     ngo_lt2 = g.road("Ngõ Lê Thái Tổ", [(-225, 190), (-125, 190)], 3.0, "service", small=True)
 
     # --- Lô địa điểm của truyện (dọn trước).
     for k, (at, w, d, road_name, along_x) in LOCATIONS.items():
-        if k == "ben_xe_6":
+        if k in ("ben_xe_6", "bai_boc_vac", "ho_guom"):
             continue
         g.LOTS[k] = g._lot_for(at, w, d, along_x)
         g.reserved.append(g.LOTS[k])
@@ -270,7 +271,17 @@ LOCATIONS = {
     "hem_dua": ((-164, -48), 5.5, 8, "Ngõ Gạch", False),
     "ben_can": ((70, -40), 24, 10, "Phố Tạ Hiện", False),
     "cau_tre": ((245, -150), 9, 9, "Phố Ngọc Thụy", False),
+    # Giai đoạn 4: chỗ làm, dịch vụ, chỗ chơi mới.
+    "bai_boc_vac": ((131, -165), 8, 6, "Phố Trần Nhật Duật", False),
+    "xe_tho": ((-100, -138.5), 6, 4, "Phố Hàng Chiếu", True),
+    "nha_tro_giuong": ((166, -57), 12, 10, "Ngõ 79 Phúc Tân", True),
+    "quan_net": ((-100, -30), 6, 10, "Phố Hàng Bạc", True),
+    "cam_do": ((-175.5, -62), 5, 8, "Ngõ Gạch", False),
+    "ve_so": ((7, -100), 4, 6, "Phố Mã Mây", False),
+    "ho_guom": ((-60, 92.5), 8, 3, "Đường dạo Hồ Gươm", True),
 }
+## Địa điểm không dựng nhà (mái che, ghế đá): sát mép đường, không lùi.
+NO_INSET = ("ben_xe_6", "bai_boc_vac", "xe_tho", "ho_guom")
 
 DESCRIPTIONS = {
     "ben_xe_6": "Điểm xe buýt Long Biên trên đê Trần Nhật Duật, sát chân cầu: xe đưa rước công nhân ra khu công nghiệp Bắc Thăng Long đón ở đây. Trung tâm nghề của Linh cũng đi xe ở đây.",
@@ -279,6 +290,13 @@ DESCRIPTIONS = {
     "tiem_sau": "Tiệm chú Sơn trong một vòm cầu đường sắt bên phố Gầm Cầu: sửa xe máy, thêm một bàn sửa đồ điện gia dụng. Tàu chạy qua trên đầu thì cả tiệm rung.",
     "xom_bo_me": "Tám phòng trọ quanh khoảng sân trong ngõ 25 Phúc Tân, ngoài đê, sau lưng là bãi sông Hồng; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
     "hem_dua": "Gác xép trong ngõ Gạch rẽ ra từ phố Hàng Buồm, đầu ngõ có cây bàng, quanh là quán net, tiệm cầm đồ. Phòng nhỏ, trần thấp, cửa sát mặt ngõ, ít chỗ phơi.",
+    "bai_boc_vac": "Bãi xe tải nông sản sát chợ Long Biên: tối nào xe rau, xe quả từ các tỉnh cũng về, cần người bốc dỡ xuống chợ đầu mối, trả công theo ca.",
+    "xe_tho": "Điểm thuê xe thồ đầu phố Hàng Chiếu, sau lưng chợ Đồng Xuân: kéo hàng từ kho ra các sạp trong chợ, trả theo chuyến.",
+    "nha_tro_giuong": "Nhà trọ giường tầng trong ngõ 79 Phúc Tân, 30.000đ một đêm: phòng chung mười hai giường, quạt trần, tủ khóa nhỏ, người làm thuê ngủ lại qua đêm.",
+    "quan_net": "Quán net phố Hàng Bạc mở thâu đêm: lên mạng tìm việc, đọc tin, chơi một ván, hay gục xuống bàn ngủ qua đêm cho rẻ.",
+    "cam_do": "Tiệm cầm đồ trong ngõ Gạch: cầm đồ lấy tiền ngay, hẹn mười ngày chuộc, có lãi.",
+    "ve_so": "Đại lý vé số đầu phố Mã Mây: vé 10.000đ một tờ, chiều mở thưởng.",
+    "ho_guom": "Dãy ghế đá ven hồ Gươm, đầu đường dạo phía Đông Kinh Nghĩa Thục: sáng sớm các cụ tập dưỡng sinh, ngày nào cũng có mấy bàn cờ tướng, tối người ngồi hóng gió, có người ngủ lại.",
     "cau_tre": "Bên kia sông, phải đi qua cầu Long Biên. Dãy nhà trên phố Ngọc Thụy, lưng quay ra sông; phòng thoáng, có hiên rộng, đi làm xa hơn.",
     "nha_di_nam": "Nhà dì Nga trên phố Hàng Chiếu, gần chợ Đồng Xuân và điểm xe buýt. Ở tạm được bảy ngày, phải gửi bớt đồ.",
     "ben_can": "Dãy năm quán bia hơi vỉa hè phố Tạ Hiện, chung lối đi và đường điện cũ chằng chịt. Hợp đồng sửa điện của anh Phúc.",
@@ -313,7 +331,7 @@ def main():
     locs = {}
     for k, (at, w, d, road_name, along_x) in LOCATIONS.items():
         locs[k] = {"at": list(at), "w": w, "d": d, "road": road_name}
-        if k == "ben_xe_6":
+        if k in NO_INSET:
             locs[k]["inset"] = 0.0
     story = {
         "_ghi_chu": "Đặt truyện lên map phố cổ dựng tay (data/maps/hn_pho_co.json, sinh bằng tools/gen_phocu_map.py). "

@@ -563,8 +563,9 @@ func _build_skills(parent: Control) -> void:
 ## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
 func _open_minigame(id: String, a: Dictionary) -> void:
 	minigame = WorkSite.new()
-	minigame.kind = str(a.minigame)
+	# Trò chơi mới dùng lại cảnh của một trò có sẵn (cfg.kind: bricks, site, dishes, repair) với hàng, chữ riêng.
 	minigame.cfg = game.cfg.minigames[a.minigame]
+	minigame.kind = str(minigame.cfg.get("kind", a.minigame))
 	minigame.last = game.s.get("job_last", {}).get(id, {})
 	minigame.title = str(a.name)
 	minigame.finished.connect(func(r: Dictionary) -> void:

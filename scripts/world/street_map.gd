@@ -426,9 +426,10 @@ const RUST := Color("7a4a32")
 const NIGHT_ZONE := Rect2(0, -75, 118, 55)
 ## Loại địa điểm: biểu tượng, màu, tên trong bảng chú thích.
 const CATS := {"home": ["Chỗ ở", Color("4f8fd6")], "food": ["Ăn uống", Color("e8a33c")], "work": ["Việc làm", Color("5aa36b")],
-	"fun": ["Giải trí", Color("c04f9a")], "bus": ["Bến xe", Color("2fa3a3")]}
+	"fun": ["Giải trí", Color("c04f9a")], "bus": ["Bến xe", Color("2fa3a3")], "service": ["Dịch vụ", Color("8a6ad0")]}
 const LOC_CAT := {"xom_bo_me": "home", "hem_dua": "home", "cau_tre": "home", "nha_di_nam": "home", "com_hanh": "food",
-	"cho_cau_nho": "work", "tiem_sau": "work", "ben_can": "fun", "ben_xe_6": "bus"}
+	"cho_cau_nho": "work", "tiem_sau": "work", "ben_can": "fun", "ben_xe_6": "bus", "bai_boc_vac": "work", "xe_tho": "work",
+	"nha_tro_giuong": "home", "quan_net": "fun", "ho_guom": "fun", "cam_do": "service", "ve_so": "service"}
 ## Tên khu lớn hiện ở mọi mức phóng; tên nhỏ (đền, tháp) chỉ khi phóng từ 2.
 const SMALL_AREAS := ["THÁP RÙA", "ĐỀN NGỌC SƠN"]
 
@@ -854,6 +855,12 @@ func _glyph(c: Control, p: Vector2, u: float, cat: String, ink: Color) -> void:
 			c.draw_arc(p + Vector2(0.45 * u, 0.15 * u), 0.38 * u, -PI / 2.0, PI / 2.0, 8, ink, maxf(1.2, 0.16 * u))
 			for fx in [-0.42, -0.1, 0.22]:
 				c.draw_circle(p + Vector2(fx * u, -0.62 * u), 0.26 * u, ink)
+		"service":
+			# Đồng xu có vạch đứng như chữ đ.
+			c.draw_arc(p, 0.85 * u, 0, TAU, 16, ink, maxf(1.4, 0.2 * u))
+			c.draw_line(p + Vector2(0.15 * u, -0.6 * u), p + Vector2(0.15 * u, 0.55 * u), ink, maxf(1.4, 0.2 * u))
+			c.draw_circle(p + Vector2(-0.12 * u, 0.2 * u), 0.3 * u, ink)
+			c.draw_line(p + Vector2(-0.15 * u, -0.38 * u), p + Vector2(0.45 * u, -0.38 * u), ink, maxf(1.0, 0.14 * u))
 		"bus":
 			c.draw_rect(Rect2(p + Vector2(-0.85 * u, -0.85 * u), Vector2(1.7 * u, 1.45 * u)), ink)
 			c.draw_rect(Rect2(p + Vector2(-0.62 * u, -0.6 * u), Vector2(1.24 * u, 0.5 * u)), Color(0, 0, 0, 0.4))

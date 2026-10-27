@@ -2642,5 +2642,41 @@
     }
    }
   ]
+ },
+ {
+  "id": "ngu_giuong_tang",
+  "system": true,
+  "title": "Đêm ở nhà trọ giường tầng",
+  "text": "Mười hai giường tầng trong một phòng, quạt trần kêu cót két, người giường dưới ngáy tới gần sáng. Ba mươi nghìn một đêm, ngủ được, nhưng không ra giấc. Năm giờ sáng đã có người dậy đi chợ đầu mối.",
+  "choices": [
+   {
+    "label": "Tiếp tục",
+    "hint": "Mệt cộng thêm một chút, tâm trạng hơi chùng"
+   }
+  ]
+ },
+ {
+  "id": "ngu_quan_net",
+  "system": true,
+  "title": "Đêm ở quán net",
+  "text": "Gục xuống bàn phím, đèn màn hình hắt xanh cả đêm, mấy đứa bàn bên vẫn gõ phím lách cách. Sáng ra cổ mỏi, mắt cay, chủ quán gõ bàn bảo hết giờ.",
+  "choices": [
+   {
+    "label": "Tiếp tục",
+    "hint": "Mệt cộng thêm, tâm trạng đi xuống"
+   }
+  ]
+ },
+ {
+  "id": "ngu_ghe_da",
+  "system": true,
+  "title": "Đêm trên ghế đá hồ Gươm",
+  "text": "Gió hồ mát, muỗi cũng nhiều. Nửa đêm bảo vệ đi qua soi đèn hỏi han một câu rồi thôi. Bốn rưỡi sáng các cụ đã ra hồ tập, An ngồi dậy, người ê ẩm.",
+  "choices": [
+   {
+    "label": "Tiếp tục",
+    "hint": "Không mất tiền, nhưng Mệt cộng thêm nhiều"
+   }
+  ]
  }
 ]

@@ -34,7 +34,10 @@ var home: String = HOME
 ## npcs: người đứng trước cửa (bấm vào cũng mở địa điểm), id là khóa trong story.reps và data/talks.json.
 ## tube: dựng thành nhà ống (floors tầng, sign chữ biển hiệu, units số căn liền nhau, shop tầng trệt buôn bán).
 ## shelter: mái che trạm xe. stalls: sạp chợ, ghế trà đá · line: dây phơi đồ trước cửa · scrap: chỗ bán ve chai.
-const LOCATIONS := {
+## LOCATIONS: các địa điểm có trên map đang chơi (lọc từ ALL_LOCATIONS lúc dựng màn phố; map cũ không có chỗ mới của
+## giai đoạn 4 thì bỏ qua chỗ đó).
+var LOCATIONS: Dictionary = {}
+const ALL_LOCATIONS := {
 	"ben_xe_6": {"name": "Điểm xe buýt Long Biên", "desc": "Điểm xe buýt Long Biên trên đê Trần Nhật Duật, sát chân cầu: xe đưa rước công nhân ra khu công nghiệp Bắc Thăng Long đón ở đây. Trung tâm nghề của Linh cũng đi xe ở đây.", "color": "3c7d6b", "shelter": true, "h": 3.0},
 	"cho_cau_nho": {"name": "Chợ Long Biên", "desc": "Chợ Long Biên dưới chân cầu Long Biên, ngoài đê: chợ đầu mối rau quả, xe tải nông sản về từ nửa đêm, sạp vật tư, hàng đồ cũ, sạp đồng nát của cô Thắm và quán trà đá có bảng tin cho thuê phòng.",
 		"tube": {"floors": 2, "sign": "CHỢ LONG BIÊN", "units": 3}, "color": "c8503f", "stalls": true, "scrap": true,
@@ -61,6 +64,25 @@ const LOCATIONS := {
 	"ben_can": {"name": "Dãy quán bia Tạ Hiện", "desc": "Dãy năm quán bia hơi vỉa hè phố Tạ Hiện, chung lối đi và đường điện cũ chằng chịt. Hợp đồng sửa điện của anh Phúc.",
 		"tube": {"floors": 2, "sign": "BIA HƠI TẠ HIỆN", "units": 5}, "color": "9c9a93",
 		"npcs": [{"name": "Anh Phúc", "id": "PHUC", "color": "c9853a"}, {"name": "Trâm", "id": "TRAM", "color": "2f6f6a"}]},
+	# Giai đoạn 4: chỗ làm, dịch vụ, chỗ chơi mới (chỉ có trên map phố cổ hn_pho_co).
+	"bai_boc_vac": {"name": "Bãi bốc vác chợ Long Biên", "desc": "Bãi xe tải nông sản sát chợ: tối nào xe rau, xe quả cũng về, cần người bốc dỡ.",
+		"color": "6b7d4a", "shelter": true, "crates": true, "h": 3.0,
+		"npcs": [{"name": "Anh cai bốc vác", "id": "", "color": "5a4a3a"}]},
+	"xe_tho": {"name": "Điểm thuê xe thồ", "desc": "Đầu phố Hàng Chiếu, sau lưng chợ Đồng Xuân: kéo hàng từ kho ra sạp, trả theo chuyến.",
+		"color": "8a6a3a", "shelter": true, "carts": true, "h": 3.0,
+		"npcs": [{"name": "Chú cho thuê xe", "id": "", "color": "4a5a6a"}]},
+	"nha_tro_giuong": {"name": "Nhà trọ giường tầng", "desc": "Ngõ 79 Phúc Tân, 30.000đ một đêm: phòng chung mười hai giường tầng.",
+		"tube": {"floors": 2, "sign": "NGHỈ TRỌ 30K/ĐÊM", "shop": false}, "color": "c9b48a",
+		"npcs": [{"name": "Bà chủ trọ", "id": "", "color": "7a4a5a"}]},
+	"quan_net": {"name": "Quán net Hàng Bạc", "desc": "Mở thâu đêm: tìm việc, đọc tin, chơi một ván, hay gục xuống bàn ngủ qua đêm.",
+		"tube": {"floors": 3, "sign": "INTERNET · GAME 24/7"}, "color": "3f4f6a"},
+	"cam_do": {"name": "Tiệm cầm đồ ngõ Gạch", "desc": "Cầm đồ lấy tiền ngay, hẹn mười ngày chuộc, có lãi.",
+		"tube": {"floors": 3, "sign": "CẦM ĐỒ · CẦM VÀNG"}, "color": "8a3a2a"},
+	"ve_so": {"name": "Đại lý vé số Mã Mây", "desc": "Vé 10.000đ một tờ, chiều mở thưởng.",
+		"tube": {"floors": 2, "sign": "VÉ SỐ KIẾN THIẾT"}, "color": "d0a030"},
+	"ho_guom": {"name": "Ghế đá hồ Gươm", "desc": "Sáng sớm các cụ tập dưỡng sinh, ngày có bàn cờ tướng, tối người ngồi hóng gió.",
+		"color": "5f8a5a", "benches": true, "h": 1.0,
+		"npcs": [{"name": "Cụ Thiện đánh cờ", "id": "", "color": "6a6a6a"}, {"name": "Cụ Lan dưỡng sinh", "id": "", "color": "9a6a8a"}]}
 }
 const SPEED := 6.0
 ## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
@@ -167,6 +189,9 @@ func _ready() -> void:
 	var map_id := _map_id()
 	real = map_id != "an_hoa" and FileAccess.file_exists("res://data/maps/%s.json" % map_id)
 	city = RealCity.new(map_id) if real else CityMap.new()
+	for id in ALL_LOCATIONS:
+		if city.locs.has(id):
+			LOCATIONS[id] = ALL_LOCATIONS[id]
 	_build_environment()
 	tubes = TubeHouse.new(0.0, font)
 	if real:
@@ -574,6 +599,27 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		_build_stalls(w, holder)
 	if loc.get("line", false):
 		_build_clothesline(holder)
+	if loc.get("benches", false):
+		# Ghế đá ven hồ: ba băng ghế quay mặt ra hồ, một bàn cờ tướng giữa hai ghế.
+		for i in 3:
+			var bx := -w / 2.0 + 1.3 + i * (w - 2.6) / 2.0
+			_block(Vector3(1.6, 0.42, 0.45), Vector3(bx, 0.0, -d + 0.6), Color("9a958a"), holder)
+		_block(Vector3(0.7, 0.62, 0.7), Vector3(0.0, 0.0, -d / 2.0 - 0.2), Color("8a8478"), holder)
+		_block(Vector3(0.6, 0.02, 0.6), Vector3(0.0, 0.62, -d / 2.0 - 0.2), Color("e8d9a8"), holder)
+	if loc.get("crates", false):
+		# Sọt rau, bao củ, thùng quả chất dưới mái che bãi xe.
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 41
+		for i in 9:
+			var col: Color = [Color("6f9a4a"), Color("b85a3a"), Color("c9a86a")][i % 3]
+			_block(Vector3(0.6, 0.45, 0.45), Vector3(-w / 2.0 + 0.8 + (i % 5) * 0.9 + rng.randf_range(-0.1, 0.1), (i / 5) * 0.45, -d + 0.8 + (i % 2) * 0.6), col, holder)
+	if loc.get("carts", false):
+		# Hai chiếc xe thồ gỗ dựng nghiêng cạnh mái che.
+		for i in 2:
+			var cx := -w / 2.0 + 1.2 + i * 2.4
+			_block(Vector3(0.9, 0.08, 1.8), Vector3(cx, 0.55, -d / 2.0), Color("7a5a3a"), holder)
+			for side in [-0.48, 0.48]:
+				_block(Vector3(0.06, 0.55, 0.55), Vector3(cx + side, 0.0, -d / 2.0 + 0.4), Color("2a2a2a"), holder)
 	var body := StaticBody3D.new()
 	body.set_meta("loc", id)
 	var cs := CollisionShape3D.new()
@@ -2229,7 +2275,10 @@ func _on_changed() -> void:
 	# Sang ngày mới: An thức dậy trước cửa chỗ ở.
 	if game.day() != _last_day:
 		if _last_day != -1:
-			player.position = loc_point(home, -1.5, 0.8)
+			# Ngủ ở nhà trọ giường tầng, quán net, ghế đá (game.sleep_away) thì sáng dậy ở đó.
+			var woke: String = str(game.s.get("wake_at", ""))
+			game.s.erase("wake_at")
+			player.position = loc_point(woke if LOCATIONS.has(woke) else home, -1.5, 0.8)
 			camera.position = player.position + cam_offset()
 			_target = null
 			_target_loc = ""
