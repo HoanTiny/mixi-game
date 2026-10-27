@@ -14,6 +14,7 @@ extends Node3D
 
 const Props3D := preload("res://scripts/world/props3d.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
+const AreaData := preload("res://scripts/realmap/area_data.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
 const Human := preload("res://scripts/world/human.gd")
 const Character := preload("res://scripts/world/character.gd")
@@ -174,7 +175,7 @@ func _chat_groups(roads: Array, center: Vector2, ok: Callable, want: int) -> Arr
 	while counts.chat < want and tries < want * 20 and not big.is_empty():
 		tries += 1
 		var r = big[_rng.randi() % big.size()]
-		var line := _offset(r.line, (float(r.width) / 2.0 + 0.9) * (-1.0 if _rng.randf() < 0.5 else 1.0))
+		var line := _offset(r.line, (float(r.width) / 2.0 + maxf(AreaData.sidewalk(r) * 0.55, 0.9)) * (-1.0 if _rng.randf() < 0.5 else 1.0))
 		var c := _at(line, _rng.randf() * _length(line))
 		if c.distance_to(center) > 200.0:
 			continue
@@ -292,7 +293,7 @@ func _build_walkers(roads: Array, center: Vector2, ok: Callable, amount: float) 
 		var mine: Array = []
 		if _big(r):
 			for side in [-1.0, 1.0]:
-				mine.append([r.line, side * (float(r.width) / 2.0 + 0.7), 0.05, k * WALK_PER_M])
+				mine.append([r.line, side * (float(r.width) / 2.0 + maxf(AreaData.sidewalk(r) * 0.45, 0.7)), 0.05, k * WALK_PER_M])
 		else:
 			mine.append([r.line, 0.0, minf(float(r.width) / 4.0, 0.5), k * LANE_PER_M])
 		for wy in mine:

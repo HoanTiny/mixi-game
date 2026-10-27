@@ -92,7 +92,7 @@ func street_name(real: String) -> String:
 	if words.size() >= 3 and words[0] in ["Hẻm", "Ngõ", "Ngách", "Kiệt"]:
 		var main := " ".join(words.slice(2)).trim_prefix("Đường ")
 		var fic := street_name(main).trim_prefix("Đường ").trim_prefix("Đại lộ ")
-		return "Hẻm %s %s" % [words[1], fic]
+		return "%s %s %s" % [words[0], words[1], fic]
 	var fb: Array = story.get("fallbackNames", ["Đường Xóm Mới"])
 	return str(fb[absi(hash(real)) % fb.size()])
 
@@ -118,14 +118,14 @@ func _index_roads() -> void:
 
 
 ## Đường gần điểm p nhất trong vòng 60 m (bỏ lối đi bộ, cầu): trả về {q: điểm trên tim đường, dir, road, d}.
-func _nearest_road(p: Vector2, min_w := 2.5) -> Dictionary:
+func _nearest_road(p: Vector2, min_w := 2.5, only := "") -> Dictionary:
 	var best := {}
 	var best_d := INF
 	var c := Vector2i(floori(p.x / SEG_CELL), floori(p.y / SEG_CELL))
 	for gx in range(c.x - 2, c.x + 3):
 		for gy in range(c.y - 2, c.y + 3):
 			for seg in _seg_grid.get(Vector2i(gx, gy), []):
-				if float(seg[2].width) < min_w:
+				if float(seg[2].width) < min_w or (only != "" and str(seg[2].name) != only):
 					continue
 				var a: Vector2 = seg[0]
 				var ab: Vector2 = seg[1] - a
@@ -141,7 +141,8 @@ func _place_locations() -> void:
 	for k in story.get("locations", {}):
 		var s: Dictionary = story.locations[k]
 		var at := Vector2(float(s.at[0]), float(s.at[1]))
-		var nr := _nearest_road(at)
+		# Map dựng tay ghi luôn phố mà địa điểm quay mặt ra (road), khỏi bị ngõ gần hơn kéo sang.
+		var nr := _nearest_road(at, 2.5, str(s.get("road", "")))
 		if nr.is_empty():
 			continue
 		var q: Vector2 = nr.q
@@ -149,7 +150,8 @@ func _place_locations() -> void:
 		if n.dot(q - at) < 0.0:
 			n = -n
 		var hw := float(nr.road.width) / 2.0
-		var c: Vector2 = q - n * (hw + 0.3)
+		# Map dựng tay ghi vỉa hè riêng (sw): nhà của địa điểm lùi vào thẳng hàng với dãy nhà bên cạnh.
+		var c: Vector2 = q - n * (hw + float(s.get("inset", maxf(float(nr.road.get("sw", -1.0)), 0.0))) + 0.3)
 		var w := float(s.get("w", 8))
 		var d := float(s.get("d", 10))
 		locs[k] = {"center": c, "normal": n, "w": w, "d": d, "street": street_name(str(nr.road.name)), "loc": k, "no": "", "address": "",

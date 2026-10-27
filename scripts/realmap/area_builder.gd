@@ -14,6 +14,7 @@ extends Node3D
 ##   ven đường; xen cây phượng tán đỏ cam), ô tô và xe máy đậu dọc đường, nhãn địa danh có chấm cam.
 
 const Geo := preload("res://scripts/realmap/geo.gd")
+const AreaData := preload("res://scripts/realmap/area_data.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const WalkGrid := preload("res://scripts/realmap/walk_grid.gd")
 const StreetDress := preload("res://scripts/realmap/street_dress.gd")
@@ -25,6 +26,9 @@ render_mode cull_disabled;
 // Hạ nhà che An: mỗi căn một độ cao tối đa đọc từ ảnh caps (AreaBuilder.update_cut tính bên GDScript, hạ và nâng
 // từ từ). Cả căn hạ một lượt, mái thành mặt cắt màu vữa sáng, không khoét lỗ giữa tường.
 uniform bool cut_on = false;
+// Nhìn xuyên (như Nobody): căn chắn An giữ nguyên hình, phần cao hơn mức caps thành lưới thưa nhìn xuyên được thay vì
+// hạ thấp căn nhà (hạ nhà để lại mặt cắt phẳng to, đi trong ngõ trông như nhà vỡ).
+uniform bool see_through = true;
 uniform sampler2D caps : filter_nearest;
 uniform int caps_w = 128;
 // Màu mặt cắt của nhà bị hạ.
@@ -43,14 +47,16 @@ varying float v_var;
 varying float v_flame;
 varying float v_idx;
 varying float v_ly;
-// 1 khi căn nhà đang bị hạ (đứng chắn An): cả căn sẫm, nhạt màu đi cho mắt dồn vào An và người trên phố.
-varying float v_low;
+// Mức caps của căn (CUT_NONE: để nguyên), độ cao thật của điểm (nhìn xuyên phần cao hơn mức caps).
+varying float v_cap;
+varying float v_wy;
 // Khoảng cách máy quay tới An (world.gd đặt mỗi khung hình; 0 là tắt): nhà gần máy quay hơn An mấy mét thì sẫm dần.
 global uniform float focus_depth;
 
 void vertex() {
 	v_cut = 0.0;
-	v_low = 0.0;
+	v_cap = 10000.0;
+	v_wy = VERTEX.y;
 	v_ly = VERTEX.y;
 	v_up = NORMAL.y;
 	v_var = flat_color ? INSTANCE_CUSTOM.g : 0.5;
@@ -66,8 +72,10 @@ void vertex() {
 	} else if (cut_on && CUSTOM0.y > 0.5) {
 		int i = int(CUSTOM0.x + 0.5);
 		float cap = texelFetch(caps, ivec2(i % caps_w, i / caps_w), 0).r;
-		v_low = cap < 9000.0 ? 1.0 : 0.0;
-		if (CUSTOM0.y > 1.5) {
+		v_cap = cap;
+		if (see_through) {
+			// Giữ nguyên hình, fragment() làm thưa phần cao hơn cap.
+		} else if (CUSTOM0.y > 1.5) {
 			// Đồ gắn kèm (bồn nước, mái hiên, biển hiệu, cổng hẻm; UV2.y là đỉnh của món đồ): hạ thấp hơn đỉnh là ẩn.
 			if (cap < UV2.y + 0.2) {
 				VERTEX = vec3(0.0, -10.0, 0.0);
@@ -124,8 +132,19 @@ void fragment() {
 		float vis = 1.0 - smoothstep(0.2, 0.5, fwidth(UV.y) / 0.32);
 		col *= mix(1.0, 0.82 + 0.18 * smoothstep(0.0, 0.75, fv), vis);
 	}
+	if (see_through && v_cap < 9000.0 && v_wy > v_cap) {
+		// Lưới thưa theo ma trận Bayer 4x4: càng cao hơn mức cap càng thưa (tối đa bỏ 4/5 điểm ảnh).
+		int bx = int(mod(FRAGCOORD.x, 4.0));
+		int by = int(mod(FRAGCOORD.y, 4.0));
+		int bi = bx + by * 4;
+		float bayer = float(bi == 0 ? 0 : bi == 1 ? 8 : bi == 2 ? 2 : bi == 3 ? 10 : bi == 4 ? 12 : bi == 5 ? 4 : bi == 6 ? 14 : bi == 7 ? 6
+			: bi == 8 ? 3 : bi == 9 ? 11 : bi == 10 ? 1 : bi == 11 ? 9 : bi == 12 ? 15 : bi == 13 ? 7 : bi == 14 ? 13 : 5) / 16.0;
+		if (bayer < clamp((v_wy - v_cap) / 1.2, 0.0, 1.0) * 0.82) {
+			discard;
+		}
+	}
 	float near = focus_depth > 0.0 ? 1.0 - smoothstep(focus_depth - 11.0, focus_depth - 4.0, -VERTEX.z) : 0.0;
-	float dim = max(v_low, near * 0.8);
+	float dim = near * 0.6;
 	if (dim > 0.0) {
 		float g = dot(col, vec3(0.3, 0.59, 0.11));
 		col = mix(col, mix(vec3(g), col, 0.4) * 0.55, dim);
@@ -569,10 +588,11 @@ func _roads() -> void:
 			# Hẻm, lối đi: láng xi măng chia ô.
 			_strip(_st("ground"), r.line, w, y, Color("a8a296" if str(r.kind) != "steps" else "9c958a", GROUND_CONCRETE))
 			continue
-		if w >= 6.0:
+		var sw := AreaData.sidewalk(r)
+		if sw > 0.0:
 			# Vỉa hè lát theo vùng hai bên, rồi mặt nhựa, rãnh biên, bó vỉa (_curbs).
 			var pv := paving(region, hash(r.line[0].snapped(Vector2.ONE)))
-			_strip(_st("ground"), r.line, w + (3.2 if w >= 7.0 else 2.4), y - 0.01, Color(str(pv[1]), float(pv[0])))
+			_strip(_st("ground"), r.line, w + sw * 2.0, y - 0.01, Color(str(pv[1]), float(pv[0])))
 		_strip(_st("ground"), r.line, w, y, Color("4a4b4e") if w >= 7.0 else Color("66676a"))
 		if w >= 6.0 and not r.bridge:
 			for side in [-1.0, 1.0]:

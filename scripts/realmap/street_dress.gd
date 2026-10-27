@@ -14,6 +14,7 @@ extends RefCounted
 ## update_cut của area_builder bật tắt theo.
 
 const Geo := preload("res://scripts/realmap/geo.gd")
+const AreaData := preload("res://scripts/realmap/area_data.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const SEG_CELL := 20.0
 
@@ -79,6 +80,9 @@ func _near(p: Vector2, r: float) -> bool:
 
 
 func _pick(key: String, fallback: Array) -> String:
+	# Khu Hà Nội: biển hiệu, chữ cổng theo kiểu ngoài Bắc (khóa có đuôi Hanoi trong realmap.json).
+	if str(b.region).begins_with("hanoi") and cfg.has(key + "Hanoi"):
+		key += "Hanoi"
 	var list: Array = cfg.get(key, fallback)
 	return str(list[_rng.randi() % list.size()])
 
@@ -600,7 +604,8 @@ func gates() -> void:
 			var pp: Vector2 = g + side * s * hw
 			_slab(st, pp - side * 0.22 - into * 0.22, pp + side * 0.22 - into * 0.22, into, 0.44, 0.0, 4.6, Color("d8d0c0"), top)
 		_slab(st, g - side * (hw + 0.4) - into * 0.2, g + side * (hw + 0.4) - into * 0.2, into, 0.4, 4.0, 4.7, Color("2f6fb0"), top)
-		var text := "%s\n%s" % [str(cfg.get("gateText", "KHU PHỐ VĂN HÓA")), str(name_of.call(str(r.name))).to_upper()]
+		var gate_key := "gateTextHanoi" if str(b.region).begins_with("hanoi") and cfg.has("gateTextHanoi") else "gateText"
+		var text := "%s\n%s" % [str(cfg.get(gate_key, "KHU PHỐ VĂN HÓA")), str(name_of.call(str(r.name))).to_upper()]
 		# Chữ quay về phía nam (phía camera) cho đọc được, ở mặt xà bên đó.
 		var face := -into if -into.y > 0.0 else into
 		var lb := _label(text, Vector3(g.x + face.x * 0.25, 4.35, g.y + face.y * 0.25), face, hw * 2.0 + 0.4, 0.62, Color("2f6fb0"))
@@ -636,7 +641,8 @@ func streets() -> void:
 			continue
 		var hw := float(r.width) / 2.0
 		var side := 1.0 if k % 2 == 0 else -1.0
-		var off := hw + (1.2 if float(r.width) >= 7.0 and not r.small else 0.35)
+		var sw := AreaData.sidewalk(r)
+		var off := hw + (sw - 0.4 if sw >= 1.0 else 0.35)
 		var poles: Array = []
 		_along(r.line, step, func(p: Vector2, d: Vector2) -> void:
 			var q: Vector2 = p + d.orthogonal() * off * side

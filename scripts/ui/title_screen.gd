@@ -7,7 +7,7 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const SETTINGS := "user://settings.json"
-const VERSION := "Bản thử nghiệm 0.6.2"
+const VERSION := "Bản thử nghiệm 0.7"
 const BRUSH := preload("res://assets/fonts/SedgwickAveDisplay-Regular.ttf")
 const HAND := preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CREAM := Color("ece3d3")
@@ -214,12 +214,14 @@ func _set_shot(name: String) -> void:
 		"intro":
 			_shot = {"from": base + Vector3(3.0, 2.2, 7.5), "at": base + Vector3(-1.0, 1.4, 0.0)}
 		_:
-			_shot = _title_shot(base)
+			# Màn tiêu đề đứng giữa phố Bờ Me trước quán cơm, nhìn dọc dãy nhà ống, dây điện, quán cóc.
+			var street: Vector3 = world.door_of("com_hanh") if world.city.locs.has("com_hanh") else base
+			_shot = _title_shot(street)
 
 
 ## Màn tiêu đề: đứng đầu hẻm trước xóm trọ, nhìn dọc dãy nhà ống, ban công, mái tôn tới cuối hẻm.
 func _title_shot(base: Vector3) -> Dictionary:
-	return {"from": base + Vector3(-10.0, 1.7, 8.0), "at": base + Vector3(10.0, 5.0, 0.0)}
+	return {"from": base + Vector3(-14.0, 2.0, 8.0), "at": base + Vector3(10.0, 6.0, -2.0)}
 
 
 func _page_root(name: String) -> Control:

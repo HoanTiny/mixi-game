@@ -92,8 +92,8 @@
     "cau_tre": { "name": "Phòng Cầu Tre", "cost": 4200000, "deposit": 1800000, "loc": "cau_tre", "note": "Xa hơn nhưng thoáng, có hiên. Tốn thêm tiền xăng." },
     "di_nam": { "name": "Ở tạm nhà dì Năm (7 ngày)", "cost": 500000, "temp": true, "loc": "nha_di_nam", "note": "Phải gửi bớt đồ, vẫn tìm phòng tiếp được." }
   },
-  "_map": "Map của màn phố: q8_tau_hu (khu thật Quận 8 ven kênh Tàu Hủ, data/maps/) hay an_hoa (phường vẽ tay, data/map.json).",
-  "map": "q8_tau_hu",
+  "_map": "Map của màn phố: hn_an_hoa (dựng tay kiểu phố Hà Nội, tools/gen_hanoi_map.py), q8_tau_hu (khu thật Quận 8 ven kênh Tàu Hủ, data/maps/) hay an_hoa (phường vẽ tay đời đầu, data/map.json).",
+  "map": "hn_an_hoa",
   "rainDays": [15, 29, 35, 41, 45, 52, 57, 64, 67, 71, 75, 80, 86, 96, 101, 106, 112, 118, 124, 129, 135, 136, 141, 147],
   "rainFlood": {"15": 1, "29": 2, "35": 1, "41": 1, "45": 2, "52": 2, "57": 1, "64": 1, "67": 1, "71": 1, "75": 2, "80": 1, "86": 1, "96": 1, "101": 1, "106": 2, "112": 1, "118": 1, "124": 1, "129": 1, "135": 2, "136": 2, "141": 1, "147": 1},
   "_chapter2": "Chương 2 · Mùa mưa (ngày 31–60): tiền nhà tháng sau đến hạn tối ngày rentDue theo chỗ thuê dài hạn; độ thân thiết ban đầu của nhân vật mới; chênh lệch mổ mắt sớm cho bà; tiền riêng bà tự quyết góp; distantMarks: số ngày giấu hay ép người nhà trong chương 2 mà chưa nói thật với má thì má đi lặng lẽ (K5); livingCostPerDay: tiền sinh hoạt mỗi tối ở chương 2 (má về, nhà năm người); utilities: điện nước tháng đầu ở chỗ thuê mới, hạn ngày utilitiesDue.",

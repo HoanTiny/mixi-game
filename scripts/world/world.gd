@@ -657,22 +657,32 @@ func _cut_stand_in(p: Dictionary, holder: Node3D, color: Color, top: float) -> D
 	m.set_shader_parameter("top", AreaBuilder.CUT_COLOR.lerp(color.srgb_to_linear(), 0.2))
 	box.material_override = m
 	pivot.add_child(box)
-	return {"poly": poly, "stand": pivot, "cap": top}
+	return {"poly": poly, "stand": pivot, "cap": top, "stand_mat": m}
 
 
 const STAND_SHADER := """
 shader_type spatial;
+render_mode cull_disabled;
 uniform vec3 wall : source_color;
 uniform vec3 top;
+// Phần cao hơn cap thành lưới thưa nhìn xuyên (như nhà của khu, xem AreaBuilder.BUILDING_SHADER).
+uniform float cap = 100.0;
 varying float up;
+varying float wy;
 void vertex() {
 	up = NORMAL.y;
+	wy = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y;
 }
 void fragment() {
-	// Nhà đang hạ (đứng chắn An): sẫm, nhạt màu như nhà thật bị hạ, cho mắt dồn vào người trên phố.
-	vec3 col = up > 0.5 ? top : wall;
-	float g = dot(col, vec3(0.3, 0.59, 0.11));
-	ALBEDO = mix(col, vec3(g), 0.6) * 0.55;
+	if (wy > cap) {
+		int bi = int(mod(FRAGCOORD.x, 4.0)) + int(mod(FRAGCOORD.y, 4.0)) * 4;
+		float bayer = float(bi == 0 ? 0 : bi == 1 ? 8 : bi == 2 ? 2 : bi == 3 ? 10 : bi == 4 ? 12 : bi == 5 ? 4 : bi == 6 ? 14 : bi == 7 ? 6
+			: bi == 8 ? 3 : bi == 9 ? 11 : bi == 10 ? 1 : bi == 11 ? 9 : bi == 12 ? 15 : bi == 13 ? 7 : bi == 14 ? 13 : 5) / 16.0;
+		if (bayer < clamp((wy - cap) / 1.2, 0.0, 1.0) * 0.82) {
+			discard;
+		}
+	}
+	ALBEDO = up > 0.5 ? top : wall;
 	ROUGHNESS = 0.9;
 }
 """
@@ -1795,11 +1805,13 @@ func _update_cutaway(delta := 0.0) -> void:
 				node.scale = Vector3.ONE * clampf((cur - AreaBuilder.CUT.stub) / (top - AreaBuilder.CUT.stub), 0.0, 1.0)
 				node.visible = node.scale.x > 0.02
 				continue
+			# Nhà của địa điểm đứng chắn An: thay bằng khối cùng màu cao bằng nhà, phần che An thành lưới thưa nhìn xuyên.
 			node.visible = not low
 			var stand: Node3D = o.stand
 			stand.visible = low
 			if low:
-				stand.scale.y = maxf(cur, 0.05)
+				stand.scale.y = top
+				(o.stand_mat as ShaderMaterial).set_shader_parameter("cap", maxf(cur, 0.05))
 		return
 	for o in occluders:
 		var r: Rect2 = o.rect

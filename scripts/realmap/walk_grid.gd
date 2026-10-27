@@ -5,6 +5,7 @@ extends RefCounted
 ## Tìm đường A* rồi rút gọn các điểm thẳng hàng. Dùng cho mô hình Dựng khu thật và map nướng sẵn của truyện.
 
 const Geo := preload("res://scripts/realmap/geo.gd")
+const AreaData := preload("res://scripts/realmap/area_data.gd")
 const OFF_ROAD := 6.0
 const PARK := 1.3
 const PARK_KINDS := ["park", "garden", "pitch", "playground", "village_green", "recreation_ground", "pedestrian", "square"]
@@ -33,7 +34,7 @@ func _init(data, bounds: Rect2) -> void:
 	for rd in data.roads:
 		if not rd.tunnel:
 			var w := float(rd.width)
-			_weigh_line(rd.line, w / 2.0 + (1.6 if w >= 7.0 and not rd.small else 0.5))
+			_weigh_line(rd.line, w / 2.0 + maxf(AreaData.sidewalk(rd), 0.5))
 	for w in data.water:
 		_block_poly(w.poly)
 	for w in data.waterways:

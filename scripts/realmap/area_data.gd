@@ -530,13 +530,26 @@ func to_dict() -> Dictionary:
 
 
 ## Đọc lại từ to_dict().
+## Bề ngang vỉa hè mỗi bên đường (mét): map dựng tay ghi riêng từng phố (sw); map lấy từ OSM thì đường từ 7 m có
+## vỉa hè 1,6 m, đường 6–7 m có 1,2 m, hẻm không có.
+static func sidewalk(r: Dictionary) -> float:
+	var sw := float(r.get("sw", -1.0))
+	if sw >= 0.0:
+		return sw
+	var w := float(r.width)
+	if bool(r.small) or w < 6.0:
+		return 0.0
+	return 1.6 if w >= 7.0 else 1.2
+
+
 func from_dict(d: Dictionary) -> void:
 	for b in d.get("buildings", []):
 		buildings.append({"poly": _pts(b.p), "height": float(b.h), "known": bool(b.k), "min_height": float(b.mh), "src": str(b.s),
 			"colour": _col(b.c), "roof_shape": str(b.rs), "roof_colour": _col(b.rc), "roof_height": float(b.rh),
 			"name": str(b.n), "worship": bool(b.w), "historic": bool(b.hi), "kind": str(b.get("kind", "yes"))})
 	for r in d.get("roads", []):
-		roads.append({"line": _pts(r.l), "kind": str(r.k), "width": float(r.w), "name": str(r.n), "bridge": bool(r.b), "tunnel": bool(r.t), "small": bool(r.s)})
+		roads.append({"line": _pts(r.l), "kind": str(r.k), "width": float(r.w), "name": str(r.n), "bridge": bool(r.b), "tunnel": bool(r.t), "small": bool(r.s),
+			"sw": float(r.get("sw", -1.0))})
 	for w in d.get("water", []):
 		water.append({"poly": _pts(w.p), "name": str(w.n)})
 	for w in d.get("waterways", []):
