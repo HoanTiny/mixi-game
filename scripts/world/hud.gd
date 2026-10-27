@@ -8,6 +8,7 @@ const UI := preload("res://scripts/ui/ui_kit.gd")
 const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
 const CharacterPanel := preload("res://scripts/ui/character_panel.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
+const Billiards := preload("res://scripts/work/billiards.gd")
 const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const MoodRing := preload("res://scripts/ui/mood_ring.gd")
 const Joystick := preload("res://scripts/ui/joystick.gd")
@@ -224,7 +225,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
+	return dialogs.visible or (_wardrobe != null and _wardrobe.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
 
 
 func location_open() -> String:
@@ -307,6 +308,12 @@ func set_prompt(id: String) -> void:
 	if id.begins_with("bin:"):
 		var lock: String = game.scrap_lock(id.substr(4))
 		_prompt_label.text = _key("E") + "Lục thùng rác tìm đồ đồng nát" if lock == "" else "Thùng rác · " + lock
+	elif id.begins_with("vendor:"):
+		var vname := ""
+		for v in world.life.vendors:
+			if "vendor:" + str(v.id) == id:
+				vname = str(v.cfg.get("name", ""))
+		_prompt_label.text = _key("E") + "Mua của hàng rong · " + vname
 	elif id != "":
 		_prompt_label.text = _key("E") + "Vào " + str(world.location_info(id).name)
 	_fill_quick(id)
@@ -325,6 +332,15 @@ func open_character() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_C, KEY_I]:
 		open_character()
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_T and game.is_started() \
+			and not game.clothes.is_empty() and (_wardrobe == null or not _wardrobe.visible) and not blocking():
+		open_wardrobe("all")
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and _wardrobe != null and _wardrobe.visible:
+		_wardrobe.visible = false
 		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_1, KEY_2, KEY_3] \
@@ -562,10 +578,11 @@ func _build_skills(parent: Control) -> void:
 
 ## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
 func _open_minigame(id: String, a: Dictionary) -> void:
-	minigame = WorkSite.new()
-	# Trò chơi mới dùng lại cảnh của một trò có sẵn (cfg.kind: bricks, site, dishes, repair) với hàng, chữ riêng.
-	minigame.cfg = game.cfg.minigames[a.minigame]
-	minigame.kind = str(minigame.cfg.get("kind", a.minigame))
+	var mcfg: Dictionary = game.cfg.minigames[a.minigame]
+	# Cảnh riêng (bàn bi-a) hay cảnh ca làm 3D; trò mới dùng lại cảnh có sẵn (cfg.kind: bricks, site, dishes, repair).
+	minigame = Billiards.new() if str(mcfg.get("scene", "")) == "billiards" else WorkSite.new()
+	minigame.cfg = mcfg
+	minigame.kind = str(mcfg.get("kind", a.minigame))
 	minigame.last = game.s.get("job_last", {}).get(id, {})
 	minigame.title = str(a.name)
 	minigame.finished.connect(func(r: Dictionary) -> void:
@@ -1251,6 +1268,144 @@ func _refresh_stats(s: Dictionary) -> void:
 
 ## Hành động nhanh trước cửa địa điểm: tối đa ba việc sinh hoạt (ăn, tắm, nghỉ…) làm được ngay, ghi giá, tác dụng,
 ## thời gian; việc chưa làm được thì ghi lý do. Phím 1–3 hay bấm, khỏi mở bảng địa điểm.
+# ---------------------------------------------------------------- tủ đồ, túi mù
+
+var _wardrobe: PanelContainer
+var _wr_tab := "all"
+var _wr_body: GridContainer
+var _wr_title: Label
+var _wr_foot: Label
+
+
+## Bảng tủ đồ: "new" là các món vừa bóc (lật thẻ theo hạng), "all" là cả tủ theo từng chỗ mặc; bấm Mặc để thay.
+func open_wardrobe(tab: String) -> void:
+	if _wardrobe == null:
+		_wardrobe = _light_panel(_root)
+		_wardrobe.custom_minimum_size = Vector2(minf(760.0, get_viewport().get_visible_rect().size.x - 40.0), 0)
+		var v := VBoxContainer.new()
+		v.add_theme_constant_override("separation", 10)
+		_wardrobe.add_child(v)
+		var head := HBoxContainer.new()
+		v.add_child(head)
+		_wr_title = UI.label("", 22, UI.INK)
+		_wr_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		head.add_child(_wr_title)
+		for t in [["new", "Vừa bóc"], ["all", "Tủ đồ"]]:
+			var b := Button.new()
+			b.text = t[1]
+			var tab_id: String = t[0]
+			b.pressed.connect(func() -> void: _fill_wardrobe(tab_id))
+			head.add_child(b)
+		var close := Button.new()
+		close.text = "Đóng"
+		close.pressed.connect(func() -> void: _wardrobe.visible = false)
+		head.add_child(close)
+		var scroll := ScrollContainer.new()
+		scroll.custom_minimum_size = Vector2(0, minf(420.0, get_viewport().get_visible_rect().size.y - 200.0))
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		v.add_child(scroll)
+		_wr_body = GridContainer.new()
+		_wr_body.columns = 4
+		_wr_body.add_theme_constant_override("h_separation", 10)
+		_wr_body.add_theme_constant_override("v_separation", 10)
+		_wr_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.add_child(_wr_body)
+		_wr_foot = UI.label("", 13, UI.INK_SOFT)
+		_wr_foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		v.add_child(_wr_foot)
+	close_location()
+	_wardrobe.visible = true
+	_fill_wardrobe(tab)
+
+
+func _fill_wardrobe(tab: String) -> void:
+	_wr_tab = tab
+	for c in _wr_body.get_children():
+		c.queue_free()
+	var w: Dictionary = game.wardrobe()
+	var ids: Array = []
+	if tab == "new":
+		ids = (w.get("last", []) as Array).duplicate()
+		_wr_title.text = "Bóc túi mù si-đa" if not ids.is_empty() else "Chưa bóc túi nào"
+	else:
+		_wr_title.text = "Tủ đồ của An · %d món" % w.owned.size()
+		for it in game.clothes.get("items", []):
+			if w.owned.has(str(it.id)):
+				ids.append(str(it.id))
+		ids.sort_custom(func(x, y) -> bool:
+			var a: Dictionary = game.cloth(x)
+			var b: Dictionary = game.cloth(y)
+			return str(a.slot) < str(b.slot) or (str(a.slot) == str(b.slot) and game._rarity_i(str(a.rarity)) > game._rarity_i(str(b.rarity))))
+	for id in ids:
+		_wr_body.add_child(_cloth_card(str(id)))
+	var worn: Array = []
+	for slot in w.worn:
+		worn.append(str(game.cloth(str(w.worn[slot])).get("name", "")))
+	_center_wardrobe.call_deferred()
+	_wr_foot.text = "Phong cách: %d (mỗi sáng Tâm trạng +%d). Đang mặc: %s. Túi liền chưa ra Hiếm: %d/%d. Phím T mở tủ đồ." % [
+		game.style(), int(minf(8.0, game.style() * 0.5)), ", ".join(worn) if not worn.is_empty() else "đồ cũ ở nhà",
+		int(w.get("pity", 0)), int(game.clothes.get("pity", 10))]
+
+
+## Bảng tủ đồ nằm giữa màn hình (cỡ bảng đổi theo số thẻ).
+func _center_wardrobe() -> void:
+	_wardrobe.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_wardrobe.reset_size()
+	var vp := get_viewport().get_visible_rect().size
+	_wardrobe.position = ((vp - _wardrobe.size) / 2.0).max(Vector2(8, 8))
+
+
+func _cloth_card(id: String) -> Control:
+	var it: Dictionary = game.cloth(id)
+	var rar: Dictionary = game.clothes.rarities.get(str(it.get("rarity", "thuong")), {})
+	var rc := Color(str(rar.get("color", "a8a090")))
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(168, 150)
+	card.add_theme_stylebox_override("panel", UI.box(Color(1, 1, 1, 0.95), rc, 8, 10))
+	(card.get_theme_stylebox("panel") as StyleBoxFlat).set_border_width_all(3)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 3)
+	card.add_child(v)
+	var top := HBoxContainer.new()
+	v.add_child(top)
+	var sw := ColorRect.new()
+	sw.color = Color(str(it.get("color", "888888")))
+	sw.custom_minimum_size = Vector2(22, 22)
+	top.add_child(sw)
+	var rl := UI.label(" " + str(rar.get("name", "")).to_upper(), 11, rc.darkened(0.25))
+	top.add_child(rl)
+	var n := UI.label(str(it.get("name", id)), 14, UI.INK)
+	n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	n.custom_minimum_size = Vector2(148, 0)
+	v.add_child(n)
+	var info := "%s · phong cách +%d" % [str(game.clothes.slots.get(str(it.slot), it.slot)), int(it.get("style", 0))]
+	var have := int(game.wardrobe().owned.get(id, 0))
+	if have > 1:
+		info += " · có %d cái" % have
+	v.add_child(UI.label(info, 11, UI.INK_SOFT))
+	for k in it.get("perk", {}):
+		var a: Dictionary = game.get_action(str(k))
+		v.add_child(UI.label("+%d%% tiền công: %s" % [int(float(it.perk[k]) * 100.0), str(a.get("name", k))], 10, Color("2f7a4a")))
+	var worn: bool = game.wardrobe().worn.get(str(it.slot), "") == id
+	var b := Button.new()
+	b.text = "Đang mặc · cởi ra" if worn else "Mặc"
+	b.pressed.connect(func() -> void:
+		if worn:
+			game.unwear(str(it.slot))
+		else:
+			game.wear_item(id)
+		world.update_outfit()
+		_fill_wardrobe(_wr_tab))
+	v.add_child(b)
+	return card
+
+
+## Phím E cạnh hàng rong: mua món đầu tiên đang mua được.
+func quick_first() -> void:
+	if not _quick_ids.is_empty():
+		_perform(str(_quick_ids[0]))
+
+
 func _fill_quick(id: String) -> void:
 	for c in _quick.get_children():
 		c.queue_free()
@@ -1367,6 +1522,11 @@ func _tool_button(text: String, on_press: Callable) -> Button:
 
 func _refresh() -> void:
 	var started: bool = game.is_started()
+	# Vừa bóc túi mù hay bấm mở tủ đồ (GameLogic._special đặt ui_open).
+	if started and str(game.s.get("ui_open", "")) != "":
+		var what := str(game.s.ui_open)
+		game.s.erase("ui_open")
+		open_wardrobe.call_deferred("new" if what == "gacha" else "all")
 	for p in [_objectives, _topbar, _mood, _stats]:
 		p.visible = started
 	if joystick != null:

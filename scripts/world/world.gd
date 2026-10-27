@@ -82,7 +82,14 @@ const ALL_LOCATIONS := {
 		"tube": {"floors": 2, "sign": "VÉ SỐ KIẾN THIẾT"}, "color": "d0a030"},
 	"ho_guom": {"name": "Ghế đá hồ Gươm", "desc": "Sáng sớm các cụ tập dưỡng sinh, ngày có bàn cờ tướng, tối người ngồi hóng gió.",
 		"color": "5f8a5a", "benches": true, "h": 1.0,
-		"npcs": [{"name": "Cụ Thiện đánh cờ", "id": "", "color": "6a6a6a"}, {"name": "Cụ Lan dưỡng sinh", "id": "", "color": "9a6a8a"}]}
+		"npcs": [{"name": "Cụ Thiện đánh cờ", "id": "", "color": "6a6a6a"}, {"name": "Cụ Lan dưỡng sinh", "id": "", "color": "9a6a8a"}]},
+	# Đời sống phố: shop si-đa túi mù của chị Vy, quán bi-a của anh Dũng.
+	"shop_ao": {"name": "Shop si-đa Hàng Đào", "desc": "Hàng thùng về từ cửa khẩu, bán lẻ và bán túi mù 99.000đ: bóc ra gì mặc nấy.",
+		"tube": {"floors": 3, "sign": "SI-ĐA · TÚI MÙ 99K"}, "color": "c0507a",
+		"npcs": [{"name": "Chị Vy", "id": "VY", "color": "d06a8a"}]},
+	"bi_a": {"name": "Quán bi-a anh Dũng", "desc": "Sáu bàn lỗ, quạt trần, tiếng bi lách cách tới khuya; tối thứ Bảy có giải.",
+		"tube": {"floors": 2, "sign": "BI-A · 30K/GIỜ"}, "color": "2f6a4a",
+		"npcs": [{"name": "Anh Dũng", "id": "DUNG", "color": "3a4a5a"}]}
 }
 const SPEED := 6.0
 ## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
@@ -1571,6 +1578,10 @@ func interact() -> void:
 	if bin != "":
 		_scavenge(bin)
 		return
+	# Đứng cạnh xe, gánh hàng rong: mua món đầu tiên mua được (phím 1–3 chọn món khác).
+	if nearest_vendor() != "":
+		hud.quick_first()
+		return
 	var near := nearest_location()
 	if near != "":
 		hud.open_location(near)
@@ -1694,7 +1705,8 @@ func _process(delta: float) -> void:
 
 	var near := nearest_location()
 	var bin := nearest_bin()
-	hud.set_prompt("bin:" + bin if bin != "" else near)
+	var vend := nearest_vendor()
+	hud.set_prompt("bin:" + bin if bin != "" else ("vendor:" + vend if vend != "" else near))
 	for id in door_rings:
 		var ring: MeshInstance3D = door_rings[id]
 		var pulse := 1.0 + (0.12 * sin(Time.get_ticks_msec() / 180.0) if id == near else 0.0)
@@ -2005,6 +2017,19 @@ func _update_ride() -> void:
 	_float_text("Lên xe đi giao" if want else "Dựng xe", Color("ffd27a"))
 
 
+## Đồ trong tủ (túi mù) vừa thay: áo có thân người thật thì thay thân, mũ thì đội lên đầu (màu theo món).
+func update_outfit() -> void:
+	dress_player()
+	if player_body == null or not player_body.has_method("wear"):
+		return
+	var hat_id: String = str(game.wardrobe().worn.get("mu", ""))
+	var it: Dictionary = game.cloth(hat_id) if hat_id != "" else {}
+	for kind in ["cap", "non_la"]:
+		player_body.wear(kind, false)
+	if it.has("hat") and not _riding:
+		player_body.wear(str(it.hat), true, Color(str(it.get("color", "2f6fb0"))))
+
+
 ## Thay bộ quần áo của An (bảng Nhân vật): dựng lại người theo thân mặc bộ mới, giữ nguyên dáng đang ngồi xe.
 func dress_player() -> void:
 	if player_body == null or not player_body.has_method("wear"):
@@ -2032,6 +2057,23 @@ func _wading() -> bool:
 ## Vùng ngập hôm nay (rỗng nếu tạnh), cho bản đồ tô màu.
 func flood_rects() -> Array:
 	return [] if _rain_layer == null else _rain_layer.flood_rects()
+
+
+## Xe, gánh hàng rong đang ra phố ở gần An (trong 2,8 m) có món bán trong config: id người bán, rỗng nếu không có.
+func nearest_vendor() -> String:
+	if life == null or not game.is_started():
+		return ""
+	var best := ""
+	var best_d := 2.8
+	for v in life.vendors:
+		var node: Node3D = v.node
+		if not node.visible:
+			continue
+		var d := Vector2(node.position.x - player.position.x, node.position.z - player.position.z).length()
+		if d < best_d and not game.actions_at("vendor:" + str(v.id)).is_empty():
+			best = str(v.id)
+			best_d = d
+	return best
 
 
 func nearest_bin() -> String:
@@ -2260,7 +2302,7 @@ func _on_changed() -> void:
 			_hold_for_title(true)
 		return
 	_sync_home()
-	dress_player()
+	update_outfit()
 	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3", "full4", "full5"] and _ending_home == null:
 		_show_ending_home()
 	elif not game.is_over() and _ending_home != null:

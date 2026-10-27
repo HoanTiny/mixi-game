@@ -172,6 +172,10 @@ static func an_look(game) -> Dictionary:
 	for it in game.cfg.get("items", {}).get("clothes", []):
 		if str(it.id) == game.outfit() and it.has("rb"):
 			look["rb"] = str(it.rb)
+	# Áo bóc từ túi mù đang mặc (data/clothes.json, có thân người thật rb) thì thay cả thân.
+	var top: String = str(game.wardrobe().worn.get("ao", "")) if game.has_method("wardrobe") else ""
+	if top != "" and game.cloth(top).has("rb"):
+		look["rb"] = str(game.cloth(top).rb)
 	return look
 
 

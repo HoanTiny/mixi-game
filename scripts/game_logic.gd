@@ -38,6 +38,8 @@ var story5: Dictionary = {}
 var s: Dictionary = {}
 ## Ghi chú giữ lại qua các lượt (chưa dùng trong lát cắt, để dành cho Sổ tay).
 var notes: Array = []
+## Danh mục quần áo bóc túi mù (data/clothes.json): rarities, slots, items.
+var clothes: Dictionary = {}
 var _event_data: Dictionary = {}
 
 
@@ -86,6 +88,34 @@ func load_data(dir := "res://data") -> void:
 			var q: Dictionary = _read_json(dir + "/quests" + suffix)
 			quests.append_array(q.get("quests", []))
 			quest_items.merge(q.get("items", {}))
+	# Gói nội dung đời sống phố cổ (không theo chương): việc làm, hội thoại, việc nhờ, sự kiện, nhân vật mới.
+	_merge_pack(dir, "_pho.json")
+	if FileAccess.file_exists(dir + "/clothes.json"):
+		clothes = _read_json(dir + "/clothes.json")
+
+
+func _merge_pack(dir: String, suffix: String) -> void:
+	if FileAccess.file_exists(dir + "/events" + suffix):
+		events.append_array(_read_json(dir + "/events" + suffix))
+	if FileAccess.file_exists(dir + "/config" + suffix):
+		var c: Dictionary = _read_json(dir + "/config" + suffix)
+		cfg.actions.append_array(c.get("actions", []))
+		cfg.minigames.merge(c.get("minigames", {}))
+	if FileAccess.file_exists(dir + "/story" + suffix):
+		var st: Dictionary = _read_json(dir + "/story" + suffix)
+		story.reps.merge(st.get("reps", {}))
+	if FileAccess.file_exists(dir + "/talks" + suffix):
+		var t: Dictionary = _read_json(dir + "/talks" + suffix)
+		t.erase("_ghi_chu")
+		for npc in t:
+			if not talks.has(npc):
+				talks[npc] = {"story": [], "chat": []}
+			talks[npc].story.append_array(t[npc].get("story", []))
+			talks[npc].chat.append_array(t[npc].get("chat", []))
+	if FileAccess.file_exists(dir + "/quests" + suffix):
+		var q: Dictionary = _read_json(dir + "/quests" + suffix)
+		quests.append_array(q.get("quests", []))
+		quest_items.merge(q.get("items", {}))
 
 
 static func _read_json(path: String) -> Variant:
@@ -583,6 +613,40 @@ func apply_effects(eff: Dictionary) -> void:
 
 func _special(name: String) -> void:
 	match name:
+		"tui_mu_1":
+			wardrobe()["last"] = [_pull("")]
+			s["ui_open"] = "gacha"
+		"tui_mu_5":
+			var got := []
+			var good := false
+			for k in 5:
+				var g := _pull("kha" if k == 4 and not good else "")
+				good = good or _rarity_i(str(cloth(g).rarity)) >= 1
+				got.append(g)
+			wardrobe()["last"] = got
+			s["ui_open"] = "gacha"
+		"hang_tuan":
+			var f := featured()
+			if f != "":
+				_own(f)
+				wardrobe()["last"] = [f]
+				s["ui_open"] = "gacha"
+		"ban_do_trung":
+			var total := 0
+			var w := wardrobe()
+			for id in w.owned.keys():
+				var extra := int(w.owned[id]) - 1
+				if extra > 0:
+					total += extra * int(clothes.rarities[str(cloth(id).rarity)].get("sell", 20000))
+					w.owned[id] = 1
+			if total > 0:
+				earn(total, "Bán lại đồ trùng cho shop")
+			else:
+				add_log("Không có món nào trùng để bán", "event")
+		"mo_tu_do":
+			s["ui_open"] = "wardrobe"
+		"ban_dong_nat":
+			sell_scrap()
 		"ve_so":
 			# Một tờ 10.000đ: chừng 1/100 trúng 500.000đ, 1/12 trúng 20.000đ; kết quả cố định theo ngày và số tờ đã mua.
 			var rng := RandomNumberGenerator.new()
@@ -913,6 +977,19 @@ func check(req: Dictionary) -> String:
 		elif key == "chapter":
 			if chapter() != int(v):
 				fail = "-"
+		elif key.begins_with("count."):
+			# Đã làm việc X ít nhất v lần (mạch đời sống phố cổ mở theo số lần ghé).
+			if count(key.substr(6)) < int(v):
+				fail = "-"
+		elif key == "style_min":
+			if style() < int(v):
+				fail = "Cần phong cách từ %d" % int(v)
+		elif key == "owned_min":
+			if wardrobe().owned.size() < int(v):
+				fail = "-"
+		elif key == "worn":
+			if not wardrobe().worn.values().has(str(v)):
+				fail = "Cần mặc %s" % str(cloth(str(v)).get("name", v))
 		elif key == "home":
 			var place: String = str(home_info().get("place", housing().place))
 			if not (place in v if v is Array else place == v):
@@ -1068,6 +1145,8 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 		pay = round_k(float(pay) * float(result.get("ratio", 1.0))) + int(result.get("bonus", 0))
 		if not bool(result.get("auto", false)):
 			s.job_last[id] = {"ratio": float(result.get("ratio", 1.0)), "bonus": int(result.get("bonus", 0))}
+	if pay > 0 and perk_pay(id) > 0.0:
+		pay = round_k(float(pay) * (1.0 + perk_pay(id)))
 	if a.group == "work" and pay > 0 and pay_mult() < 1.0:
 		pay = round_k(float(pay) * pay_mult())
 		add_log("Phong độ kém, chỉ được %d%% tiền công" % int(pay_mult() * 100.0), "warn")
@@ -1112,6 +1191,100 @@ func sleep_away(kind: String, loc: String) -> void:
 	if not is_over() and c.has("event"):
 		s.queue.push_front({"id": str(c.event), "data": {}})
 		_commit()
+
+
+# ---------------------------------------------------------------- tủ đồ, túi mù si-đa
+
+## Tủ đồ của An: owned {id: số món}, worn {slot: id}, pity (số túi liền chưa ra món từ Hiếm), pulls, last (vừa bóc).
+func wardrobe() -> Dictionary:
+	if not s.has("wardrobe"):
+		s["wardrobe"] = {"owned": {}, "worn": {}, "pity": 0, "pulls": 0, "last": []}
+	return s.wardrobe
+
+
+func cloth(id: String) -> Dictionary:
+	for it in clothes.get("items", []):
+		if str(it.id) == id:
+			return it
+	return {}
+
+
+func _rarity_i(r: String) -> int:
+	return (clothes.get("order", ["thuong", "kha", "hiem", "hieu"]) as Array).find(r)
+
+
+func _own(id: String) -> void:
+	var w := wardrobe()
+	w.owned[id] = int(w.owned.get(id, 0)) + 1
+
+
+## Bóc một túi: hạng theo trọng số (clothes.rarities[].w), từ hạng guarantee trở lên; pity túi liền chưa ra Hiếm thì túi
+## này chắc chắn từ Hiếm. Kết quả cố định theo ngày, số túi đã bóc.
+func _pull(guarantee: String) -> String:
+	var w := wardrobe()
+	var order: Array = clothes.get("order", ["thuong", "kha", "hiem", "hieu"])
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([day(), int(w.pulls), int(s.get("seed", 7)), "tui_mu"])
+	var lo := maxi(order.find(guarantee), 0)
+	if int(w.pity) >= int(clothes.get("pity", 10)) - 1:
+		lo = maxi(lo, order.find("hiem"))
+	var total := 0.0
+	for i in range(lo, order.size()):
+		total += float(clothes.rarities[order[i]].w)
+	var roll := rng.randf() * total
+	var r: String = order[order.size() - 1]
+	for i in range(lo, order.size()):
+		roll -= float(clothes.rarities[order[i]].w)
+		if roll <= 0.0:
+			r = order[i]
+			break
+	var pool: Array = clothes.items.filter(func(it) -> bool: return str(it.rarity) == r)
+	var id := str(pool[rng.randi() % pool.size()].id)
+	w["pulls"] = int(w.pulls) + 1
+	w["pity"] = 0 if order.find(r) >= order.find("hiem") else int(w.pity) + 1
+	var fresh: bool = not w.owned.has(id)
+	_own(id)
+	if r == order[order.size() - 1] and fresh:
+		add_diary("Bóc túi mù ở shop Hàng Đào ra đúng %s. Chị Vy cầm lên soi, huýt sáo một tiếng." % str(cloth(id).name))
+	add_log("Bóc túi mù: %s (%s)%s" % [str(cloth(id).name), str(clothes.rarities[r].name), "" if fresh else ", trùng"], "event")
+	return id
+
+
+## Món hàng hiệu cũ bày bán của tuần này (đổi mỗi bảy ngày).
+func featured() -> String:
+	var pool: Array = clothes.get("items", []).filter(func(it) -> bool: return it.get("featured", false))
+	if pool.is_empty():
+		return ""
+	return str(pool[(day() / 7) % pool.size()].id)
+
+
+func wear_item(id: String) -> void:
+	var it := cloth(id)
+	if it.is_empty() or not wardrobe().owned.has(id):
+		return
+	wardrobe().worn[str(it.slot)] = id
+	_commit()
+
+
+func unwear(slot: String) -> void:
+	wardrobe().worn.erase(slot)
+	_commit()
+
+
+## Điểm phong cách: cộng style các món đang mặc.
+func style() -> int:
+	var n := 0
+	for slot in wardrobe().worn:
+		n += int(cloth(str(wardrobe().worn[slot])).get("style", 0))
+	return n
+
+
+## Thưởng tiền công của việc id theo đồ đang mặc (perk.pay.<id>), ví dụ 0.1 là +10%.
+func perk_pay(id: String) -> float:
+	var k := 0.0
+	for slot in wardrobe().worn:
+		k += float(cloth(str(wardrobe().worn[slot])).get("perk", {}).get(id, 0.0))
+	return k
 
 
 ## Khoản phải trả còn chờ trả có mã bắt đầu bằng prefix (cầm đồ mỗi lần một mã riêng).
@@ -1442,6 +1615,8 @@ func finish_day() -> void:
 		for k in cfg.needs.overnight:
 			need_adj(k, float(cfg.needs.overnight[k]) * float(_diff().get("needsRate", 1.0)))
 		s["needs_t"] = float(cfg.dayStart)
+		if style() > 0:
+			need_adj("mood", minf(8.0, float(style()) * 0.5))
 	spend(living_cost(), "Sinh hoạt cả nhà")
 
 	# Mệt: đếm ngày ở mức cảnh báo và những lần bỏ qua cơ hội nghỉ, rồi hồi qua đêm.
@@ -2255,7 +2430,7 @@ func talk_lock(npc: String) -> String:
 
 ## Nói chuyện: kể đoạn mạch chuyện kế tiếp nếu đã mở, không thì tán gẫu vài câu.
 func talk(npc: String) -> void:
-	if talk_lock(npc) != "":
+	if talk_lock(npc) != "" or not talks.has(npc):
 		return
 	s["used"] = float(s.used) + float(cfg.get("talkHours", 0.5))
 	s.today["talk_" + npc] = 1

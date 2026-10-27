@@ -1,133 +1,189 @@
 {
-  "_ghi_chu": "Âm thanh màn phố. Thiếu file nào thì chỗ đó im. Các file .wav trong assets/sounds/ là tiếng tạm do tools/gen_sounds.py tổng hợp; thay bằng file thu thật (.ogg hoặc .wav) cùng tên, hoặc sửa path. hours: [từ, đến) giờ trong ngày, đến > 24 là qua nửa đêm. rain: true chỉ phát khi mưa. every: [ít nhất, nhiều nhất] giây giữa hai lần. vendor: tiếng rao phát từ xe bán rong cùng tên trong schedules.json (xe chưa ra phố thì im); không có vendor thì x, z là chỗ phát. text: chữ nổi hiện cùng tiếng rao.",
-  "ambience": {
-    "pho_ngay": {
-      "path": "res://assets/sounds/traffic.wav",
-      "volume_db": -12,
-      "hours": [
-        6,
-        20
-      ]
-    },
-    "pho_dem": {
-      "path": "res://assets/sounds/night.wav",
-      "volume_db": -14,
-      "hours": [
-        19,
-        30
-      ]
-    },
-    "mua": {
-      "path": "res://assets/sounds/rain.wav",
-      "volume_db": -6,
-      "rain": true
-    }
+ "_ghi_chu": "Âm thanh màn phố. Thiếu file nào thì chỗ đó im. Các file .wav trong assets/sounds/ là tiếng tạm do tools/gen_sounds.py tổng hợp; thay bằng file thu thật (.ogg hoặc .wav) cùng tên, hoặc sửa path. hours: [từ, đến) giờ trong ngày, đến > 24 là qua nửa đêm. rain: true chỉ phát khi mưa. every: [ít nhất, nhiều nhất] giây giữa hai lần. vendor: tiếng rao phát từ xe bán rong cùng tên trong schedules.json (xe chưa ra phố thì im); không có vendor thì x, z là chỗ phát. text: chữ nổi hiện cùng tiếng rao.",
+ "ambience": {
+  "pho_ngay": {
+   "path": "res://assets/sounds/traffic.wav",
+   "volume_db": -12,
+   "hours": [
+    6,
+    20
+   ]
   },
-  "calls": [
-    {
-      "path": "res://assets/sounds/rao_banh_mi.ogg",
-      "text": "Bánh mì nóng giòn đây!",
-      "hours": [
-        6,
-        9
-      ],
-      "every": [
-        25,
-        45
-      ],
-      "volume_db": -2,
-      "vendor": "banh_mi"
-    },
-    {
-      "path": "res://assets/sounds/rao_xoi.ogg",
-      "text": "Xôi nóng đây, xôi đỗ xôi ngô!",
-      "hours": [
-        6,
-        9
-      ],
-      "every": [
-        35,
-        60
-      ],
-      "volume_db": -2,
-      "vendor": "xoi"
-    },
-    {
-      "path": "res://assets/sounds/rao_ve_chai.ogg",
-      "text": "Ai đồng nát sắt vụn bán đi, đồ cũ bán đi!",
-      "hours": [
-        9,
-        17
-      ],
-      "every": [
-        40,
-        70
-      ],
-      "volume_db": -2,
-      "vendor": "ve_chai"
-    },
-    {
-      "path": "res://assets/sounds/rao_che.ogg",
-      "text": "Chè đỗ đen, chè bưởi đây!",
-      "hours": [
-        16,
-        21
-      ],
-      "every": [
-        35,
-        60
-      ],
-      "volume_db": -2,
-      "vendor": "che"
-    },
-    {
-      "path": "res://assets/sounds/rao_hu_tieu.ogg",
-      "text": "Phở nóng đây!",
-      "hours": [
-        18.5,
-        22
-      ],
-      "every": [
-        30,
-        50
-      ],
-      "volume_db": -2,
-      "vendor": "hu_tieu"
-    }
-  ],
-  "horn": {
-    "path": "res://assets/sounds/horn.wav",
-    "volume_db": -6,
-    "hours": [
-      6,
-      21
-    ],
-    "every": [
-      6,
-      14
-    ]
+  "pho_dem": {
+   "path": "res://assets/sounds/night.wav",
+   "volume_db": -14,
+   "hours": [
+    19,
+    30
+   ]
   },
-  "stepEvery": 0.36,
-  "sfx": {
-    "step": {
-      "path": "res://assets/sounds/step.wav",
-      "volume_db": -16
-    },
-    "earn": {
-      "path": "res://assets/sounds/earn.wav",
-      "volume_db": -6
-    },
-    "spend": {
-      "path": "res://assets/sounds/spend.wav",
-      "volume_db": -8
-    },
-    "dialog": {
-      "path": "res://assets/sounds/dialog.wav",
-      "volume_db": -10
-    },
-    "done": {
-      "path": "res://assets/sounds/done.wav",
-      "volume_db": -8
-    }
+  "mua": {
+   "path": "res://assets/sounds/rain.wav",
+   "volume_db": -6,
+   "rain": true
   }
+ },
+ "calls": [
+  {
+   "path": "res://assets/sounds/rao_banh_mi.ogg",
+   "text": "Bánh mì nóng giòn đây!",
+   "hours": [
+    6,
+    9
+   ],
+   "every": [
+    25,
+    45
+   ],
+   "volume_db": -2,
+   "vendor": "banh_mi"
+  },
+  {
+   "path": "res://assets/sounds/rao_xoi.ogg",
+   "text": "Xôi nóng đây, xôi đỗ xôi ngô!",
+   "hours": [
+    6,
+    9
+   ],
+   "every": [
+    35,
+    60
+   ],
+   "volume_db": -2,
+   "vendor": "xoi"
+  },
+  {
+   "path": "res://assets/sounds/rao_ve_chai.ogg",
+   "text": "Ai đồng nát sắt vụn bán đi, đồ cũ bán đi!",
+   "hours": [
+    9,
+    17
+   ],
+   "every": [
+    40,
+    70
+   ],
+   "volume_db": -2,
+   "vendor": "ve_chai"
+  },
+  {
+   "path": "res://assets/sounds/rao_che.ogg",
+   "text": "Chè đỗ đen, chè bưởi đây!",
+   "hours": [
+    16,
+    21
+   ],
+   "every": [
+    35,
+    60
+   ],
+   "volume_db": -2,
+   "vendor": "che"
+  },
+  {
+   "path": "res://assets/sounds/rao_hu_tieu.ogg",
+   "text": "Phở nóng đây!",
+   "hours": [
+    18.5,
+    22
+   ],
+   "every": [
+    30,
+    50
+   ],
+   "volume_db": -2,
+   "vendor": "hu_tieu"
+  },
+  {
+   "path": "res://assets/sounds/rao_che.ogg",
+   "text": "Kem Tràng Tiền đây, kem cốm, kem sữa dừa!",
+   "hours": [
+    10,
+    21
+   ],
+   "every": [
+    35,
+    60
+   ],
+   "volume_db": -3,
+   "vendor": "kem"
+  },
+  {
+   "path": "res://assets/sounds/rao_xoi.ogg",
+   "text": "Ai mua nhãn, mua vải, mua táo không?",
+   "hours": [
+    7,
+    17
+   ],
+   "every": [
+    40,
+    70
+   ],
+   "volume_db": -3,
+   "vendor": "hoa_qua"
+  },
+  {
+   "path": "res://assets/sounds/rao_che.ogg",
+   "text": "Hoa đây, cúc họa mi, sen đây!",
+   "hours": [
+    6,
+    11
+   ],
+   "every": [
+    40,
+    70
+   ],
+   "volume_db": -3,
+   "vendor": "hoa"
+  },
+  {
+   "path": "res://assets/sounds/rao_xoi.ogg",
+   "text": "Bánh rán nóng đây, bánh rán đường, bánh rán mặn!",
+   "hours": [
+    14,
+    19
+   ],
+   "every": [
+    35,
+    60
+   ],
+   "volume_db": -3,
+   "vendor": "banh_ran"
+  }
+ ],
+ "horn": {
+  "path": "res://assets/sounds/horn.wav",
+  "volume_db": -6,
+  "hours": [
+   6,
+   21
+  ],
+  "every": [
+   6,
+   14
+  ]
+ },
+ "stepEvery": 0.36,
+ "sfx": {
+  "step": {
+   "path": "res://assets/sounds/step.wav",
+   "volume_db": -16
+  },
+  "earn": {
+   "path": "res://assets/sounds/earn.wav",
+   "volume_db": -6
+  },
+  "spend": {
+   "path": "res://assets/sounds/spend.wav",
+   "volume_db": -8
+  },
+  "dialog": {
+   "path": "res://assets/sounds/dialog.wav",
+   "volume_db": -10
+  },
+  "done": {
+   "path": "res://assets/sounds/done.wav",
+   "volume_db": -8
+  }
+ }
 }

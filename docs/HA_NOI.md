@@ -154,3 +154,8 @@ Những chỗ sổ tay chưa nói mà các file đã chọn khác nhau, nay th�
 | Mực nước | "ngang thắt lưng" (không "ngang hông"). |
 | Tiếng rao, hàng rong | Người mua đồ cũ là **"Đồng nát"**, rao "Ai đồng nát sắt vụn bán đi, đồ cũ bán đi!"; hàng đêm là **"Phở đêm"**, rao "Phở nóng đây!" (thay hủ tiếu gõ). |
 | Tổ tình nguyện | **tổ an toàn điện mùa nước**. |
+
+## 6. Nhân vật của gói đời sống phố cổ (talks_pho, quests_pho)
+
+Chị Vy (chủ shop si-đa Hàng Đào, hàng thùng từ cửa khẩu Tân Thanh, Lạng Sơn), cái Ngân (con gái chị Vy, lớp 9), anh Dũng
+(chủ quán bi-a Lương Ngọc Quyến, thợ điện cũ), Toản (khách quen hay rủ Minh cược), cô Huệ (bán hoa xe đạp ở hồ Gươm).

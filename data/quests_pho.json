@@ -1,0 +1,831 @@
+{
+ "_ghi_chu": "Việc nhờ của gói đời sống phố cổ (nạp sau 5 chương, GameLogic._merge_pack), cùng cú pháp quests.json. pho_vy_hang_uot, pho_minh_no_bia không tự nhờ: mở từ đoạn chuyện vy_lo_moc, dg_minh (talks_pho.json). pho_minh_no_bia rẽ nhánh bằng goto theo id bước (s_gap, s_van, s_van_xong, s_hanh, s_ket). pho_giai_bia chỉ nhờ khi đã thuê bàn bi-a từ 2 lần; trận giải đòi cuối tuần (weekend), tập từ 8 lần thì vào chung kết. Cờ mới đều bắt đầu bằng pho.",
+ "items": {
+  "bao_do_am": "Hai bao đồ ẩm cần giặt sấy",
+  "bao_do_sach": "Hai bao đồ đã giặt sấy",
+  "bien_ban_xe": "Biên bản thu xe hoa của cô Huệ",
+  "bo_do_linh": "Bộ đồ đi phỏng vấn của Linh"
+ },
+ "quests": [
+  {
+   "id": "pho_vy_hang_uot",
+   "title": "Hai kiện hàng ngấm mưa",
+   "who": "Chị Vy",
+   "giver": "shop_ao",
+   "offer": false,
+   "intro": "Hai kiện hàng thùng ngấm mưa trên đường từ Lạng Sơn về. Phải phân loại, giặt sấy gấp trước phiên chợ đêm cuối tuần, không thì mốc cả lô như năm ngoái.",
+   "accept": "\"Chị trải bạt ra, em làm luôn.\"",
+   "decline": "\"Hôm nay em kẹt mất rồi chị ạ.\"",
+   "deadline_days": 2,
+   "deadline_hour": 20,
+   "reward_hint": "150 nghìn, chị Vy +4",
+   "reward": {
+    "cash": 150000,
+    "cash_label": "Chị Vy trả công phân hàng, tiền giặt sấy",
+    "rep.VY": 4,
+    "flag.phoHangUotXong": true,
+    "diary": "Cứu được hai kiện hàng ngấm mưa cho chị Vy. Trải ra, chia đống, vác đi giặt sấy, vác về. Phiên chợ đêm chị bán hết sạch sào áo khô."
+   },
+   "reward_text": "Phiên chợ đêm Hàng Đào, sào áo của chị Vy treo kín, thơm mùi xà phòng. Chị đếm tiền trả An, đưa thừa, An trả lại, chị dúi lần nữa. \"Tiền giặt sấy em ứng, chị trả. Còn công thì chị nợ em bữa bún chả.\"",
+   "fail": {
+    "rep.VY": -3,
+    "item.bao_do_am": -1,
+    "item.bao_do_sach": -1
+   },
+   "fail_text": "Quá hạn, hai kiện hàng vẫn nằm ẩm trong góc shop. Chị Vy gọi đứa cháu đến phụ, làm đến nửa đêm. Chị không trách, chỉ bảo: \"Không kịp thì em nói sớm cho chị một câu.\"",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "shop_ao",
+     "hours": 1,
+     "text": "Rọc hai kiện hàng ướt ở shop chị Vy, trải ra xem",
+     "scene": {
+      "title": "Mùi ẩm trong bao tải",
+      "who": "Chị Vy",
+      "text": "Rọc bao ra, mùi ẩm xộc lên. Lớp trên khô, lớp giữa ẩm, dưới đáy có mấy cái áo len đã lấm tấm chấm mốc. Chị Vy ngồi xổm, hai tay đặt lên đầu gối, nhìn đống đồ như nhìn cuốn sổ nợ.",
+      "choices": [
+       {
+        "label": "Chia ba đống: khô treo luôn, ẩm đem giặt sấy, mốc để riêng",
+        "hint": "Làm cẩn thận, Mệt +3, Chị Vy +2",
+        "effects": {
+         "fatigue": 3,
+         "rep.VY": 2,
+         "item.bao_do_am": 1,
+         "log": "Ba đống đồ trên tấm bạt. Chị Vy gật gù: \"Mắt em được đấy.\""
+        }
+       },
+       {
+        "label": "Gom hết vào bao, mang đi giặt sấy một thể cho nhanh",
+        "hint": "Nhanh hơn, Chị Vy −1",
+        "effects": {
+         "rep.VY": -1,
+         "item.bao_do_am": 1,
+         "log": "Chị Vy kéo lại mấy cái áo len: \"Mốc mà giặt chung là lây sang cả bao đấy em.\" Chị tự nhặt riêng ra."
+        }
+       }
+      ]
+     }
+    },
+    {
+     "kind": "action",
+     "action": "lam_shop_vy",
+     "count": 1,
+     "text": "Phân loại nốt hàng thùng một buổi cho chị Vy (8:00–18:00)"
+    },
+    {
+     "kind": "visit",
+     "loc": "cho_cau_nho",
+     "hours": 0.5,
+     "window": [
+      7,
+      19
+     ],
+     "need_items": {
+      "bao_do_am": 1
+     },
+     "consume": true,
+     "carry": true,
+     "effects": {
+      "cash": -60000,
+      "cash_label": "Giặt sấy hai bao đồ ẩm ở hàng giặt là chợ Long Biên",
+      "item.bao_do_sach": 1
+     },
+     "text": "Vác hai bao đồ ẩm ra hàng giặt là ở chợ Long Biên giặt sấy (7:00–19:00)"
+    },
+    {
+     "kind": "visit",
+     "loc": "shop_ao",
+     "hours": 0.5,
+     "window": [
+      8,
+      21
+     ],
+     "need_items": {
+      "bao_do_sach": 1
+     },
+     "consume": true,
+     "carry": true,
+     "text": "Mang đồ đã giặt sấy về shop chị Vy (8:00–21:00)",
+     "scene": {
+      "title": "Bảy cái áo len",
+      "who": "Chị Vy",
+      "text": "Đồ giặt sấy về thơm tho. Còn bảy cái áo len giặt hai lần vẫn lấm tấm vết mốc ở nách và cổ, nhìn kỹ mới thấy. Chị Vy cầm một cái lên soi dưới đèn. \"Bỏ thì tiếc, bán thì ngại. Em nghĩ sao?\"",
+      "choices": [
+       {
+        "label": "\"Chị treo riêng một sào, ghi rõ áo có vết mốc, bán rẻ.\"",
+        "hint": "Chị Vy +4. Thật với khách",
+        "effects": {
+         "rep.VY": 4,
+         "flag.phoBanThatMoc": true,
+         "log": "Chị Vy cắt miếng bìa, viết to: \"Áo len lỗi vết mốc, 20 nghìn, xem kỹ trước khi mua.\" Phiên chợ, bà cụ nào cũng lật nách áo ra xem rồi vẫn mua."
+        }
+       },
+       {
+        "label": "\"Chị là chủ, chị muốn thế nào em làm thế.\"",
+        "hint": "Chị Vy +2",
+        "effects": {
+         "rep.VY": 2,
+         "flag.phoBanThatMoc": true,
+         "log": "Chị Vy nghĩ một lúc rồi tự viết tấm bìa ghi rõ vết mốc. \"Chị bán bằng tên chị mà em.\""
+        }
+       },
+       {
+        "label": "\"Nhét lẫn vào túi mù, khách bóc trúng thì cũng là hên xui.\"",
+        "hint": "Chị Vy −3",
+        "effects": {
+         "rep.VY": -3,
+         "flag.phoTronMoc": true,
+         "log": "Chị Vy đặt cái áo xuống. \"Túi mù là hên xui về món đồ, không phải hên xui chuyện chị có lừa người ta không.\" Chị cất bảy cái áo vào bao riêng."
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "pho_minh_no_bia",
+   "title": "Khoản nợ ở bàn số bốn",
+   "who": "Anh Dũng",
+   "giver": "bi_a",
+   "offer": false,
+   "intro": "Minh ghi nợ cược với một tay khách quen ở quán bi-a. Anh Dũng không cho ghi nợ trong quán, nhưng chúng nó ghi với nhau ở ngoài. Minh chưa nói với ai.",
+   "accept": "\"Tối nay em ra quán gặp nó.\"",
+   "decline": "\"Để em nghĩ đã anh ạ.\"",
+   "deadline_days": 3,
+   "deadline_hour": 23,
+   "reward_hint": "Anh Dũng +4",
+   "reward": {
+    "rep.DUNG": 4,
+    "flag.phoMinhXong": true,
+    "diary": "Khoản nợ cược của Minh ở quán bi-a xong rồi. Xong theo cách nào thì từ giờ đi ngang quán anh Dũng mình cũng nhớ."
+   },
+   "reward_text": "Anh Dũng tắt đèn bàn số bốn, cất cái gậy của Minh lên giá. \"Gậy nó anh giữ đấy. Bao giờ đánh vui thì lấy xuống.\"",
+   "fail": {
+    "rep.MINH": -2,
+    "rep.DUNG": -2,
+    "flag.phoMinhVayApp": true
+   },
+   "fail_text": "Ba hôm trôi qua. Minh vay qua một cái ứng dụng trên điện thoại để trả Toản cho xong, lãi tính theo ngày. Anh Dũng biết chuyện, chỉ lắc đầu: \"Lỗ cũ chưa lấp đã đào lỗ mới.\"",
+   "steps": [
+    {
+     "id": "s_gap",
+     "kind": "visit",
+     "loc": "bi_a",
+     "hours": 0.5,
+     "window": [
+      18,
+      23
+     ],
+     "text": "Ra quán bi-a buổi tối gặp Minh (18:00–23:00)",
+     "scene": {
+      "title": "Sáu trăm nghìn",
+      "who": "Minh",
+      "text": "Minh đứng dậy khỏi bàn số bốn, kéo An ra cửa. \"Tao nợ thằng Toản sáu trăm. Ban đầu đánh năm chục cho vui, thua thì gỡ, gỡ thì lại thua. Mày đừng nói với vợ tao, đừng nói với chị Hạnh. Chị ấy đang cho tao chở cơm, biết chuyện là chị ấy nghĩ khác.\" Trong quán, Toản ngồi gõ gõ cái gậy xuống sàn.",
+      "choices": [
+       {
+        "label": "Trả hộ Minh sáu trăm nghìn, hứa không nói với ai",
+        "hint": "−600.000đ. Giấu giúp Minh",
+        "require": {
+         "cash_min": 600000
+        },
+        "goto": "s_ket",
+        "effects": {
+         "cash": -600000,
+         "cash_label": "Trả hộ Minh tiền nợ cược",
+         "rep.MINH": 3,
+         "flag.phoGiauMinh": true
+        }
+       },
+       {
+        "label": "\"Để tao đánh một ván gỡ cho mày.\"",
+        "hint": "Phải thắng một ván cược ở quán",
+        "goto": "s_van",
+        "effects": {
+         "flag.phoDanhGo": true,
+         "log": "Minh nhìn An như nhìn cái phao. Ở quầy, anh Dũng nhíu mày."
+        }
+       },
+       {
+        "label": "\"Mày tự nói với chị Hạnh. Tao đi cùng, tao không nói thay.\"",
+        "hint": "Minh tự quyết, An đứng cạnh. Minh +1",
+        "goto": "s_hanh",
+        "effects": {
+         "rep.MINH": 1,
+         "flag.phoMinhTuNoi": true
+        }
+       },
+       {
+        "label": "\"Mày không nói thì tao nói với chị Hạnh.\"",
+        "hint": "Nói hộ Minh. Minh −2",
+        "goto": "s_hanh",
+        "effects": {
+         "rep.MINH": -2,
+         "flag.phoNoiHoMinh": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "s_van",
+     "kind": "action",
+     "action": "bia_cuoc",
+     "count": 1,
+     "min_ratio": 1.0,
+     "manual": true,
+     "text": "Thắng một ván cược 50.000đ ở quán bi-a (vào đủ 3 bi trong 10 cơ)",
+     "short_text": "Thua ván rồi. Minh vẫn còn nợ, An mất thêm năm chục"
+    },
+    {
+     "id": "s_van_xong",
+     "kind": "visit",
+     "loc": "bi_a",
+     "hours": 0.25,
+     "text": "Cầm tiền thắng ván ra nói chuyện với Minh",
+     "scene": {
+      "title": "Ván gỡ",
+      "who": "Minh",
+      "text": "An thắng ván, được một trăm nghìn. Minh vỗ vai An, mắt sáng lên: \"Thêm vài ván nữa là đủ!\" Toản cười, xếp bi vào khung tam giác. Một trăm nghìn. Còn năm trăm. Anh Dũng đứng ở quầy không nói gì, nhưng đã tắt đèn hai bàn bên cạnh.",
+      "choices": [
+       {
+        "label": "Đặt tiền vào tay Minh: \"Đánh nữa là thua. Mày nói với chị Hạnh đi, tao đi cùng.\"",
+        "hint": "Minh tự quyết, An đứng cạnh. Anh Dũng +2",
+        "goto": "s_hanh",
+        "effects": {
+         "rep.DUNG": 2,
+         "flag.phoMinhTuNoi": true
+        }
+       },
+       {
+        "label": "Đánh thêm ván nữa",
+        "hint": "Lại phải thắng một ván cược",
+        "goto": "s_van",
+        "effects": {
+         "log": "Anh Dũng nói nhỏ lúc An đi ngang: \"Em biết câu gỡ thì thua chưa?\""
+        }
+       },
+       {
+        "label": "Bù nốt năm trăm cho Minh, giữ kín chuyện này",
+        "hint": "−500.000đ. Giấu giúp Minh",
+        "require": {
+         "cash_min": 500000
+        },
+        "goto": "s_ket",
+        "effects": {
+         "cash": -500000,
+         "cash_label": "Bù nốt tiền nợ cược cho Minh",
+         "rep.MINH": 2,
+         "flag.phoGiauMinh": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "s_hanh",
+     "kind": "visit",
+     "loc": "com_hanh",
+     "hours": 0.75,
+     "window": [
+      9,
+      20
+     ],
+     "text": "Sang Cơm Hạnh cùng Minh gặp chị Hạnh (9:00–20:00)",
+     "scene": {
+      "title": "Trong bếp Cơm Hạnh",
+      "who": "Chị Hạnh",
+      "text": "Minh đứng cạnh nồi canh, nói một mạch, mắt nhìn xuống sàn. An đứng sau, không chen câu nào. Chị Hạnh nghe hết, lau tay vào tạp dề. \"Sáu trăm à? Chị ứng tiền chở cơm cho em, mỗi tuần trừ một ít. Còn chuyện nói với vợ thì em tự nói, chị không nói hộ.\"",
+      "variants": [
+       {
+        "when": {
+         "flag.phoNoiHoMinh": true
+        },
+        "text": "An kể với chị Hạnh trước. Lúc Minh tới, chị Hạnh đã biết. Minh đứng ở cửa bếp, mặt đỏ, nhìn An như nhìn người lạ. Chị Hạnh bảo: \"Sáu trăm chị ứng được, trừ dần vào tiền chở cơm. Nhưng lần sau có chuyện thì em nói với chị, đừng để chị nghe từ người khác.\""
+       }
+      ],
+      "choices": [
+       {
+        "label": "Đứng cạnh Minh, để chị Hạnh với Minh tự thỏa thuận",
+        "hint": "Chị Hạnh +2, Minh +2",
+        "effects": {
+         "rep.HANH": 2,
+         "rep.MINH": 2
+        }
+       },
+       {
+        "label": "Góp thêm hai trăm cho Minh trả nhanh",
+        "hint": "−200.000đ, Minh +3, Chị Hạnh +1",
+        "require": {
+         "cash_min": 200000
+        },
+        "effects": {
+         "cash": -200000,
+         "cash_label": "Góp tiền cho Minh trả nợ cược",
+         "rep.MINH": 3,
+         "rep.HANH": 1
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "s_ket",
+     "kind": "visit",
+     "loc": "bi_a",
+     "hours": 0.5,
+     "window": [
+      17,
+      23
+     ],
+     "text": "Ra quán bi-a với Minh trả Toản cho xong (17:00–23:00)",
+     "scene": {
+      "title": "Trả cho xong",
+      "who": "Anh Dũng",
+      "text": "Minh đặt sáu trăm nghìn lên quầy trước mặt anh Dũng, đếm từng tờ, rồi gọi Toản ra nhận. \"Hết nợ. Tao không đánh cược nữa.\" Toản nhún vai cầm tiền. Anh Dũng gạch tên Minh khỏi cột \"đánh cược\" trên bảng, viết lại ngay bên dưới, cột \"đánh vui\".",
+      "variants": [
+       {
+        "when": {
+         "flag.phoGiauMinh": true
+        },
+        "text": "Toản nhận tiền, gạch sổ. Minh vỗ vai An: \"Mày cứu tao.\" Rồi Minh ngồi lại, xem người ta đánh ở bàn bên. Chị Hạnh không biết, vợ Minh không biết. Anh Dũng nhìn An, rồi nhìn Minh. \"Nó hết nợ thật chưa, hay mới hết nợ thằng Toản?\""
+       }
+      ],
+      "choices": [
+       {
+        "label": "Ngồi đánh một ván vui với Minh, không cược",
+        "hint": "Minh +2, Tâm trạng +4",
+        "effects": {
+         "rep.MINH": 2,
+         "need.mood": 4
+        }
+       },
+       {
+        "label": "Bảo Minh: \"Tao trả rồi, nhưng mày vẫn nên tự nói với chị Hạnh.\"",
+        "hint": "Minh +1, Anh Dũng +2",
+        "showIf": {
+         "flag.phoGiauMinh": true
+        },
+        "effects": {
+         "rep.MINH": 1,
+         "rep.DUNG": 2,
+         "log": "Minh gật, không hứa. Ít ra câu ấy đã được nói ra."
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "pho_giai_bia",
+   "title": "Giải bi-a tối thứ Bảy",
+   "who": "Anh Dũng",
+   "giver": "bi_a",
+   "days": [
+    8,
+    146
+   ],
+   "offer_window": [
+    16,
+    23
+   ],
+   "when": {
+    "count.bia_choi": 2
+   },
+   "intro": "Tối thứ Bảy quán anh Dũng có giải nhỏ, mười sáu người, lệ phí năm chục. Giải nhất ba trăm nghìn với cái cúp nhựa, còn lại toàn tiếng vỗ tay. Anh Dũng hỏi An có ghi tên không.",
+   "accept": "\"Anh ghi tên em vào.\"",
+   "decline": "\"Em chưa đủ tay anh ạ.\"",
+   "accept_effects": {
+    "cash": -50000,
+    "cash_label": "Lệ phí giải bi-a tối thứ Bảy"
+   },
+   "deadline_days": 7,
+   "deadline_hour": 23,
+   "reward_hint": "Giải tới 300 nghìn, anh Dũng +4",
+   "reward": {
+    "rep.DUNG": 4,
+    "flag.phoDaDanhGiai": true,
+    "diary": "Đánh giải bi-a tối thứ Bảy ở quán anh Dũng. Mười sáu người, một cái cúp nhựa. Ai thua cũng được anh Dũng mời cốc trà đá."
+   },
+   "reward_text": "Anh Dũng tắt bớt đèn, chỉ để bàn chung kết sáng. Người thắng người thua cùng ngồi uống trà đá đến khuya. \"Tuần sau lại đánh nhé,\" anh Dũng nói với cả quán.",
+   "fail": {
+    "rep.DUNG": -1
+   },
+   "fail_text": "Hết tuần mà An không tới. Anh Dũng gạch tên An khỏi bảng giải, viết thêm tên cậu sinh viên đứng chờ suất.",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "bia_choi",
+     "count": 1,
+     "text": "Thuê bàn tập một giờ cho quen tay trước giải"
+    },
+    {
+     "kind": "visit",
+     "loc": "bi_a",
+     "hours": 2,
+     "window": [
+      19,
+      23
+     ],
+     "text": "Tối thứ Bảy ra quán anh Dũng đánh giải (19:00–23:00)",
+     "scene": {
+      "title": "Tối thứ Bảy ở quán anh Dũng",
+      "who": "Anh Dũng",
+      "text": "Bốn bàn dồn lại thành hai, khán giả đứng chật cửa, mùi phấn lẫn mùi trà đá. Anh Dũng đọc tên từng cặp bằng cái loa cầm tay. Đến lượt An, đối thủ là cậu sinh viên đeo kính, cầm gậy rất chắc tay.",
+      "variants": [
+       {
+        "when": {
+         "count.bia_choi": 8
+        },
+        "choices": [
+         {
+          "label": "Vào đánh, tay đã quen bàn",
+          "hint": "Giải nhất +300.000đ, Tâm trạng +8",
+          "require": {
+           "weekend": true
+          },
+          "effects": {
+           "cash": 300000,
+           "cash_label": "Giải nhất bi-a tối thứ Bảy",
+           "fatigue": 4,
+           "need.mood": 8,
+           "flag.phoGiaiNhat": true,
+           "log": "Chung kết, An vào bi cuối bằng một cú đánh băng. Cả quán vỗ bàn rầm rầm, anh Dũng trao cái cúp nhựa."
+          }
+         },
+         {
+          "label": "Nhường suất cho cậu sinh viên đứng chờ",
+          "hint": "Anh Dũng +3, Tâm trạng +3",
+          "require": {
+           "weekend": true
+          },
+          "effects": {
+           "rep.DUNG": 3,
+           "need.mood": 3,
+           "log": "Cậu sinh viên đeo kính cảm ơn rối rít, đánh đến tận bán kết. An đứng ngoài cổ vũ to nhất quán."
+          }
+         },
+         {
+          "label": "Chưa tới tối giải, hẹn anh Dũng hôm ấy quay lại",
+          "hint": "Giải đánh tối thứ Bảy, đông thì sang tối Chủ Nhật",
+          "goto": "stay"
+         }
+        ]
+       }
+      ],
+      "choices": [
+       {
+        "label": "Vào đánh, ván nào chắc ván ấy",
+        "hint": "+100.000đ giải khuyến khích, Tâm trạng +6",
+        "require": {
+         "weekend": true
+        },
+        "effects": {
+         "cash": 100000,
+         "cash_label": "Giải khuyến khích bi-a tối thứ Bảy",
+         "fatigue": 4,
+         "need.mood": 6,
+         "log": "An thắng hai ván, thua ở bán kết đúng một bi. Giải khuyến khích một trăm nghìn, anh Dũng trao tận tay."
+        }
+       },
+       {
+        "label": "Nhường suất cho cậu sinh viên đứng chờ",
+        "hint": "Anh Dũng +3, Tâm trạng +3",
+        "require": {
+         "weekend": true
+        },
+        "effects": {
+         "rep.DUNG": 3,
+         "need.mood": 3,
+         "log": "Cậu sinh viên đeo kính cảm ơn rối rít, đánh đến tận bán kết. An đứng ngoài cổ vũ to nhất quán."
+        }
+       },
+       {
+        "label": "Chưa tới tối giải, hẹn anh Dũng hôm ấy quay lại",
+        "hint": "Giải đánh tối thứ Bảy, đông thì sang tối Chủ Nhật",
+        "goto": "stay"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "pho_xe_hoa_ho_guom",
+   "title": "Chiếc xe hoa bị thu",
+   "who": "Cô Huệ bán hoa",
+   "giver": "ho_guom",
+   "days": [
+    6,
+    145
+   ],
+   "offer_window": [
+    7,
+    17
+   ],
+   "intro": "Cô Huệ bán hoa xe đạp ngồi thừ ở ghế đá hồ Gươm. Sáng nay cô dựng xe trên vỉa hè phố Đinh Tiên Hoàng, trật tự phường thu cả xe lẫn hoa. Cô không biết lên phường phải nói gì.",
+   "accept": "\"Cô đưa cháu xem tờ biên bản.\"",
+   "decline": "\"Cháu đang vội, cô hỏi người khác hộ cháu.\"",
+   "deadline_days": 2,
+   "deadline_hour": 18,
+   "reward_hint": "Tâm trạng +6, có khi bà Thoa vui",
+   "reward": {
+    "need.mood": 6,
+    "flag.phoXeHoaXong": true,
+    "diary": "Cô Huệ bán hoa lấy lại được cái xe đạp chở hoa ở phường Hàng Trống. Đọc biên bản hộ cô, đi cùng cô. Nhớ cái mẹt bánh khúc của bà ngày xưa cũng bị thu như thế."
+   },
+   "reward_text": "Mấy hôm sau đi ngang hồ Gươm, An thấy cô Huệ dựng xe hoa đúng chỗ được phép. Cô vẫy An, dúi cho một bó cúc họa mi: \"Cho bà. Bảo bà là cô Huệ gửi.\"",
+   "fail": {
+    "need.mood": -3,
+    "item.bien_ban_xe": -1
+   },
+   "fail_text": "Quá hạn mà An không quay lại. Cô Huệ nhờ được bà bán nước chè đi cùng lên phường. Xe lấy về được, chỉ mất thêm một ngày hoa.",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "ho_guom",
+     "hours": 0.5,
+     "text": "Ngồi xuống ghế đá với cô Huệ, đọc tờ biên bản",
+     "scene": {
+      "title": "Tờ biên bản gấp tư",
+      "who": "Cô Huệ",
+      "text": "Cô Huệ đưa tờ biên bản đã nhàu. \"Hai chục năm cô đạp xe hoa quanh hồ, chưa bị thu lần nào. Hôm nay đỗ có một tí để bán cho khách…\" Giấy ghi: lấn chiếm vỉa hè, mang giấy tờ lên trụ sở phường Hàng Trống nộp phạt, nhận lại xe. An bỗng nhớ ngày bé, cái mẹt bánh khúc của bà ở chợ cũng có lần bị thu như thế.",
+      "choices": [
+       {
+        "label": "Đọc to từng dòng cho cô, ghi ra giấy những thứ cần mang",
+        "hint": "Cô Huệ hiểu việc",
+        "effects": {
+         "item.bien_ban_xe": 1,
+         "log": "Cô Huệ gấp tờ giấy An ghi, nhét vào túi áo ngực: \"Có thế thôi à? Thế mà cô sợ cả buổi.\""
+        }
+       },
+       {
+        "label": "Gọi cho bà, hỏi ngày xưa bà lấy lại mẹt bánh thế nào",
+        "hint": "Bà Thoa +2",
+        "effects": {
+         "item.bien_ban_xe": 1,
+         "rep.BA_TU": 2,
+         "log": "Bà nghe xong cười trong điện thoại: \"Lên phường thì nói thật, nhận lỗi, xin đóng phạt. Đừng cãi, đừng khóc. Khóc thì về nhà hãy khóc.\""
+        }
+       }
+      ]
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "ho_guom",
+     "hours": 1.5,
+     "window": [
+      8,
+      11.5
+     ],
+     "need_items": {
+      "bien_ban_xe": 1
+     },
+     "consume": true,
+     "text": "Đi cùng cô Huệ lên trụ sở phường Hàng Trống sát hồ Gươm, nhận lại xe (8:00–11:30)",
+     "scene": {
+      "title": "Trụ sở phường",
+      "who": "Cô Huệ",
+      "text": "Cán bộ phường đọc biên bản, nói chậm rãi: phạt ba trăm nghìn vì lấn vỉa hè, nộp xong thì nhận xe. Hoa trên xe đã héo một nửa. Cô Huệ mở cái ví vải, đếm đi đếm lại, thiếu một trăm rưỡi. Cô nhìn xuống, không nhìn An.",
+      "choices": [
+       {
+        "label": "Điền đơn xin nộp phạt làm hai lần, để cô tự ký",
+        "hint": "Cô Huệ tự lo phần tiền",
+        "effects": {
+         "flag.phoHueTuNop": true,
+         "log": "Cán bộ đồng ý cho nộp làm hai lần. Cô Huệ ký tên, chữ to và nghiêng như chữ bà."
+        }
+       },
+       {
+        "label": "Cho cô vay một trăm rưỡi, khi nào bán được thì trả",
+        "hint": "−150.000đ, cô Huệ trả sau",
+        "require": {
+         "cash_min": 150000
+        },
+        "effects": {
+         "cash": -150000,
+         "cash_label": "Cho cô Huệ vay tiền nộp phạt",
+         "flag.phoChoHueVay": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "cho_cau_nho",
+     "hours": 0.75,
+     "window": [
+      6,
+      17
+     ],
+     "text": "Đưa cô Huệ ra chợ Long Biên hỏi một chỗ bán hoa có thuê (6:00–17:00)",
+     "scene": {
+      "title": "Một ô chợ có số",
+      "who": "Cô Huệ",
+      "text": "Ban quản lý chợ Long Biên còn mấy ô trống ở dãy hoa, thuê theo tháng, có số, không ai đuổi. Đắt hơn đạp xe quanh hồ, nhưng không phải ngó trước ngó sau. Cô Huệ đứng nhìn ô chợ trống một lúc lâu.",
+      "choices": [
+       {
+        "label": "Đưa cô về gặp bà, để bà dẫn cô đi hỏi ban quản lý",
+        "hint": "Bà Thoa +3",
+        "bonus": [
+         {
+          "when": {
+           "flag.phoChoHueVay": true
+          },
+          "effects": {
+           "cash": 150000,
+           "cash_label": "Cô Huệ trả lại tiền vay nộp phạt",
+           "log": "Cô Huệ bán xong mẻ hoa buổi sáng, đếm trả An một trăm rưỡi, không thiếu đồng nào."
+          }
+         }
+        ],
+        "effects": {
+         "rep.BA_TU": 3,
+         "flag.phoBaDanHue": true,
+         "diary": "Bà dẫn cô Huệ bán hoa đi gặp ban quản lý chợ Long Biên. Bà bán ở chợ ba chục năm, ai cũng gọi \"cụ Thoa\". Về nhà bà vui cả buổi: \"Bà vẫn còn có ích đấy chứ.\""
+        }
+       },
+       {
+        "label": "Hỏi rõ giá thuê, ghi lại để cô tự tính",
+        "hint": "Cô Huệ tự quyết, Bà Thoa +1",
+        "bonus": [
+         {
+          "when": {
+           "flag.phoChoHueVay": true
+          },
+          "effects": {
+           "cash": 150000,
+           "cash_label": "Cô Huệ trả lại tiền vay nộp phạt",
+           "log": "Cô Huệ bán xong mẻ hoa buổi sáng, đếm trả An một trăm rưỡi, không thiếu đồng nào."
+          }
+         }
+        ],
+        "effects": {
+         "rep.BA_TU": 1,
+         "log": "Cô Huệ gấp tờ giấy ghi giá, bỏ vào ví vải: \"Để cô về bàn với ông nhà đã.\" Lần này cô không thừ người nữa."
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "pho_bo_do_linh",
+   "title": "Bộ đồ đi phỏng vấn",
+   "who": "Linh",
+   "giver": "home",
+   "days": [
+    36,
+    140
+   ],
+   "offer_window": [
+    17,
+    21
+   ],
+   "when": {
+    "linh_away": false
+   },
+   "intro": "Linh có một buổi phỏng vấn. Em lục tủ mãi không ra bộ nào tử tế, cái sơ mi duy nhất đã ngả vàng cổ. \"Anh hay ra shop chị Vy ở Hàng Đào, đi với em một hôm được không? Em tự chọn, anh chỉ cần đi cùng.\"",
+   "accept": "\"Mai anh đưa em đi.\"",
+   "decline": "\"Em mượn tạm bạn được không?\"",
+   "deadline_days": 3,
+   "deadline_hour": 22,
+   "reward_hint": "Linh +4",
+   "reward": {
+    "rep.LINH": 4,
+    "flag.phoBoDoLinh": true,
+    "diary": "Linh có bộ đồ mua ở shop chị Vy để đi phỏng vấn. Tối trước hôm đi, em là lại cổ áo hai lần."
+   },
+   "reward_text": "Sáng hôm phỏng vấn, Linh dậy sớm, là lại cổ áo lần nữa rồi mới đi. Ra đến đầu ngõ em quay lại: \"Anh ơi, trông em có giống người đi làm thật không?\" Bà đứng ở cửa nhìn theo đến khi em khuất.",
+   "fail": {
+    "rep.LINH": -2,
+    "item.bo_do_linh": -1
+   },
+   "fail_text": "Đến hôm phỏng vấn, Linh mặc tạm cái áo cũ, gấp cổ vào trong cho đỡ vàng. Em không trách, chỉ bảo: \"Thôi, người ta chấm câu trả lời chứ có chấm cái áo đâu.\"",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "shop_ao",
+     "hours": 1,
+     "window": [
+      8,
+      21
+     ],
+     "text": "Đưa Linh ra shop chị Vy ở Hàng Đào chọn đồ (8:00–21:00)",
+     "scene": {
+      "title": "Linh trong buồng thử đồ",
+      "who": "Chị Vy",
+      "text": "Chị Vy kéo ra một sào đồ công sở: sơ mi trắng, quần âu, chân váy đen. Linh thử từng bộ, lần nào bước ra cũng nhìn An trước khi nhìn gương. Chị Vy khoanh tay: \"Em gái em mặc gì cũng được, quan trọng là nó thấy mình là mình.\"",
+      "choices": [
+       {
+        "label": "Để Linh tự chọn, An chỉ trả tiền bộ em ưng",
+        "hint": "−200.000đ, Linh +3, Linh tin +1",
+        "require": {
+         "cash_min": 200000
+        },
+        "effects": {
+         "cash": -200000,
+         "cash_label": "Bộ đồ đi phỏng vấn cho Linh",
+         "item.bo_do_linh": 1,
+         "rep.LINH": 3,
+         "respect": 1,
+         "log": "Linh chọn cái sơ mi trắng cổ đức với chân váy đen, tự mặc cả với chị Vy được hai chục."
+        }
+       },
+       {
+        "label": "Bán lại cho chị Vy mấy món đồ si cũ, xin bớt cho Linh",
+        "hint": "−80.000đ, Chị Vy +2, Linh +2",
+        "require": {
+         "owned_min": 6
+        },
+        "effects": {
+         "cash": -80000,
+         "cash_label": "Bộ đồ đi phỏng vấn cho Linh, chị Vy bớt",
+         "item.bo_do_linh": 1,
+         "rep.VY": 2,
+         "rep.LINH": 2,
+         "log": "Chị Vy trừ mấy món đồ cũ vào tiền bộ đồ. \"Khách quen thì chị tính giá khách quen.\" Linh tự chọn bộ em ưng."
+        }
+       },
+       {
+        "label": "Chọn hộ Linh bộ anh thấy hợp nhất",
+        "hint": "−200.000đ, Linh −1",
+        "require": {
+         "cash_min": 200000
+        },
+        "effects": {
+         "cash": -200000,
+         "cash_label": "Bộ đồ đi phỏng vấn cho Linh",
+         "item.bo_do_linh": 1,
+         "rep.LINH": -1,
+         "log": "Linh mặc bộ An chọn, cười gượng: \"Ừ, cũng được.\" Em không nói bộ em thích là bộ kia."
+        }
+       },
+       {
+        "label": "Hôm nay chưa đủ tiền, hẹn Linh hôm khác",
+        "hint": "Quay lại sau",
+        "goto": "stay"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "home",
+     "hours": 1,
+     "window": [
+      19,
+      23
+     ],
+     "need_items": {
+      "bo_do_linh": 1
+     },
+     "consume": true,
+     "carry": true,
+     "text": "Tối trước buổi phỏng vấn, về nhà xem Linh mặc thử (19:00–23:00)",
+     "scene": {
+      "title": "Tập phỏng vấn trong phòng trọ",
+      "who": "Linh",
+      "text": "Linh mặc thử bộ đồ mới, đứng giữa phòng. \"Anh hỏi em mấy câu đi. Hỏi như người ta hỏi ấy, đừng hỏi kiểu anh trai.\" Bà ngồi ở góc phòng, giả vờ nghe đài, tai thì nghe hai anh em.",
+      "choices": [
+       {
+        "label": "Mặc sơ mi trắng là phẳng, ngồi hỏi Linh như trưởng phòng thật",
+        "hint": "Linh +4, Bà Thoa +2, Tâm trạng +4",
+        "require": {
+         "worn": "ao_so_mi_trang"
+        },
+        "effects": {
+         "rep.LINH": 4,
+         "rep.BA_TU": 2,
+         "need.mood": 4,
+         "log": "Linh phì cười: \"Anh mặc thế trông giống trưởng phòng thật.\" Rồi em nghiêm mặt, trả lời từng câu. Bà vỗ tay ở câu cuối."
+        }
+       },
+       {
+        "label": "Ngồi hỏi Linh từng câu, để em tự trả lời",
+        "hint": "Linh +3, Linh tin +1",
+        "effects": {
+         "rep.LINH": 3,
+         "respect": 1,
+         "log": "Linh trả lời vấp ở câu thứ hai, tự làm lại. Đến câu thứ năm thì em không cần nhìn giấy nữa."
+        }
+       },
+       {
+        "label": "Bảo Linh đi ngủ sớm, mai còn tỉnh táo",
+        "hint": "Linh +1",
+        "effects": {
+         "rep.LINH": 1,
+         "log": "Linh treo bộ đồ lên móc, vuốt phẳng hai lần rồi mới tắt đèn."
+        }
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

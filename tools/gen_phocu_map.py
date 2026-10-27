@@ -279,6 +279,9 @@ LOCATIONS = {
     "cam_do": ((-175.5, -62), 5, 8, "Ngõ Gạch", False),
     "ve_so": ((7, -100), 4, 6, "Phố Mã Mây", False),
     "ho_guom": ((-60, 92.5), 8, 3, "Đường dạo Hồ Gươm", True),
+    # Đời sống phố: shop si-đa túi mù, quán bi-a.
+    "shop_ao": ((-111, -100), 6, 8, "Phố Hàng Đào", False),
+    "bi_a": ((30, -53.5), 8, 9, "Phố Lương Ngọc Quyến", True),
 }
 ## Địa điểm không dựng nhà (mái che, ghế đá): sát mép đường, không lùi.
 NO_INSET = ("ben_xe_6", "bai_boc_vac", "xe_tho", "ho_guom")
@@ -296,6 +299,8 @@ DESCRIPTIONS = {
     "quan_net": "Quán net phố Hàng Bạc mở thâu đêm: lên mạng tìm việc, đọc tin, chơi một ván, hay gục xuống bàn ngủ qua đêm cho rẻ.",
     "cam_do": "Tiệm cầm đồ trong ngõ Gạch: cầm đồ lấy tiền ngay, hẹn mười ngày chuộc, có lãi.",
     "ve_so": "Đại lý vé số đầu phố Mã Mây: vé 10.000đ một tờ, chiều mở thưởng.",
+    "shop_ao": "Shop quần áo si-đa của chị Vy trên phố Hàng Đào: hàng thùng về từ cửa khẩu, bán lẻ, bán túi mù 99.000đ, bóc ra gì mặc nấy.",
+    "bi_a": "Quán bi-a của anh Dũng trên phố Lương Ngọc Quyến: sáu bàn lỗ, quạt trần, tiếng bi chạm nhau lách cách tới khuya; tối thứ Bảy có giải.",
     "ho_guom": "Dãy ghế đá ven hồ Gươm, đầu đường dạo phía Đông Kinh Nghĩa Thục: sáng sớm các cụ tập dưỡng sinh, ngày nào cũng có mấy bàn cờ tướng, tối người ngồi hóng gió, có người ngủ lại.",
     "cau_tre": "Bên kia sông, phải đi qua cầu Long Biên. Dãy nhà trên phố Ngọc Thụy, lưng quay ra sông; phòng thoáng, có hiên rộng, đi làm xa hơn.",
     "nha_di_nam": "Nhà dì Nga trên phố Hàng Chiếu, gần chợ Đồng Xuân và điểm xe buýt. Ở tạm được bảy ngày, phải gửi bớt đồ.",
@@ -352,6 +357,11 @@ def main():
             "ve_chai": [[124, -140], [180, -140], [180, 0], [124, 0], [124, -140]],
             "che": [[-120, 44], [0, 44], [0, 250], [-120, 250], [-120, 44]],
             "hu_tieu": [[60, -24], [60, -72], [-120, -72], [-120, -24], [60, -24]],
+            "kem": [[5, 44], [5, 250], [60, 250], [60, 44], [5, 44]],
+            "hoa_qua": [[126, -125], [126, -60], [150, -60], [150, -125], [126, -125]],
+            "hoa": [[-115, -24], [0, -24], [0, -71], [-115, -71], [-115, -24]],
+            "bong_bay": [[-100, 44], [-20, 44], [-20, 96], [-100, 96], [-100, 44]],
+            "banh_ran": [[-60, -71], [60, -71], [60, -24], [-60, -24], [-60, -71]],
         },
     }
     with open(os.path.join(g.ROOT, "data", "maps", MAP_ID + "_story.json"), "w", encoding="utf-8") as f:

@@ -15,6 +15,28 @@
 - **Ẩn nhà kiểu Nobody** (`AreaBuilder.update_cut`, `ray_cap`): bỏ hẳn lưới chấm bi. Chỉ căn nào bị tia từ máy quay tới đầu, ngực, gối của An xuyên qua mới bị cắt tầng như nhà búp bê: tầng trên, ban công, mái ẩn dần, còn tầng trệt (3,4 m) với mái hiên, biển hiệu; vẫn chắn thì thấp hơn nhưng không dưới 1 m; An đứng lọt trong lô thì còn 1 m. Nhà sau lưng An (An đi trên vỉa hè trước mặt tiền) không bao giờ bị cắt. Mặt cắt là sàn nâu sẫm. Máy quay đặt `near = 0.1`.
 - Sông Hồng bờ uốn lượn, bãi bồi cát vàng ở bờ Phúc Tân; đáy hồ là phố Hàng Khay nối sang Tràng Tiền.
 
+**Bản 1.3 · đời sống phố cổ** (gói nội dung `data/*_pho.json` nạp cùng năm chương, `GameLogic._merge_pack`; chỉ có trên map phố cổ):
+- **Shop si-đa Hàng Đào của chị Vy, túi mù** (`data/clothes.json`, `GameLogic._pull`):
+  - Bóc một túi 99.000đ, hoặc năm túi 450.000đ (chắc chắn có món từ Khá).
+  - Bốn hạng: Thường 60%, Khá 28%, Hiếm 10%, Hàng hiệu cũ 2%. Mười túi liền chưa ra món Hiếm thì túi sau chắc chắn Hiếm.
+  - Món hàng hiệu cũ bày bán theo tuần (350.000đ). Đồ trùng bán lại cho shop. Làm thêm: phân loại hàng thùng.
+- **Tủ đồ** (phím T, hay "Thử đồ" ở shop): 25 món chia năm chỗ mặc (áo, quần, giày dép, mũ, phụ kiện).
+  - Điểm phong cách: mỗi sáng Tâm trạng cộng nửa điểm, tối đa 8.
+  - Vài món thưởng tiền công: áo phản quang +10% bốc vác, kéo xe thồ; kính râm +10% xe ôm…
+  - Áo có thân người thật thì An mặc vào thật; mũ đội lên đầu.
+- **Quán bi-a anh Dũng** (Lương Ngọc Quyến), trò chơi bàn bi-a `scripts/work/billiards.gd`:
+  - Bàn lỗ nhìn từ trên xuống, kéo lùi để ngắm và lấy lực. Có đường ngắm, bi ma ở chỗ chạm, hướng bi màu sẽ chạy.
+  - Thuê bàn một giờ 30.000đ. Ván cược 50.000đ: vào 3 bi trong 10 cơ thì ăn 100.000đ.
+  - Làm thêm: trông quán ca tối.
+- **Hàng rong mua được:** đứng cạnh xe, gánh (trong 2,8 m) thì hiện lời nhắc, phím E mua món đầu, phím 1–3 chọn món. Hành động có `location` là `vendor:<id>`.
+  - Có sẵn: bánh mì, xôi, chè, phở đêm, bán đồng nát.
+  - Thêm năm người bán mới có tuyến và tiếng rao: kem Tràng Tiền, gánh hoa quả, xe hoa, bóng bay, gánh bánh rán. Mua kem, hoa quả, hoa về cho bà và Linh thì thân hơn.
+- **Mạch truyện phụ** (`talks_pho.json`, `quests_pho.json`):
+  - Chị Vy: 8 đoạn chuyện. Lô hàng thùng ẩm mốc, cái Ngân lớp 9; chị can khi An bóc túi quá tay.
+  - Anh Dũng: 7 đoạn chuyện. Thợ điện cũ ngã giàn giáo, quán không ghi nợ.
+  - Năm việc nhờ: lô hàng ướt (bán thật hay giấu đồ mốc vào túi mù); Minh nợ cược bi-a (trả giấu, đánh gỡ, để Minh tự nói với chị Hạnh hay nói thay); giải bi-a cuối tuần; xe hoa của cô Huệ bị thu ở hồ Gươm; bộ đồ đi phỏng vấn của Linh.
+- **Điều kiện mới cho truyện:** `count.<việc>`, `style_min`, `owned_min`, `worn`.
+
 **Bản 1.2.1 · bản đồ M vẽ tay** (`street_map.gd`, `_organic`): nhà là đa giác méo, dãy nhà ống cắt thành căn to nhỏ lùi lệch, xoay nghiêng, có chái cơi nới; mái màu rải ngẫu nhiên có nhiễu sáng tối, bóng đổ lệch, nóc và mái chảy hay gờ ngói, viền sẫm. Đường lượn chậm, phình ra thắt lại, đầu đường bo tròn, chỗ giao đường lớn vạt rộng. Sông, hồ bờ cong méo (hồ Gươm méo theo thùy), bãi cát lồi lõm ven sông Hồng. Ngõ ngách ngoằn ngoèo đâm vào giữa khối nhà, có ngõ cụt. Cây mọc theo cụm, mỗi tán một cỡ, một sắc. Hình tính một lần theo tọa độ thế giới (chừng 50 ms), phóng, dời chỉ chiếu lại; chỉ là hình minh họa, phố 3D không đổi.
 
 **Bản 1.2 · giai đoạn 4, việc làm và hoạt động mới** (chỉ có trên map phố cổ `hn_pho_co`; map khác không có chỗ thì bỏ qua):
