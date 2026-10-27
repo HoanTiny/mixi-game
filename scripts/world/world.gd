@@ -951,7 +951,7 @@ func _lamp(pos: Vector3, rot := 0.0) -> void:
 		_block(Vector3(0.14, 5.2, 0.14), pos, Color("4b4d52"))
 	var lamp := OmniLight3D.new()
 	lamp.position = pos + Vector3(0, 4.9, 0)
-	lamp.omni_range = 9.0
+	lamp.omni_range = 11.0
 	lamp.light_color = Color("ffcf8a")
 	lamp.light_energy = 0.0
 	lamp.visible = false
@@ -1300,6 +1300,8 @@ func _build_real() -> void:
 				if str(step.get("kind", "")) == "find":
 					step["area"] = city.quest_areas[str(q.id)]
 	_build_real_lamps()
+	_build_lanterns()
+	_build_lamp_pools()
 	_build_real_traffic()
 	_build_real_canal()
 	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra. Đứng chắn trước An thì thu nhỏ như cây thường.
@@ -1863,6 +1865,7 @@ func _update_cutaway(delta := 0.0) -> void:
 			area.reset_cut()
 		_overview = overview
 		if not overview:
+			area.lane_mode = _lane
 			area.update_cut(here, off.y / off.z, delta)
 		for o in occluders:
 			var top := float(o.h)
@@ -2241,16 +2244,132 @@ func _on_changed() -> void:
 	_update_lighting(game.clock())
 
 
-## Ánh sáng theo giờ trong game: sáng vàng nhạt, trưa gắt, chiều cam, tối đèn đường.
+## Đèn lồng đỏ treo dưới một phần biển hiệu trước tiệm (phố cổ Hà Nội): một MultiMesh, ban ngày đỏ trầm, về đêm
+## sáng rực (vật liệu phát sáng theo night).
+var _lantern_mat: StandardMaterial3D
+var _neon := []
+
+
+## Vầng sáng đèn đường trên mặt đất về đêm: một tấm tròn cộng sáng (không tốn đèn thật) dưới mỗi cột đèn. Bộ dựng hình
+## Compatibility chỉ cho mỗi lưới nhận tám đèn, mặt đường gộp thành ít lưới lớn nên đèn OmniLight không phủ hết.
+var _pool_mat: ShaderMaterial
+const POOL_SHADER := """
+shader_type spatial;
+render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabled;
+uniform float strength = 0.0;
+void fragment() {
+	float d = length(UV - 0.5) * 2.0;
+	float a = 1.0 - smoothstep(0.0, 1.0, d);
+	ALBEDO = vec3(1.0, 0.74, 0.42);
+	ALPHA = a * a * strength;
+}
+"""
+
+
+func _build_lamp_pools() -> void:
+	# Dưới cột đèn; dọc phố mỗi 20 m xen kẽ hai bên (bóng đèn gắn cột điện, đèn hắt từ cửa tiệm); trong ngõ mỗi 15 m
+	# một vầng giữa ngõ (bóng đèn treo tường).
+	var spots: Array = []
+	for l in lamps:
+		spots.append((l as Node3D).position)
+	if real:
+		for r in city.data.roads:
+			if r.bridge or r.tunnel or str(r.kind) in ["footway", "path", "steps"]:
+				continue
+			var hw := float(r.width) / 2.0
+			var flip := [1.0]
+			var off := 0.0 if r.small else hw + maxf(AreaBuilder.AreaData.sidewalk(r), 1.0) * 0.5
+			AreaBuilder._along(r.line, 15.0 if r.small else 20.0, func(p: Vector2, d: Vector2) -> void:
+				flip[0] = -flip[0]
+				var q: Vector2 = p + d.orthogonal() * off * flip[0]
+				if city.walkable(q):
+					spots.append(Vector3(q.x, 0, q.y)))
+	if spots.is_empty():
+		return
+	var q := PlaneMesh.new()
+	q.size = Vector2(12.0, 12.0)
+	var sh := Shader.new()
+	sh.code = POOL_SHADER
+	_pool_mat = ShaderMaterial.new()
+	_pool_mat.shader = sh
+	q.material = _pool_mat
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = q
+	mm.instance_count = spots.size()
+	for i in spots.size():
+		var lp: Vector3 = spots[i]
+		mm.set_instance_transform(i, Transform3D(Basis(), Vector3(lp.x, city.ground_y(Vector2(lp.x, lp.z)) + 0.09, lp.z)))
+	var mi := MultiMeshInstance3D.new()
+	mi.multimesh = mm
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
+
+
+func _build_lanterns() -> void:
+	if area == null or area.dress == null:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2024
+	var spots: Array = []
+	for sp in area.dress.lantern_spots:
+		if rng.randf() < 0.3:
+			spots.append(sp)
+	if spots.size() > 260:
+		spots = spots.slice(0, 260)
+	if spots.is_empty():
+		return
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.2
+	mesh.height = 0.36
+	mesh.radial_segments = 10
+	mesh.rings = 6
+	_lantern_mat = StandardMaterial3D.new()
+	_lantern_mat.albedo_color = Color("b3261e")
+	_lantern_mat.emission_enabled = true
+	_lantern_mat.emission = Color("ff4a2a")
+	_lantern_mat.emission_energy_multiplier = 0.0
+	_lantern_mat.roughness = 0.6
+	mesh.material = _lantern_mat
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	var xforms := []
+	for sp in spots:
+		var n: Vector2 = sp.n
+		var t := Vector2(n.y, -n.x)
+		var base: Vector3 = sp.pos + Vector3(n.x, 0, n.y) * 0.5
+		# Đôi đèn lồng hai đầu biển, hay một chiếc giữa biển.
+		var offs := [-0.35, 0.35] if float(sp.w) > 2.2 else [0.0]
+		for o in offs:
+			xforms.append(Transform3D(Basis(), base + Vector3(t.x, 0, t.y) * float(sp.w) * float(o) + Vector3(0, -0.25, 0)))
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+	var mi := MultiMeshInstance3D.new()
+	mi.multimesh = mm
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
+	# Chữ neon: chừng ba phần mười biển hiệu (cố định theo chữ, chỗ) đổi màu phát sáng về đêm.
+	var neon_cols := [Color("ff3d8b"), Color("34e0ff"), Color("ff5a36"), Color("7dff6a"), Color("ffd23f"), Color("c77dff")]
+	for e in area.dress.sign_labels:
+		var l: Label3D = e.label
+		var h := absi(hash(l.text + str(l.position.snapped(Vector3.ONE))))
+		if h % 10 < 3:
+			_neon.append({"label": l, "day": e.day, "neon": neon_cols[h % neon_cols.size()]})
+
+
+## Ánh sáng theo giờ trong game: sáng vàng ấm, trưa trong, chiều cam đậm, chạng vạng tím hồng, đêm xanh tím với vầng
+## đèn đường vàng, cửa sổ sáng đèn, biển neon, đèn lồng đỏ.
 func _update_lighting(hour: float) -> void:
 	var t := clampf((hour - 6.0) / 16.0, 0.0, 1.0)
 	var elevation := lerpf(24.0, 60.0, sin(t * PI))
 	# Nắng chiếu từ phía sau dãy nhà ra đường: bóng nhà đổ dài trên vỉa hè như Nobody.
 	sun.rotation_degrees = Vector3(-elevation, 115.0 + t * 130.0, 0)
-	var warm := Color("ffd9a8")
-	var noon := Color("fff0dc")
-	var dusk := Color("ff9a5c")
-	var night := Color("5b6c9a")
+	var warm := Color("ffcf96")
+	var noon := Color("fff1dc")
+	var dusk := Color("ff8a48")
+	var night := Color("6a74b8")
 	var c: Color
 	if hour < 9.0:
 		c = warm.lerp(noon, (hour - 6.0) / 3.0)
@@ -2265,20 +2384,37 @@ func _update_lighting(hour: float) -> void:
 	if rain:
 		c = c.lerp(Color("8a96a8"), 0.7)
 	sun.light_color = c
-	sun.light_energy = (0.35 if hour >= 20.0 else 1.1) * (0.35 if rain else 1.0)
+	# Đêm: trăng yếu, để đèn đường, cửa sổ, neon nổi lên.
+	var nf := clampf((hour - 17.8) / 1.7, 0.0, 1.0) if not rain else clampf((hour - 16.5) / 1.5, 0.0, 1.0)
+	sun.light_energy = lerpf(1.1, 0.22, nf) * (0.35 if rain else 1.0)
 	# Vùng bóng hắt sáng xanh nhạt của trời (ngày nắng), xám khi mưa; nền trời sau mô hình cùng màu trời theo giờ.
-	var sky := Color("a9d4ee").lerp(Color("f3b27a"), clampf((hour - 17.0) / 2.0, 0.0, 1.0)).lerp(Color("1d2433"), clampf((hour - 18.5) / 1.5, 0.0, 1.0))
+	var sky := Color("a9d4ee").lerp(Color("f6a36e"), clampf((hour - 16.5) / 2.0, 0.0, 1.0)).lerp(Color("2a2240"), clampf((hour - 18.3) / 1.2, 0.0, 1.0)).lerp(Color("121726"), clampf((hour - 19.5) / 1.5, 0.0, 1.0))
 	if rain:
 		sky = sky.lerp(Color("7d8794"), 0.75)
 	env.background_color = sky
-	env.ambient_light_color = c.lerp(Color("b9cde0"), 0.2 if rain else 0.5)
-	env.ambient_light_energy = 0.45 if hour >= 20.0 else (0.75 if rain else 0.9)
-	var on := hour >= (16.0 if rain else 18.0)
+	env.ambient_light_color = c.lerp(Color("b9cde0"), 0.2 if rain else 0.5).lerp(Color("55609a"), nf * 0.7)
+	env.ambient_light_energy = lerpf(0.75 if rain else 0.9, 0.62, nf)
+	RenderingServer.global_shader_parameter_set("night", nf)
+	# Quầng sáng (glow) chỉ bật lúc tối: đèn lồng, chữ neon, cửa sổ lóa nhẹ. Điện thoại tắt cho nhẹ.
+	env.glow_enabled = nf > 0.05 and not ScreenFit.low_power
+	env.glow_intensity = 0.9 * nf
+	env.glow_hdr_threshold = 0.9
+	env.glow_bloom = 0.05
+	if _lantern_mat != null:
+		_lantern_mat.emission_energy_multiplier = lerpf(0.25, 3.2, nf)
+	if _pool_mat != null:
+		_pool_mat.set_shader_parameter("strength", 0.7 * nf)
+	for e in _neon:
+		var l: Label3D = e.label
+		var col: Color = (e.day as Color).lerp(Color(e.neon) * 2.4, nf)
+		col.a = 1.0
+		l.modulate = col
+	var on := hour >= (16.0 if rain else 17.8)
 	if crowd != null:
 		crowd.set_time(hour, rain)
 	for lamp in lamps:
 		lamp.visible = on
-		lamp.light_energy = 2.2 if on else 0.0
+		lamp.light_energy = lerpf(1.4, 3.4, nf) if on else 0.0
 	_set_rain(rain)
 	# Mưa: sương xám dày hơn, nhìn xa mờ hẳn; trời nắng chỉ hơi mờ xa cho có chiều sâu.
 	env.fog_light_color = Color("8f98a3") if rain else sky.lerp(Color.WHITE, 0.25)

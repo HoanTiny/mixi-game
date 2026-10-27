@@ -42,6 +42,10 @@ var shops: Array = []
 var pole_spots: Array = []
 ## Biển có thể ghi chữ: chọn những biển gần các địa điểm của truyện nhất (keep_clear của builder) khi xong.
 var _boards: Array = []
+## Chữ biển hiệu đã dựng {label, day: màu ban ngày} (màn phố đổi một phần thành chữ neon về đêm) và chỗ treo đèn lồng
+## trước các biển hiệu {pos: Vector3 mép dưới biển, n: hướng ra đường}.
+var sign_labels: Array = []
+var lantern_spots: Array = []
 ## Đếm để in khi thử: nhà xét, có mặt tiền, mái hiên, biển, ban công, mái ngói mặt tiền, sân thượng, tum, cột, cổng.
 var counts := {"homes": 0, "fronts": 0, "awnings": 0, "boards": 0, "balconies": 0, "canopies": 0, "roofs": 0, "tums": 0,
 	"poles": 0, "gates": 0, "signs": 0, "crossings": 0, "lights": 0}
@@ -880,7 +884,11 @@ func finish() -> void:
 		bd["d"] = best
 	_boards.sort_custom(func(x, y) -> bool: return float(x.d) < float(y.d))
 	for bd in _boards.slice(0, max_labels):
-		b._cut_label(int(bd.idx), _label(str(bd.text), bd.pos, bd.n, float(bd.w), float(bd.h), bd.board), float(bd.top))
+		var l := _label(str(bd.text), bd.pos, bd.n, float(bd.w), float(bd.h), bd.board)
+		b._cut_label(int(bd.idx), l, float(bd.top))
+		sign_labels.append({"label": l, "day": l.modulate})
+	for bd in _boards:
+		lantern_spots.append({"pos": Vector3(bd.pos.x, float(bd.pos.y) - float(bd.h) / 2.0 - 0.15, bd.pos.z), "n": bd.n, "w": float(bd.w)})
 	var items := []
 	for s in _stools:
 		var p: Vector2 = s[0]

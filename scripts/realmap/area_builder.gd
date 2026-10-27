@@ -52,6 +52,8 @@ varying float v_cap;
 varying float v_wy;
 // Khoảng cách máy quay tới An (world.gd đặt mỗi khung hình; 0 là tắt): nhà gần máy quay hơn An mấy mét thì sẫm dần.
 global uniform float focus_depth;
+// 0 ban ngày, 1 ban đêm (world.gd đặt theo giờ): cửa sổ, cửa tiệm sáng đèn.
+global uniform float night;
 
 void vertex() {
 	v_cut = 0.0;
@@ -89,6 +91,7 @@ void vertex() {
 }
 
 void fragment() {
+	vec3 win_emit = vec3(0.0);
 	vec3 leaf = mix(tint, flame_tint, step(0.5, v_flame));
 	// Màu đỉnh của nhà là mã màu sRGB (như trong bảng màu), đổi sang tuyến tính; tán cây giữ màu tint nhân thẳng.
 	vec3 col = flat_color ? leaf * COLOR.rgb * mix(vec3(0.82, 0.86, 0.95), vec3(1.16, 1.12, 0.92), v_var) : pow(COLOR.rgb, vec3(2.2));
@@ -117,6 +120,17 @@ void fragment() {
 		if (frame) col = mix(col, trim, 0.9 * vis);
 		if (glass) col = mix(col, vec3(0.07, 0.11, 0.13), 0.88 * vis);
 		if (door) col = mix(col, vec3(0.3, 0.29, 0.28), 0.6 * vis);
+		if (night > 0.0) {
+			// Về đêm: chừng bốn phần mười ô cửa sổ sáng đèn (đa số vàng ấm, ít ô đèn tuýp trắng xanh), phần lớn cửa
+			// tiệm tầng trệt sáng; mỗi ô cửa một số ngẫu nhiên cố định theo căn, tầng, cột.
+			float lit = fract(sin(dot(vec3(floor_i, floor(UV.x / 2.6), v_idx), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+			if (glass && lit < 0.42) {
+				win_emit = mix(vec3(1.0, 0.68, 0.32), vec3(0.72, 0.84, 1.0), step(0.32, lit)) * 1.5 * vis;
+			}
+			if (door && lit < 0.7) {
+				win_emit = vec3(1.0, 0.74, 0.4) * 0.7 * vis;
+			}
+		}
 		if (fy < 0.04) col *= mix(1.0, 0.9, vis);
 		col *= mix(0.86, 1.0, clamp(UV.y / 2.5, 0.0, 1.0));
 	} else if (!flat_color && UV2.x > 0.2) {
@@ -150,6 +164,7 @@ void fragment() {
 		col = mix(col, mix(vec3(g), col, 0.4) * 0.55, dim);
 	}
 	ALBEDO = col;
+	EMISSION = win_emit * night;
 	ROUGHNESS = 0.88;
 	if (v_kind > 1.5 && v_kind < 2.5) {
 		METALLIC = 0.6;
@@ -1135,6 +1150,13 @@ static func _strip_z(poly: PackedVector2Array, x0: float, x1: float) -> Vector2:
 
 ## Mỗi khung hình ở màn phố: căn nào che An (cut_target) thì hạ dần xuống, hết che thì nâng dần lên lại; tán cây chắn
 ## trước An thu nhỏ dần. p: chỗ An đứng (x, z).
+## An đang trong ngõ hẹp (world.gd đặt): tầng trên các căn trong vòng LANE_R mét quanh An cũng nhìn xuyên, chỉ giữ
+## tầng trệt (LANE_CAP mét), như bỏ mái khi đi sâu vào ngõ.
+var lane_mode := false
+const LANE_R := 7.0
+const LANE_CAP := 3.4
+
+
 func update_cut(p: Vector2, slope: float, delta: float) -> void:
 	if _cut_img == null:
 		return
@@ -1147,6 +1169,8 @@ func update_cut(p: Vector2, slope: float, delta: float) -> void:
 				continue
 			seen[i] = true
 			var t := cut_target(_cut_polys[i], p, slope)
+			if lane_mode and Geo.bounds(_cut_polys[i]).grow(LANE_R).has_point(p):
+				t = minf(t, LANE_CAP)
 			if t < _cut_tops[i]:
 				want[i] = t
 				if not _cut_now.has(i):
