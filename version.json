@@ -1,11 +1,11 @@
 {
-  "version": "1.6",
-  "revision": "6e10b4be124a44f0ec4f3ad22d0295c75c26464f",
+  "version": "1.7",
+  "revision": "99beffd02fab08b9df8e7fb25a56ef7843249ddf",
   "engine": "4.7.2",
-  "pack": "index-72486d9d86e7.pck",
-  "bytes": 44054100,
-  "sha256": "72486d9d86e705b484bc3fab29096fddd700c5a092ec05d2ad7d83af113eccb2",
-  "builtAt": "2026-10-28T11:09:21.188Z",
+  "pack": "index-740a17b25b28.pck",
+  "bytes": 44093832,
+  "sha256": "740a17b25b2850daa288dfde85baee0a55afa852bd75bd3d9dbf72449c66765c",
+  "builtAt": "2026-10-28T14:34:27.622Z",
   "preview": "?neighborhood-demo",
   "windowsDownload": "1.6"
 }
