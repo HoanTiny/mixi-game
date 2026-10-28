@@ -1,5 +1,15 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.4 · phố mẫu, nhân vật và xe**
+
+- [Chơi bản chính](https://hoantiny.github.io/mixi-game/) ·
+  [Xem phố mẫu mới](https://hoantiny.github.io/mixi-game/?street-demo).
+- Phố mẫu có quán cơm, tiệm sửa xe và hẻm trọ; chế độ xem thử không ghi vào save chính.
+- Nhân vật có tư thế lái và nhịp bước mới; xe gần có bánh quay, đèn đêm, vật liệu mới.
+- Chi tiết: [bản nâng cấp](docs/MOBILITY_UPGRADE.md), [phố mẫu](docs/STREET_PROTOTYPE.md),
+  [đợt tiếp theo](docs/NEXT_UPDATE.md), [triển khai web](docs/WEB_RELEASE.md).
+- Bản tải Windows hiện vẫn là 1.3.2; lần phát hành này cập nhật bản web.
+
 **Bản 1.0: truyện chuyển sang phố cổ Hà Nội, dùng tên thật.** An, 27 tuổi, vừa mất việc ở Điện máy Thăng Long. Cả nhà có 30 ngày để dọn khỏi **xóm trọ Phúc Tân** (ngõ 25 Phúc Tân, ngoài đê sông Hồng) trước mùa mưa; truyện đi tiếp năm chương, 150 ngày. Cốt truyện, lựa chọn, con số giữ nguyên; người, đất, giọng nói đổi theo [docs/HA_NOI.md](docs/HA_NOI.md):
 - **Người:** bà Thoa (bà ngoại của An, Linh), ông Thịnh (ông ngoại đã mất), chú Sơn tiệm sửa xe, dì Nga, ông Bảo, cô Bích tổ trưởng, cô Tâm chủ mặt bằng, bà Cả, bà Bính, cô Thắm đồng nát, cu Bin, Mẹ. Kha quê Thanh Hóa; chị Lụa bán bánh rán ở chợ Long Biên.
 - **Đất:** chợ Long Biên dưới chân cầu Long Biên, điểm xe buýt Long Biên (xe đưa công nhân ra khu công nghiệp Bắc Thăng Long), tiệm chú Sơn trong vòm cầu đường sắt phố Gầm Cầu, Cơm Hạnh cuối phố Hàng Chiếu sau lưng chợ Đồng Xuân, nhà dì Nga phố Hàng Chiếu, dãy năm quán bia Tạ Hiện, gác xép ngõ Gạch (cây bàng đầu ngõ), phòng Ngọc Thụy bên kia sông. Quê Nam Định, Giao Thủy, Thái Bình; xe khách đi từ bến xe Giáp Bát.
