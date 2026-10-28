@@ -387,7 +387,7 @@ func _dark_panel(parent: Control) -> PanelContainer:
 
 func _light_panel(parent: Control) -> PanelContainer:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", UI.box(Color(0.96, 0.96, 0.98, 0.97), UI.LINE, 10, 16))
+	p.add_theme_stylebox_override("panel", UI.box(Color(UI.CARD, 1.0), UI.LINE, 10, 16))
 	p.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	parent.add_child(p)
 	return p
@@ -1363,7 +1363,7 @@ func _cloth_card(id: String) -> Control:
 	var rc := Color(str(rar.get("color", "a8a090")))
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(168, 150)
-	card.add_theme_stylebox_override("panel", UI.box(Color(1, 1, 1, 0.95), rc, 8, 10))
+	card.add_theme_stylebox_override("panel", UI.box(UI.PAPER, rc, 8, 10))
 	(card.get_theme_stylebox("panel") as StyleBoxFlat).set_border_width_all(3)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 3)
@@ -2067,9 +2067,9 @@ func _quest_card(title: String, hint: String, lock: String, on_press: Callable) 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(320, 92)
 	btn.disabled = lock != ""
-	btn.add_theme_stylebox_override("normal", UI.box(Color("fff6dc"), UI.GOLD, 8, 10))
-	btn.add_theme_stylebox_override("hover", UI.box(Color("ffeec0"), UI.GOLD, 8, 10))
-	btn.add_theme_stylebox_override("disabled", UI.box(Color("f6f1e4"), Color("e6d7a8"), 8, 10))
+	btn.add_theme_stylebox_override("normal", UI.box(Color("332f22"), UI.GOLD, 8, 10))
+	btn.add_theme_stylebox_override("hover", UI.box(Color("423b27"), UI.GOLD, 8, 10))
+	btn.add_theme_stylebox_override("disabled", UI.box(UI.PAPER, Color("6b6250"), 8, 10))
 	btn.pressed.connect(on_press)
 	var v := VBoxContainer.new()
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE

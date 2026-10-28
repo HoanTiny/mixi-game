@@ -115,6 +115,8 @@ const CAM_NEAR := Vector3(0, 6.5, 9.0)
 const CAM_FAR := Vector3(0, 92, 64)
 const ZOOM_MAX := 2.0
 const INTERACT_RANGE := 2.4
+## Khoảng cách gần nhất giữa An và một người khác khi đi (hai vai chạm nhau).
+const PERSON_GAP := 0.62
 ## Bảng tên tiệm không cao hơn mức này để không lọt lên mép trên màn hình dưới bảng mục tiêu.
 const SIGN_MAX := 4.6
 ## Nhà phía trước lệch sang hai bên trong khoảng này cũng ẩn theo, cho thấy cả người đứng cạnh An.
@@ -1666,6 +1668,13 @@ func _process(delta: float) -> void:
 	elif _target != null:
 		step = _follow_path(_speed() * delta)
 	if step != Vector3.ZERO:
+		step = _avoid_people(step, key_dir == Vector3.ZERO)
+		# Bấm đi tới chỗ có người đứng sẵn (nói chuyện, mua hàng): chạm khoảng chừa của họ là coi như tới.
+		if step == Vector3.ZERO and _target != null and not _path.is_empty() \
+				and _path[_path.size() - 1].distance_to(Vector2(player.position.x, player.position.z)) < PERSON_GAP + 0.9:
+			_path_i = _path.size()
+			_arrive()
+	if step != Vector3.ZERO:
 		player.position += step
 		player.position.y = lerpf(player.position.y, city.ground_y(Vector2(player.position.x, player.position.z)), clampf(delta * 12.0, 0.0, 1.0))
 		var run := sprinting()
@@ -1766,6 +1775,52 @@ func _slide(step: Vector3) -> Vector3:
 	for s in [Vector2(step.x, step.z), Vector2(step.x, 0), Vector2(0, step.z)]:
 		if s != Vector2.ZERO and city.walkable(p + s):
 			return Vector3(s.x, 0, s.y)
+	return Vector3.ZERO
+
+
+## Người gần An (nhân vật có tên, người đứng chờ, người đi bộ có xương), vị trí trên mặt đất.
+func _people_near(r: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	var me := Vector2(player.position.x, player.position.z)
+	var nodes: Array = idlers.duplicate()
+	for id in npc_nodes:
+		nodes.append(npc_nodes[id].node)
+	if crowd != null:
+		nodes.append_array(crowd.live_people())
+	for n in nodes:
+		if not is_instance_valid(n) or not n.is_visible_in_tree():
+			continue
+		var q := Vector2(n.global_position.x, n.global_position.z)
+		if q.distance_squared_to(me) < r * r and q.distance_squared_to(me) > 0.0001:
+			out.append(q)
+	return out
+
+
+## An không đi xuyên qua người: bước nào lấn vào khoảng PERSON_GAP của ai đó thì đổi hướng lệch dần (ưu tiên bên
+## phải như đi vỉa hè); đi bằng phím thì chỉ trượt theo trục. Đang lấn sẵn (người vừa đi tới) thì cho bước ra.
+func _avoid_people(step: Vector3, steer: bool) -> Vector3:
+	var people := _people_near(3.0)
+	if people.is_empty() or _riding:
+		return step
+	var me := Vector2(player.position.x, player.position.z)
+	var s := Vector2(step.x, step.z)
+	var tries: Array = [s]
+	if steer:
+		for deg in [-30.0, 30.0, -55.0, 55.0, -80.0, 80.0]:
+			tries.append(s.rotated(deg_to_rad(deg)))
+	else:
+		tries.append_array([Vector2(s.x, 0), Vector2(0, s.y)])
+	for t: Vector2 in tries:
+		if t == Vector2.ZERO or not city.walkable(me + t):
+			continue
+		var ok := true
+		for q: Vector2 in people:
+			var after := (me + t).distance_to(q)
+			if after < PERSON_GAP and after < me.distance_to(q) + 0.0001:
+				ok = false
+				break
+		if ok:
+			return Vector3(t.x, 0, t.y)
 	return Vector3.ZERO
 
 

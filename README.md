@@ -22,9 +22,16 @@
   - Tay nghề tăng theo số món, mua đồng hồ đo riêng thì đo nhanh hơn, chọn hướng thợ sửa độc lập thì đơn tăng 10% tiền công.
   - Bước tiếp theo của đơn hiện trong bảng mục tiêu.
 - **Tiệm tóc Hàng Bạc:** cắt gọn, tỉa tự nhiên, nhuộm đen, nâu hạt dẻ, nâu khói (`scripts/wardrobe.gd`, HAIR).
+- **Bản 1.3.2 nối thêm:**
+  - **Giao diện tối** theo bảng màu của nhánh (`scripts/ui/ui_kit.gd`): bảng địa điểm, sổ, nhật ký, tủ đồ, thẻ việc nhờ, màn cân bằng. Điện thoại vẫn nền sáng như màn hình máy thật.
+  - **Người đi tránh nhau** theo cách của `crowd_motion.gd`, viết lại cho phố cổ:
+    - An không đi xuyên người (nhân vật có tên, người đứng chờ, người đi bộ gần An). Bấm chuột để đi thì An lượn qua, ưu tiên bên phải; đi bằng phím thì trượt dọc người đó.
+    - Người đi bộ thấy An chắn phía trước thì bước lệch sang bên thoáng và đi chậm lại, qua rồi trở về làn (`crowd.gd`, `_dodge_step`).
+    - Đo khi An đứng giữa vỉa hè đông trong 10 giây: số khung hình có người lấn dưới 0,5 m giảm từ 168 xuống 1.
 - **Chưa nối, giữ trong repo:**
-  - Nhà chia gian (`neighborhood.gd`), cư dân có khớp (`citizen.gd`), tuyến vỉa hè (`resident_routes.gd`), người đi tránh nhau (`crowd_motion.gd`): đều dựng cho con phố thẳng đời đầu.
-  - Chế độ chơi thử 5 ngày, nhu cầu kiểu mới (No, Sạch, Tinh thần), bảng Nhân vật dạng cửa sổ, bảng màu giao diện tối: bản phố cổ đã có phần tương ứng.
+  - Nhà chia gian (`neighborhood.gd`), tuyến vỉa hè (`resident_routes.gd`): dựng cho con phố thẳng đời đầu, phố cổ đã có nhà ống và tuyến đi bộ riêng.
+  - Cư dân có khớp (`citizen.gd`): người dựng bằng khối hình học; phố cổ đã dùng người Rocketbox có xương nên không thay.
+  - Chế độ chơi thử 5 ngày, nhu cầu kiểu mới (No, Sạch, Tinh thần), bảng Nhân vật dạng cửa sổ: bản phố cổ đã có phần tương ứng.
   - Các bản mô hình An thử nghiệm, ảnh tham chiếu nhân vật: không đưa vào bản xuất (`exclude_filter`).
 
 **Bản 1.3 · đời sống phố cổ** (gói nội dung `data/*_pho.json` nạp cùng năm chương, `GameLogic._merge_pack`; chỉ có trên map phố cổ):

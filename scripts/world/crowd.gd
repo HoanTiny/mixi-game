@@ -53,6 +53,9 @@ const KEEP_RIGHT := 0.25
 const KEEP_RIGHT_TIME := 1.2
 ## Ô lưới tra đoạn đường lớn (mét).
 const ROAD_CELL := 16.0
+## Khoảng ngang người đi bộ chừa ra khi né An, và lệch xa nhất khỏi làn.
+const DODGE_GAP := 0.95
+const DODGE_MAX := 1.3
 const SHIRTS := ["e94b3c", "3a7bd5", "f2c230", "f4f1ea", "2e9e5b", "e67e22", "8e44ad", "1abc9c", "d35480", "34495e", "c0392b", "95a5a6"]
 ## Sắc quần (props3d.gd: phần sơn thứ hai): xanh đen, xanh jean nhiều nhất, nâu kaki, đỏ đô.
 const PANTS_HUES := [0.6, 0.62, 0.58, 0.6, 0.64, 0.08, 0.1, 0.97]
@@ -71,6 +74,9 @@ var _w_s := PackedFloat32Array()
 var _w_dir := PackedFloat32Array()
 var _w_lat := PackedFloat32Array()
 var _w_speed := PackedFloat32Array()
+## Người đi bộ đang né An: chỉ số -> độ lệch ngang thêm (m) và còn bao lâu đi chậm lại.
+var _dodge := {}
+var _hold := {}
 ## Trẻ con: MultiMesh trẻ con, MultiMesh trái banh, mỗi nhóm {c, d (hướng hẻm), kids: [pha], from, to, t}.
 var _kid_mm: MultiMesh
 var _ball_mm: MultiMesh
@@ -472,7 +478,7 @@ func _update_walkers(delta: float, focus: Vector2, all := false, seen := {}) -> 
 			continue
 		var pts := _w_pts[i]
 		var span := float(pts.size() - 1) * STEP
-		var s := _w_s[i] + _w_dir[i] * _w_speed[i] * delta
+		var s := _w_s[i] + _w_dir[i] * _w_speed[i] * delta * (0.35 if _hold.has(i) else 1.0)
 		if s > span or s < 0.0:
 			_w_dir[i] = -_w_dir[i]
 			s = clampf(s, 0.0, span)
@@ -484,12 +490,47 @@ func _update_walkers(delta: float, focus: Vector2, all := false, seen := {}) -> 
 		var a := pts[k]
 		var b := pts[k + 1]
 		# Bên phải chiều đi: orthogonal() của hướng khúc là bên trái chiều xuôi.
-		var p := a.lerp(b, s / STEP - float(k)) - (b - a).normalized().orthogonal() * _w_lat[i]
+		var n := (b - a).normalized().orthogonal()
+		var base := a.lerp(b, s / STEP - float(k))
+		var p := base - n * (_w_lat[i] + (0.0 if all else _dodge_step(i, base, n, (b - a).normalized() * _w_dir[i], focus, delta)))
 		var f := (b - a) * _w_dir[i]
 		var xf := Transform3D(Basis(Vector3.UP, atan2(f.x, f.y)), Vector3(p.x, 0.0, p.y))
 		if not all and p.distance_squared_to(focus) < NEAR * NEAR and _animate(i, _w_look[i], xf, _w_speed[i], delta, seen):
 			xf = Transform3D(Basis().scaled(Vector3.ZERO), xf.origin)
 		mm.set_instance_transform(slot, xf)
+
+
+## Né An: An ở phía trước trong hành lang 1 m thì bước lệch sang bên đang thoáng hơn và đi chậm lại, qua rồi thì
+## trở về làn. Trả độ lệch thêm (cùng chiều với _w_lat).
+func _dodge_step(i: int, base: Vector2, n: Vector2, fwd: Vector2, focus: Vector2, delta: float) -> float:
+	var cur := float(_dodge.get(i, 0.0))
+	var rel := focus - base
+	if rel.length_squared() > 25.0:
+		if cur != 0.0:
+			_dodge.erase(i)
+			_hold.erase(i)
+		return 0.0
+	var ahead := rel.dot(fwd)
+	var gap := rel.dot(n) + _w_lat[i]
+	var want := 0.0
+	if ahead > -0.5 and ahead < 2.6:
+		want = maxf(0.0, DODGE_GAP - gap) if gap >= 0.0 else minf(0.0, -DODGE_GAP - gap)
+		want = clampf(want, -DODGE_MAX, DODGE_MAX)
+	cur = move_toward(cur, want, delta * 2.4)
+	if absf(gap + cur) < DODGE_GAP * 0.8 and ahead > 0.0 and ahead < 1.4:
+		_hold[i] = true
+	else:
+		_hold.erase(i)
+	if cur == 0.0 and want == 0.0:
+		_dodge.erase(i)
+	else:
+		_dodge[i] = cur
+	return cur
+
+
+## Người có xương đang đứng thay người đi bộ (gần An), để An không đi xuyên qua họ.
+func live_people() -> Array:
+	return _live.values()
 
 
 ## Người có xương đứng thay cho người key ở xf, bước theo tốc độ speed (m/giây); hết người rảnh thì trả false.
