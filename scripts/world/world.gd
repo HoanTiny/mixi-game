@@ -23,6 +23,7 @@ const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const PlayerMotion := preload("res://scripts/vehicles/player_motion.gd")
+const TravelPace := preload("res://scripts/vehicles/travel_pace.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
 const Crowd := preload("res://scripts/world/crowd.gd")
 const TitleScreen := preload("res://scripts/ui/title_screen.gd")
@@ -101,12 +102,14 @@ const ALL_LOCATIONS := {
 		"tube": {"floors": 3, "sign": "CẮT TÓC · NHUỘM"}, "color": "827363",
 		"npcs": [{"name": "Anh thợ cắt tóc", "id": "", "color": "4a4a5a"}]}
 }
-const SPEED := 6.0
+## World units are metres: a purposeful walk, an optional jog and a slow urban
+## delivery ride. Animation uses actual m/s, independently of these speed caps.
+const SPEED := 1.7
 ## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
-const RIDE_SPEED := 1.8
+const RIDE_SPEED := 4.8 / SPEED
 ## Chạy nhanh (giữ Shift, nút Chạy trên màn cảm ứng): nhanh gấp SPRINT lần, mỗi mét chỉ tốn RUN_TIME giờ đi bộ, cứ
 ## RUN_FATIGUE_M mét thì Mệt +1; trong ngõ hẹp không chạy được, còn đi chậm lại LANE_SLOW lần vì chật người, xe.
-const SPRINT := 1.65
+const SPRINT := 3.15 / SPEED
 const RUN_TIME := 0.6
 const RUN_FATIGUE_M := 70.0
 const LANE_SLOW := 0.82
@@ -163,6 +166,7 @@ var player_body: Node3D
 var _ride_bike: Node3D
 var _riding := false
 var _player_motion := PlayerMotion.new()
+var _travel_pace := TravelPace.new()
 var _ride_headlight: SpotLight3D
 var _night_factor := 0.0
 var font: SystemFont
@@ -249,8 +253,8 @@ func _ready() -> void:
 	var marker_mat := _mat(Color(0.95, 0.76, 0.3, 0.55))
 	marker_mat.emission_enabled = true
 	marker_mat.emission = Color("f2c14e")
-	marker_mat.emission_energy_multiplier = 0.16 if real and city.pilot_active else 0.5
-	if real and city.pilot_active:
+	marker_mat.emission_energy_multiplier = 0.16 if real and (city.pilot_active or city.street_upgrade) else 0.5
+	if real and (city.pilot_active or city.street_upgrade):
 		marker_mat.albedo_color = Color(0.68, 0.56, 0.31, 0.19)
 	marker.material_override = marker_mat
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -275,7 +279,7 @@ func _ready() -> void:
 	life = StreetLife.new()
 	add_child(life)
 	life.setup(self)
-	if real and city.pilot_active:
+	if real and (city.pilot_active or city.street_upgrade):
 		pilot_life = PilotLife.new()
 		add_child(pilot_life)
 		pilot_life.setup(self)
@@ -419,7 +423,7 @@ func _build_environment() -> void:
 	sun = DirectionalLight3D.new()
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
-	if real and city.pilot_active:
+	if real and (city.pilot_active or city.street_upgrade):
 		sun.shadow_blur = 3.0
 		sun.shadow_opacity = 0.68
 	sun.directional_shadow_max_distance = 70.0
@@ -636,25 +640,25 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		_build_shelter(bld, w, d, color)
 		top = 3.0
 		sign_height = 3.6
-	if loc.get("stalls", false):
+	if loc.get("stalls", false) and not architecture.get("owns_dressing", false):
 		_build_stalls(w, holder)
 	if loc.get("line", false) and id not in StreetPrototype.LOCATIONS:
 		_build_clothesline(holder)
-	if loc.get("benches", false):
+	if loc.get("benches", false) and not architecture.get("owns_dressing", false):
 		# Ghế đá ven hồ: ba băng ghế quay mặt ra hồ, một bàn cờ tướng giữa hai ghế.
 		for i in 3:
 			var bx := -w / 2.0 + 1.3 + i * (w - 2.6) / 2.0
 			_block(Vector3(1.6, 0.42, 0.45), Vector3(bx, 0.0, -d + 0.6), Color("9a958a"), holder)
 		_block(Vector3(0.7, 0.62, 0.7), Vector3(0.0, 0.0, -d / 2.0 - 0.2), Color("8a8478"), holder)
 		_block(Vector3(0.6, 0.02, 0.6), Vector3(0.0, 0.62, -d / 2.0 - 0.2), Color("e8d9a8"), holder)
-	if loc.get("crates", false):
+	if loc.get("crates", false) and not architecture.get("owns_dressing", false):
 		# Sọt rau, bao củ, thùng quả chất dưới mái che bãi xe.
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 41
 		for i in 9:
 			var col: Color = [Color("6f9a4a"), Color("b85a3a"), Color("c9a86a")][i % 3]
 			_block(Vector3(0.6, 0.45, 0.45), Vector3(-w / 2.0 + 0.8 + (i % 5) * 0.9 + rng.randf_range(-0.1, 0.1), (i / 5) * 0.45, -d + 0.8 + (i % 2) * 0.6), col, holder)
-	if loc.get("carts", false):
+	if loc.get("carts", false) and not architecture.get("owns_dressing", false):
 		# Hai chiếc xe thồ gỗ dựng nghiêng cạnh mái che.
 		for i in 2:
 			var cx := -w / 2.0 + 1.2 + i * 2.4
@@ -664,9 +668,9 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	var body := StaticBody3D.new()
 	body.set_meta("loc", id)
 	var blockers: Array = [Rect2(-w / 2.0, -d, w, d)]
-	if real and city.pilot_active and id == "xom_bo_me":
-		blockers = city.pilot_home_blockers
-		architecture["front_pick_shapes"] = []
+	if real and city.has_courtyard(id):
+		blockers = city.location_blockers(id)
+		architecture["shell_pick_shapes"] = []
 	for rect: Rect2 in blockers:
 		var cs := CollisionShape3D.new()
 		var bs := BoxShape3D.new()
@@ -674,10 +678,10 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		cs.shape = bs
 		cs.position = Vector3(rect.get_center().x, maxf(top, 2.5) / 2.0, rect.get_center().y)
 		body.add_child(cs)
-		if architecture.has("front_pick_shapes") and body.get_child_count() <= 2:
-			architecture.front_pick_shapes.append(cs)
+		if architecture.has("shell_pick_shapes"):
+			architecture.shell_pick_shapes.append(cs)
 	holder.add_child(body)
-	if real and city.pilot_active and id == "xom_bo_me":
+	if real and city.has_courtyard(id):
 		# The raised alley paving needs its own click surface. It intentionally has
 		# no location metadata: clicking the floor walks into the courtyard.
 		var paving := StaticBody3D.new()
@@ -694,8 +698,9 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	var loc_tag := _label3d(str(loc.name), Vector3(0, 3.0, city.door_out + 0.4), 22)
 	loc_tag.add_to_group("near_tag")
 	loc_tag.set_meta("range", LOC_TAG_RANGE)
-	if real and city.pilot_active and id in StreetPrototype.LOCATIONS:
+	if real and (city.pilot_active or city.street_upgrade) and id in StreetPrototype.LOCATIONS:
 		loc_tag.set_meta("physical_sign", true)
+		loc_tag.set_meta("sign_shell", architecture.get("front_walls"))
 	holder.add_child(loc_tag)
 	var occ := {"node": bld, "rect": CityMap.footprint(p), "h": top}
 	if real:
@@ -710,7 +715,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	var torus := TorusMesh.new()
 	torus.inner_radius = 0.55
 	torus.outer_radius = 0.72
-	if real and city.pilot_active:
+	if real and (city.pilot_active or city.street_upgrade):
 		torus.inner_radius = 0.59
 		torus.outer_radius = 0.64
 	ring.mesh = torus
@@ -719,7 +724,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	mat.emission_enabled = true
 	mat.emission = Color("f2c14e")
 	mat.emission_energy_multiplier = 0.6
-	if real and city.pilot_active:
+	if real and (city.pilot_active or city.street_upgrade):
 		mat.albedo_color = Color("a99a6c")
 		mat.emission_energy_multiplier = 0.12
 	ring.material_override = mat
@@ -1379,6 +1384,7 @@ func _map_id() -> String:
 ## có biển hiệu đặt lên lô đã dọn, nhà có số để giao hàng, thùng rác, đèn đường, xe máy và người đi bộ trên đường thật.
 func _build_real() -> void:
 	area = AreaBuilder.new()
+	area.street_upgrade = city.street_upgrade
 	area.show_labels = false
 	# Lòng đường có vân nhựa đường như phường vẽ tay, sẫm hơn cho hợp ánh nắng của màn phố; vỉa hè, sân, hẻm lát gạch,
 	# xi măng (xem AreaBuilder.GROUND_SHADER).
@@ -1612,7 +1618,7 @@ func _build_real_traffic() -> void:
 	crowd = Crowd.new()
 	add_child(crowd)
 	crowd.build(area.dress, city.data.roads, area.dress.center, city.walkable, hot, stalls,
-		area.tree_spots() + area.dress.pole_spots + _lamp_spots + (PilotLife.reservation_points(city) if city.pilot_active else []), 0.65 if ScreenFit.low_power else 1.0)
+		area.tree_spots() + area.dress.pole_spots + _lamp_spots + (PilotLife.reservation_points(city) if city.pilot_active or city.street_upgrade else []), 0.65 if ScreenFit.low_power else 1.0)
 	small.shuffle()
 	for k in mini(small.size(), 22):
 		var pth: Dictionary = small[k].duplicate()
@@ -1640,7 +1646,7 @@ static func _poly_at(poly: PackedVector2Array, s: float, off: float) -> Vector2:
 func cam_offset() -> Vector3:
 	if zoom > 1.0:
 		return CAM_OFFSET.lerp(CAM_FAR, zoom - 1.0)
-	return (PILOT_CAM_NEAR if real and city.pilot_active else CAM_NEAR).lerp(CAM_OFFSET, zoom)
+	return (PILOT_CAM_NEAR if real and (city.pilot_active or city.street_upgrade) else CAM_NEAR).lerp(CAM_OFFSET, zoom)
 
 
 ## Bật tắt nhìn toàn cảnh (nút kính lúp trên thanh trên cùng, cho máy cảm ứng): đang ở gần thì lùi ra xa hẳn, đang xa thì về góc chơi.
@@ -1769,39 +1775,7 @@ func _process(delta: float) -> void:
 			key_dir += Vector3(jv.x, 0, jv.y) / maxf(jv.length(), 0.001) * minf(jv.length() * 1.3, 1.0)
 	_update_lane(delta)
 	_update_ride()
-	var motion_start := player.position
-	var step := Vector3.ZERO
-	if key_dir != Vector3.ZERO:
-		_target = null
-		_target_loc = ""
-		step = _slide(key_dir.limit_length(1.0) * _speed() * delta)
-	elif _target != null:
-		step = _follow_path(_speed() * delta)
-	if step != Vector3.ZERO:
-		step = _avoid_people(step, key_dir == Vector3.ZERO)
-		# Bấm đi tới chỗ có người đứng sẵn (nói chuyện, mua hàng): chạm khoảng chừa của họ là coi như tới.
-		if step == Vector3.ZERO and _target != null and not _path.is_empty() \
-				and _path[_path.size() - 1].distance_to(Vector2(player.position.x, player.position.z)) < PERSON_GAP + 0.9:
-			_path_i = _path.size()
-			_arrive()
-	if step != Vector3.ZERO:
-		player.position += step
-		player.position.y = lerpf(player.position.y, city.ground_y(Vector2(player.position.x, player.position.z)), clampf(delta * 12.0, 0.0, 1.0))
-		var run := sprinting()
-		_add_walk(step.length() * (RIDE_TIME if _riding else (RainLayer.WADE_COST if _wading() else (RUN_TIME if run else 1.0))))
-		if run:
-			_run_meters += step.length()
-			if _run_meters >= RUN_FATIGUE_M:
-				_run_meters -= RUN_FATIGUE_M
-				game.add_fatigue(1.0)
-		_idle_t = 0.0
-	# The final path segment can set position directly and return a zero step.
-	# Sampling around navigation also covers that segment, but ignores teleports
-	# that happened before this frame. A blocked player has zero wheel travel.
-	var actual_travel := player.position - motion_start
-	_update_player_motion(actual_travel, delta)
-	if not _riding and _player_motion.speed > 0.001:
-		audio.step(delta * _player_motion.speed / SPEED)
+	var actual_travel := _advance_player(key_dir, delta)
 	for c in idlers:
 		c.animate(delta, 0.0)
 	_tick_idle(delta, actual_travel)
@@ -1816,7 +1790,7 @@ func _process(delta: float) -> void:
 	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
 	var far := clampf(zoom - 1.0, 0.0, 1.0)
 	sun.directional_shadow_max_distance = lerpf(50.0, 180.0, far) if ScreenFit.low_power else lerpf(70.0, 240.0, far)
-	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.light_shadows or (real and city.pilot_active) else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.light_shadows or (real and (city.pilot_active or city.street_upgrade)) else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	if sun.directional_shadow_mode != shadow_mode:
 		sun.directional_shadow_mode = shadow_mode
 	_update_cutaway(delta)
@@ -1872,6 +1846,63 @@ func _pan_by(rel: Vector2) -> void:
 ## Space: đưa máy quay về An ngay.
 func recenter() -> void:
 	_pan = Vector3.ZERO
+
+
+## A short acceleration/stop envelope removes instant full-speed skating. A
+## released key finishes its last small step; blocking UI and arrivals stop it.
+func _advance_player(key_dir: Vector3, delta: float) -> Vector3:
+	var start := player.position
+	var wanted := key_dir.limit_length(1.0)
+	var following := wanted == Vector3.ZERO and _target != null
+	if hud.blocking():
+		_travel_pace.reset()
+		_update_player_motion(Vector3.ZERO, delta)
+		return Vector3.ZERO
+	if wanted != Vector3.ZERO:
+		_target = null
+		_target_loc = ""
+	elif following:
+		_finish_path_step()
+		if _target != null and _path_i < _path.size():
+			var wp: Vector2 = _path[_path_i]
+			wanted = Vector3(wp.x - player.position.x, 0, wp.y - player.position.z).normalized()
+		else:
+			following = false
+	var top_speed := _speed()
+	if wanted != Vector3.ZERO:
+		# Slow briefly while the body turns, particularly when reversing direction.
+		var facing := Vector3(sin(player.rotation.y), 0, cos(player.rotation.y))
+		var alignment := clampf(facing.dot(wanted.normalized()), -1.0, 1.0)
+		top_speed *= lerpf(0.3 if _riding else 0.45, 1.0, (alignment + 1.0) * 0.5)
+	var distance := _travel_pace.advance(wanted, top_speed, delta, _riding, _path_remaining() if following else -1.0)
+	var step := _follow_path(distance) if following else _slide(_travel_pace.direction * distance)
+	if step != Vector3.ZERO:
+		step = _avoid_people(step, following)
+		if step == Vector3.ZERO and following and not _path.is_empty() \
+				and _path[_path.size() - 1].distance_to(Vector2(player.position.x, player.position.z)) < PERSON_GAP + 0.9:
+			_path_i = _path.size()
+			_arrive()
+	if step != Vector3.ZERO:
+		player.position += step
+		player.position.y = lerpf(player.position.y, city.ground_y(Vector2(player.position.x, player.position.z)), clampf(delta * 12.0, 0.0, 1.0))
+	var travel := player.position - start
+	var metres := Vector2(travel.x, travel.z).length()
+	_travel_pace.reconcile(distance, metres, delta)
+	if metres > 0.0:
+		var run := sprinting()
+		_add_walk(metres * (RIDE_TIME if _riding else (RainLayer.WADE_COST if _wading() else (RUN_TIME if run else 1.0))))
+		if run:
+			_run_meters += metres
+			if _run_meters >= RUN_FATIGUE_M:
+				_run_meters -= RUN_FATIGUE_M
+				game.add_fatigue(1.0)
+		_idle_t = 0.0
+	if following:
+		_finish_path_step()
+	_update_player_motion(travel, delta)
+	if not _riding and metres > 0.0:
+		audio.step(metres / 1.7)
+	return travel
 
 
 ## Đi bằng phím: chỉ bước vào chỗ đi được, chạm tường thì trượt dọc theo tường.
@@ -1931,23 +1962,37 @@ func _avoid_people(step: Vector3, steer: bool) -> Vector3:
 
 ## Bước theo các điểm rẽ của đường đi; tới điểm cuối thì mở địa điểm (nếu đi tới một nơi).
 func _follow_path(dist: float) -> Vector3:
+	_finish_path_step()
 	if _path_i >= _path.size():
 		_arrive()
 		return Vector3.ZERO
 	var wp := _path[_path_i]
 	var to := Vector3(wp.x - player.position.x, 0, wp.y - player.position.z)
-	if to.length() <= dist:
+	# Never move the player here: the final centimetres need the same collision,
+	# person avoidance, time accounting and foot/wheel cadence as every other step.
+	return to.limit_length(maxf(dist, 0.0))
+
+
+func _finish_path_step() -> void:
+	var here := Vector2(player.position.x, player.position.z)
+	while _path_i < _path.size() and here.distance_squared_to(_path[_path_i]) < 0.000001:
 		_path_i += 1
-		if _path_i >= _path.size():
-			player.position = Vector3(wp.x, player.position.y, wp.y)
-			_arrive()
-			return Vector3.ZERO
-		return to
-	return to.normalized() * dist
+	if _target != null and _path_i >= _path.size():
+		_arrive()
+
+
+func _path_remaining() -> float:
+	var here := Vector2(player.position.x, player.position.z)
+	var remaining := 0.0
+	for i in range(_path_i, _path.size()):
+		remaining += here.distance_to(_path[i])
+		here = _path[i]
+	return remaining
 
 
 func _arrive() -> void:
 	_target = null
+	_travel_pace.reset()
 	if _target_loc != "":
 		hud.open_location(_target_loc)
 		_target_loc = ""
@@ -2099,11 +2144,14 @@ func _update_cutaway(delta := 0.0) -> void:
 				if kit.front_walls != null:
 					var local := node.to_local(player.global_position)
 					var inside := not overview and local.z < -3.8 and (o.interior_rect as Rect2).has_point(Vector2(local.x, local.z))
-					kit.front_walls.visible = not inside
+					var shell_hidden: bool = inside or (low and (kit.get("front_occlusion_cut", false) or kit.get("occluding_shell") != null))
+					kit.front_walls.visible = not shell_hidden
+					if kit.get("occluding_shell") != null:
+						kit.occluding_shell.visible = not shell_hidden
 					# Navigation still blocks the rooms. Hidden walls must not intercept
 					# clicks aimed at the now-visible courtyard floor behind them.
-					for shape in kit.get("front_pick_shapes", []):
-						shape.set_deferred("disabled", inside)
+					for shape in kit.get("shell_pick_shapes", []):
+						shape.set_deferred("disabled", shell_hidden)
 				continue
 			if o.stand == null:
 				# Cây (dừa): thu nhỏ dần, hạ hẳn thì ẩn.
@@ -2184,6 +2232,7 @@ func _update_ride() -> void:
 		return
 	_riding = want
 	_player_motion.reset()
+	_travel_pace.reset()
 	if _ride_bike == null:
 		_ride_bike = Props3D.moving_instance(Props3D.motorbike("tay_ga", true), Color("733e38"))
 		player.add_child(_ride_bike)
@@ -2220,11 +2269,13 @@ func _update_player_motion(travel: Vector3, delta: float) -> void:
 	player.rotation.y = _player_motion.advance(travel, delta, player.rotation.y, _riding)
 	if player_body.has_method("set_ride_motion"):
 		player_body.set_ride_motion(_player_motion.speed if _riding else 0.0, _player_motion.turn)
-	if player_body.has_method("animate"):
-		player_body.animate(delta, _player_motion.speed / SPEED)
+	if player_body.has_method("animate_motion"):
+		player_body.animate_motion(_player_motion.speed, delta)
+	elif player_body.has_method("animate"):
+		player_body.animate(delta, _player_motion.speed / (1.35 * 1.6))
 	elif _player_motion.speed > 0.001:
 		if not Models.play(player_body, "walk"):
-			_walk_t += delta * 11.0 * _player_motion.speed / SPEED
+			_walk_t += delta * 11.0 * _player_motion.speed / 1.7
 			player_body.position.y = absf(sin(_walk_t)) * 0.06
 	elif not Models.play(player_body, "idle"):
 		player_body.position.y = 0.0
@@ -2501,7 +2552,7 @@ func _update_traffic(delta: float) -> void:
 			Models.play(n.get_child(0), "idle")
 			continue
 		if n.get_child(0).has_method("animate"):
-			n.get_child(0).animate(delta, float(w.speed) / 4.0)
+			n.get_child(0).animate(delta, float(w.speed) / (1.35 * 1.6))
 		Models.play(n.get_child(0), "walk")
 		var to: Vector3 = w.goal - n.position
 		if to.length() < 0.2:
@@ -2719,7 +2770,7 @@ func _update_lighting(hour: float) -> void:
 	var bounce := Color("bfc6cb") if rain else Color("c4ccd0")
 	env.ambient_light_color = bounce.lerp(Color("aab4c4"), nf)
 	env.ambient_light_energy = lerpf(0.56 if rain else 0.55, 0.44, nf)
-	if real and city.pilot_active:
+	if real and (city.pilot_active or city.street_upgrade):
 		# Broad sky fill and weaker raking sun keep worn plaster/skin readable,
 		# with local shop lamps providing the warm accents after sunset.
 		sun.rotation_degrees = Vector3(-elevation, 28.0 + t * 45.0, 0)
@@ -2921,9 +2972,9 @@ var _tag_t := 0.0
 
 func _name_tag(text: String, pos: Vector3) -> Label3D:
 	var l := _label3d(text, pos, 18)
-	l.outline_size = 4 if real and city.pilot_active else 8
+	l.outline_size = 4 if real and (city.pilot_active or city.street_upgrade) else 8
 	l.add_to_group("near_tag")
-	l.set_meta("range", 3.8 if real and city.pilot_active else NAME_RANGE)
+	l.set_meta("range", 3.8 if real and (city.pilot_active or city.street_upgrade) else NAME_RANGE)
 	return l
 
 
@@ -2939,7 +2990,15 @@ func _update_tags(delta: float) -> void:
 		var d := Vector2(lb.global_position.x - player.position.x, lb.global_position.z - player.position.z).length()
 		var on: bool = d < float(lb.get_meta("range", NAME_RANGE)) or zoom > 1.2
 		if lb.get_meta("physical_sign", false) and zoom < 0.75:
-			on = false
+			# A real sign replaces the floating label only when its front faces the
+			# camera and its cutaway shell is visible. Keep a small location label
+			# for side/rear views, so north-facing shops remain discoverable.
+			var holder := lb.get_parent() as Node3D
+			var to_cam := (camera.global_position - lb.global_position).normalized()
+			var shell = lb.get_meta("sign_shell") if lb.has_meta("sign_shell") else null
+			var sign_visible: bool = shell == null or (is_instance_valid(shell) and shell.is_visible_in_tree())
+			if sign_visible and holder.global_basis.z.dot(to_cam) > 0.35:
+				on = false
 		if on != (lb.modulate.a > 0.5):
 			lb.modulate.a = 1.0 if on else 0.0
 			lb.outline_modulate.a = 0.9 if on else 0.0

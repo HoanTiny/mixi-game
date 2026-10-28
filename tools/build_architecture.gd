@@ -96,6 +96,8 @@ func _run() -> void:
 		var group_names := ["ground", "upper", "roof"]
 		if result.front_walls != null:
 			group_names.append("front_walls")
+		if result.get("occluding_shell") != null:
+			group_names.append("occluding_shell")
 		for section in group_names:
 			var group: Node3D = result[section]
 			var mesh_node := group.get_child(0) as MeshInstance3D
@@ -120,6 +122,7 @@ func _run() -> void:
 		assert(instance.has_node("RoofArchitecture/RoofAndCornice"))
 		if cfg.kind == "lodging":
 			assert(instance.has_node("FrontWingWalls/FrontWallsAndDoors"))
+			assert(instance.has_node("CourtyardShell/CourtyardWalls"))
 		instance.free()
 		metrics.append(count)
 		node.free()

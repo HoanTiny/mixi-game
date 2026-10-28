@@ -97,10 +97,21 @@ func _pick(key: String, fallback: Array) -> String:
 ## (bề rộng đường trong OSM hay thiếu phần vỉa hè).
 ## Trả về {a, b, n (pháp tuyến ra đường), road} hay {} nếu nhà không có mặt tiền.
 func _frontage(poly: PackedVector2Array) -> Dictionary:
+	var faces := frontages(poly)
+	if faces.is_empty():
+		return {}
+	faces.sort_custom(func(a: Dictionary, c: Dictionary) -> bool: return float(a.gap)<float(c.gap))
+	return faces[0]
+
+
+## All exposed street edges, including the second elevation of a corner plot.
+## Stable edge indices allow AreaBuilder to replace only those wall surfaces.
+func frontages(poly: PackedVector2Array) -> Array:
 	var c := Geo.centroid(poly)
-	var best := {}
-	var best_d := INF
+	var faces: Array = []
 	for i in poly.size():
+		var best := {}
+		var best_d := INF
 		var a := poly[i]
 		var e := poly[(i + 1) % poly.size()]
 		var l := a.distance_to(e)
@@ -124,15 +135,17 @@ func _frontage(poly: PackedVector2Array) -> Dictionary:
 			var gap := q.distance_to(m) - float(s[2].width) / 2.0
 			if gap < 5.0 and gap < best_d:
 				best_d = gap
-				best = {"a": a, "b": e, "n": n, "road": s[2]}
-	return best
+				best = {"a": a, "b": e, "n": n, "road": s[2], "edge": i, "gap": gap}
+		if not best.is_empty():
+			faces.append(best)
+	return faces
 
 
 ## Một căn (idx: số của căn trong ảnh caps; st: lưới nhà của ô chứa căn): mặt tiền có mái hiên, biển hiệu, chỗ kê bàn
 ## ghế quán cóc, ban công các tầng trên; nhà mái bằng có đồ trên sân thượng. info: flat (mái bằng), wall (màu tường),
 ## lh (cao mỗi tầng).
 func front(st: SurfaceTool, idx: int, poly: PackedVector2Array, base: float, h: float, info := {}) -> void:
-	if base > 0.5 or h < 3.0 or not _near(Geo.centroid(poly), radius):
+	if base > 0.5 or h < 3.0 or (not b.street_upgrade and not _near(Geo.centroid(poly), radius)):
 		return
 	counts.homes += 1
 	var f := _frontage(poly)
@@ -150,6 +163,9 @@ func front(st: SurfaceTool, idx: int, poly: PackedVector2Array, base: float, h: 
 	if _rng.randf() < float(cfg.get("awningShare", 0.7)):
 		var dep := _rng.randf_range(0.9, 1.35)
 		var col := Color(_pick("awnings", ["2f6fb0"]))
+		if b.street_upgrade:
+			dep = minf(dep, 0.85 if small else 1.05)
+			col = col.lerp(Color("66685b"),0.42)
 		var own: int = b._cut_add(PackedVector2Array([a, e, e + n * dep, a + n * dep]), 2.8)
 		counts.awnings += 1
 		st.set_custom(0, Color(own, 2.0, 0.0, 0.0))
@@ -166,6 +182,8 @@ func front(st: SurfaceTool, idx: int, poly: PackedVector2Array, base: float, h: 
 		counts.boards += 1
 		shops.append([(a + e) / 2.0 + n * _rng.randf_range(0.7, 1.1) + d * _rng.randf_range(-0.6, 0.6), n])
 		var board := Color(_pick("boards", ["c0392b"]))
+		if b.street_upgrade:
+			board=board.lerp(Color("776b56"),0.35)
 		var y0 := 2.95
 		var y1 := minf(3.85, h - 0.15)
 		var p0 := a + n * 0.12 + d * 0.15
@@ -197,12 +215,16 @@ func _balconies(st: SurfaceTool, idx: int, a: Vector2, e: Vector2, n: Vector2, h
 	var det: SurfaceTool = b._bst((a + e) / 2.0, true)
 	det.set_custom(0, Color(idx, 3.0, 0.0, 0.0))
 	var flowers := _rng.randf() < float(cfg.get("flowerShare", 0.55))
+	if b.street_upgrade:
+		flowers=flowers and posmod(idx,4)==0
 	var iron := 0.3 if _rng.randf() < 0.7 else 0.4
 	var dep := _rng.randf_range(0.8, 1.1)
 	var parts := clampi(roundi(l / 4.2), 1, 4)
 	var seg := l / parts
 	var top_y := 0.0
 	for k in range(1, mini(floori((h - 0.4) / lh), 7)):
+		if b.street_upgrade and posmod(idx+k,3)==0:
+			continue
 		var y := k * lh
 		if y + 1.4 > h:
 			break
@@ -232,6 +254,18 @@ func _balcony(st: SurfaceTool, p0: Vector2, p1: Vector2, n: Vector2, dep: float,
 		var u: Vector2 = pair[0]
 		var v: Vector2 = pair[1]
 		var sl := u.distance_to(v)
+		if b.street_upgrade:
+			var along := (v-u)/maxf(sl,0.001)
+			var normal := along.orthogonal()
+			var steel := Color("444b45")
+			_slab(st,u,v,normal,0.045,y+0.94,y+1.0,steel,Vector2(0,top))
+			_slab(st,u,v,normal,0.04,y+0.12,y+0.16,steel,Vector2(0,top))
+			for bar in range(0,ceili(sl/0.18)+1):
+				var at := u+along*minf(sl,bar*0.18)
+				var a0 := at-along*0.018
+				var b0 := at+along*0.018
+				_quad(st,Vector3(a0.x,y+0.15,a0.y),Vector3(b0.x,y+0.15,b0.y),Vector3(b0.x,y+0.96,b0.y),Vector3(a0.x,y+0.96,a0.y),steel,Vector2(0,top))
+			continue
 		_quad_uv(st, Vector3(u.x, y, u.y), Vector3(v.x, y, v.y), Vector3(v.x, y + 1.0, v.y), Vector3(u.x, y + 1.0, u.y), wall.darkened(0.3),
 			[Vector2(run, 0.0), Vector2(run + sl, 0.0), Vector2(run + sl, 1.0), Vector2(run, 1.0)], Vector2(iron, top))
 		run += sl

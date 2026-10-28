@@ -19,6 +19,8 @@ const UI := preload("res://scripts/ui/ui_kit.gd")
 const WalkGrid := preload("res://scripts/realmap/walk_grid.gd")
 const StreetDress := preload("res://scripts/realmap/street_dress.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
+const CityFacades := preload("res://scripts/architecture/city_facades.gd")
+const CityTrees := preload("res://scripts/architecture/city_trees.gd")
 
 const BUILDING_SHADER := """
 shader_type spatial;
@@ -123,10 +125,11 @@ void fragment() {
 		float fy = fract(UV.y / 3.2);
 		float fx = fract(UV.x / 2.6);
 		float floor_i = floor(UV.y / 3.2);
-		bool upper = floor_i >= 1.0 && UV.y < UV2.y - 0.6;
+		bool painted_windows = UV2.x < 1.4;
+		bool upper = painted_windows && floor_i >= 1.0 && UV.y < UV2.y - 0.6;
 		bool frame = upper && fy > 0.3 && fy < 0.78 && fx > 0.3 && fx < 0.7;
 		bool glass = upper && fy > 0.35 && fy < 0.74 && fx > 0.35 && fx < 0.65;
-		bool door = floor_i < 1.0 && fy > 0.05 && fy < 0.72 && fx > 0.12 && fx < 0.88 && UV2.y > 4.0;
+		bool door = painted_windows && floor_i < 1.0 && fy > 0.05 && fy < 0.72 && fx > 0.12 && fx < 0.88 && UV2.y > 4.0;
 		float pick = fract(sin(v_idx * 12.9898) * 43758.5453);
 		vec3 trim = pick < 0.45 ? vec3(0.16, 0.42, 0.39) : (pick < 0.7 ? vec3(0.92, 0.91, 0.87) : (pick < 0.85 ? vec3(0.36, 0.24, 0.17) : vec3(0.2, 0.36, 0.56)));
 		// Nhìn xa (mỗi ô cửa chỉ còn vài điểm ảnh) thì mờ dần cửa sổ, tránh lấm tấm.
@@ -146,8 +149,20 @@ void fragment() {
 				win_emit = vec3(1.0, 0.74, 0.4) * 0.7 * vis;
 			}
 		}
-		if (fy < 0.04) col *= mix(1.0, 0.9, vis);
+		if (painted_windows && fy < 0.04) col *= mix(1.0, 0.9, vis);
 		col *= mix(0.86, 1.0, clamp(UV.y / 2.5, 0.0, 1.0));
+	} else if (!flat_color && UV2.x < -0.5) {
+		// Recessed glass/shutters belong to actual apertures, not painted wall masks.
+		if (UV2.x > -1.5) {
+			surface_rough = 0.4;
+			float lit = fract(sin(v_idx * 12.9898 + floor(UV.y / 3.2) * 32.1) * 43758.5453);
+			if (lit < 0.38) win_emit = vec3(0.65, 0.40, 0.19) * 0.65;
+		} else {
+			float slat = smoothstep(0.0, 0.15, fract(UV.y / 0.095));
+			float vis = 1.0 - smoothstep(0.12, 0.7, fwidth(UV.y) / 0.095);
+			col *= mix(1.0, 0.72 + 0.28 * slat, vis);
+			surface_rough = 0.72;
+		}
 	} else if (!flat_color && UV2.x > 0.2) {
 		// Lan can ban công: song dọc, tay vịn, thanh dưới (UV.x: mét dọc lan can, UV.y: 0 ở sàn, 1 ở tay vịn); màu đỉnh
 		// là phần nhìn xuyên qua song. UV2.x 0,3: sắt sơn sẫm; 0,4: sắt sơn trắng. Nhìn xa thì hòa thành màu trung bình.
@@ -337,6 +352,10 @@ var water_color := Color("2b6a8f")
 var park_cars_from := 8.0
 ## Lưới chi tiết của nhà chỉ vẽ khi tâm ô cách máy quay dưới chừng này mét (điện thoại đặt gần hơn cho nhẹ).
 var detail_range := 170.0
+## Opt-in city rollout; enabled by the Hanoi story world, not the generic OSM viewer.
+var street_upgrade := false
+var architecture_counts := {"total":0, "street_buildings":0, "facades":0, "doors":0, "windows":0,
+	"background":0, "heritage":0, "elevated":0, "short":0, "lowered":0, "detail_batches":0, "trees":0}
 var cut_materials: Array = []
 ## Đồ phố Việt (street_dress.gd): đặt tùy chọn trước khi build (center, radius, label_radius, wires, name_of);
 ## để trống là không dựng.
@@ -880,6 +899,7 @@ func _buildings() -> void:
 		if poly.size() < 3:
 			continue
 		var c := Geo.centroid(poly)
+		architecture_counts.total += 1
 		var a := absf(Geo.area(poly))
 		# Số thứ tự căn nhà cho shader hạ nhà: cả căn đọc chung một độ cao trong ảnh caps.
 		var idx := _cut_polys.size()
@@ -896,10 +916,19 @@ func _buildings() -> void:
 			else:
 				h = lh * _rng.randi_range(int(lv[0]), int(lv[1])) + 0.4
 		var base := float(b.min_height)
+		# Lower repetitive narrow house rows without moving any footprint, doorway,
+		# delivery address or landmark. Known civic/large structures keep their height.
+		if street_upgrade and not b.worship and a < 190.0 and base < 0.5 and h > 11.0:
+			var cap := 10.0 + _rng.randf_range(0.0, 1.5)
+			if h > cap:
+				h = cap
+				architecture_counts.lowered += 1
 		var wall_col: Color = b.colour if b.colour != null else Color(str(palette[_rng.randi() % palette.size()]))
 		# Baked maps carry their own pastel colors, so weather those too, not just fallback colors.
 		if not b.worship:
 			wall_col = wall_col.lerp(Color("928774"), 0.3)
+			if street_upgrade:
+				wall_col = CityFacades.wall_color(hash(Vector2i(roundi(c.x*10),roundi(c.y*10))), wall_col)
 		# Cao ốc từ 30 m: kính xanh xám.
 		if b.colour == null and h >= 30.0:
 			wall_col = Color(["5d7389", "4a5a6c", "7f8e9c", "d9dde2"][_rng.randi() % 4])
@@ -939,7 +968,21 @@ func _buildings() -> void:
 			if b.known and h - rh > base + 2.0:
 				h -= rh
 		_cut_tops.append(h + rh)
-		_walls_of(st, poly, base, h, wall_col, not b.worship)
+		var facades: Array = []
+		if street_upgrade:
+			if b.worship:
+				architecture_counts.heritage += 1
+			elif base > 0.5:
+				architecture_counts.elevated += 1
+			elif h < 2.7:
+				architecture_counts.short += 1
+			elif dress != null:
+				facades = dress.frontages(poly)
+				if facades.is_empty():
+					architecture_counts.background += 1
+				else:
+					architecture_counts.street_buildings += 1
+		_walls_of(st, poly, base, h, wall_col, not b.worship, idx, facades)
 		if pitched and float(rect.fill) > 0.82 and shape in ["gabled", "hipped", "half-hipped", "gambrel", "mansard", "skillion"]:
 			_rect_roof(st, rect, h, rh, roof_col, wall_col, shape == "gabled" or shape == "skillion", tiled or b.worship)
 		elif pitched:
@@ -961,6 +1004,7 @@ func _buildings() -> void:
 		mi.mesh = (_bsts[k] as SurfaceTool).commit()
 		mi.material_override = building_mat
 		if k.z == 1:
+			architecture_counts.detail_batches += 1
 			mi.visibility_range_end = detail_range
 			mi.visibility_range_end_margin = 15.0
 		add_child(mi)
@@ -1002,7 +1046,7 @@ static func _tank(st: SurfaceTool, p: Vector2, y: float) -> void:
 ## Lưới nhà của ô chứa điểm p (cùng vật liệu nhà, CUSTOM0 dạng RGBA float): ô TILE mét; detail: lưới chi tiết ô
 ## DETAIL_TILE mét, nhìn xa thì khỏi vẽ. Mỗi lưới nhớ CUSTOM0 riêng: trước khi thêm đỉnh phải set_custom cho căn đang dựng.
 func _bst(p: Vector2, detail := false) -> SurfaceTool:
-	var size := DETAIL_TILE if detail else TILE
+	var size := (48.0 if street_upgrade else DETAIL_TILE) if detail else TILE
 	var k := Vector3i(floori(p.x / size), floori(p.y / size), 1 if detail else 0)
 	if not _bsts.has(k):
 		var st := SurfaceTool.new()
@@ -1013,7 +1057,7 @@ func _bst(p: Vector2, detail := false) -> SurfaceTool:
 
 
 ## Tường quanh đường viền, từ y0 tới y1. UV.x là quãng đường dọc tường, UV.y là độ cao (để shader vẽ cửa sổ theo tầng).
-func _walls_of(st: SurfaceTool, poly: PackedVector2Array, y0: float, y1: float, col: Color, windows := true) -> void:
+func _walls_of(st: SurfaceTool, poly: PackedVector2Array, y0: float, y1: float, col: Color, windows := true, idx := -1, facades: Array = []) -> void:
 	var c := Geo.centroid(poly)
 	var run := 0.0
 	# UV2.x = 1: shader vẽ cửa sổ theo tầng; chùa, đình để tường trơn.
@@ -1029,6 +1073,16 @@ func _walls_of(st: SurfaceTool, poly: PackedVector2Array, y0: float, y1: float, 
 		if Vector2(nn.x, nn.z).dot(mid - c) < 0.0:
 			nn = -nn
 		var shade := col.darkened(0.06) if absf(nn.x) > absf(nn.z) else col
+		var frontage := facades.filter(func(f: Dictionary) -> bool: return int(f.edge)==i)
+		if not frontage.is_empty():
+			var det := _bst(mid,true)
+			var result := CityFacades.build(st,det,idx,p0,p1,Vector2(nn.x,nn.z),y0,y1,shade,hash(Vector2i(roundi(mid.x*10),roundi(mid.y*10))))
+			architecture_counts.facades += 1
+			architecture_counts.doors += int(result.doors)
+			architecture_counts.windows += int(result.windows)
+			st.set_custom(0,Color(idx,1,0,0))
+			run += l
+			continue
 		var u0 := Vector2(run, 0.0)
 		var u1 := Vector2(run + l, 0.0)
 		var hh := y1 - y0
@@ -1206,6 +1260,10 @@ static func _strip_z(poly: PackedVector2Array, x0: float, x1: float) -> Vector2:
 ## lane_mode (world.gd đặt khi An trong ngõ hẹp) chỉ còn để tương thích, không cắt thêm căn nào.
 var lane_mode := false
 const BASE_H := 1.0
+## Street-scale cutaway keeps a low foundation beside An rather than a waist-high
+## slab that can still hide his legs at narrow doorways. Other map views retain
+## their existing foundation height.
+const STREET_BASE_H := 0.35
 const GROUND_H := 3.4
 ## Độ cao trên chân An của các điểm tia nhắm tới: đầu, ngực, gối.
 const RAY_TARGETS := [1.7, 1.2, 0.5]
@@ -1222,7 +1280,7 @@ func update_cut(cam: Vector3, pos: Vector3, delta: float) -> void:
 			if seen.has(i):
 				continue
 			seen[i] = true
-			var t := ray_cap(_cut_polys[i], _cut_tops[i], cam, pos)
+			var t := ray_cap(_cut_polys[i], _cut_tops[i], cam, pos, STREET_BASE_H if street_upgrade else BASE_H)
 			if t < _cut_tops[i]:
 				want[i] = t
 				if not _cut_now.has(i):
@@ -1231,7 +1289,11 @@ func update_cut(cam: Vector3, pos: Vector3, delta: float) -> void:
 	for i in _cut_now.keys():
 		var top: float = _cut_tops[i]
 		var was := float(_cut_now[i])
-		var cur := move_toward(was, float(want.get(i, top)), float(CUT.speed) * delta)
+		var target := float(want.get(i, top))
+		# Never leave An behind a descending 10–25 m roof for several frames. The
+		# close street camera clears new blockers immediately; restoration remains
+		# gradual so houses do not pop back up as he walks around a corner.
+		var cur := target if street_upgrade and target < was else move_toward(was, target, float(CUT.speed) * delta)
 		if cur == was and want.has(i):
 			continue
 		changed = true
@@ -1252,19 +1314,19 @@ func update_cut(cam: Vector3, pos: Vector3, delta: float) -> void:
 ## Mức cắt cho một khối đáy poly cao top: INF nếu không chắn tia nào từ máy quay cam tới An (pos là chân An).
 ## Tia nào đi xuyên qua đáy khối ở độ cao thấp hơn đỉnh khối là bị che; mức cắt lấy theo chỗ tia thấp nhất trong khối
 ## (gần An nhất), kẹp giữa BASE_H và GROUND_H.
-static func ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3) -> float:
+static func ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3, base_h := BASE_H) -> float:
 	# Clear a small band around the player, including companions and nearby doors.
 	var side := Vector3(cam.z - pos.z, 0, pos.x - cam.x).normalized() * 2.4
-	var cap := _single_ray_cap(poly, top, cam, pos)
+	var cap := _single_ray_cap(poly, top, cam, pos, base_h)
 	for offset in [side, -side]:
-		cap = minf(cap, _single_ray_cap(poly, top, cam + offset, pos + offset))
+		cap = minf(cap, _single_ray_cap(poly, top, cam + offset, pos + offset, base_h))
 	return cap
 
 
-static func _single_ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3) -> float:
+static func _single_ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3, base_h := BASE_H) -> float:
 	var p2 := Vector2(pos.x, pos.z)
 	if Geometry2D.is_point_in_polygon(p2, poly):
-		return BASE_H
+		return base_h
 	var a := Vector2(cam.x, cam.z)
 	var bb := Geo.bounds(poly)
 	var seg := Rect2(a, Vector2.ZERO).expand(p2)
@@ -1281,7 +1343,7 @@ static func _single_ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, 
 				low = minf(low, lerpf(cam.y, pos.y + float(h), t))
 	if low >= top:
 		return INF
-	return clampf(low - 0.3, BASE_H, GROUND_H)
+	return clampf(low - 0.3, base_h, GROUND_H)
 
 
 ## Tán cây: coi như khối vuông bằng tán, cao chừng 2,5 lần bán kính; chắn tia tới An thì thu nhỏ hẳn, hết chắn thì to lại.
@@ -1337,19 +1399,20 @@ func reset_cut() -> void:
 func _multimesh_trees() -> void:
 	if _trees.is_empty():
 		return
-	var trunk := Props3D.trunk()
+	var trunk := CityTrees.trunk() if street_upgrade else Props3D.trunk()
 	var bark := ShaderMaterial.new()
 	bark.shader = building_mat.shader
 	bark.set_shader_parameter("flat_color", true)
 	bark.set_shader_parameter("trunk", true)
 	bark.set_shader_parameter("tint", Color("6b4f3a"))
 	cut_materials.append(bark)
-	var crown := Props3D.crown()
+	var crown := CityTrees.crown() if street_upgrade else Props3D.crown()
 	var leaf := ShaderMaterial.new()
 	leaf.shader = building_mat.shader
 	leaf.set_shader_parameter("flat_color", true)
-	leaf.set_shader_parameter("tint", Color("4d6742"))
-	leaf.set_shader_parameter("flame_tint", Color("996344"))
+	leaf.set_shader_parameter("tint", Color("44543a") if street_upgrade else Color("4d6742"))
+	leaf.set_shader_parameter("flame_tint", Color("6c6340") if street_upgrade else Color("996344"))
+	architecture_counts.trees = _trees.size() if street_upgrade else 0
 	cut_materials.append(leaf)
 	_tree_slot.resize(_trees.size())
 	for i in _trees.size():

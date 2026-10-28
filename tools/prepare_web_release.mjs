@@ -26,7 +26,7 @@ assert(shell.includes('__GODOT_CONFIG__') && shell.includes('__BUILD_REVISION__'
 shell = shell.replace('__GODOT_CONFIG__', JSON.stringify(config)).replace('__BUILD_REVISION__', revision);
 await copyFile(resolve(packArg), join(site, packName));
 await writeFile(join(site, 'index.html'), shell);
-await writeFile(join(site, 'version.json'), JSON.stringify({ version: '1.4', revision,
+await writeFile(join(site, 'version.json'), JSON.stringify({ version: '1.5', revision,
   engine: '4.7.2', pack: packName, bytes: pack.length, sha256: hash,
-  builtAt: new Date().toISOString(), preview: '?street-demo', windowsDownload: '1.3.2' }, null, 2) + '\n');
+  builtAt: new Date().toISOString(), preview: '?city-demo', windowsDownload: '1.3.2' }, null, 2) + '\n');
 console.log(JSON.stringify({ revision, pack: packName, bytes: pack.length, sha256: hash }));

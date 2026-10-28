@@ -105,16 +105,23 @@ func _world_motion() -> void:
 		_check(marker.transform.is_equal_approx(marker_pose), "Bank tilted or moved the ground marker")
 	var wheel_material := world._ride_bike.get_surface_override_material(0) as ShaderMaterial
 	_check(is_equal_approx(float(wheel_material.get_shader_parameter("wheel_distance")), 0.6), "World did not pass actual wheel distance")
-	# Run the real _process path-final branch: it moves directly and returns ZERO.
+	# A short route must accelerate and stop through the normal movement path;
+	# every centimetre, including the final step, reaches the wheel shader.
 	var start: Vector3 = world.player.position
 	world._path = PackedVector2Array([Vector2(start.x, start.z), Vector2(start.x + 0.08, start.z)])
 	world._path_i = 1
 	world._target = start + Vector3(0.08, 0, 0)
 	world._target_loc = ""
 	var before: float = world._player_motion.distance
-	world._process(0.02)
+	world._walk_meters = 0.0
+	for frame in 120:
+		world._process(1.0 / 60.0)
+		_check(world.player.position.x <= start.x + 0.0801, "Final path step overshot destination")
+		if world._target == null:
+			break
 	_check(absf(world.player.position.x - start.x - 0.08) < 0.0001, "Final path segment did not arrive exactly")
 	_check(absf(world._player_motion.distance - before - 0.08) < 0.0001, "Final path snap was omitted from wheel travel")
+	_check(absf(world._walk_meters - 0.08 * world.RIDE_TIME) < 0.0001, "Short arrival bypassed per-metre game time accounting")
 	var stopped: float = world._player_motion.distance
 	for frame in 60:
 		world._update_player_motion(Vector3.ZERO, 1.0 / 60.0)
@@ -134,5 +141,8 @@ func _world_motion() -> void:
 	_check(not world._riding and not world._ride_bike.visible and not world._ride_headlight.visible, "Dismount left bike/light active")
 	_check(avatar.transform.is_equal_approx(Transform3D.IDENTITY), "Dismount left avatar offset or banked")
 	_check(world._player_motion.distance == 0.0 and float(wheel_material.get_shader_parameter("wheel_distance")) == 0.0, "Dismount did not reset wheel phase")
+	for frame in 30:
+		world._update_player_motion(Vector3(1.7 / 60.0, 0, 0), 1.0 / 60.0)
+	_check(absf(avatar.animation.speed_scale - 1.7 / 1.5) < 0.003, "Walking cadence is not bound to actual metres per second")
 	world.queue_free()
 	await process_frame

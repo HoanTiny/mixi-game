@@ -206,10 +206,10 @@ func animate_motion(speed: float, delta: float) -> void:
 	# Hysteresis prevents a tiny joystick input from continually restarting clips.
 	var moving := speed > (0.04 if walking else 0.08)
 	if moving:
+		var target := clampf(speed / 1.5, 0.15, 2.3)
 		if not walking:
 			animation.play(walk_clip, 0.2)
-			_walk_cadence = 0.78
-		var target := clampf(speed / 1.5, 0.55, 1.8)
+			_walk_cadence = minf(0.78, target)
 		_walk_cadence = lerpf(_walk_cadence, target, 1.0 - exp(-11.0 * maxf(delta, 0.0)))
 		animation.speed_scale = _walk_cadence
 	elif walking or not animation.is_playing():

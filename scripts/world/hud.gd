@@ -1983,7 +1983,11 @@ func _refresh_location() -> void:
 		return
 	var loc: Dictionary = world.location_info(_loc_id)
 	_loc_title.text = loc.name
-	_loc_desc.text = loc.desc
+	var context := ""
+	if world.real and world.city.street_upgrade and game.chapter() == 1:
+		context = preload("res://scripts/world/street_context.gd").describe(_loc_id, game.clock(), bool(game.s.today.get("rain", false)))
+	# Practical information must remain readable on touch screens too.
+	_loc_desc.text = str(loc.desc) if context.is_empty() else "%s\n%s" % [loc.desc, context]
 	for c in _loc_cards.get_children():
 		c.queue_free()
 	var found := 0
@@ -2094,6 +2098,7 @@ var _tip: PanelContainer
 var _tip_label: Label
 var _tip_id := ""
 var _tip_time := 0.0
+var _tip_cooldown := 0.0
 
 
 func _build_tip(parent: Control) -> void:
@@ -2122,6 +2127,9 @@ func _close_tip() -> void:
 	_tip_id = ""
 	_tip.visible = false
 	if id != "" and game.is_started():
+		# Leave room for the street and the conversation just opened. Tutorials
+		# should not form a queue of new cards after every acknowledgement.
+		_tip_cooldown = 14.0
 		if not game.s.has("tips_seen"):
 			game.s["tips_seen"] = []
 		game.s.tips_seen.append(id)
@@ -2172,6 +2180,9 @@ func _update_tip(dt: float) -> void:
 		_tip.visible = false
 	if not game.is_started() or game.is_over() or dialogs.visible:
 		return
+	if _tip_cooldown > 0.0:
+		_tip_cooldown = maxf(0.0, _tip_cooldown - dt)
+		return
 	if _tip.visible:
 		# Tự tắt sau một lúc nếu người chơi không bấm, coi như đã đọc.
 		_tip_time += dt
@@ -2179,7 +2190,7 @@ func _update_tip(dt: float) -> void:
 			_close_tip()
 		return
 	# Màn thấp: có bảng mở (hay bảng mục tiêu đang mở hết) thì chờ, khỏi đè ô gợi ý lên bảng.
-	if ScreenFit.compact and (_panel_open() or _obj_expanded):
+	if _panel_open() or (ScreenFit.compact and _obj_expanded):
 		return
 	var seen: Array = game.s.get("tips_seen", [])
 	for tip in game.story.get("tips", []):

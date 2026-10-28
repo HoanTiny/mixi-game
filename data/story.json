@@ -247,7 +247,7 @@
  "tips": [
   {
    "id": "di_lai",
-   "text": "Bấm chuột vào mặt đường để đi, hoặc dùng phím WASD. Bấm vào cửa tiệm hay người đứng trước cửa để vào. Đi bộ cũng tốn giờ.",
+      "text": "Bấm mặt đường hoặc dùng WASD để đi bộ. Giữ Shift khi cần chạy; thả ra để chậm lại. Tới cửa tiệm hay người quen, bấm E để gặp. Đi lại vẫn tốn giờ trong ngày.",
    "textTouch": "Chạm vào mặt đường để đi. Chạm vào cửa tiệm hay người đứng trước cửa để vào. Chụm, mở hai ngón để kéo máy quay xa, gần. Đi bộ cũng tốn giờ."
   },
   {

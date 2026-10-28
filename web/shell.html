@@ -116,6 +116,8 @@ const GODOT_CONFIG = __GODOT_CONFIG__;
 // A review slice runs as a disposable demo; normal play keeps its existing save.
 if (new URLSearchParams(location.search).has('street-demo')) {
 	GODOT_CONFIG.args = ['--', '--demo', '--no-title', '--street-demo', '--map=hn_pho_co'];
+} else if (new URLSearchParams(location.search).has('city-demo')) {
+	GODOT_CONFIG.args = ['--', '--demo', '--no-title', '--map=hn_pho_co'];
 }
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);

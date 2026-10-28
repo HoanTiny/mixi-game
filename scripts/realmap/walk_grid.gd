@@ -55,6 +55,7 @@ func _init(data, bounds: Rect2) -> void:
 
 ## Chặn mọi ô ngoài khung r (mép map của truyện): không đi, không tìm đường ra ngoài chỗ đã dựng.
 func block_outside(r: Rect2) -> void:
+	_paths.clear()
 	var reg := grid.region
 	for x in range(reg.position.x, reg.end.x):
 		for y in range(reg.position.y, reg.end.y):
@@ -64,6 +65,7 @@ func block_outside(r: Rect2) -> void:
 
 ## Chặn thêm một đa giác sau khi dựng lưới (nhà của địa điểm trong truyện).
 func block_poly(poly: PackedVector2Array) -> void:
+	_paths.clear()
 	_block_poly(poly)
 
 
@@ -214,20 +216,26 @@ func _cost(p: Vector2) -> float:
 func path(a: Vector2, b: Vector2) -> PackedVector2Array:
 	var s := nearest_walkable(a)
 	var g := nearest_walkable(b)
-	var key := Vector4i(floori(s.x), floori(s.y), floori(g.x), floori(g.y))
+	# Smoothed segments depend on the exact sub-cell endpoints. Reusing a path
+	# merely because both points share their old grid cells can connect a new
+	# endpoint through a blocked corner. Exact keys retain repeated NPC routes.
+	var key := Vector4(s.x,s.y,g.x,g.y)
 	if _paths.has(key):
-		var hit: PackedVector2Array = _paths[key].duplicate()
-		# Đường nhớ sẵn tính từ giữa ô: đầu, cuối đặt lại đúng chỗ.
-		hit[0] = s
-		hit[hit.size() - 1] = g
-		return hit
-	var ids := grid.get_id_path(Vector2i(key.x, key.y), Vector2i(key.z, key.w))
+		return (_paths[key] as PackedVector2Array).duplicate()
+	var ids := grid.get_id_path(Vector2i(floori(s.x),floori(s.y)),Vector2i(floori(g.x),floori(g.y)))
 	if ids.is_empty():
 		return PackedVector2Array()
 	var pts := PackedVector2Array([s])
-	for i in range(1, ids.size() - 1):
-		pts.append(Vector2(ids[i]) + Vector2(0.5, 0.5))
-	pts.append(g)
+	# Include start/end cell centres. Each raw connector then stays inside its
+	# free cell or crosses a valid A* neighbour, even for an edge click.
+	for id in ids:
+		var center:=Vector2(id)+Vector2(0.5,0.5)
+		if center.distance_squared_to(pts[-1])>0.000001:
+			pts.append(center)
+	if g.distance_squared_to(pts[-1])>0.000001:
+		pts.append(g)
+	if pts.size()==1:
+		pts.append(g)
 	# Nắn thẳng: từ mỗi điểm nhảy tới điểm xa nhất (trong SMOOTH_LOOK điểm tới) đi thẳng được, tìm bằng chia đôi cho
 	# nhanh (đường dài trên map thật cả nghìn ô, xét từng cặp thì khựng cả khung hình).
 	var out := PackedVector2Array([pts[0]])
@@ -255,10 +263,41 @@ func path(a: Vector2, b: Vector2) -> PackedVector2Array:
 ## Đi thẳng từ a tới b được không: không vướng gì, và không cắt qua chỗ đắt hơn cả hai đầu (đang đi trên phố thì
 ## không đi tắt qua khe nhà hay bãi trống).
 func _clear(a: Vector2, b: Vector2) -> bool:
-	var steps := int(ceil(a.distance_to(b) / 0.5))
 	var lim := maxf(_cost(a), _cost(b))
-	for k in steps + 1:
-		var q := a.lerp(b, float(k) / float(maxi(steps, 1)))
-		if not walkable(q) or _cost(q) > lim:
+	var cell:=Vector2i(floori(a.x),floori(a.y))
+	var finish:=Vector2i(floori(b.x),floori(b.y))
+	if not _clear_cell(cell,lim) or not _clear_cell(finish,lim):
+		return false
+	var direction:=b-a
+	var step:=Vector2i(signi(finish.x-cell.x),signi(finish.y-cell.y))
+	var dx:=1.0/absf(direction.x) if absf(direction.x)>0.000001 else INF
+	var dy:=1.0/absf(direction.y) if absf(direction.y)>0.000001 else INF
+	var tx:=((cell.x+1.0-a.x) if step.x>0 else (a.x-cell.x))*dx if step.x!=0 else INF
+	var ty:=((cell.y+1.0-a.y) if step.y>0 else (a.y-cell.y))*dy if step.y!=0 else INF
+	# Grid traversal checks every crossed cell. A fixed 0.5m sampling interval
+	# missed small corner crossings along otherwise clear long street segments.
+	var budget:=absi(finish.x-cell.x)+absi(finish.y-cell.y)+2
+	for unused in budget:
+		if cell==finish:
+			return true
+		if absf(tx-ty)<0.000001:
+			# Match A*'s NO_OBSTACLES diagonal rule: do not brush through the
+			# shared corner of two blocked orthogonal neighbours.
+			if not _clear_cell(cell+Vector2i(step.x,0),lim) or not _clear_cell(cell+Vector2i(0,step.y),lim):
+				return false
+			cell+=step
+			tx+=dx
+			ty+=dy
+		elif tx<ty:
+			cell.x+=step.x
+			tx+=dx
+		else:
+			cell.y+=step.y
+			ty+=dy
+		if not _clear_cell(cell,lim):
 			return false
-	return true
+	return false
+
+
+func _clear_cell(cell: Vector2i, limit: float) -> bool:
+	return grid.is_in_boundsv(cell) and not grid.is_point_solid(cell) and grid.get_point_weight_scale(cell)<=limit

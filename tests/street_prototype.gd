@@ -65,8 +65,9 @@ func _run() -> void:
 			if o.has("architecture"):
 				assert(o.architecture.ground.visible and o.node.scale.is_equal_approx(Vector3.ONE))
 				house_cut = house_cut or not o.architecture.roof.visible
-				if o.architecture.front_walls != null:
+				if o.architecture.get("occluding_shell") != null:
 					assert(not o.architecture.front_walls.visible, "Front wings must reveal the whole courtyard")
+					assert(not o.architecture.occluding_shell.visible, "Courtyard walls must reveal the whole courtyard")
 		assert(house_cut, "Courtyard view must cut away obstructing roof")
 		await physics_frame
 		await process_frame

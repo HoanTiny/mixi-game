@@ -2,8 +2,8 @@ extends RefCounted
 ## Presentation only: navigation owns translation. Drive wheel phase and body
 ## cadence from the distance actually covered, never from a requested speed.
 
-const WALK_TURN_RATE := 17.260924
-const RIDE_TURN_RATE := 10.0
+const WALK_TURN_RATE := 9.5
+const RIDE_TURN_RATE := 6.5
 const MAX_BANK := 0.12
 var speed := 0.0
 var turn := 0.0

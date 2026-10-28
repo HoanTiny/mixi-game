@@ -1,4 +1,4 @@
-# Triển khai bản web 1.4
+# Triển khai bản web 1.5
 
 Nguồn nằm ở nhánh `feature/noi-chuyen`, website GitHub Pages lấy nhánh `gh-pages`.
 Giữ lịch sử của cả hai nhánh, không force-push. Gộp các thay đổi mới trên remote
@@ -17,7 +17,8 @@ cùng phiên bản trên `gh-pages`. Không cần tải template của mọi n�
 - Dựng lại cây site từ commit `origin/gh-pages` hiện tại vào thư mục staging.
 - Chạy `node tools/prepare_web_release.mjs build/pages build/web/index.pck SOURCE_SHA`.
   Công cụ ghi HTML từ `web/shell.html`, tên PCK theo SHA-256 và `version.json`.
-- Thử cả trang chính và `?street-demo` trên trình duyệt. Demo truyền các cờ
+- Thử cả trang chính và `?city-demo` trên trình duyệt. Demo toàn phố truyền các cờ
+  `--demo --no-title --map=hn_pho_co`, không ghi save chính. Phố mẫu `?street-demo` truyền
   `--demo --no-title --street-demo --map=hn_pho_co`, giữ `_persist=false`.
 - Chỉ đưa các file site vào commit `gh-pages`, với parent là bản triển khai mới nhất.
   Giữ file tải Windows hiện có; không ghi đè bản Windows bằng gói chưa kiểm.

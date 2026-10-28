@@ -1,12 +1,16 @@
 extends RefCounted
-## Three authored street fronts. All decoration stays inside the existing lots;
-## the central approach, NPCs and quest interaction rings remain unobstructed.
+## Named Hanoi street fronts. Keep each location's existing plot and door while
+## giving every occupation a readable frontage and separate cutaway groups.
 const Props := preload("res://scripts/world/props3d.gd")
 const Surfaces := preload("res://scripts/world/surfaces.gd")
 const WorkProps := preload("res://scripts/work/work_props.gd")
 const Models := preload("res://scripts/world/models.gd")
 const Architecture := preload("res://scripts/architecture/street_kit.gd")
-const LOCATIONS := ["com_hanh", "tiem_sau", "xom_bo_me"]
+const StoryFronts := preload("res://scripts/architecture/story_fronts.gd")
+const PRIMARY := ["com_hanh", "tiem_sau", "xom_bo_me"]
+const LOCATIONS := ["com_hanh", "tiem_sau", "xom_bo_me", "cho_cau_nho", "ben_xe_6",
+	"nha_di_nam", "hem_dua", "ben_can", "cau_tre", "bai_boc_vac", "xe_tho",
+	"nha_tro_giuong", "quan_net", "cam_do", "ve_so", "ho_guom", "shop_ao", "bi_a", "tiem_toc"]
 
 ## Reuse the photographed props already shipped for the work scenes. Fit before
 ## rotating so each cluster has predictable bounds and stays behind the sidewalk.
@@ -119,6 +123,10 @@ static func signboard(world, parent: Node3D, text: String, pos: Vector3, width: 
 		parent.add_child(small)
 
 static func build(world, parent: Node3D, id: String, width: float, depth: float, seed := -1) -> Dictionary:
+	if id not in PRIMARY:
+		var city_kit := StoryFronts.build(parent, id, width, depth, LOCATIONS.find(id) if seed < 0 else seed)
+		signboard(world, city_kit.front_walls, city_kit.sign_text, city_kit.sign_position, city_kit.sign_width, city_kit.sign_color)
+		return city_kit
 	var kinds := {"com_hanh": "restaurant", "tiem_sau": "repair", "xom_bo_me": "lodging"}
 	var kit := Architecture.build(parent, kinds[id], width, depth, LOCATIONS.find(id) if seed < 0 else seed)
 	var sign_pos: Vector3 = kit.sign_position
@@ -188,4 +196,6 @@ static func build(world, parent: Node3D, id: String, width: float, depth: float,
 			world._block(Vector3(5.6, 0.025, 0.025), Vector3(0, 2.6, -depth + 0.9), Color("494a40"), parent)
 			for i in 5:
 				laundry(parent, Vector3(-2.3 + i * 1.05, 2.58, -depth + 0.9), i)
+	kit["owns_dressing"] = true
+	kit["identity"] = kinds[id]
 	return kit

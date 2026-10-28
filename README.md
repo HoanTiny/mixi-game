@@ -1,12 +1,13 @@
 # Trên Phố · Trước mùa mưa
 
-**Bản web 1.4 · phố mẫu, nhân vật và xe**
+**Bản web 1.5 · phố cổ và nhịp sống**
 
 - [Chơi bản chính](https://hoantiny.github.io/mixi-game/) ·
-  [Xem phố mẫu mới](https://hoantiny.github.io/mixi-game/?street-demo).
-- Phố mẫu có quán cơm, tiệm sửa xe và hẻm trọ; chế độ xem thử không ghi vào save chính.
-- Nhân vật có tư thế lái và nhịp bước mới; xe gần có bánh quay, đèn đêm, vật liệu mới.
-- Chi tiết: [bản nâng cấp](docs/MOBILITY_UPGRADE.md), [phố mẫu](docs/STREET_PROTOTYPE.md),
+  [Xem thử toàn phố cổ](https://hoantiny.github.io/mixi-game/?city-demo).
+- Nâng cấp cả 19 địa điểm và 1.268 nhà hướng phố; sân trọ đi được, nhà che người được cắt riêng.
+- Đi bộ 1,7 m/s, Shift chạy nhẹ; nhân vật và xe tăng/giảm tốc, nhịp bước theo quãng đường thật.
+- Chế độ xem thử không ghi save chính. Phố mẫu cũ vẫn có ở `?street-demo`.
+- Chi tiết: [nâng cấp toàn phố](docs/CITY_UPGRADE.md), [di chuyển](docs/LOCOMOTION_UPDATE.md),
   [đợt tiếp theo](docs/NEXT_UPDATE.md), [triển khai web](docs/WEB_RELEASE.md).
 - Bản tải Windows hiện vẫn là 1.3.2; lần phát hành này cập nhật bản web.
 

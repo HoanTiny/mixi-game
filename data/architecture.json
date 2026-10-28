@@ -1,26 +1,258 @@
 {
-  "version": 2,
+  "version": 3,
   "units": "metres",
-  "facade": {"x": "frontage", "y": "height", "z": "street positive, building rear negative", "origin": "frontage centre, ground level"},
+  "facade": {
+    "x": "frontage",
+    "y": "height",
+    "z": "street positive, building rear negative",
+    "origin": "frontage centre, ground level"
+  },
   "generator": "res://tools/build_architecture.gd",
   "runtime": "res://scripts/architecture/street_kit.gd",
   "authorship": "Original geometry authored for this project. No game assets or extracted models used.",
   "materials": "Existing project Poly Haven plaster, timber, worn tile and corrugated metal PBR textures; source licences retained under assets/ph.",
-  "geometry": "Indexed ArrayMesh surfaces with metric UVs, vertex normals, tangent space and vertex colour. Batched by material within separate ground, upper, roof and lodging front-wall groups.",
+  "geometry": "Indexed ArrayMesh surfaces with metric UVs, vertex normals, tangent space and vertex colour. Batched by material within floor, upper, roof and independently hideable ground-shell groups.",
   "weathering": "Irregular feathered damp and limewash patches, staggered exposed brick repairs, worn cement skirting, water runoff marks, utility meters, conduits and upper-storey AC units. Existing PBR textures only; no downloaded decals.",
-  "floor_materials": {"restaurant": "muted worn_tile_floor", "repair": "neutral concrete_floor_02 at 0.32 tiles per metre", "lodging": "neutral concrete_floor_02 at 0.32 tiles per metre"},
-  "cutaway_groups": ["UpperArchitecture", "RoofArchitecture", "FrontWingWalls (lodging only, while inside courtyard)"],
+  "floor_materials": {
+    "restaurant": "muted worn_tile_floor",
+    "repair": "neutral concrete_floor_02 at 0.32 tiles per metre",
+    "lodging": "neutral concrete_floor_02 at 0.32 tiles per metre"
+  },
+  "cutaway_groups": [
+    "UpperArchitecture",
+    "RoofArchitecture",
+    "FrontWingWalls (all expanded named fronts: full high ground shell and fascia; original lodging: entrance wings)",
+    "CourtyardShell (original lodging: rear and side walls)"
+  ],
   "collision": "Local Rect2 footprints returned as blockers by build(); physical geometry has no full-footprint solid shell.",
-  "lodging": {"width": 13, "depth": 8, "entrance_width": 3, "front_wing_depth": 4, "courtyard_width": 7, "courtyard_z": [-7.7, -4]},
+  "lodging": {
+    "width": 13,
+    "depth": 8,
+    "entrance_width": 3,
+    "front_wing_depth": 4,
+    "courtyard_width": 7,
+    "courtyard_z": [
+      -7.7,
+      -4
+    ]
+  },
   "archetypes": [
-    {"id": "rice_shop", "scene": "res://scenes/architecture/rice_shop.tscn", "kind": "restaurant", "width": 8, "depth": 8, "seed": 0, "features": ["open shop recess", "striped fabric canopy", "full-width iron balcony", "wooden shutters", "corrugated pitched roof"]},
-    {"id": "repair_workshop", "scene": "res://scenes/architecture/repair_workshop.tscn", "kind": "repair", "width": 9, "depth": 8, "seed": 1, "features": ["wide workshop opening", "rolled steel shutter", "clerestory windows", "low industrial roof", "exposed brick pier repairs"]},
-    {"id": "lodging_courtyard", "scene": "res://scenes/architecture/lodging_courtyard.tscn", "kind": "lodging", "width": 13, "depth": 8, "seed": 2, "features": ["three-metre alley", "seven-metre rear courtyard", "recessed timber room doors", "two upper front wings", "low rear room roofs"]},
-    {"id": "terrace_shuttered", "scene": "res://scenes/architecture/terrace_shuttered.tscn", "kind": "residential", "width": 5.8, "depth": 8, "seed": 0},
-    {"id": "terrace_narrow_balcony", "scene": "res://scenes/architecture/terrace_narrow_balcony.tscn", "kind": "residential", "width": 5.2, "depth": 8, "seed": 1},
-    {"id": "terrace_three_bay", "scene": "res://scenes/architecture/terrace_three_bay.tscn", "kind": "residential", "width": 6.6, "depth": 8, "seed": 2},
-    {"id": "terrace_flat_roof", "scene": "res://scenes/architecture/terrace_flat_roof.tscn", "kind": "residential", "width": 5.5, "depth": 8, "seed": 3},
-    {"id": "terrace_plain_sash", "scene": "res://scenes/architecture/terrace_plain_sash.tscn", "kind": "residential", "width": 5.8, "depth": 8, "seed": 4},
-    {"id": "terrace_roof_rail", "scene": "res://scenes/architecture/terrace_roof_rail.tscn", "kind": "residential", "width": 6.6, "depth": 8, "seed": 5}
+    {
+      "id": "rice_shop",
+      "scene": "res://scenes/architecture/rice_shop.tscn",
+      "kind": "restaurant",
+      "width": 8,
+      "depth": 8,
+      "seed": 0,
+      "features": [
+        "open shop recess",
+        "striped fabric canopy",
+        "full-width iron balcony",
+        "wooden shutters",
+        "corrugated pitched roof"
+      ]
+    },
+    {
+      "id": "repair_workshop",
+      "scene": "res://scenes/architecture/repair_workshop.tscn",
+      "kind": "repair",
+      "width": 9,
+      "depth": 8,
+      "seed": 1,
+      "features": [
+        "wide workshop opening",
+        "rolled steel shutter",
+        "clerestory windows",
+        "low industrial roof",
+        "exposed brick pier repairs"
+      ]
+    },
+    {
+      "id": "lodging_courtyard",
+      "scene": "res://scenes/architecture/lodging_courtyard.tscn",
+      "kind": "lodging",
+      "width": 13,
+      "depth": 8,
+      "seed": 2,
+      "features": [
+        "three-metre alley",
+        "seven-metre rear courtyard",
+        "recessed timber room doors",
+        "two upper front wings",
+        "low rear room roofs"
+      ]
+    },
+    {
+      "id": "terrace_shuttered",
+      "scene": "res://scenes/architecture/terrace_shuttered.tscn",
+      "kind": "residential",
+      "width": 5.8,
+      "depth": 8,
+      "seed": 0
+    },
+    {
+      "id": "terrace_narrow_balcony",
+      "scene": "res://scenes/architecture/terrace_narrow_balcony.tscn",
+      "kind": "residential",
+      "width": 5.2,
+      "depth": 8,
+      "seed": 1
+    },
+    {
+      "id": "terrace_three_bay",
+      "scene": "res://scenes/architecture/terrace_three_bay.tscn",
+      "kind": "residential",
+      "width": 6.6,
+      "depth": 8,
+      "seed": 2
+    },
+    {
+      "id": "terrace_flat_roof",
+      "scene": "res://scenes/architecture/terrace_flat_roof.tscn",
+      "kind": "residential",
+      "width": 5.5,
+      "depth": 8,
+      "seed": 3
+    },
+    {
+      "id": "terrace_plain_sash",
+      "scene": "res://scenes/architecture/terrace_plain_sash.tscn",
+      "kind": "residential",
+      "width": 5.8,
+      "depth": 8,
+      "seed": 4
+    },
+    {
+      "id": "terrace_roof_rail",
+      "scene": "res://scenes/architecture/terrace_roof_rail.tscn",
+      "kind": "residential",
+      "width": 6.6,
+      "depth": 8,
+      "seed": 5
+    }
+  ],
+  "story_runtime": "res://scripts/architecture/story_fronts.gd",
+  "story_coverage": {
+    "map": "hn_pho_co",
+    "named_locations": 19,
+    "primary_prototypes": 3,
+    "expanded_fronts": 16,
+    "identity_types": 17,
+    "legacy_dressing": "Disabled when owns_dressing is true",
+    "navigation": "Stable plot and interaction IDs; only main lodging courtyard opens via RealCity navigation",
+    "details_lod": "Use-specific small props batched by material and hidden beyond 72 m",
+    "visual_review": "GPU review found north-facing lintel/pier occlusion, fascia hidden below balconies, and opaque backing behind service displays. Fixed separate shell groups, odd market bays, projected fascia and real framed transparent display glazing."
+  },
+  "story_archetypes": [
+    {
+      "kind": "market",
+      "features": [
+        "low pitched hall roof",
+        "steel roof trusses",
+        "weathered masonry piers",
+        "open produce stalls"
+      ]
+    },
+    {
+      "kind": "beer",
+      "features": [
+        "five narrow terrace shopfronts",
+        "fabric canopies",
+        "low tables and benches"
+      ]
+    },
+    {
+      "kind": "home",
+      "features": [
+        "recessed entrance",
+        "shoe rack",
+        "timber bench",
+        "separate upper balcony"
+      ]
+    },
+    {
+      "kind": "dorm",
+      "features": [
+        "two adjoining frontages",
+        "visible bunk frame",
+        "ladder and shared bench"
+      ]
+    },
+    {
+      "kind": "internet",
+      "features": [
+        "wide glazed frontage",
+        "desks",
+        "monitors and keyboard geometry"
+      ]
+    },
+    {
+      "kind": "pawn",
+      "features": [
+        "barred counter",
+        "recessed side display"
+      ]
+    },
+    {
+      "kind": "lottery",
+      "features": [
+        "ticket counter",
+        "paper ticket layout"
+      ]
+    },
+    {
+      "kind": "clothes",
+      "features": [
+        "standing garment racks",
+        "hanging shirts"
+      ]
+    },
+    {
+      "kind": "barber",
+      "features": [
+        "inset mirror",
+        "hydraulic chair",
+        "waiting bench"
+      ]
+    },
+    {
+      "kind": "billiards",
+      "features": [
+        "two felt tables",
+        "pockets",
+        "cue rack"
+      ]
+    },
+    {
+      "kind": "bus",
+      "features": [
+        "thin steel shelter",
+        "route board",
+        "timber waiting bench"
+      ]
+    },
+    {
+      "kind": "loading",
+      "features": [
+        "corrugated shelter",
+        "slatted produce crates",
+        "spoked handcart"
+      ]
+    },
+    {
+      "kind": "cart",
+      "features": [
+        "two handcarts",
+        "separate roof"
+      ]
+    },
+    {
+      "kind": "park",
+      "features": [
+        "timber-and-iron benches",
+        "stone chess table",
+        "stone stools"
+      ]
+    }
   ]
 }

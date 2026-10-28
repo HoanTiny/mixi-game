@@ -102,6 +102,9 @@ static func _mat(key: String, seed: int) -> Material:
 			m = Props.plain(Color(["5a7067", "776c58", "667777", "6c635b"][variant]), 0.79, 0.18)
 		"glass":
 			m = Props.plain(Color("243c3b"), 0.24, 0.12)
+		"display_glass":
+			m = Props.plain(Color(0.32, 0.48, 0.47, 0.17), 0.2, 0.05)
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		"brick":
 			m = Props.tex("plastered_wall_04", 3.1, Color("9a7059")).duplicate()
 		"damp":
@@ -300,7 +303,7 @@ static func _sloped_roof(b: Batch, width: float, depth: float, eave: float, ridg
 ## Kinds: restaurant, repair, lodging, residential. Residential seed selects six profiles.
 ## Blockers are local XZ footprints; upper/roof can be hidden independently for cutaway.
 ## Geometry is authored at the requested lot size; only balcony/eave details overhang.
-static func build(parent: Node3D, kind: String, width: float, depth: float, seed: int = 0) -> Dictionary:
+static func build(parent: Node3D, kind: String, width: float, depth: float, seed: int = 0, split_shell := false) -> Dictionary:
 	# Lot boundaries must stay exact: widening a narrow terrace breaks navigation.
 	assert(width >= 3.0 and depth >= 4.0, "Architecture lots require at least 3m width and 4m depth")
 	assert(kind != "lodging" or width >= 7.0, "Courtyard lodging requires at least 7m width")
@@ -316,11 +319,17 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 	parent.add_child(upper)
 	parent.add_child(roof)
 	var front_walls: Node3D = null
-	if kind == "lodging":
+	if kind == "lodging" or split_shell:
 		front_walls = Node3D.new()
 		front_walls.name = "FrontWingWalls"
 		parent.add_child(front_walls)
+	var occluding_shell: Node3D = null
+	if kind == "lodging":
+		occluding_shell = Node3D.new()
+		occluding_shell.name = "CourtyardShell"
+		parent.add_child(occluding_shell)
 	var g := Batch.new()
+	var slab := Batch.new() if split_shell or kind == "lodging" else g
 	var u := Batch.new()
 	var r := Batch.new()
 	var fw := Batch.new()
@@ -332,7 +341,7 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 	var h := 7.2
 	var sign_y := 2.95
 	# All shells have floors and individual thickness walls, never a footprint-sized solid box.
-	g.box(_mat("concrete" if kind in ["repair", "lodging"] else "floor", seed), Vector3(0, 0.07, -d / 2.0), Vector3(w, 0.14, d))
+	slab.box(_mat("concrete" if kind in ["repair", "lodging"] else "floor", seed), Vector3(0, 0.07, -d / 2.0), Vector3(w, 0.14, d))
 	for s in [-1.0, 1.0]:
 		if kind == "lodging":
 			var split := minf(4.0, d * 0.5)
@@ -409,6 +418,14 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			r.box(_mat("roof", seed), Vector3(rear_x, 3.08, rear_z), Vector3(rear_wing + 0.25, 0.12, rear_depth + 0.2))
 			blockers.append(Rect2(rear_x - rear_wing / 2.0, -d + 0.3, rear_wing, rear_depth))
 		blockers.append(Rect2(-w / 2.0, -d, w, 0.3))
+		# Keep the room plan legible when the tall shell yields to the camera.
+		# These low courses stay wholly inside the existing blocked footprints.
+		for room in blockers:
+			var course := minf(0.22, minf(room.size.x, room.size.y) / 2.0)
+			var middle := room.get_center()
+			for side in [-1.0, 1.0]:
+				slab.box(old, Vector3(middle.x, 0.24, middle.y + side * (room.size.y - course) / 2.0), Vector3(room.size.x, 0.32, course))
+				slab.box(old, Vector3(middle.x + side * (room.size.x - course) / 2.0, 0.24, middle.y), Vector3(course, 0.32, room.size.y))
 		fw.box(old, Vector3(0, 3.0, 0), Vector3(corridor, 0.28, 0.4))
 		g.box(old, Vector3(0, 0.09, -0.12), Vector3(corridor, 0.08, 0.55))
 		_air_conditioner(u, w, seed, 5.68)
@@ -437,8 +454,9 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 		_sloped_roof(r, w, d, 4.3, h, seed)
 	else:
 		var restaurant := kind == "restaurant"
+		var shop := kind in ["shop", "service"]
 		var profile := posmod(seed, 6) if not restaurant else 0
-		var ground_opening := maxf(2.4, w - 1.2) if restaurant else maxf(2.5, w * 0.55)
+		var ground_opening := maxf(2.4, w - 1.2) if restaurant or shop else maxf(2.5, w * 0.55)
 		_opening(g, wall, 0, 0.14, -0.12, w, 3.3, ground_opening, 2.6)
 		var pier := (w - ground_opening) / 2.0
 		for s in [-1.0, 1.0]:
@@ -489,6 +507,17 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			# Recessed folding residential entry, leaving central 2.5 m as an open passage.
 			for s in [-1.0, 1.0]:
 				g.box(shutter, Vector3(s * (ground_opening / 2.0 + 0.03), 1.4, -0.42), Vector3(0.12, 2.5, 0.55))
+			if shop:
+				# Shop displays sit behind a real reveal; the central entrance stays open.
+				var display_w := maxf(0.28, (ground_opening - 1.6) / 2.0)
+				for s in [-1.0, 1.0]:
+					var glass_x: float = s * (0.8 + display_w / 2.0)
+					for side in [-1.0, 1.0]:
+						g.box(iron, Vector3(glass_x + side * (display_w / 2.0 - 0.022), 1.35, -0.55), Vector3(0.045, 2.4, 0.07))
+					for y in [0.17, 2.53]:
+						g.box(iron, Vector3(glass_x, y, -0.55), Vector3(display_w, 0.045, 0.07))
+					g.box(_mat("display_glass", seed), Vector3(glass_x, 1.4, -0.5), Vector3(maxf(0.16, display_w - 0.09), 2.23, 0.025))
+					g.box(old, Vector3(glass_x, 0.2, -0.46), Vector3(display_w + 0.05, 0.1, 0.16))
 		_air_conditioner(u, w, seed)
 	if kind != "lodging":
 		var header_y := 4.17 if kind == "repair" else 6.22
@@ -509,9 +538,16 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 	u.box(iron, Vector3(px, 4.2, 0.18), Vector3(0.14, 0.04, 0.12))
 	u.rod(iron, Vector3(px, h - 0.4, 0.2), Vector3(px, h - 0.33, 0.43), 0.045)
 	ground.set_meta("blockers", blockers)
-	g.finish(ground, "MasonryAndDetails")
+	if kind == "lodging":
+		slab.finish(ground, "MasonryAndDetails")
+		g.finish(occluding_shell, "CourtyardWalls")
+	elif split_shell:
+		slab.finish(ground, "PermanentFloor")
+		g.finish(front_walls, "CutawayGroundShell")
+	else:
+		g.finish(ground, "MasonryAndDetails")
 	u.finish(upper, "UpperAndBalcony")
 	r.finish(roof, "RoofAndCornice")
-	if front_walls != null:
+	if kind == "lodging":
 		fw.finish(front_walls, "FrontWallsAndDoors")
-	return {"height": h, "ground": ground, "upper": upper, "roof": roof, "front_walls": front_walls, "blockers": blockers, "sign_position": Vector3(0, sign_y, 0.15), "sign_width": w - 0.6}
+	return {"height": h, "ground": ground, "upper": upper, "roof": roof, "front_walls": front_walls, "occluding_shell": occluding_shell, "front_occlusion_cut": split_shell, "blockers": blockers, "sign_position": Vector3(0, sign_y, 0.15), "sign_width": w - 0.6}

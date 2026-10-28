@@ -30,6 +30,8 @@ var fillers: Array = []
 ## Authored review slice. All coordinates/footprints live in data/street_pilot.json;
 ## normal games never load its overrides or alter the baked city around it.
 var pilot_active := false
+## The approved street treatment is the normal Hanoi map, not a demo override.
+var street_upgrade := false
 var pilot_plots: Array = []
 var pilot_courtyard := Vector2.ZERO
 var pilot_walk_points: Dictionary = {}
@@ -57,6 +59,7 @@ var _water_dist := {}
 
 func _init(map_id: String) -> void:
 	id = map_id
+	street_upgrade = map_id == "hn_pho_co"
 	var m = JSON.parse_string(FileAccess.get_file_as_string("res://data/maps/%s.json" % map_id))
 	var st = JSON.parse_string(FileAccess.get_file_as_string("res://data/maps/%s_story.json" % map_id))
 	story = st if st is Dictionary else {}
@@ -281,8 +284,8 @@ func _block_locations() -> void:
 		var p: Dictionary = locs[k]
 		var c: Vector2 = p.center
 		var n: Vector2 = p.normal
-		if pilot_active and k == "xom_bo_me":
-			for rect in pilot_home_blockers:
+		if has_courtyard(str(k)):
+			for rect in location_blockers(str(k)):
 				# Reserve at least one cell for a thin wall: the 1 m grid's three
 				# scanlines can otherwise miss the 30 cm courtyard rear wall.
 				var nav_rect: Rect2 = rect
@@ -290,12 +293,45 @@ func _block_locations() -> void:
 					nav_rect.position.y -= (1.0 - nav_rect.size.y) / 2.0
 					nav_rect.size.y = 1.0
 				grid.block_poly(_pilot_rect_poly(nav_rect, c, n))
+			# An authored courtyard is a destination, not off-road terrain that
+			# nearest_walkable should pull back to a nearby street. Change cost
+			# only: rooms and the rear wall must never be reopened.
+			var front_depth := minf(4.0, float(p.d) * 0.5)
+			var court_width := minf(7.0, float(p.w) - 1.4)
+			for walk_rect in [Rect2(-1.5, -front_depth, 3.0, front_depth + 0.2),
+				Rect2(-court_width / 2.0, -float(p.d) + 0.3, court_width, float(p.d) - front_depth - 0.3)]:
+				grid._weigh_poly(_pilot_rect_poly(walk_rect, c, n), 1.0)
 			continue
 		var t := Vector2(n.y, -n.x)
 		var hw := float(p.w) / 2.0
 		var front := c - n * 0.6
 		var back := c - n * float(p.d)
 		grid.block_poly(PackedVector2Array([front - t * hw, front + t * hw, back + t * hw, back - t * hw]))
+
+
+func has_courtyard(loc_id: String) -> bool:
+	return (street_upgrade or pilot_active) and loc_id == "xom_bo_me" and locs.has(loc_id)
+
+
+## Same five room footprints as StreetKit lodging. The lane and rear court are
+## genuinely walkable in the story map; doors into private rooms stay blocked.
+func location_blockers(loc_id: String) -> Array[Rect2]:
+	var p: Dictionary = locs[loc_id]
+	var w := float(p.w)
+	var d := float(p.d)
+	if not has_courtyard(loc_id):
+		return [Rect2(-w / 2.0, -d, w, d)]
+	if pilot_active:
+		return pilot_home_blockers
+	var front_depth := minf(4.0, d * 0.5)
+	var wing := (w - 3.0) / 2.0
+	var court := minf(7.0, w - 1.4)
+	var rear_wing := (w - court) / 2.0
+	return [Rect2(-w / 2.0, -front_depth, wing, front_depth),
+		Rect2(1.5, -front_depth, wing, front_depth),
+		Rect2(-w / 2.0, -d + 0.3, rear_wing, d - front_depth - 0.3),
+		Rect2(court / 2.0, -d + 0.3, rear_wing, d - front_depth - 0.3),
+		Rect2(-w / 2.0, -d, w, 0.3)]
 
 
 ## Đầu hẻm của con đường địa điểm nằm trên: đầu nào chạm đường lớn hơn thì là đầu hẻm; trả về chỗ ở mép hẻm,
@@ -437,7 +473,7 @@ func walkable(p: Vector2) -> bool:
 
 ## Độ cao mặt đất chỗ p: trên mặt cầu thì cao hơn mặt đường (AreaBuilder.BRIDGE_Y), người đi qua cầu không bị lún.
 func ground_y(p: Vector2) -> float:
-	if pilot_active and locs.has("xom_bo_me"):
+	if has_courtyard("xom_bo_me"):
 		var lodging: Dictionary = locs.xom_bo_me
 		var offset: Vector2 = p - (lodging.center as Vector2)
 		var normal: Vector2 = lodging.normal
