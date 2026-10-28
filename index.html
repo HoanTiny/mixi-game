@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>Trên Phố</title>
-		<meta name="mixi-build" content="33d822c7b25e2f7bf4d377ceb4da98c2f84b1007">
+		<meta name="mixi-build" content="6e10b4be124a44f0ec4f3ad22d0295c75c26464f">
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -112,9 +112,11 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"mainPack":"index-211cddc6f698.pck","fileSizes":{"index-211cddc6f698.pck":44261196,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"mainPack":"index-72486d9d86e7.pck","fileSizes":{"index-72486d9d86e7.pck":44054100,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 // A review slice runs as a disposable demo; normal play keeps its existing save.
-if (new URLSearchParams(location.search).has('street-demo')) {
+if (new URLSearchParams(location.search).has('neighborhood-demo')) {
+	GODOT_CONFIG.args = ['--', '--demo', '--demo-full', '--no-title', '--map=hn_pho_co'];
+} else if (new URLSearchParams(location.search).has('street-demo')) {
 	GODOT_CONFIG.args = ['--', '--demo', '--no-title', '--street-demo', '--map=hn_pho_co'];
 } else if (new URLSearchParams(location.search).has('city-demo')) {
 	GODOT_CONFIG.args = ['--', '--demo', '--no-title', '--map=hn_pho_co'];
