@@ -52,6 +52,8 @@ Sân lát/bãi đỗ dùng vật liệu phù hợp thay cho mảng cỏ mặc đ
   giá xe, chuyến về, chuyển bản lưu và phạm vi đơn giao.
 - `neighborhood_world`: đi trọn vòng cửa thật, bảng địa điểm, chuyến xe và
   đặt lại đường đi; chụp GPU tại nhà, quán cơm, điểm xe, Ngọc Thụy.
+- `location_panel_layout`: bảng địa điểm không tràn màn ở 1280×720 và
+  1366×768; thử cuộn qua mô tả dài, tới hành động cuối và giữ nút Rời đi.
 - Mô phỏng logic `sim.gd` qua 150 ngày. Chưa thay thế cho chơi thủ công mọi
   lựa chọn của năm chương hoặc đo hiệu năng mọi thiết bị.
 

@@ -47,6 +47,7 @@ var _location: PanelContainer
 var _loc_title: Label
 var _loc_desc: Label
 var _loc_cards: VBoxContainer
+var _loc_leave: Button
 ## Sổ: phải thu, phải trả, lời hứa, sổ gia đình, thân thiết và đồ đang mang.
 var _skills: PanelContainer
 var _skills_text: RichTextLabel
@@ -147,7 +148,8 @@ func _ready() -> void:
 	_spacer(top)
 	_build_status(top)
 
-	# Hàng giữa: kỹ năng / nhật ký bên trái, bảng địa điểm bên phải.
+	# Hàng giữa: kỹ năng / nhật ký bên trái. Bảng địa điểm có vùng riêng bên phải,
+	# không bị hàng mục tiêu cao đẩy xuống dưới màn hình.
 	var middle := _pass(HBoxContainer.new(), rows)
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var left := _pass(VBoxContainer.new(), middle)
@@ -157,7 +159,7 @@ func _ready() -> void:
 	_build_log(left)
 	_build_phone(left)
 	_spacer(middle)
-	_build_location(middle)
+	_build_location(root)
 
 	# Lời nhắc tương tác và thanh "đang làm" ở giữa, phía trên thanh công cụ.
 	var prompt_row := _pass(HBoxContainer.new(), rows)
@@ -240,6 +242,8 @@ func location_open() -> String:
 func open_location(id: String) -> void:
 	if not game.is_started() or blocking():
 		return
+	if _loc_id != id:
+		_loc_scroll.scroll_vertical = 0
 	_loc_id = id
 	_refresh()
 
@@ -543,25 +547,36 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 
 func _build_location(parent: Control) -> void:
 	_location = _light_panel(parent)
+	_location.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 8)
 	_location.add_child(v)
 	_loc_title = UI.label("", 22, UI.INK)
+	_loc_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	v.add_child(_loc_title)
-	_loc_desc = UI.label("", 13, UI.INK_SOFT)
-	_loc_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_loc_desc.custom_minimum_size = Vector2(320, 0)
-	v.add_child(_loc_desc)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(336, 0)
+	scroll.custom_minimum_size = Vector2(336, 80)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
 	v.add_child(scroll)
 	_loc_scroll = scroll
+	# Mô tả và mọi hành động cùng cuộn; con lăn trên đoạn mô tả vẫn tới được các nút.
+	var body := VBoxContainer.new()
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 12)
+	scroll.add_child(body)
+	_loc_desc = UI.label("", 13, UI.INK_SOFT)
+	_loc_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_loc_desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(_loc_desc)
 	_loc_cards = VBoxContainer.new()
 	_loc_cards.add_theme_constant_override("separation", 8)
-	scroll.add_child(_loc_cards)
+	body.add_child(_loc_cards)
 	var leave := Button.new()
+	_loc_leave = leave
 	leave.text = "Rời đi"
+	leave.custom_minimum_size.y = 42
 	leave.pressed.connect(close_location)
 	v.add_child(leave)
 	_location.visible = false
@@ -2111,9 +2126,12 @@ func _refresh_location() -> void:
 	_fit_location.call_deferred()
 
 
-## Bảng địa điểm cao vừa đủ số thẻ, nhiều quá thì cuộn (tránh khoảng trắng thừa khi chỉ có một việc).
+## Khung độc lập luôn nằm trong màn hình; tiêu đề và nút Rời đi cố định ngoài vùng cuộn.
 func _fit_location() -> void:
-	_loc_scroll.custom_minimum_size.y = minf(_loc_cards.get_combined_minimum_size().y, _panel_max_h(true))
+	_location.offset_left = -minf(400.0, ScreenFit.view_size().x - 32.0) - 16.0
+	_location.offset_right = -16.0
+	_location.offset_top = 64.0
+	_location.offset_bottom = -16.0
 
 
 ## Thẻ việc nhờ: nền vàng nhạt để nổi giữa các việc làm, dòng phụ xuống hàng được (bước việc nhờ thường dài).
