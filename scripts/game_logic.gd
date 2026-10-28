@@ -49,6 +49,11 @@ const Wardrobe := preload("res://scripts/wardrobe.gd")
 const Survival := preload("res://scripts/systems/survival.gd")
 const Attributes := preload("res://scripts/systems/attributes.gd")
 const GameClock := preload("res://scripts/systems/game_clock.gd")
+## Tay nghề, bằng cấp (data/systems/careers.json) và tầng luật của trò chơi nhỏ (data/systems/minigames.json).
+const Careers := preload("res://scripts/systems/careers.gd")
+const MiniGames := preload("res://scripts/minigames/minigames.gd")
+## Kết quả trò chơi nhỏ vừa tính xong (MiniGames.on_action) để giao diện báo; không lưu vào bản lưu.
+var last_minigame: Dictionary = {}
 ## Danh mục quần áo bóc túi mù (data/clothes.json): rarities, slots, items.
 var clothes: Dictionary = {}
 var _event_data: Dictionary = {}
@@ -103,9 +108,12 @@ func load_data(dir := "res://data") -> void:
 	_merge_pack(dir, "_pho.json")
 	if FileAccess.file_exists(dir + "/clothes.json"):
 		clothes = _read_json(dir + "/clothes.json")
-	for sys in ["survival", "attributes"]:
+	for sys in ["survival", "attributes", "careers"]:
 		if FileAccess.file_exists(dir + "/systems/" + sys + ".json"):
 			cfg[sys] = _read_json(dir + "/systems/" + sys + ".json")
+	if FileAccess.file_exists(dir + "/systems/minigames.json"):
+		cfg["minigame_catalog"] = _read_json(dir + "/systems/minigames.json")
+		MiniGames.register(self)
 
 
 func _merge_pack(dir: String, suffix: String) -> void:
@@ -625,7 +633,7 @@ func apply_effects(eff: Dictionary) -> void:
 					if not s.has("scores"):
 						s["scores"] = {}
 					s.scores[key.substr(6)] = int(s.scores.get(key.substr(6), 0)) + int(v)
-				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v)):
+				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)):
 					push_warning("Hiệu ứng không rõ: " + str(key))
 
 
@@ -1044,10 +1052,12 @@ func check(req: Dictionary) -> String:
 			if away != bool(v):
 				fail = "-"
 		else:
-			# Trạng thái (has_cond, no_cond) và thuộc tính (stat.X) do scripts/systems/ tự xét.
+			# Trạng thái (has_cond, no_cond), thuộc tính (stat.X), tay nghề, bằng cấp (prof.X, cert) do scripts/systems/ tự xét.
 			var r = Survival.check(self, key, v)
 			if r == null:
 				r = Attributes.check(self, key, v)
+			if r == null:
+				r = Careers.check(self, key, v)
 			if r == null:
 				push_warning("Điều kiện không rõ: " + str(key))
 			else:
@@ -1184,6 +1194,8 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	var pay := int(a.get("pay", 0))
 	if a.has("rainPay") and s.today.get("rain", false):
 		pay = int(a.rainPay)
+	# Trò chơi trong data/systems/minigames.json: kết quả thô của cảnh {score, fails} đổi thành {ratio, bonus, win}.
+	result = MiniGames.normalize(self, a, result)
 	if not result.is_empty():
 		pay = round_k(float(pay) * float(result.get("ratio", 1.0))) + int(result.get("bonus", 0))
 		if not bool(result.get("auto", false)):
@@ -1207,6 +1219,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	apply_effects(Survival.action_effects(self, a))
 	Survival.on_action(self, a, float(a.hours))
 	Attributes.on_action(self, a, result)
+	MiniGames.on_action(self, a, result)
 	if a.group == "work" and finish > float(cfg.lateHour) + 0.001:
 		add_fatigue(float(cfg.lateFatigue))
 		add_log("Làm tới cuối tối: Mệt +%d" % int(cfg.lateFatigue), "warn")
@@ -2397,6 +2410,7 @@ func migrate_save() -> void:
 	Day23.migrate(self)
 	Survival.migrate(self)
 	Attributes.migrate(self)
+	Careers.migrate(self)
 
 
 func neighborhood_target() -> Dictionary:

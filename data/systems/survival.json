@@ -26,6 +26,20 @@
       "reason": "Tâm trạng chạm đáy, không gượng dậy đi làm nổi. Nghỉ, ăn, ngủ hay nói chuyện với ai đó đã",
       "desc": "Tâm trạng chạm đáy: không nhận được việc kiếm tiền nào, chỉ nghỉ, ăn, ngủ, nói chuyện. Hết khi Tâm trạng hồi lên 30."
     },
+    "treo_lung": {
+      "name": "Trẹo lưng", "tone": "bad", "icon": "person",
+      "hours": 36,
+      "mods": {"move": -0.15},
+      "blocks": ["heavy"],
+      "reason": "Đang trẹo lưng, chưa bê vác được",
+      "desc": "Chấn thương khi làm nặng: đi chậm, không nhận việc nặng trong 36 giờ."
+    },
+    "dap_ngon": {
+      "name": "Dập ngón tay", "tone": "bad", "icon": "person",
+      "hours": 24,
+      "mods": {"mg.time": -0.15, "rate.mood": 0.3},
+      "desc": "Ngón tay băng bó: thao tác chậm (bớt giờ trong ca có chỉ tiêu), dễ cáu hơn trong 24 giờ."
+    },
     "khi_huyet": {
       "name": "Khí huyết lưu thông", "tone": "good", "icon": "heart",
       "hours": 6,

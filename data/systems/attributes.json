@@ -1,5 +1,5 @@
 {
-  "_ghi_chu": "Bốn thuộc tính nền tảng (scripts/systems/attributes.gd). Cấp 1–maxLevel; xpToNext[i] là XP cần để lên từ cấp i+1. start: cấp đầu ván của An (mười năm thợ điện máy nên Trí tuệ, Nhạy bén khá hơn). actionXp: XP nhận khi làm xong việc (nhân theo kết quả trò chơi nhỏ), việc có trường xp riêng thì dùng trường đó. talk, delivery, scavenge: XP khi tán gẫu, giao xong một đơn, lục một thùng. perLevel: hiệu ứng bị động cộng thêm mỗi cấp trên 1 (move: tốc độ đi, mg.time: thêm giờ trong trò chơi nhỏ, activity.heavy, fatigue.heavy: bớt hao No và Mệt khi làm nặng, xp: học nhanh hơn, scrap: bán đồng nát được giá hơn).",
+  "_ghi_chu": "Bốn thuộc tính nền tảng (scripts/systems/attributes.gd). Cấp 1–maxLevel; xpToNext[i] là XP cần để lên từ cấp i+1. start: cấp đầu ván của An (mười năm thợ điện máy nên Trí tuệ, Nhạy bén khá hơn). actionXp: XP nhận khi làm xong việc (nhân theo kết quả trò chơi nhỏ), việc có trường xp riêng thì dùng trường đó. talk, delivery, scavenge: XP khi tán gẫu, giao xong một đơn, lục một thùng. perLevel: hiệu ứng bị động cộng thêm mỗi cấp trên 1 (move: tốc độ đi, mg.time: thêm giờ trong trò chơi nhỏ, activity.heavy, fatigue.heavy: bớt hao No và Mệt khi làm nặng, injury: bớt rủi ro chấn thương trong trò chơi lao động, xp: học nhanh hơn, scrap: bán đồng nát được giá hơn).",
   "order": ["str", "int", "agi", "per"],
   "stats": {
     "str": {"name": "Thể chất", "icon": "person", "desc": "Bê vác bền hơn: làm việc nặng ít đói, ít mệt hơn. Lên nhờ ca kho, bốc vác, công trình, dưỡng sinh."},
@@ -12,7 +12,7 @@
   "xpToNext": [60, 120, 200, 300],
   "levelUpMood": 5,
   "perLevel": {
-    "str": {"activity.heavy": -0.1, "fatigue.heavy": -0.05},
+    "str": {"activity.heavy": -0.1, "fatigue.heavy": -0.05, "injury": -0.1},
     "int": {"xp": 0.06},
     "agi": {"move": 0.025, "mg.time": 0.04},
     "per": {"scrap": 0.05}

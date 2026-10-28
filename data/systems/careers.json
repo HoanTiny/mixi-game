@@ -1,0 +1,12 @@
+{
+  "_ghi_chu": "Tay nghề theo nghề và bằng cấp (scripts/systems/careers.gd). profs.<id>: tên nghề; xpToNext[i] là EXP cần để lên từ cấp i+1 (cấp tối đa = số mục + 1). perLevel: hiệu ứng mỗi cấp trên 1 (pay: cộng tiền công trò chơi lao động của nghề đó). certs.<id>: bằng cấp, có được qua hiệu ứng cert.<id> (học xong lớp, sự kiện); điều kiện cert: <id> trong require của việc hay trò chơi nhỏ.",
+  "profs": {
+    "boc_vac": {"name": "Bốc vác"}
+  },
+  "xpToNext": [80, 160, 280, 420],
+  "perLevel": {"pay": 0.05},
+  "certs": {
+    "han": {"name": "Chứng chỉ thợ hàn"},
+    "dien_lanh": {"name": "Chứng chỉ điện lạnh"}
+  }
+}

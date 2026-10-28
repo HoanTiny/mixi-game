@@ -17,6 +17,7 @@ const Joystick := preload("res://scripts/ui/joystick.gd")
 ## Ca làm việc 3D theo trường minigame của việc trong config.json (bricks, site, dishes, repair): mỗi việc một bản đồ
 ## nhỏ riêng, An tự đi lại làm.
 const WorkSite := preload("res://scripts/work/work_site.gd")
+const MiniGameViews := preload("res://scripts/minigames/views/registry.gd")
 
 var world
 var game
@@ -557,7 +558,18 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 		if sit_down: world.end_rest_pose()
 		world.set_player_inside(false)
 		world.audio.play("done")
-		game.do_action(id, result))
+		game.do_action(id, result)
+		_minigame_report())
+
+
+## Kết quả trò chơi nhỏ vừa tính (game.last_minigame: mức thưởng, chấn thương) hiện thành chữ nổi trên đầu An.
+func _minigame_report() -> void:
+	var r: Dictionary = game.last_minigame
+	game.last_minigame = {}
+	if r.is_empty():
+		return
+	var text := str(r.text) + ("\nBị %s!" % str(r.injury).to_lower() if str(r.injury) != "" else "")
+	world._float_text(text, Color("a3e08a") if r.win and str(r.injury) == "" else Color("ffb27a"))
 
 
 func _build_location(parent: Control) -> void:
@@ -613,13 +625,10 @@ func _build_skills(parent: Control) -> void:
 
 ## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
 func _open_minigame(id: String, a: Dictionary) -> void:
-	var mcfg: Dictionary = game.cfg.minigames[a.minigame]
-	# Nhanh nhẹn cho thêm giờ trong ca có chỉ tiêu (data/systems/attributes.json, mg.time).
-	if mcfg.has("seconds") and game.mod("mg.time") > 0.0:
-		mcfg = mcfg.duplicate()
-		mcfg["seconds"] = float(mcfg.seconds) * (1.0 + game.mod("mg.time"))
-	# Cảnh riêng (bàn bi-a) hay cảnh ca làm 3D; trò mới dùng lại cảnh có sẵn (cfg.kind: bricks, site, dishes, repair).
-	minigame = Billiards.new() if str(mcfg.get("scene", "")) == "billiards" else WorkSite.new()
+	# Số liệu đã nhân theo thuộc tính, tay nghề và lời giới thiệu do tầng luật soạn (scripts/minigames/minigames.gd);
+	# cảnh chọn theo view (scripts/minigames/views/registry.gd): ném vòng, bê gạch, bàn bi-a hay ca làm 3D.
+	var mcfg: Dictionary = game.MiniGames.view_cfg(game, str(a.minigame))
+	minigame = MiniGameViews.make(mcfg)
 	minigame.cfg = mcfg
 	minigame.kind = str(mcfg.get("kind", a.minigame))
 	minigame.last = game.s.get("job_last", {}).get(id, {})
