@@ -67,8 +67,15 @@ func run() -> void:
 	portrait._sel="an_base"; portrait.refresh(); portrait._item_btn.pressed.emit()
 	check(not g.wardrobe().worn.has("ao"),"can return to base outfit")
 	portrait._turn.rotation.y=0.5
-	portrait._portrait_camera.fov=23
+	portrait._portrait_zoom=0.8
 	await snapshot("04_character_close")
+	portrait._portrait_zoom=1.0
+	root.size=Vector2i(800,1000)
+	await snapshot("04c_narrow_character")
+	var body_left: Vector2=portrait._portrait_camera.unproject_position(Vector3(-0.4,0.9,0))
+	var body_right: Vector2=portrait._portrait_camera.unproject_position(Vector3(0.4,0.9,0))
+	check(body_left.x>=0 and body_right.x<=portrait._view.size.x,"narrow viewport keeps shoulders in frame")
+	root.size=Vector2i(1280,720)
 	portrait.close(); portrait.queue_free(); await process_frame
 	g.s.used=2.1; g._commit()
 	g.do_action("pho_chao_son"); g.resolve_choice(0)

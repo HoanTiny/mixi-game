@@ -44,6 +44,7 @@ var _body: Node3D
 var _drag := false
 var _spin := 0.0
 var _portrait_camera: Camera3D
+var _portrait_zoom := 1.0
 
 
 func _ready() -> void:
@@ -116,6 +117,12 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if not visible or _turn == null:
 		return
+	# Keep the whole body in frame when the browser side panel is tall/narrow.
+	# Zoom is relative to this fit, rather than a fixed FOV that clips shoulders.
+	var aspect := maxf(0.1,float(_view.size.x)/maxf(1.0,float(_view.size.y)))
+	var fitted_height := maxf(2.2,0.95/aspect)
+	_portrait_camera.fov = clampf(rad_to_deg(2.0*atan(fitted_height/8.8))*_portrait_zoom,18.0,100.0)
+	for slot in _slots.values(): slot.panel.visible=aspect>0.42
 	if not _drag:
 		_spin = lerpf(_spin, 0.0, clampf(delta * 1.5, 0.0, 1.0))
 		_turn.rotation.y += _spin * delta
@@ -374,7 +381,7 @@ func _refresh_items() -> void:
 		_item_desc.text = {"scrap": "Chưa có đồ đồng nát. Lục thùng rác dọc vỉa hè (đứng gần, bấm E) để nhặt chai, lon, bìa giấy.",
 			"keep": "Chưa có gì. Đồ người ta nhờ mang và những món kỷ niệm sẽ nằm ở đây."}.get(_tab, "")
 		return
-	_item_title.text = "【%s】%s" % [chosen.group, chosen.name]
+	_item_title.text = "%s · %s" % [chosen.group, chosen.name]
 	_item_desc.text = str(chosen.desc)
 	if _tab == "clothes" and not chosen.used:
 		_item_btn.visible = true
@@ -525,7 +532,7 @@ func _on_drag(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_drag = event.pressed
 	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-		_portrait_camera.fov = clampf(_portrait_camera.fov + (-2.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 2.0), 21.0, 34.0)
+		_portrait_zoom = clampf(_portrait_zoom + (-0.06 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 0.06),0.75,1.12)
 	elif event is InputEventMouseMotion and _drag:
 		_turn.rotation.y += event.relative.x * 0.012
 		_spin = event.relative.x * 0.4
