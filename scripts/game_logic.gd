@@ -40,6 +40,7 @@ var s: Dictionary = {}
 var notes: Array = []
 ## Đơn sửa đồ ở tiệm chú Sơn và bàn sửa 3D (scripts/street_life.gd, scripts/world/repair_bench.gd).
 const Street := preload("res://scripts/street_life.gd")
+const Neighborhood := preload("res://scripts/neighborhood_flow.gd")
 ## Tiệm tóc: kiểu tóc, màu nhuộm cho mô hình An (scripts/wardrobe.gd, HAIR).
 const Wardrobe := preload("res://scripts/wardrobe.gd")
 ## Danh mục quần áo bóc túi mù (data/clothes.json): rarities, slots, items.
@@ -412,6 +413,7 @@ func earn(n: int, why: String) -> void:
 	s["cash"] = int(s.cash) + n
 	s.stats["earned"] = int(s.stats.earned) + n
 	add_log("+%s · %s" % [fmt_money(n), why], "plus")
+	Neighborhood.earned(self,n)
 
 
 func spend(n: int, why: String) -> int:
@@ -586,6 +588,9 @@ func apply_effects(eff: Dictionary) -> void:
 			"housing_seen":
 				if not housing().seen.has(str(v)):
 					housing().seen.append(str(v))
+				Neighborhood.room_seen(self,str(v))
+			"housing_visit":
+				Neighborhood.plan_visit(self,str(v))
 			"quest_start":
 				var qa: Dictionary = v if v is Dictionary else {"id": str(v)}
 				if quest_state(str(qa.id)) == "":
@@ -1058,6 +1063,9 @@ func action_money(a: Dictionary) -> int:
 
 
 func is_hidden(a: Dictionary) -> bool:
+	if str(a.id)=="pho_chao_son" and s.get("neighborhood",{}).get("stage","done")!="intro": return true
+	if str(a.id)=="pho_ban_thu_chi" and s.get("neighborhood",{}).get("stage","done") not in ["meal","home"]: return true
+	if str(a.id)=="sua_do_le" and (quest_state("quat_trai_cay")=="active" or not s.get("street",{}).get("job",{}).is_empty()): return true
 	if a.has("days") and (day() < int(a.days[0]) or day() > int(a.days[1])):
 		return true
 	if a.has("require") and a.require.has("route") and check({"route": a.require.route}) != "":
@@ -1185,6 +1193,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	s.counts[id] = count(id) + 1
 	s.today[id] = today_count(id) + 1
 	s.today.list.append(id)
+	Neighborhood.action_done(self,a)
 	_quest_on_action(id, result)
 	_commit()
 	if a.has("sleepAway"):
@@ -1586,6 +1595,7 @@ func scene_cards_at(loc: String) -> Array:
 func scene_lock(id: String) -> String:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return "-"
+	if not scenes_today().has(id): return "Cảnh này đã kết thúc hoặc chưa tới ngày"
 	var e := scene_info(id)
 	# Tới sớm thì vẫn vào được: An ngồi chờ tới giờ (như các việc có khung giờ). Quá giờ thì lỡ.
 	if e.has("window") and clock() > float(e.window[1]):
@@ -2349,9 +2359,18 @@ func slice_report() -> Dictionary:
 
 
 func _commit() -> void:
+	migrate_save()
 	_tick_needs()
 	_check_quests()
 	changed.emit()
+
+
+func migrate_save() -> void:
+	Neighborhood.migrate(self)
+
+
+func neighborhood_target() -> Dictionary:
+	return Neighborhood.target(self)
 
 
 # ---------------------------------------------------------------- giao đồ ăn
@@ -2630,6 +2649,8 @@ func quest_step(id: String) -> Dictionary:
 	if quest_state(id) != "active":
 		return {}
 	var step: Dictionary = quest_def(id).steps[int(s.quests[id].step)]
+	if id=="quat_trai_cay" and int(s.quests[id].step)==0:
+		return Street.story_step(self)
 	if str(step.get("loc", "")) == "home":
 		step = step.duplicate()
 		step["loc"] = home_loc()
@@ -2640,7 +2661,7 @@ func quest_step(id: String) -> Dictionary:
 func quest_target(id: String) -> Dictionary:
 	var step := quest_step(id)
 	match str(step.get("kind", "")):
-		"visit":
+		"visit", "repair":
 			return {"loc": str(step.loc)}
 		"action":
 			return {"loc": action_loc(get_action(str(step.action)))}
@@ -2666,6 +2687,8 @@ func quest_step_lock(id: String) -> String:
 	var step := quest_step(id)
 	if step.get("kind", "") != "visit":
 		return "-"
+	if now_abs()+float(step.get("hours",0.0))+quest_step_wait(id)>float(s.quests[id].get("deadline",INF))+0.001:
+		return "Không kịp trước giờ hẹn"
 	# Tới sớm thì ngồi chờ tới giờ như cảnh chính; quá giờ thì lỡ.
 	if step.has("window") and clock() > float(step.window[1]):
 		return "Đã quá khung %s–%s" % [hh(float(step.window[0])), hh(float(step.window[1]))]
@@ -2783,13 +2806,16 @@ func _quest_event(id: String) -> Dictionary:
 
 ## over: ghi đè hạn khi việc nhờ được mở từ một lựa chọn trong cảnh chính, ví dụ {"deadline_hour": 12}.
 func quest_accept(id: String, over: Dictionary = {}) -> void:
+	if quest_state(id) in ["active","done","failed","ended"]: return
 	var q := quest_def(id).duplicate()
+	if q.is_empty(): return
 	for k in ["deadline_days", "deadline_hour"]:
 		if over.has(k):
 			q[k] = over[k]
 	_qs()[id] = {"state": "active", "step": 0, "day": day(), "deadline": _quest_deadline(q, day()), "progress": 0, "misses": 0}
 	add_log("Nhận việc nhờ: " + str(q.title), "event")
 	apply_effects(q.get("accept_effects", {}))
+	if id=="quat_trai_cay": Street.start_story(self)
 	_quest_start_step(id)
 
 
@@ -2822,11 +2848,17 @@ func _quest_advance(id: String, goto := "next") -> void:
 
 
 func _quest_finish(id: String, ok: bool) -> void:
+	if quest_state(id)!="active": return
 	var q := quest_def(id)
 	var st: Dictionary = s.quests[id]
 	st["state"] = "done" if ok else "failed"
 	st.erase("step_deadline")
 	apply_effects(q.get("reward" if ok else "fail", {}))
+	if id=="quat_trai_cay":
+		if ok:
+			s.street.xp=int(s.street.xp)+1
+			s.street.completed=int(s.street.completed)+1
+		Street.end_story(self)
 	s.queue.append({"id": ("qd:" if ok else "qf:") + id, "data": {}})
 	add_log(("Xong việc nhờ: " if ok else "Hỏng việc nhờ: ") + str(q.title), "plus" if ok else "warn")
 

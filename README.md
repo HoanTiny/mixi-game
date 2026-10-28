@@ -1,15 +1,20 @@
 # Trên Phố · Trước mùa mưa
 
-**Bản web 1.5 · phố cổ và nhịp sống**
+**Bản web/Windows 1.6 · phố gọn, nhiệm vụ liền mạch**
 
 - [Chơi bản chính](https://hoantiny.github.io/mixi-game/) ·
-  [Xem thử toàn phố cổ](https://hoantiny.github.io/mixi-game/?city-demo).
-- Nâng cấp cả 19 địa điểm và 1.268 nhà hướng phố; sân trọ đi được, nhà che người được cắt riêng.
+  [Thử từ ngày đầu](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.6) ·
+  [Tải Windows 1.6](https://hoantiny.github.io/mixi-game/download/TruocMuaMua-Windows.zip).
+- Gom nhà trọ, tiệm sửa, chợ và quán cơm: vòng đi từ 477 xuống 148,5 m; giữ 19 địa điểm, 195 nhà nền và 182 địa chỉ giao hàng.
+- Nối ba ngày đầu với bàn sửa, nhận công, ăn/nghỉ và xem phòng tại chỗ; HUD và bản đồ dẫn cùng một mục tiêu.
+- Có chuyến xe tới khu xa, hiện giá và thời gian; đơn giao đầu game ở gần người chơi.
 - Đi bộ 1,7 m/s, Shift chạy nhẹ; nhân vật và xe tăng/giảm tốc, nhịp bước theo quãng đường thật.
 - Chế độ xem thử không ghi save chính. Phố mẫu cũ vẫn có ở `?street-demo`.
-- Chi tiết: [nâng cấp toàn phố](docs/CITY_UPGRADE.md), [di chuyển](docs/LOCOMOTION_UPDATE.md),
+- Chi tiết: [cụm phố và truyện 1.6](docs/NEIGHBORHOOD_UPDATE.md), [di chuyển](docs/LOCOMOTION_UPDATE.md),
   [đợt tiếp theo](docs/NEXT_UPDATE.md), [triển khai web](docs/WEB_RELEASE.md).
-- Bản tải Windows hiện vẫn là 1.3.2; lần phát hành này cập nhật bản web.
+- ZIP Windows: giải nén rồi mở `TrenPho.exe`, không cần cài Godot; save Windows và web riêng nhau.
+
+Phần dưới ghi lại nội dung các phiên bản trước; bố cục/khoảng cách hiện tại theo bản 1.6 ở trên.
 
 **Bản 1.0: truyện chuyển sang phố cổ Hà Nội, dùng tên thật.** An, 27 tuổi, vừa mất việc ở Điện máy Thăng Long. Cả nhà có 30 ngày để dọn khỏi **xóm trọ Phúc Tân** (ngõ 25 Phúc Tân, ngoài đê sông Hồng) trước mùa mưa; truyện đi tiếp năm chương, 150 ngày. Cốt truyện, lựa chọn, con số giữ nguyên; người, đất, giọng nói đổi theo [docs/HA_NOI.md](docs/HA_NOI.md):
 - **Người:** bà Thoa (bà ngoại của An, Linh), ông Thịnh (ông ngoại đã mất), chú Sơn tiệm sửa xe, dì Nga, ông Bảo, cô Bích tổ trưởng, cô Tâm chủ mặt bằng, bà Cả, bà Bính, cô Thắm đồng nát, cu Bin, Mẹ. Kha quê Thanh Hóa; chị Lụa bán bánh rán ở chợ Long Biên.

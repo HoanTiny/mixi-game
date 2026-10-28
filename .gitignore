@@ -3,6 +3,7 @@
 /android/
 *.tmp
 build/
+__pycache__/
 # Local runtime verification output
 *-test.log
 tests/*-preview.png

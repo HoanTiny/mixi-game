@@ -24,9 +24,17 @@ func _run() -> void:
 	var c: Dictionary=area.architecture_counts
 	assert(c.total==city.data.buildings.size(),"Every background plot must be accounted for")
 	assert(c.total==c.street_buildings+c.background+c.heritage+c.elevated+c.short,"Coverage classification must be exhaustive")
-	assert(c.street_buildings>500 and c.facades>=c.street_buildings,"Full street coverage was not built")
+	if city.layout_version >= 2:
+		# Compact topology deliberately removes empty filler blocks. Keep the
+		# authored density bounded while still requiring frontage coverage below.
+		assert(c.total >= 100 and c.total <= 300, "Compact district filler budget regressed")
+		assert(c.street_buildings >= 100, "Compact streets lost their inhabited edges")
+	else:
+		assert(c.street_buildings>500,"Full street coverage was not built")
+	assert(c.facades>=c.street_buildings,"Street building lacks a rendered frontage")
 	assert(c.doors>=c.facades and c.windows>0,"Missing physical openings")
-	assert(c.trees==area.counts.trees and c.trees>100,"Full tree rollout missing")
+	assert(c.trees==area.counts.trees,"Tree rendering disagrees with coverage")
+	assert(c.trees>30 if city.layout_version >= 2 else c.trees>100,"Tree rollout missing")
 	assert(c.detail_batches<160,"Geometry must stay batched rather than per house")
 	assert(city.homes==homes_before,"Delivery addresses changed during visual upgrade")
 	assert(footprint_before.size()==city.data.buildings.size())

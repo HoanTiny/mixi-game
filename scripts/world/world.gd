@@ -6,6 +6,7 @@ extends Node3D
 ## Nhà cửa, người, xe lấy mô hình thật theo data/models.json; thiếu file thì dựng khối hình tạm.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
+const QuestGuide := preload("res://scripts/quest_guide.gd")
 const Hud := preload("res://scripts/world/hud.gd")
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const Models := preload("res://scripts/world/models.gd")
@@ -32,6 +33,7 @@ const StreetKit := preload("res://scripts/architecture/street_kit.gd")
 const PilotLife := preload("res://scripts/world/pilot_life.gd")
 const PilotGround := preload("res://scripts/world/pilot_ground.gd")
 const PilotDetails := preload("res://scripts/world/pilot_details.gd")
+const NeighborhoodTravel := preload("res://scripts/neighborhood_travel.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
 ## (game.home_loc()); bà, Linh, má đứng trước cửa chỗ đó, ông Ba ở sát vách.
@@ -296,6 +298,7 @@ func _ready() -> void:
 		if hud.dialogs.visible:
 			audio.play("dialog"))
 	game.changed.connect(_on_changed)
+	_migrate_neighborhood()
 	_on_changed()
 	print("[world] dựng màn phố %d ms (map %s)" % [Time.get_ticks_msec() - t0, _map_id()])
 	# Vào thẳng chế độ Dựng khu thật: bản web có "?khu" trên địa chỉ, hay đối số "--realmap-auto=…" khi thử tự động.
@@ -2395,6 +2398,61 @@ func _scavenge(id: String) -> void:
 
 # ---------------------------------------------------------------- giao đồ ăn
 
+func _migrate_neighborhood() -> void:
+	if real and NeighborhoodTravel.migrate_layout(game, city, homes, LOCATIONS):
+		# changed có thể đang phát từ new_game; ghi bản chuyển đổi sau lượt phát đó.
+		game._commit.call_deferred()
+
+
+func travel_options(location_id: String) -> Array:
+	if not real or not NeighborhoodTravel.enabled(city) or not LOCATIONS.has(location_id):
+		return []
+	var options: Array = NeighborhoodTravel.options(game, location_id)
+	var near: bool = Vector2(player.position.x, player.position.z).distance_to(city.loc_door(location_id)) <= INTERACT_RANGE + 0.5
+	for option in options:
+		if not near:
+			option.reason = "Đi tới điểm đón xe trước"
+		elif str(option.reason) == "" and game.hours_left() < float(option.minutes) / 60.0 + _walk_meters * float(game.cfg.walkHoursPerMeter):
+			option.reason = "Không đủ giờ cho chuyến này"
+	return options
+
+
+func travel_to(destination: String) -> bool:
+	if hud.blocking() or title_open() or not LOCATIONS.has(destination):
+		return false
+	var from: String = hud.location_open()
+	var allowed := false
+	for option in travel_options(from):
+		if str(option.destination) == destination and str(option.reason) == "":
+			allowed = true
+	if not allowed:
+		return false
+	var arrival: Vector2 = city.loc_door(destination)
+	if not city.walkable(arrival):
+		return false
+	# Trả phần đi bộ chưa đủ nấc năm phút trước khi tính đúng một lần tiền/giờ xe.
+	game.elapse(_walk_meters * float(game.cfg.walkHoursPerMeter))
+	if not NeighborhoodTravel.pay(game, from, destination):
+		return false
+	_walk_meters = 0.0
+	_run_meters = 0.0
+	_idle_t = 0.0
+	_target = null
+	_target_loc = ""
+	_pending_click = null
+	_path.clear()
+	_path_i = 0
+	_travel_pace.reset()
+	_pan = Vector3.ZERO
+	player.position = Vector3(arrival.x, city.ground_y(arrival), arrival.y)
+	camera.position = player.position + cam_offset()
+	camera.look_at(player.position + Vector3.UP, Vector3.UP)
+	_make_trail()
+	hud.close_location()
+	game._commit()
+	hud.open_location(destination)
+	return true
+
 ## Chỗ cần tới của đơn đang chạy: quán (chưa lấy món) hoặc nhà khách. null nếu không có đơn.
 func delivery_target():
 	var o: Dictionary = game.delivery_active()
@@ -2408,6 +2466,8 @@ func delivery_target():
 ## Tạo một đơn mới từ vị trí thật trên phố: quán ngẫu nhiên, giao tới nhà dân (địa chỉ kiểu 42/3/5)
 ## hoặc một chỗ khác cách quán vừa phải. Tiền công tính theo đường đi thật cả lúc lấy lẫn lúc giao.
 func make_offer() -> Dictionary:
+	if real and NeighborhoodTravel.enabled(city):
+		return NeighborhoodTravel.make_offer(game, city, Vector2(player.position.x, player.position.z), homes, LOCATIONS)
 	var shops: Array = game.cfg.delivery.shops.keys()
 	var shop: String = shops.pick_random()
 	var sp := door_of(shop)
@@ -2589,6 +2649,7 @@ func _on_changed() -> void:
 			title.show_page("title")
 			_hold_for_title(true)
 		return
+	_migrate_neighborhood()
 	_sync_home()
 	update_outfit()
 	if game.is_over() and str(game.s.over.get("kind", "")) in ["full", "full2", "full3", "full4", "full5"] and _ending_home == null:
@@ -3253,20 +3314,22 @@ func _update_quests() -> void:
 ## Những điểm cần tới hôm nay: [vị trí, màu, độ cao dấu]. Bản đồ nhỏ cũng dùng danh sách này.
 func objective_spots() -> Array:
 	var out := []
-	if not game.is_started():
-		return out
-	for id in game.scenes_today():
-		var loc := str(game.scene_info(id).loc)
-		if LOCATIONS.has(loc):
-			out.append([door_of(loc), Color("f2c14e"), 4.2])
-	for id in game.quests_active():
-		var t: Dictionary = game.quest_target(id)
-		if t.has("loc") and LOCATIONS.has(t.loc):
-			out.append([door_of(str(t.loc)), Color("5aa9ff"), 4.2])
-		elif t.has("area"):
+	var seen := {}
+	var targets: Array = QuestGuide.targets(game)
+	for i in targets.size():
+		var target: Dictionary = targets[i]
+		if not bool(target.get("navigable", true)): continue
+		var color := Color("f2c14e") if i == 0 else Color("5aa9ff")
+		var loc := str(target.get("location", ""))
+		if LOCATIONS.has(loc) and not seen.has(loc):
+			out.append([door_of(loc), color, 4.2])
+			seen[loc] = true
+		elif target.has("area"):
 			for b in bins:
-				if game.in_area(t.area, b.pos.x, b.pos.z) and game.scrap_lock(b.id) == "":
-					out.append([b.pos, Color("5aa9ff"), 2.2])
+				var bin_id := "bin:" + str(b.id)
+				if not seen.has(bin_id) and game.in_area(target.area, b.pos.x, b.pos.z) and game.scrap_lock(b.id) == "":
+					out.append([b.pos, color, 2.2])
+					seen[bin_id] = true
 	return out
 
 

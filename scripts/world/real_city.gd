@@ -19,6 +19,8 @@ var clip := PackedVector2Array()
 var bounds := Rect2()
 var grid
 var story: Dictionary = {}
+## Changes only when authored roads/doors move; save migration reads this value.
+var layout_version := 1
 var sources := ""
 ## id địa điểm -> {center, normal, w, d, street, loc}: như lô của city_map, mặt tiền nhìn ra đường thật.
 var locs := {}
@@ -63,6 +65,7 @@ func _init(map_id: String) -> void:
 	var m = JSON.parse_string(FileAccess.get_file_as_string("res://data/maps/%s.json" % map_id))
 	var st = JSON.parse_string(FileAccess.get_file_as_string("res://data/maps/%s_story.json" % map_id))
 	story = st if st is Dictionary else {}
+	layout_version = int(story.get("layoutVersion", 1))
 	_load_pilot(map_id)
 	var cfg = JSON.parse_string(FileAccess.get_file_as_string("res://data/realmap.json"))
 	data = AreaData.new(Geo.new(float(m.center[0]), float(m.center[1])), cfg)
@@ -102,6 +105,10 @@ func _init(map_id: String) -> void:
 # ---------------------------------------------------------------- pilot street
 
 func _load_pilot(map_id: String) -> void:
+	# The 1.4 sample used layout-1 coordinates. The compact city is now the
+	# sample too; command-line demo flags still control nonpersistent saves.
+	if layout_version >= 2:
+		return
 	if "--street-demo" not in OS.get_cmdline_user_args():
 		return
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://data/street_pilot.json"))

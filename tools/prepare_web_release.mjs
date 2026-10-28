@@ -5,9 +5,10 @@ import { createHash } from 'node:crypto';
 import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
 
-const [siteArg, packArg, revision] = process.argv.slice(2);
+const [siteArg, packArg, revision, version = '1.6', windowsVersion = '1.3.2'] = process.argv.slice(2);
 assert(siteArg && packArg && /^[a-f0-9]{40}$/.test(revision ?? ''),
-  'Usage: node tools/prepare_web_release.mjs SITE_DIR WEB_PCK SOURCE_SHA');
+  'Usage: node tools/prepare_web_release.mjs SITE_DIR WEB_PCK SOURCE_SHA [VERSION] [WINDOWS_VERSION]');
+assert(/^\d+\.\d+(?:\.\d+)?$/.test(version) && /^\d+\.\d+(?:\.\d+)?$/.test(windowsVersion), 'Invalid release version');
 const site = resolve(siteArg);
 const pack = await readFile(resolve(packArg));
 assert(pack.subarray(0, 4).toString() === 'GDPC', 'Not a Godot resource pack');
@@ -26,7 +27,7 @@ assert(shell.includes('__GODOT_CONFIG__') && shell.includes('__BUILD_REVISION__'
 shell = shell.replace('__GODOT_CONFIG__', JSON.stringify(config)).replace('__BUILD_REVISION__', revision);
 await copyFile(resolve(packArg), join(site, packName));
 await writeFile(join(site, 'index.html'), shell);
-await writeFile(join(site, 'version.json'), JSON.stringify({ version: '1.5', revision,
+await writeFile(join(site, 'version.json'), JSON.stringify({ version, revision,
   engine: '4.7.2', pack: packName, bytes: pack.length, sha256: hash,
-  builtAt: new Date().toISOString(), preview: '?city-demo', windowsDownload: '1.3.2' }, null, 2) + '\n');
+  builtAt: new Date().toISOString(), preview: '?neighborhood-demo', windowsDownload: windowsVersion }, null, 2) + '\n');
 console.log(JSON.stringify({ revision, pack: packName, bytes: pack.length, sha256: hash }));

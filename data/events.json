@@ -141,40 +141,31 @@
   "missed": "Mấy mẩu tin vẫn dán trên bảng tin ở chợ Long Biên. Muốn xem phòng thì tự tới ngõ Gạch (cạnh chợ) hay Ngọc Thụy (bên kia sông).",
   "choices": [
    {
-    "label": "Hẹn đi xem ngõ Gạch ngay sáng nay",
-    "hint": "Mất 1,5 giờ. Thấy tận mắt bậc cửa, chỗ phơi, tiếng ồn",
+    "label": "Hẹn xem phòng ngõ Gạch",
+    "hint": "Đánh dấu nơi cần tới; chỉ tính thời gian khảo sát khi đến nơi",
     "effects": {
-     "hours": 1.5,
-     "fatigue": 3,
-     "housing_seen": "hem_dua",
-     "log": "Ngõ Gạch: phòng nhỏ, cửa sát mặt ngõ, bước ra là có người bán rau. Chỗ phơi chỉ đủ hai sào.",
-     "diary": "Đi xem ngõ Gạch. Bước ra là có người bán rau. Bà chắc thích tiếng rao, mà chỗ phơi chỉ đủ hai sào."
+     "housing_visit": "hem_dua",
+     "diary": "Hẹn đi xem phòng ngõ Gạch. Phải tới tận nơi, xem đường đi và chỗ phơi rồi về kể với bà."
     }
    },
    {
-    "label": "Hẹn đi xem Ngọc Thụy",
-    "hint": "Mất 2,5 giờ vì phải đi vòng qua cầu. Xa hơn nhưng có hiên",
+    "label": "Hẹn xem phòng Ngọc Thụy",
+    "hint": "Đánh dấu nơi cần tới; chỉ tính thời gian khảo sát khi đến nơi",
     "effects": {
-     "hours": 2.5,
-     "fatigue": 4,
-     "housing_seen": "cau_tre",
-     "log": "Ngọc Thụy: hiên rộng, gió mát. Đường ra chợ phải qua cầu, bà đi bộ sẽ mệt.",
-     "diary": "Đi xem Ngọc Thụy. Hiên rộng, gió lùa. Ra chợ phải qua cầu. Bà đi nổi không thì phải hỏi bà, không tự đoán."
+     "housing_visit": "cau_tre",
+     "diary": "Hẹn đi xem phòng Ngọc Thụy. Phải tới tận nơi, xem đường đi và chỗ phơi rồi về kể với bà."
     }
    },
    {
-    "label": "Ghé nhà dì Nga hỏi phương án ở tạm",
-    "hint": "Mất 2 giờ. Có đường lui nếu thiếu tiền ngày 30",
+    "label": "Ghé nhà dì Nga hỏi ở tạm",
+    "hint": "Đánh dấu nơi cần tới; chỉ tính thời gian khảo sát khi đến nơi",
     "effects": {
-     "hours": 2,
-     "fatigue": 2,
-     "housing_seen": "di_nam",
-     "flag.hoiDiNam": true,
-     "log": "Dì Nga: \"Ở thì ở, bảy ngày. Đồ đạc gửi bớt, nhà dì chật.\"",
-     "diary": "Ghé dì Nga. Dì cho ở bảy ngày, nói trước nhà chật. Có đường lui rồi, mà không ai muốn bước lui."
+     "housing_visit": "di_nam",
+     "diary": "Hẹn đi xem nhà dì Nga. Phải tới tận nơi, xem đường đi và chỗ phơi rồi về kể với bà."
     }
    }
-  ]
+  ],
+  "hours": 0.15
  },
  {
   "id": "ngay4",

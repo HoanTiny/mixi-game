@@ -62,6 +62,7 @@ func _ready() -> void:
 	var saved = _read(SAVE_PATH)
 	if saved is Dictionary and not saved.is_empty():
 		game.s = saved
+		game.migrate_save()
 	game.changed.connect(_save)
 	game.notes_changed.connect(func() -> void: _write(NOTES_PATH, game.notes))
 

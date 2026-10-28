@@ -145,7 +145,8 @@ func _process(delta: float) -> void:
 
 
 func _refresh() -> void:
-	var hour := float(world.game.clock())
+	# Màn tiêu đề cũng dựng phố, trước khi người chơi có ngày/giờ trong save.
+	var hour := float(world.game.clock()) if world.game.is_started() else 11.0
 	var focus: Vector3 = world.player.global_position
 	for entry in _actors:
 		var actor = entry.actor

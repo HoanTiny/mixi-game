@@ -1,17 +1,20 @@
-# Sau bản web 1.5
+# Sau bản 1.6
 
-Đã mở rộng kiến trúc sang cả map phố cổ, thêm nhịp đi có tăng/giảm tốc và lời dẫn
-theo giờ. Phạm vi, bằng chứng và giới hạn ở [CITY_UPGRADE.md](CITY_UPGRADE.md).
+Đã áp dụng bố cục phố gọn và nối ba ngày đầu; chi tiết ở
+[NEIGHBORHOOD_UPDATE.md](NEIGHBORHOOD_UPDATE.md). Kế hoạch và đối chiếu tham khảo
+trước khi triển khai được lưu ở [NEIGHBORHOOD_DESIGN.md](NEIGHBORHOOD_DESIGN.md).
 
-1. Thử đi thực tế trên web để chốt tốc độ 1,7 m/s và quãng đường đi làm; đo tải
-   lạnh, khung hình và bộ nhớ trên thiết bị yếu trước khi thêm nhiều asset.
-2. Thêm clip chạy nhẹ, quay tại chỗ và lên/xuống xe. Tay cầm tay lái và chân đặt
-   lên bàn đạp cần tiếp xúc đúng, vẫn giữ tủ đồ, tóc, mũ và rig hiện tại.
-3. Gắn sinh hoạt theo ca ở chợ, sân trọ và quán cơm với động tác tiếp xúc đồ vật.
-   Lời dẫn theo giờ hiện tại chưa đồng nghĩa NPC có lịch hành động hoàn chỉnh.
-4. Rà chương sau và vòng trọ → việc → ăn → giao hàng → về nhà; chỉ thêm tình
-   tiết sau khi kiểm lựa chọn, hạn chót, lưu/nạp và khả năng đọc trên điện thoại.
+Ưu tiên tiếp theo:
 
-Mỗi đợt cần ảnh cùng góc/giờ trên GPU và web, kiểm lỗi shader/va chạm, bản web
-gắn mã nguồn để đối chiếu. Không suy FPS web từ số đo PC hoặc coi tải trang thành
-công là đã kiểm mọi chương/save và mọi thiết bị.
+1. Chơi thử bằng người thật từ ngày 1 đến ngày 7: ghi thời gian tới mục tiêu,
+   chỗ phải mở bản đồ, số lần thiếu tiền linh kiện và lỡ hẹn. Chưa coi số đo
+   đường đi hoặc mô phỏng logic là thay thế cho lượt chơi này.
+2. Nối các việc sau ngày 3 với những cụm phố đã mở: mỗi chuyến xa có người
+   giới thiệu, lý do và phản hồi khi quay về. Giữ các tuyến nghề và năm chương.
+3. Hoàn thiện sinh hoạt NPC, quay người, lên/xuống xe và vật liệu mặt phố.
+   Chuyến xe hiện là chuyển vị trí có phí/thời gian, chưa có hoạt cảnh lên xe.
+4. Đo tải lạnh, bộ nhớ và khung hình trên web/thiết bị yếu. Đo riêng khu chợ
+   đông người; không suy hiệu năng cả map từ một ảnh GPU hay một máy.
+
+Không tăng mật độ nhà chỉ để lấp khoảng trống; kiểm đường đi, mặt tiền và
+tầm nhìn ở góc camera chơi trước khi thêm chi tiết.

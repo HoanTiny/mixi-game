@@ -565,11 +565,19 @@ func _ground() -> void:
 func _parks() -> void:
 	for p in data.parks:
 		var col := Color("697555")
+		var ground_kind := GROUND_PLAIN
 		match str(p.kind):
 			"pitch":
 				col = Color("647653")
 			"playground":
 				col = Color("c9b48c")
+				ground_kind = GROUND_CONCRETE
+			"square", "pedestrian":
+				col = Color("aaa091")
+				ground_kind = GROUND_CONCRETE
+			"parking":
+				col = Color("77736b")
+				ground_kind = GROUND_ASPHALT
 			"cemetery":
 				col = Color("92947b")
 			"forest", "wood", "nature_reserve":
@@ -577,7 +585,7 @@ func _parks() -> void:
 			"sand", "beach":
 				# Bãi bồi cát vàng ven sông.
 				col = Color("d8c48e")
-		col.a = GROUND_PLAIN if str(p.kind) != "playground" else GROUND_CONCRETE
+		col.a = ground_kind
 		_fill(_st("ground"), p.poly, 0.02, col)
 		# Cây trong công viên: rải theo lưới thưa.
 		if str(p.kind) in ["park", "garden", "forest", "wood", "nature_reserve", "village_green"]:

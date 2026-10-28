@@ -31,6 +31,9 @@ var _map: Control
 var _big_map: Control
 var _loc_scroll: ScrollContainer
 var _objective_box: VBoxContainer
+var _guide_button: Button
+var _guide_location := ""
+var _guide_primary_id := ""
 var _status: PanelContainer
 var _day_label: Label
 var _clock_label: Label
@@ -835,6 +838,7 @@ func _process(delta: float) -> void:
 	_phone_tick -= delta
 	if _phone_tick <= 0.0:
 		_phone_tick = 0.25
+		_refresh_guide_distance()
 		_warn_needs()
 		_update_tip(0.25)
 		_update_order_strip(active)
@@ -1599,6 +1603,9 @@ func _update_prompt() -> void:
 
 
 func _refresh_objectives(s: Dictionary) -> void:
+	_guide_button = null
+	_guide_location = ""
+	_guide_primary_id = ""
 	for c in _objective_box.get_children():
 		c.queue_free()
 	_obj_n = 0
@@ -1625,17 +1632,34 @@ func _fit_objectives() -> void:
 
 
 func _fill_objectives(s: Dictionary) -> void:
-	# Cảnh chính hôm nay: đi tới đúng nơi, đúng khung giờ (dấu ◆ vàng trên phố).
-	for id in game.scenes_today():
-		var e: Dictionary = game.scene_info(id)
-		var where := str(world.location_info(str(e.loc)).name)
-		if e.has("window"):
-			where += " · %s–%s" % [GameLogic.hh(float(e.window[0])), GameLogic.hh(float(e.window[1]))]
-		_objective("Hôm nay: " + game.fill(str(e.title)), "Tới " + where, "current")
-	# Đơn sửa đồ đang nhận ở tiệm chú Sơn: bước tiếp theo, chỗ cần tới.
-	var repair: Dictionary = QuestGuide.active(game)
-	if not repair.is_empty():
-		_objective("Đơn sửa: " + str(repair.title), "%s · %s · %s" % [str(repair.step), str(world.location_info(str(repair.location)).name), str(repair.hint)], "current")
+	var targets: Array = QuestGuide.targets(game)
+	if not targets.is_empty():
+		var primary: Dictionary = targets[0]
+		_guide_primary_id = str(primary.id)
+		_objective(str(primary.title), _guide_description(primary), "current")
+		var loc := str(primary.get("location", ""))
+		if bool(primary.get("navigable", true)) and world.LOCATIONS.has(loc):
+			_guide_location = loc
+			_guide_button = Button.new()
+			_guide_button.add_theme_font_size_override("font_size", 12)
+			_guide_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+			_guide_button.mouse_filter = Control.MOUSE_FILTER_STOP
+			_guide_button.pressed.connect(func() -> void:
+				# Recheck the current state: a deadline may have passed since redraw.
+				var latest: Dictionary = QuestGuide.active(game)
+				if latest.is_empty() or not bool(latest.get("navigable", true)): return
+				var destination := str(latest.get("location", ""))
+				if not world.LOCATIONS.has(destination): return
+				close_location()
+				_big_map.visible = false
+				world.walk_to_location(destination))
+			_objective_box.add_child(_guide_button)
+			_refresh_guide_distance()
+		for other in targets.slice(1):
+			# Quest details already have a section below; scene/order/follow-up
+			# alternatives share the same descriptions and availability here.
+			if str(other.id).begins_with("quest:"): continue
+			_objective("Còn có: " + str(other.title), _guide_description(other), "normal")
 	if game.chapter() == 2:
 		_refresh_objectives2(s)
 		return
@@ -1887,6 +1911,7 @@ func _refresh_objectives5(s: Dictionary) -> void:
 ## Việc nhờ đang làm và người đang cần giúp.
 func _quest_objectives() -> void:
 	var active: Array = game.quests_active()
+	active = active.filter(func(id): return "quest:" + str(id) != _guide_primary_id)
 	if ScreenFit.compact and not _obj_expanded:
 		# Gọn: mỗi loại một dòng; chạm vào bảng để xem từng việc.
 		if not active.is_empty():
@@ -1913,6 +1938,23 @@ func _quest_objectives() -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(360, 0)
 		_objective_box.add_child(l)
+
+
+func _guide_description(target: Dictionary) -> String:
+	var parts := [str(target.step)]
+	var loc := str(target.get("location", ""))
+	if world.LOCATIONS.has(loc): parts.append(str(world.location_info(loc).name))
+	if not str(target.get("reason", "")).is_empty(): parts.append(str(target.reason))
+	if not str(target.get("hint", "")).is_empty(): parts.append(str(target.hint))
+	return " · ".join(parts)
+
+
+func _refresh_guide_distance() -> void:
+	if not is_instance_valid(_guide_button) or _guide_button.is_queued_for_deletion() or _guide_location == "": return
+	if not world.LOCATIONS.has(_guide_location): return
+	var preview: Dictionary = world.route_preview(_guide_location)
+	var meters := roundi(float(preview.get("meters", 0.0)))
+	_guide_button.text = "Tới " + str(world.location_info(_guide_location).name) + (" · %d m" % meters if meters > 3 else " · ngay gần đây")
 
 
 func _objective(text: String, sub: String, state: String) -> void:
@@ -2007,6 +2049,14 @@ func _refresh_location() -> void:
 		_loc_cards.add_child(_quest_card("◆  " + game.fill(str(e.title)), meta + "\n" + str(e.get("who", "")),
 			game.scene_lock(id), game.open_scene.bind(id)))
 		found += 1
+	# Remote neighborhoods are reached from a named stop with explicit cost/time.
+	if world.has_method("travel_options"):
+		for trip in world.travel_options(_loc_id):
+			var destination := str(trip.destination)
+			var meta := "%d phút · %s" % [int(trip.minutes), GameLogic.fmt_money(int(trip.cost))]
+			_loc_cards.add_child(UI.choice("Đi xe tới " + str(trip.name), meta, str(trip.get("reason", "")),
+				func() -> void: world.travel_to(destination)))
+			found += 1
 	for who in world.npcs_at(_loc_id):
 		var npc := str(who.id)
 		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(who.name),

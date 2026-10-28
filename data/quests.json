@@ -24,7 +24,7 @@
    "decline": "\"Hôm nay cháu bận mất rồi chú ạ.\"",
    "deadline_days": 0,
    "deadline_hour": 15,
-   "reward_hint": "120 nghìn, chú Sơn +6",
+   "reward_hint": "120 nghìn tiền công, chú Sơn +6; tự thanh toán linh kiện",
    "reward": {
     "cash": 120000,
     "cash_label": "Cô bán hoa quả trả tiền sửa quạt",
@@ -45,44 +45,10 @@
    "fail_text": "Quá giờ hẹn, cô bán hoa quả phải mượn tạm cái quạt của quán bên cạnh. Chú Sơn xin lỗi thay An. \"Lần sau không kịp thì nói sớm nhé cháu.\"",
    "steps": [
     {
-     "kind": "visit",
+     "kind": "repair",
      "loc": "tiem_sau",
-     "hours": 1,
-     "text": "Xem cái quạt cây ở bàn sửa của chú Sơn",
-     "scene": {
-      "title": "Cái quạt cây kêu ù ù",
-      "who": "Chú Sơn",
-      "text": "Cắm điện vào, quạt kêu ù ù nhưng cánh đứng yên. Lấy tay đẩy nhẹ thì cánh quay, càng lúc càng nhanh. Trục quạt trơn, không kẹt.\nChú Sơn ngồi bên cạnh, khoanh tay chờ.",
-      "choices": [
-       {
-        "label": "Thay cái tụ khởi động của quạt",
-        "hint": "Tốn một cái tụ của tiệm",
-        "effects": {
-         "item.quat": 1,
-         "fatigue": 3,
-         "log": "Thay tụ mới, bật lên là cánh quay ngay. Chú Sơn gật đầu, không nói gì."
-        }
-       },
-       {
-        "label": "Tra dầu vào bạc trục",
-        "hint": "Ít tốn, làm nhanh",
-        "goto": "stay",
-        "effects": {
-         "fatigue": 2,
-         "log": "Tra dầu xong quạt vẫn ù ù, phải đẩy tay mới quay. Chưa đúng bệnh."
-        }
-       },
-       {
-        "label": "\"Cháu không chắc, chú xem lại hộ cháu.\"",
-        "hint": "Thành thật, nhưng việc vẫn là của mình",
-        "goto": "stay",
-        "effects": {
-         "rep.SAU": 2,
-         "log": "Chú Sơn chỉ vào cái tụ: \"Đẩy tay mới chạy thì nghĩ tới cái gì?\""
-        }
-       }
-      ]
-     }
+     "hours": 0,
+     "text": "Đo kiểm, chọn linh kiện, sửa trên bàn và chạy thử quạt"
     },
     {
      "kind": "visit",
