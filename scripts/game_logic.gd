@@ -40,6 +40,7 @@ var s: Dictionary = {}
 var notes: Array = []
 ## Đơn sửa đồ ở tiệm chú Sơn và bàn sửa 3D (scripts/street_life.gd, scripts/world/repair_bench.gd).
 const Street := preload("res://scripts/street_life.gd")
+const Day23 := preload("res://scripts/day23.gd")
 const Neighborhood := preload("res://scripts/neighborhood_flow.gd")
 ## Tiệm tóc: kiểu tóc, màu nhuộm cho mô hình An (scripts/wardrobe.gd, HAIR).
 const Wardrobe := preload("res://scripts/wardrobe.gd")
@@ -1479,6 +1480,8 @@ func fill(text: String) -> String:
 		"sleep_out": str(int(cfg.fatigue.sleepOutside)),
 		"npc": str(_event_data.get("npc", "")),
 		"line": str(_event_data.get("line", "")),
+		"family_result": str(_event_data.get("family_result","")),
+		"work_result": str(_event_data.get("work_result","")),
 		"chat_rep": str(int(cfg.get("chatRep", 2))),
 		"cash": fmt_money(int(s.get("cash", 0))),
 		"cost_hem_dua": fmt_money(housing_cost("hem_dua")) if is_started() else "",
@@ -1645,6 +1648,7 @@ func night_preview() -> Dictionary:
 func finish_day() -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
+	Day23.tick(self,true)
 	var tonight := []
 	if not delivery_active().is_empty():
 		add_log("Hết ngày, đơn giao hàng đang chạy bị hủy", "warn")
@@ -2362,11 +2366,13 @@ func _commit() -> void:
 	migrate_save()
 	_tick_needs()
 	_check_quests()
+	Day23.tick(self)
 	changed.emit()
 
 
 func migrate_save() -> void:
 	Neighborhood.migrate(self)
+	Day23.migrate(self)
 
 
 func neighborhood_target() -> Dictionary:
@@ -2858,6 +2864,9 @@ func _quest_finish(id: String, ok: bool) -> void:
 		if ok:
 			s.street.xp=int(s.street.xp)+1
 			s.street.completed=int(s.street.completed)+1
+			if s.flags.get("opening_fan_met",false):
+				s.flags.opening_mango=true
+				need_adj("mood",5)
 		Street.end_story(self)
 	s.queue.append({"id": ("qd:" if ok else "qf:") + id, "data": {}})
 	add_log(("Xong việc nhờ: " if ok else "Hỏng việc nhờ: ") + str(q.title), "plus" if ok else "warn")

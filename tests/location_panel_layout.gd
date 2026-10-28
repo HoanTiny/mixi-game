@@ -64,7 +64,7 @@ func _run() -> void:
 				check(intro != null and contains(scroll.get_global_rect(), intro.get_global_rect()), label + ": first-day introduction is immediately visible")
 				# This day has few cards; also exercise a longer story/context state.
 				var original_desc: String = hud._loc_desc.text
-				hud._loc_desc.text = original_desc + "\n" + original_desc.repeat(5)
+				hud._loc_desc.text = original_desc + "\n" + original_desc.repeat(20)
 				await settle()
 				# Exercise event propagation over the description, the originally stuck area.
 				var pointer: Vector2 = scroll.get_global_rect().position + Vector2(60.0, 30.0)

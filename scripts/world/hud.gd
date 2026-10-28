@@ -525,11 +525,13 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 	var start: float = st.start
 	var finish: float = start + float(a.hours)
 	_working = true
-	world.set_player_inside(true)
+	var sit_down: bool=game.action_loc(a) in ["xom_bo_me","com_hanh","ho_guom"] and (bool(a.get("rest",false)) or id in ["nghi","com_voi_ba","an_com","an_com_quen"])
+	if sit_down: world.begin_rest_pose(game.action_loc(a))
+	else: world.set_player_inside(true)
 	_work_title.text = "Đang " + str(a.name).to_lower() if a.group == "work" else str(a.name)
 	_work.visible = true
 	_refresh()
-	var seconds := maxf(0.8, float(a.hours) * float(game.cfg.get("workSecondsPerHour", 0.35)))
+	var seconds := maxf(2.5 if sit_down else 0.8, float(a.hours) * float(game.cfg.get("workSecondsPerHour", 0.35)))
 	var tw := create_tween()
 	tw.tween_method(func(t: float) -> void:
 		var now := lerpf(start, finish, t)
@@ -540,6 +542,7 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 	tw.tween_callback(func() -> void:
 		_working = false
 		_work.visible = false
+		if sit_down: world.end_rest_pose()
 		world.set_player_inside(false)
 		world.audio.play("done")
 		game.do_action(id, result))
@@ -1975,7 +1978,7 @@ func _refresh_guide_distance() -> void:
 func _objective(text: String, sub: String, state: String) -> void:
 	_obj_n += 1
 	var short: bool = not _obj_expanded
-	if short and _obj_n > (2 if ScreenFit.compact else 3):
+	if short and _obj_n > 1:
 		_obj_hidden += 1
 		return
 	var color := UI.HUD_TEXT
@@ -2048,6 +2051,16 @@ func _refresh_location() -> void:
 	for c in _loc_cards.get_children():
 		c.queue_free()
 	var found := 0
+	for offer in game.Day23.social_options(game,_loc_id):
+		var aid: String=offer.id
+		_loc_cards.add_child(UI.choice(offer.name,"%d phút · %s"%[roundi(offer.hours*60.0),offer.hint],offer.reason,
+			func() -> void: _arc_action(aid)))
+		found+=1
+	var first_customer: bool = _loc_id=="tiem_sau" and game.is_full() and game.day()==1 and game.clock()<=10.5 and game.s.get("neighborhood",{}).get("stage","")=="intro"
+	if first_customer:
+		_loc_desc.text="Cô bán hoa quả vừa đặt chiếc quạt hỏng lên bàn. Cô cần nó cho buổi chợ trưa. Chú Sơn nhường ghế cho An."
+		_loc_cards.add_child(UI.action_card(game,game.get_action("pho_chao_son"),320,_perform))
+		found+=1
 	if _loc_id == world.home:
 		var n: Dictionary = game.night_preview()
 		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d · Mệt −%d qua đêm" % [game.day(), int(n.recover)],
@@ -2101,6 +2114,9 @@ func _refresh_location() -> void:
 		if _loc_id == "tiem_sau" and not job.is_empty() and str(job.stage) == "repair":
 			_loc_cards.add_child(UI.choice("Mở bàn sửa 3D", "Kéo linh kiện hỏng ra, lắp linh kiện mới, siết hai vít", "", _open_bench))
 		for offer in game.Street.options(game, _loc_id):
+			# Assembly belongs to the bench, not a parallel one-click action.
+			if str(offer.id) in ["fix_cap", "fix_fuse"]: continue
+			if str(offer.id)=="accept" and game.is_full() and game.day()==1 and game.clock()<=10.5 and game.s.get("neighborhood",{}).get("stage","")=="intro": continue
 			var hint := str(offer.hint)
 			var meta := "%d phút" % roundi(float(offer.hours) * 60.0)
 			if int(offer.cost) > 0:
@@ -2112,6 +2128,8 @@ func _refresh_location() -> void:
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
 			if game.action_loc(a) == _loc_id:
+				if first_customer and str(a.id)=="pho_chao_son": continue
+				if str(a.id)=="sua_do_le" and world.real and (first_customer or game.s.flags.get("opening_fan_met",false)) and int(game.s.street.completed)<2: continue
 				_loc_cards.add_child(UI.action_card(game, a, 320, _perform))
 				found += 1
 	if loc.get("scrap", false):
@@ -2132,6 +2150,17 @@ func _fit_location() -> void:
 	_location.offset_right = -16.0
 	_location.offset_top = 64.0
 	_location.offset_bottom = -16.0
+
+func _arc_action(id: String) -> void:
+	if _working: return
+	var at: String=_loc_id
+	if id=="arc_debrief":
+		_working=true
+		world.begin_rest_pose(at)
+		await get_tree().create_timer(2.0).timeout
+		world.end_rest_pose()
+		_working=false
+	game.Day23.act(game,at,id)
 
 
 ## Thẻ việc nhờ: nền vàng nhạt để nổi giữa các việc làm, dòng phụ xuống hàng được (bước việc nhờ thường dài).

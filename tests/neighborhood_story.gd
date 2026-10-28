@@ -53,6 +53,8 @@ func bench(g) -> void:
 func _initialize() -> void:
 	var g = fresh()
 	check(g.neighborhood_target().action=="pho_chao_son","day1 has workshop introduction")
+	# Late arrival retains the ordinary daily-order path; the early fan is covered separately.
+	g.s.used=5.0
 	g.do_action("pho_chao_son")
 	check(g.clock()>=8 and g.s.neighborhood.stage=="work","introduction waits until shop opens")
 	street(g,"accept")

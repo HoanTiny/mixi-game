@@ -10,6 +10,7 @@ static func targets(g) -> Array:
 	if not g.is_started() or g.is_over() or not g.s.get("queue", []).is_empty():
 		return []
 	var out := []
+	out.append_array(g.Day23.targets(g))
 	var repair := _repair(g)
 	for id in g.quests_active():
 		var step: Dictionary = g.quest_step(id)
@@ -105,13 +106,14 @@ static func _repair(g) -> Dictionary:
 	var st: Dictionary = g.s.get("street", {})
 	var job: Dictionary = st.get("job", {})
 	if job.is_empty(): return {}
-	var steps := {"inspect":"Đo kiểm món khách gửi","part":"Tìm linh kiện thay thế","repair":"Lắp linh kiện trên bàn sửa 3D","test":"Chạy thử trước khi trả khách","deliver":"Trả món và nhận tiền công"}
+	if job.get("arc","")=="day23": return _arc_repair(g,job)
+	var steps := {"inspect":"Đo kiểm món khách gửi","diagnose":"Đọc số đo, chọn nguyên nhân","part":"Tìm linh kiện thay thế","repair":"Lắp linh kiện trên bàn sửa 3D","test":"Chạy thử trước khi trả khách","deliver":"Trả món và nhận tiền công"}
 	var stage := str(job.get("stage", ""))
 	if not steps.has(stage): return {}
 	var item := _entry("repair", str(job.name), steps[stage], "tiem_sau", 95)
 	var due_hour := float(job.get("due_hour", 17.0))
 	item.hint = "" if job.has("quest_id") else "Hẹn ngày %d · %s" % [int(job.get("due", g.day())), g.hh(due_hour)]
-	var option_id: String = {"inspect":"inspect", "repair":"fix_cap" if int(job.get("kind", 0)) == 0 else "fix_fuse", "test":"test", "deliver":"deliver"}.get(stage, "")
+	var option_id: String = {"inspect":"inspect","diagnose":"diagnose_cap", "repair":"fix_cap" if int(job.get("kind", 0)) == 0 else "fix_fuse", "test":"test", "deliver":"deliver"}.get(stage, "")
 	if stage == "part":
 		if int(st.get("parts", {}).get(job.part, 0)) > 0:
 			option_id = "own_part"
@@ -148,6 +150,18 @@ static func _street_option(g, loc: String, id: String) -> Dictionary:
 	for option in g.Street.options(g, loc):
 		if str(option.id) == id: return option
 	return {}
+
+static func _arc_repair(g, job: Dictionary) -> Dictionary:
+	var stage: String=job.stage
+	var loc := "cho_cau_nho" if stage in ["part","deliver"] else "tiem_sau"
+	var texts := {"measure":"Đo dây, mâm nhiệt và cầu chì","diagnose":"Đối chiếu ba kết quả đo","quote":"Báo giá và loại linh kiện","approval":"Chờ khách xác nhận báo giá","part":"Mua linh kiện đã thống nhất","check_part":"Kiểm tra linh kiện cũ tại tiệm","used_choice":"Đối chiếu nhãn, chọn mẫu đúng ngưỡng","repair":"Lắp cầu chì trên bàn sửa 3D","test":"Đun thử và kiểm tra ngắt","deliver":"Mang ấm tới hàng nước"}
+	var item := _entry("repair",job.name,texts.get(stage,"Tiếp tục đơn sửa"),loc,98)
+	var price_note: String = "chưa chốt giá" if stage in ["measure","diagnose","quote"] else "giá báo "+g.fmt_money(job.pay)
+	item.hint="Hẹn ngày %d · %s · %s"%[job.due,g.hh(job.due_hour),price_note]
+	if float(job.due)*24.0+float(job.due_hour)-g.now_abs()<2.0: item.priority+=60
+	var opts: Array=g.Day23.repair_options(g,loc).filter(func(o): return o.id not in ["arc_delay","arc_cancel"])
+	if not opts.is_empty() and opts.all(func(o): return o.reason!=""): _blocked(item,str(opts[0].reason))
+	return item
 
 
 static func notice(g, title: String, text: String) -> void:

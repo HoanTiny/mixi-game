@@ -13,6 +13,9 @@ var walking := false
 var idle_time := 0.0
 var sitting := false
 var _ride_pose: SkeletonModifier3D
+var _task_pose: SkeletonModifier3D
+var resting := false
+var held_kind := ""
 var _worn := {}
 var _unit_scale := 1.0
 var _walk_cadence := 0.78
@@ -23,6 +26,17 @@ const PATH := "res://assets/characters/an/an-rigged.glb"
 ## Có mô hình An đã gắn xương trong dự án (bản xuất game chỉ có bản đã nhập, không có file .glb gốc).
 static func available() -> bool:
 	return ResourceLoader.exists(PATH) or FileAccess.file_exists(PATH)
+
+## Street and job scenes share the same wardrobe interpretation.
+func apply_outfit(game) -> void:
+	var ap: Dictionary = game.s.get("appearance", DEFAULT_COLORS)
+	var colors := DEFAULT_COLORS.duplicate()
+	for key in colors: colors[key]=str(ap.get(key,colors[key]))
+	for slot in [["ao","shirt"],["quan","pants"]]:
+		var id := str(game.wardrobe().worn.get(slot[0],""))
+		if id!="": colors[slot[1]]=str(game.cloth(id).get("color",colors[slot[1]]))
+	set_colors(colors)
+	set_hair_style(str(game.s.get("hair_style","natural")))
 
 
 func setup(_shirt: Color, _pants: Color, _identity := "An") -> void:
@@ -79,6 +93,9 @@ func setup(_shirt: Color, _pants: Color, _identity := "An") -> void:
 		_ride_pose = _RidePose.new()
 		_ride_pose.unit_scale = _unit_scale
 		skeleton.add_child(_ride_pose)
+		_task_pose = _TaskPose.new()
+		_task_pose.unit_scale = _unit_scale
+		skeleton.add_child(_task_pose)
 	set_colors(DEFAULT_COLORS)
 
 func _create_idle() -> void:
@@ -200,7 +217,7 @@ func set_hair_style(style: String) -> void:
 func animate_motion(speed: float, delta: float) -> void:
 	if not animation or walk_clip.is_empty():
 		return
-	if sitting:
+	if sitting or resting:
 		walking = false
 		return
 	# Hysteresis prevents a tiny joystick input from continually restarting clips.
@@ -253,9 +270,62 @@ func sit(on: bool, seat_h: float) -> void:
 		animation.play(idle_clip, 0.18)
 		walking = false
 
-func hold(_kind: String) -> void:
-	# Grip solving is active for the entire seated pose, independent of walk speed.
-	pass
+func hold(kind: String) -> void:
+	held_kind=kind
+	if _task_pose != null: _task_pose.carrying=kind!="" and kind!="ride"
+	if _task_pose != null: _task_pose.kind=kind
+
+func place() -> void:
+	if _task_pose != null: _task_pose.place_left=0.65
+
+## A chair pose has feet on the floor, unlike the motorcycle pose.
+func rest(on: bool, seat_h := 0.46) -> void:
+	resting=on
+	if _task_pose==null: return
+	_task_pose.resting=on
+	if model!=null and skeleton!=null:
+		var hip := skeleton.find_bone("Hips")
+		model.position.y=seat_h+0.09-skeleton.get_bone_global_rest(hip).origin.y*_unit_scale if on else 0.0
+		_task_pose.model_offset=model.position.y
+	if animation!=null:
+		animation.play(idle_clip,0.15)
+		walking=false
+
+class _TaskPose extends _RidePose:
+	var kind := ""
+	var carrying := false
+	var resting := false
+	var weight := 0.0
+	var place_left := 0.0
+
+	func advance_motion(delta: float) -> void:
+		var dt := clampf(delta,0.0,0.1)
+		place_left=maxf(0.0,place_left-dt)
+		weight=move_toward(weight,1.0 if carrying or resting or place_left>0 else 0.0,dt*6.0)
+		elapsed+=dt
+
+	func _apply() -> void:
+		if weight<0.001: return
+		var sk := get_skeleton()
+		if sk==null: return
+		var before := {}
+		for side in ["Left","Right"]:
+			for part in ["Arm","ForeArm","Hand","UpLeg","Leg","Foot"]:
+				var index := sk.find_bone(side+part)
+				if index>=0: before[index]=sk.get_bone_global_pose(index)
+		for side in ["Left","Right"]:
+			var s := 1.0 if side=="Left" else -1.0
+			var reach := sin((1.0-place_left/0.65)*PI) if place_left>0 else 0.0
+			var hand := Vector3(s*0.20,1.06-reach*0.18,0.44+reach*0.14)
+			if kind=="kettle" and place_left<=0:
+				hand=Vector3(0.24,1.16,0.44) if side=="Left" else Vector3(-0.06,1.01,0.44)
+			if resting: hand=Vector3(s*0.22,0.65,0.26)
+			hand.y-=model_offset
+			_solve(sk,side+"Arm",side+"ForeArm",side+"Hand",hand/unit_scale,Vector3(s*0.8,-0.7,-0.2),false)
+			if resting:
+				_solve(sk,side+"UpLeg",side+"Leg",side+"Foot",Vector3(s*0.16,0.08-model_offset,0.32)/unit_scale,Vector3(s*0.08,0.1,1.0),true)
+		for index in before:
+			sk.set_bone_global_pose(index,(before[index] as Transform3D).interpolate_with(sk.get_bone_global_pose(index),weight))
 
 func wear(kind: String, on: bool, tint := Color("344e5c")) -> void:
 	if not skeleton:

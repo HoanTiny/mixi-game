@@ -209,7 +209,10 @@ func refresh() -> void:
 	if job.stage=="test": instruction = "Đã lắp xong · Chạy thử trước khi trả khách."
 	if job.stage=="deliver": instruction = "Chạy thử đạt · Rời bàn để trả món và nhận tiền công."
 	hint.text = instruction + ("\n"+feedback if not feedback.is_empty() else "")
-	details.text = str(job.reading) + "\n" + "Giờ %s · Sửa 45 phút, Mệt +8 khi lắp xong · Linh kiện đã lấy cho đơn" % game.hh(game.clock())
+	var minutes := 45
+	for offer in game.Street.options(game,"tiem_sau"):
+		if offer.id==("fix_cap" if kind==0 else "fix_fuse"): minutes=roundi(float(offer.hours)*60.0)
+	details.text = str(job.reading) + "\n" + "Giờ %s · Sửa %d phút, Mệt +8 khi lắp xong · Linh kiện đã lấy cho đơn" % [game.hh(game.clock()),minutes]
 func _surface_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_RIGHT and dragging==null:
 		orbit_yaw -= event.relative.x*0.006

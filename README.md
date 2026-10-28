@@ -1,5 +1,56 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.7 · ba ngày đầu, chiếc quạt và cuộc hẹn với Linh**
+
+[Chơi thử ngày 1–3](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.7)
+· [Chơi bản chính](https://hoantiny.github.io/mixi-game/?v=1.7).
+Link chơi thử không ghi đè save chính. Bản tải Windows vẫn là 1.6.
+
+Chào chú Sơn trước 10:30 ngày 1 để gặp khách cần quạt cho buổi chợ. Chọn giờ hẹn,
+đọc số đo, tìm linh kiện, sửa trên bàn 3D và mang ra chợ trả. Quạt chạy tại sạp
+sau khi giao; khách gửi xoài về cho bà và nhớ An ở lần gặp ngày hôm sau.
+Có thể từ chối hoặc nhận sai rồi chuyển sang phụ quán; save cũ và lần tới tiệm
+muộn vẫn dùng cuộc gặp ngày 2. Bản web đã có nội dung này; bản tải Windows chưa cập nhật.
+
+Chạy thử không ghi save chính: `godot --path . -- --demo --demo-full`.
+Trên máy Windows hiện tại có thể mở `play-story-demo.cmd` để chơi từ ngày 1;
+hoặc kéo file Godot executable vào launcher nếu Godot nằm ở chỗ khác.
+Các kiểm tra của lát cắt: `tests/opening_slice.gd`, `tests/opening_visual.gd`
+(thêm `--capture` để lưu ảnh vào `build/opening-preview`), cùng
+`tests/neighborhood_story.gd`, `tests/neighborhood_world.gd`, `tests/location_panel_layout.gd`.
+Các bài kiểm tra dựng thế giới cần `-- --demo --demo-full`.
+
+Phần hình ảnh mới tập trung ở tiệm, sạp khách và hiên nhà: quạt có lồng/cánh,
+hoa quả và đồ đóng gói; nền bê tông bớt ô kẻ; giảm nhóm đứng chắn cửa. An dùng
+cùng rig và màu đồ khi vào ca làm.
+
+**Tiếp nối ngày 2–3 · chiếc ấm và cuộc hẹn với Linh**
+
+- Khi đã gặp khách ngày 1, sáng ngày 2 có lời nhắn của Linh: xem phòng ngõ Gạch
+  lúc 12 hoặc 16 giờ. Báo trước 11:30 được đổi từ trưa sang chiều một lần.
+  Vắng quá 15 phút, Linh tự đi và mang ảnh về; tình cảm chỉ giảm nếu đã hứa.
+- Ở tiệm Sơn, nhận hoặc từ chối chiếc ấm hàng nước. Đo dây, mâm nhiệt, cầu chì;
+  đọc số đo; báo giá; chờ khách xác nhận 15 phút rồi mới mua đồ.
+- Cầu chì mới: báo 180k, mua chợ 25k hoặc tiệm 45k. Tồn kho cũ: báo 175k,
+  túi 10k, thêm 30 phút kiểm tra và chọn đúng mẫu 184°C. Chọn sai không lắp được.
+  Có thể đổi phương án, báo lại giá; tiền túi cũ đã mua vẫn được tính.
+- Bàn sửa mất 90 phút khi siết vít cuối; rời bàn giữ tiến độ. Trả tại chợ trước
+  14 giờ ngày 2, hoặc gọi xin dời 17 giờ. Trễ không báo giảm 20%; báo sau hạn giảm
+  10%. Giữ hẹn mở khoản giới thiệu +20k cho đơn thường ở Sơn.
+- Có thể ứng linh kiện; hủy đơn vẫn hoàn tiền hoặc ghi nợ. Hết ngày 3 Sơn nhận
+  lại đơn còn dang dở, tránh chiếm bàn sửa mãi.
+- Sau 17 giờ ngày 3, Linh đến quán Hạnh. Cuộc nói chuyện phản ánh việc đã làm
+  và cho chọn chỗ ở cần khảo sát tiếp. Nếu bỏ lỡ, có thể bàn tại nhà tối hôm sau.
+- An mang quạt/ấm đã thử trên tay, có tư thế đặt đồ và ngồi nghỉ trên ghế;
+  tay được giải IK trên rig hiện có, chưa có khớp ngón tay riêng. Linh đi theo
+  cuộc hẹn qua hệ thống đường có sẵn. Cột che mặt tiền được bỏ khỏi đường nhìn;
+  thêm hàng nước, biển báo giá và đèn hiên bật buổi chiều.
+
+Kiểm tra thêm: `tests/day23.gd` (hai lịch sống, sai chẩn đoán, save/load,
+vỡ hẹn, nợ linh kiện) và `tests/day23_visual.gd` (GPU, kéo thả ấm, đường của
+Linh, tư thế An, ảnh ở `build/day23-preview`). Bản thử web 1.7 có các thay đổi này;
+chưa đo thời lượng 20–30 phút với người chơi thật. Bản Windows vẫn là 1.6.
+
 **Bản web/Windows 1.6 · phố gọn, nhiệm vụ liền mạch**
 
 - [Chơi bản chính](https://hoantiny.github.io/mixi-game/) ·
