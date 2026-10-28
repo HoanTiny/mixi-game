@@ -6,6 +6,7 @@ extends RefCounted
 ## INSTANCE_CUSTOM (instanced_material()). Xe, ghe, xe đẩy nhìn về +z, gốc ở mặt đất (mặt nước) chính giữa.
 
 const Character := preload("res://scripts/world/character.gd")
+const VehicleKit := preload("res://scripts/vehicles/vehicle_kit.gd")
 
 const SHADER := """
 shader_type spatial;
@@ -15,12 +16,20 @@ render_mode cull_back;
 uniform vec3 paint : source_color = vec3(0.7, 0.2, 0.2);
 uniform vec3 paint2 : source_color = vec3(0.3, 0.5, 0.8);
 uniform bool per_instance = false;
+// The fixed mesh remains batched. UV2 holds wheel radius/hub Z only on rotating
+// vertices; moving traffic stores one normalized turn in custom alpha.
+uniform bool rolling = false;
+uniform float wheel_distance = 0.0;
+uniform bool running_lights = false;
+global uniform float night;
 // Người đi bộ (MultiMesh): tay chân vung theo nhịp bước. UV.x đánh dấu chi (1, 2 chân trái, phải; 3, 4 tay trái,
 // phải), UV.y là độ cao khớp hông, vai; mỗi người một nhịp lệch theo chỗ đứng.
 uniform bool swing = false;
 uniform float swing_speed = 7.0;
 varying vec3 v_paint;
 varying vec3 v_paint2;
+varying vec3 v_vehicle_paint;
+varying vec3 v_local;
 vec3 shirt(float h) {
 	vec3 k = clamp(abs(fract(h + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);
 	return mix(vec3(1.0), k, 0.55) * 0.88;
@@ -28,6 +37,16 @@ vec3 shirt(float h) {
 void vertex() {
 	v_paint = per_instance ? pow(INSTANCE_CUSTOM.rgb, vec3(2.2)) : paint;
 	v_paint2 = per_instance ? pow(shirt(INSTANCE_CUSTOM.a), vec3(2.2)) : paint2;
+	v_vehicle_paint = per_instance ? (OUTPUT_IS_SRGB ? INSTANCE_CUSTOM.rgb : pow(INSTANCE_CUSTOM.rgb, vec3(2.2))) : paint;
+	v_local = VERTEX;
+	if (rolling && UV2.x > 0.01 && UV.x < -0.5) {
+		float angle = per_instance ? INSTANCE_CUSTOM.a * 6.28318530718 : wheel_distance / UV2.x;
+		float c = cos(angle);
+		float s = sin(angle);
+		vec2 offset = VERTEX.yz - UV2;
+		VERTEX.yz = UV2 + vec2(offset.x * c - offset.y * s, offset.x * s + offset.y * c);
+		NORMAL.yz = vec2(NORMAL.y * c - NORMAL.z * s, NORMAL.y * s + NORMAL.z * c);
+	}
 	if (swing && UV.x > 0.5) {
 		float limb = floor(UV.x + 0.5);
 		float side = (limb == 1.0 || limb == 4.0) ? 1.0 : -1.0;
@@ -46,6 +65,31 @@ void fragment() {
 	ALBEDO = base * mix(vec3(1.0), v_paint, k1) * mix(vec3(1.0), v_paint2, k2);
 	// Phần sơn bóng hơn nhựa, cao su, gỗ.
 	ROUGHNESS = mix(0.8, 0.4, k1);
+	// Only the authored close vehicles use this material encoding. Other props,
+	// vegetation and legacy pedestrian UVs retain their original shading.
+	if (UV.x < -0.5) {
+		vec3 surface = OUTPUT_IS_SRGB ? COLOR.rgb : pow(COLOR.rgb, vec3(2.2));
+		surface *= mix(vec3(1.0), v_vehicle_paint, k1);
+		// Broad, restrained weathering: high-frequency analytic patterns alias into
+		// a visible checkerboard on large body panels at the gameplay camera.
+		float variation = sin(v_local.x * 7.1 + v_local.z * 5.3) * sin(v_local.y * 11.3 - v_local.z * 3.7);
+		float dust = (1.0 - smoothstep(0.12, 0.64, v_local.y)) * 0.07;
+		vec3 dust_color = OUTPUT_IS_SRGB ? vec3(0.31, 0.29, 0.24) : vec3(0.076, 0.066, 0.043);
+		ALBEDO = mix(surface * (0.985 + variation * 0.008), dust_color, dust);
+		ROUGHNESS = clamp(UV.y + variation * 0.012 + dust, 0.16, 0.98);
+		METALLIC = UV.x < -1.5 && UV.x > -2.5 ? 0.72 : 0.0;
+		SPECULAR = UV.x < -2.5 ? 0.64 : 0.38;
+		// Opaque tinted windows are much less diffuse than painted bodywork;
+		// otherwise the sun-facing windshield reads as a bright blue body panel.
+		if (UV.x < -5.5) {
+			ALBEDO *= 0.42;
+			SPECULAR = 0.48;
+		}
+		if (running_lights && UV.x < -3.5 && UV.x > -5.5) {
+			vec3 lamp = UV.x < -4.5 ? vec3(0.65, 0.025, 0.008) : vec3(0.70, 0.62, 0.42);
+			EMISSION = lamp * clamp(night, 0.0, 1.0) * (UV.x < -4.5 ? 0.6 : 1.2);
+		}
+	}
 }
 """
 ## Ngồi xe máy: độ cao khớp hông, chỗ hông người lái và người ngồi sau theo chiều dài xe (xem Character.sit).
@@ -89,6 +133,17 @@ static func instanced_material() -> ShaderMaterial:
 	return _mats["instanced"]
 
 
+## Shared near-traffic vehicle material. Alpha is wheel phase, not a shirt tint;
+## real riders/helmets are separate surfaces and preserve their own materials.
+static func moving_instanced_material() -> ShaderMaterial:
+	if not _mats.has("moving_instanced"):
+		var m := instanced_material().duplicate() as ShaderMaterial
+		m.set_shader_parameter("rolling", true)
+		m.set_shader_parameter("running_lights", true)
+		_mats["moving_instanced"] = m
+	return _mats["moving_instanced"]
+
+
 ## Vật liệu cho MultiMesh người đi bộ (person("walk")): như instanced_material, tay chân vung theo nhịp speed.
 static func walking_material(speed := 7.0) -> ShaderMaterial:
 	var key := "walk|%s" % speed
@@ -129,6 +184,36 @@ static func instance(mesh: Mesh, paint := Color(1, 1, 1)) -> MeshInstance3D:
 		mi.set_surface_override_material(1, glass_material())
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	return mi
+
+
+## A private material is essential: the player must never rotate parked bikes
+## sharing the same paint/cache. No additional mesh or wheel draw calls.
+static func moving_instance(mesh: Mesh, paint := Color(1, 1, 1)) -> MeshInstance3D:
+	var mi := instance(mesh, paint)
+	var m := material(paint).duplicate() as ShaderMaterial
+	m.set_shader_parameter("rolling", true)
+	m.set_shader_parameter("running_lights", true)
+	mi.set_surface_override_material(0, m)
+	mi.set_meta("wheel_circumference", TAU * wheel_radius(mesh))
+	return mi
+
+
+static func set_vehicle_distance(vehicle: MeshInstance3D, traveled_metres: float) -> void:
+	var m := vehicle.get_surface_override_material(0) as ShaderMaterial
+	if m != null:
+		# Bound the shader's float argument so a long delivery cannot lose precision.
+		m.set_shader_parameter("wheel_distance", fposmod(traveled_metres, float(vehicle.get_meta("wheel_circumference", TAU * 0.27))))
+
+
+## All close models use a common axle radius within a vehicle. Radius is also
+## hub Y because tyres rest at ground height. Static body UV2 is exactly zero.
+static func wheel_radius(mesh: Mesh) -> float:
+	var data: Array = mesh.surface_get_arrays(0)
+	if data[Mesh.ARRAY_TEX_UV2] != null:
+		for pivot in data[Mesh.ARRAY_TEX_UV2]:
+			if pivot.x > 0.01:
+				return pivot.x
+	return 0.27
 
 
 # ---------------------------------------------------------------- màu, hình cơ bản
@@ -338,8 +423,8 @@ static func rider_bike(kind := "tay_ga", passenger := false) -> ArrayMesh:
 ## Xe máy đang chạy có người thật lái (tư thế nướng sẵn ở assets/rb/crowd, tools/bake_people.gd): mặt lưới đầu là xe
 ## và bóng giả (vật liệu sơn theo MultiMesh), sau là người lái (back: người ngồi sau, rỗng thì không) với ảnh thật, mũ
 ## bảo hiểm màu helmet. Chưa nướng thì trả null.
-static func rider_real(kind: String, driver: String, back: String, helmet: Color) -> ArrayMesh:
-	var key := "that|%s|%s|%s|%s" % [kind, driver, back, helmet.to_html()]
+static func rider_real(kind: String, driver: String, back: String, helmet: Color, detail := false) -> ArrayMesh:
+	var key := "that|%s|%s|%s|%s|%s" % [kind, driver, back, helmet.to_html(), detail]
 	if _cache.has(key):
 		return _cache[key]
 	var parts := [[driver, "ride"]] + ([[back, "back"]] if back != "" else [])
@@ -347,14 +432,17 @@ static func rider_real(kind: String, driver: String, back: String, helmet: Color
 		if not ResourceLoader.exists("res://assets/rb/crowd/%s_%s.res" % pr):
 			return null
 	var g = Character.Mesher.new(false)
-	_motorbike(g, kind, false)
-	var disc := PackedInt32Array()
-	var mid: int = g.vert(Vector3(0.0, 0.012, 0.0), Vector3.UP, _c("1c1d20"), NB)
-	for j in 10:
-		var th := TAU * float(j) / 10.0
-		disc.append(g.vert(Vector3(sin(th) * 0.42, 0.012, cos(th) * 1.0 - 0.05), Vector3.UP, _c("26272b"), NB))
-	for j in 10:
-		g.tri(mid, disc[j], disc[(j + 1) % 10])
+	_motorbike(g, kind, detail)
+	# Close vehicles cast a real shadow. The far-LOD polygon is intentionally
+	# absent here so it cannot form a second opaque ten-sided patch under them.
+	if not detail:
+		var disc := PackedInt32Array()
+		var mid: int = g.vert(Vector3(0.0, 0.012, 0.0), Vector3.UP, _c("1c1d20"), NB)
+		for j in 10:
+			var th := TAU * float(j) / 10.0
+			disc.append(g.vert(Vector3(sin(th) * 0.42, 0.012, cos(th) * 1.0 - 0.05), Vector3.UP, _c("26272b"), NB))
+		for j in 10:
+			g.tri(mid, disc[j], disc[(j + 1) % 10])
 	var m: ArrayMesh = g.commit()
 	for i in m.get_surface_count():
 		m.surface_set_material(i, instanced_material())
@@ -365,7 +453,10 @@ static func rider_real(kind: String, driver: String, back: String, helmet: Color
 	# Người (ảnh atlas chung) gộp một mặt, mũ bảo hiểm (màu đỉnh) gộp một mặt: mỗi nhóm xe vẽ ba lần.
 	var groups := {}
 	for pr in parts:
-		var src: ArrayMesh = load("res://assets/rb/crowd/%s_%s.res" % pr)
+		var detailed_path := "res://assets/rb/riders_detail/%s_%s_%s.res" % [pr[0], pr[1], kind]
+		if pr[1] == "back":
+			detailed_path = "res://assets/rb/riders_detail/%s_back.res" % pr[0]
+		var src: ArrayMesh = load(detailed_path if detail and ResourceLoader.exists(detailed_path) else "res://assets/rb/crowd/%s_%s.res" % pr)
 		for i in src.get_surface_count():
 			var mat := src.surface_get_material(i)
 			var is_helmet: bool = mat is StandardMaterial3D and (mat as StandardMaterial3D).vertex_color_use_as_albedo
@@ -436,6 +527,9 @@ static func _rider(g, hz: float, foot: Vector3, driver: bool) -> void:
 
 
 static func _motorbike(g, kind: String, detail: bool) -> void:
+	if detail:
+		VehicleKit.motorcycle(g, kind, load("res://scripts/world/props3d.gd"))
+		return
 	var s := 12 if detail else 6
 	var R := 0.27
 	var zf := 0.76
@@ -586,10 +680,16 @@ static func _limb(g, a: Vector3, b: Vector3, r0: float, r1: float, col: Color, u
 # ---------------------------------------------------------------- ô tô
 
 ## Ô tô con bốn chỗ (dài 4,2 m): thân bo vuông sơn, cabin kính, mui sơn, bốn bánh, đèn trước sau, biển số.
-static func car() -> ArrayMesh:
-	if _cache.has("car"):
-		return _cache.car
+static func car(detail := true) -> ArrayMesh:
+	var key := "car|%s" % detail
+	if _cache.has(key):
+		return _cache[key]
 	var g = Character.Mesher.new(false)
+	if detail:
+		VehicleKit.car(g, load("res://scripts/world/props3d.gd"))
+		var close_mesh: ArrayMesh = g.commit()
+		_cache[key] = close_mesh
+		return close_mesh
 	var body := [[-2.1, 0.52, 0.8, 0.2], [-2.03, 0.6, 0.86, 0.3], [-1.65, 0.66, 0.875, 0.36], [1.25, 0.64, 0.875, 0.34],
 		[1.85, 0.57, 0.86, 0.26], [2.1, 0.5, 0.8, 0.18]]
 	var rings := []
@@ -609,7 +709,7 @@ static func car() -> ArrayMesh:
 	_box(g, Vector3(0, 0.45, 2.11), Vector3(0.5, 0.12, 0.02), _c("e8e6dc"))
 	_box(g, Vector3(0, 0.55, -2.11), Vector3(0.5, 0.12, 0.02), _c("e8e6dc"))
 	var m: ArrayMesh = g.commit()
-	_cache["car"] = m
+	_cache[key] = m
 	return m
 
 

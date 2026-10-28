@@ -21,6 +21,53 @@ const OLD_BONE_POS := {"head": Vector3(0, 1.56, 0), "chest": Vector3(0, 1.3, 0),
 static var _scenes := {}
 static var _anims := {}
 static var _mats := {}
+static var _skin_shader: Shader
+const SKIN_SHADER := """
+shader_type spatial;
+render_mode diffuse_burley, specular_schlick_ggx;
+uniform sampler2D color_map : source_color, filter_linear_mipmap_anisotropic;
+uniform sampler2D normal_map : hint_normal, filter_linear_mipmap_anisotropic;
+uniform bool has_normal = false;
+uniform bool head_surface = false;
+uniform int outfit_profile = 0;
+vec3 to_srgb(vec3 c) {
+	return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c));
+}
+vec3 to_linear(vec3 c) {
+	return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
+}
+void fragment() {
+	vec3 source = texture(color_map, UV).rgb;
+	vec3 base = OUTPUT_IS_SRGB ? source : to_srgb(source);
+	float lum = dot(base, vec3(0.2126, 0.7152, 0.0722));
+	float chroma = max(base.r, max(base.g, base.b)) - min(base.r, min(base.g, base.b));
+	float skin = head_surface ? 1.0 : smoothstep(0.035, 0.10, base.r - base.b) * (1.0 - smoothstep(0.20, 0.36, base.r - base.g));
+	// Keep the photographed weave and wrinkles; mute only the most saturated dye.
+	vec3 toned = mix(vec3(lum), base, head_surface ? 0.98 : 0.87);
+	if (!head_surface && outfit_profile == 1) {
+		// The cook's photographed jacket/apron has low-chroma white cloth. Hands
+		// are warmer and remain untouched, as do the dark trousers and shoes.
+		float white_cloth = smoothstep(0.33, 0.58, lum) * (1.0 - smoothstep(0.035, 0.15, chroma));
+		float apron = smoothstep(0.59, 0.63, UV.y) * smoothstep(0.24, 0.29, UV.x) * (1.0 - smoothstep(0.71, 0.76, UV.x));
+		vec3 dye = mix(vec3(0.47, 0.53, 0.49), vec3(0.49, 0.40, 0.29), apron);
+		toned = mix(toned, dye * clamp(pow(max(lum, 0.001) / 0.72, 0.65), 0.66, 1.20), white_cloth);
+		skin *= 1.0 - white_cloth;
+	} else if (!head_surface && outfit_profile == 2) {
+		// Delivery jacket: faded forest green, retaining the reflective stripe.
+		float red_cloth = smoothstep(0.12, 0.25, base.r - base.g) * smoothstep(1.45, 1.85, base.r / max(base.g, 0.01));
+		toned = mix(toned, vec3(0.23, 0.35, 0.29) * clamp(pow(max(lum, 0.01) / 0.27, 0.6), 0.62, 1.25), red_cloth);
+		skin *= 1.0 - red_cloth;
+	}
+	toned *= head_surface ? vec3(0.97, 0.965, 0.95) : vec3(0.96);
+	ALBEDO = OUTPUT_IS_SRGB ? toned : to_linear(toned);
+	ROUGHNESS = mix(0.91, 0.62, skin);
+	SPECULAR = mix(0.16, 0.30, skin);
+	if (has_normal) {
+		NORMAL_MAP = texture(normal_map, UV).rgb;
+		NORMAL_MAP_DEPTH = head_surface ? 0.30 : 0.48;
+	}
+}
+"""
 
 var look: Dictionary = {}
 var _model: Node3D
@@ -33,6 +80,7 @@ var _hold := ""
 var _female := false
 var _seen: VisibleOnScreenNotifier3D
 var _worn := {}
+var _walk_cadence := 0.85
 
 
 static func make(look_in: Dictionary) -> Node3D:
@@ -116,7 +164,7 @@ func _skin(name: String, hair: String, only: MeshInstance3D = null) -> void:
 	for mi in ([only] if only != null else _sk.find_children("*", "MeshInstance3D", true, false)):
 		var mesh: Mesh = (mi as MeshInstance3D).mesh
 		for i in mesh.get_surface_count():
-			(mi as MeshInstance3D).set_surface_override_material(i, _material(name, _part(mesh, i), hair))
+			(mi as MeshInstance3D).set_surface_override_material(i, _material(name, _part(mesh, i), hair, str(look.get("cloth_profile", ""))))
 
 
 static func _part(mesh: Mesh, i: int) -> String:
@@ -167,13 +215,14 @@ static func _parts(name: String, parts: Array) -> ArrayMesh:
 	return out
 
 
-static func _material(name: String, part: String, hair := "") -> Material:
-	var key := name + "|" + part + "|" + hair
+static func _material(name: String, part: String, hair := "", profile := "") -> Material:
+	var key := name + "|" + part + "|" + hair + "|" + profile
 	if _mats.has(key):
 		return _mats[key]
 	var dir := "%s/%s/" % [ROOT, name]
 	var m := StandardMaterial3D.new()
 	m.roughness = 0.82
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	if part == "opacity":
 		var tex := dir + ("opacity_grey.png" if hair == "grey" and ResourceLoader.exists(dir + "opacity_grey.png") else "opacity_color.png")
 		if ResourceLoader.exists(tex):
@@ -181,18 +230,28 @@ static func _material(name: String, part: String, hair := "") -> Material:
 		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 		m.alpha_scissor_threshold = 0.45
 		m.cull_mode = BaseMaterial3D.CULL_DISABLED
-		m.roughness = 0.6
+		m.roughness = 0.74
+		m.metallic_specular = 0.24
 	else:
+		if _skin_shader == null:
+			_skin_shader = Shader.new()
+			_skin_shader.code = SKIN_SHADER
+		var skin_mat := ShaderMaterial.new()
+		skin_mat.shader = _skin_shader
 		var color := dir + part + "_color.jpg"
 		if part == "head" and hair == "grey" and ResourceLoader.exists(dir + "head_grey.jpg"):
 			color = dir + "head_grey.jpg"
 		if not ResourceLoader.exists(color):
 			color = dir + "body_color.jpg"
-		m.albedo_texture = load(color)
+		skin_mat.set_shader_parameter("color_map", load(color))
+		skin_mat.set_shader_parameter("head_surface", part == "head")
+		skin_mat.set_shader_parameter("outfit_profile", 1 if profile == "cook" else (2 if profile == "delivery" else 0))
 		var nor := dir + part + "_normal.jpg"
 		if ResourceLoader.exists(nor):
-			m.normal_enabled = true
-			m.normal_texture = load(nor)
+			skin_mat.set_shader_parameter("normal_map", load(nor))
+			skin_mat.set_shader_parameter("has_normal", true)
+		_mats[key] = skin_mat
+		return skin_mat
 	_mats[key] = m
 	return m
 
@@ -260,15 +319,22 @@ func _wake(on_screen: bool) -> void:
 	_ap.active = on_screen and is_visible_in_tree()
 
 
-func animate(_delta: float, moving: float) -> void:
-	var want := "sit" if _sitting else ("walk" if moving > 0.12 else "idle")
+func animate(delta: float, moving: float) -> void:
+	var threshold := 0.06 if _state == "walk" else 0.12
+	var want := "sit" if _sitting else ("walk" if moving > threshold else "idle")
 	if want == "idle" and bool(look.get("talker", false)) and _ap.has_animation("rb/talk"):
 		want = "talk"
 	if want != _state:
 		_ap.play("rb/" + want, 0.25)
+		if want == "walk":
+			_walk_cadence = 0.85
 		_state = want
 	# Người trong game đi nhanh hơn người thật (bản đồ thu nhỏ): bước nhanh theo, không trượt chân quá nhiều.
-	_ap.speed_scale = clampf(moving * 1.6, 0.7, 2.6) if want == "walk" else 1.0
+	if want == "walk":
+		_walk_cadence = lerpf(_walk_cadence, clampf(moving * 1.6, 0.55, 2.6), 1.0 - exp(-11.0 * maxf(delta, 0.0)))
+		_ap.speed_scale = _walk_cadence
+	else:
+		_ap.speed_scale = 1.0
 
 
 ## Ngồi: hip_h là độ cao khớp hông so với gốc người (ghế đẩu, yên xe); hạ hay nâng cả người cho khớp.

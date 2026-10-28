@@ -22,9 +22,15 @@ const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
 const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
+const PlayerMotion := preload("res://scripts/vehicles/player_motion.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
 const Crowd := preload("res://scripts/world/crowd.gd")
 const TitleScreen := preload("res://scripts/ui/title_screen.gd")
+const StreetPrototype := preload("res://scripts/world/street_prototype.gd")
+const StreetKit := preload("res://scripts/architecture/street_kit.gd")
+const PilotLife := preload("res://scripts/world/pilot_life.gd")
+const PilotGround := preload("res://scripts/world/pilot_ground.gd")
+const PilotDetails := preload("res://scripts/world/pilot_details.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
 ## (game.home_loc()); bà, Linh, má đứng trước cửa chỗ đó, ông Ba ở sát vách.
@@ -109,8 +115,11 @@ const PAN_MAX := 80.0
 const RIDE_TIME := 0.35
 ## Camera góc chơi xa (nhìn cả dãy phố) và gần nhất (thấy rõ nhân vật); con lăn chuột chỉnh giữa hai mức, lăn tiếp ra
 ## xa là nhìn toàn cảnh (CAM_FAR).
-const CAM_OFFSET := Vector3(0, 24, 17)
-const CAM_NEAR := Vector3(0, 6.5, 9.0)
+const CAM_OFFSET := Vector3(0, 16, 18)
+const CAM_NEAR := Vector3(0, 6.5, 10.5)
+## The authored street uses a steeper close view to reveal the pavement and
+## recessed thresholds; the full overview remains the same camera range.
+const PILOT_CAM_NEAR := Vector3(0, 9.6, 11.0)
 ## Nhìn toàn cảnh (zoom từ 1 tới ZOOM_MAX): máy quay lùi xa, ngắm cả khu phố như mô hình sa bàn.
 const CAM_FAR := Vector3(0, 92, 64)
 const ZOOM_MAX := 2.0
@@ -138,7 +147,7 @@ var _marker: Node3D
 ## Nhân vật đứng một chỗ (nhân vật phụ trước cửa) cần chạy hoạt cảnh đứng thở.
 var idlers: Array = []
 ## 0 là gần nhất, 1 là xa nhất.
-var zoom := 0.3
+var zoom := 0.12
 ## Thùng rác dọc vỉa hè để lục ve chai: {"id", "pos"}.
 var bins: Array = []
 const BIN_RANGE := 1.4
@@ -151,6 +160,9 @@ var player_body: Node3D
 ## Xe máy của An (hiện khi đang có đơn giao hàng), An đang ngồi trên xe.
 var _ride_bike: Node3D
 var _riding := false
+var _player_motion := PlayerMotion.new()
+var _ride_headlight: SpotLight3D
+var _night_factor := 0.0
 var font: SystemFont
 var lamps: Array = []
 var door_rings := {}
@@ -164,6 +176,7 @@ var crowd: Node3D = null
 const CROWD_SPOTS := [["cho_cau_nho", 26, 12.0], ["ben_xe_6", 10, 7.0], ["com_hanh", 5, 5.0]]
 ## Khối nhà có thể che An: {"node", "rect": Rect2 nền nhà, "h": chiều cao}.
 var occluders: Array = []
+var pilot_life: Node3D
 ## Nhân vật có tên: id -> {node, body, name, loc}; street_life cho họ đi lại theo giờ.
 var npc_nodes := {}
 var life: Node
@@ -234,7 +247,9 @@ func _ready() -> void:
 	var marker_mat := _mat(Color(0.95, 0.76, 0.3, 0.55))
 	marker_mat.emission_enabled = true
 	marker_mat.emission = Color("f2c14e")
-	marker_mat.emission_energy_multiplier = 0.5
+	marker_mat.emission_energy_multiplier = 0.16 if real and city.pilot_active else 0.5
+	if real and city.pilot_active:
+		marker_mat.albedo_color = Color(0.68, 0.56, 0.31, 0.19)
 	marker.material_override = marker_mat
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	marker.position = Vector3(0, 0.18, 0)
@@ -258,6 +273,10 @@ func _ready() -> void:
 	life = StreetLife.new()
 	add_child(life)
 	life.setup(self)
+	if real and city.pilot_active:
+		pilot_life = PilotLife.new()
+		add_child(pilot_life)
+		pilot_life.setup(self)
 
 	hud = Hud.new()
 	hud.world = self
@@ -372,31 +391,35 @@ func _build_environment() -> void:
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color("2b2f38")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("c9c6be")
+	env.ambient_light_color = Color("c4ccd0")
 	env.ambient_light_energy = 0.55
 	# Phản chiếu lấy từ ảnh HDRI phố lúc chiều; vùng bóng được hắt sáng màu vàng nâu ấm như Nobody.
 	var sky := Surfaces.sky()
 	if sky:
 		env.sky = sky
 		env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
-	# Màu tươi, nắng trong như mô hình phố: không làm nhạt màu, sương mỏng (đổi theo giờ, trời mưa trong _update_lighting).
+	# Giữ vữa, da người và tôn ở tông tự nhiên. Bóng được đọc bằng nắng/hắt sáng;
+	# Compatibility không có SSAO nên không dựa vào hiệu ứng đó để tạo chiều sâu.
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 1.05
+	env.tonemap_exposure = 1.0
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.1
-	env.adjustment_saturation = 0.94
+	env.adjustment_contrast = 1.06
+	env.adjustment_saturation = 0.9
 	env.ssao_enabled = true
 	env.ssao_radius = 1.2
 	env.ssao_intensity = 1.4
 	env.fog_enabled = true
-	env.fog_light_color = Color("cfe0ec")
-	env.fog_density = 0.0012
+	env.fog_light_color = Color("b5bdc1")
+	env.fog_density = 0.0008
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
 	sun = DirectionalLight3D.new()
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
+	if real and city.pilot_active:
+		sun.shadow_blur = 3.0
+		sun.shadow_opacity = 0.68
 	sun.directional_shadow_max_distance = 70.0
 	if ScreenFit.light_shadows:
 		# Điện thoại, trình duyệt: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
@@ -594,8 +617,13 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	holder.add_child(bld)
 	var sign_height := 3.4
 	var top := float(loc.get("h", 6.0))
-	var model := models.spawn("buildings." + id, null, Vector3(w, top, d))
-	if model:
+	var architecture := {}
+	var model := models.spawn("buildings." + id, null, Vector3(w, top, d)) if id not in StreetPrototype.LOCATIONS else null
+	if id in StreetPrototype.LOCATIONS:
+		architecture = StreetPrototype.build(self, bld, id, w, d, int(p.get("seed", -1)))
+		top = float(architecture.height)
+		sign_height = minf(top, SIGN_MAX)
+	elif model:
 		bld.add_child(model)
 		top = float(model.get_meta("height"))
 		sign_height = minf(top + 0.8, SIGN_MAX)
@@ -608,7 +636,7 @@ func _build_location(id: String, loc: Dictionary) -> void:
 		sign_height = 3.6
 	if loc.get("stalls", false):
 		_build_stalls(w, holder)
-	if loc.get("line", false):
+	if loc.get("line", false) and id not in StreetPrototype.LOCATIONS:
 		_build_clothesline(holder)
 	if loc.get("benches", false):
 		# Ghế đá ven hồ: ba băng ghế quay mặt ra hồ, một bàn cờ tướng giữa hai ghế.
@@ -633,21 +661,46 @@ func _build_location(id: String, loc: Dictionary) -> void:
 				_block(Vector3(0.06, 0.55, 0.55), Vector3(cx + side, 0.0, -d / 2.0 + 0.4), Color("2a2a2a"), holder)
 	var body := StaticBody3D.new()
 	body.set_meta("loc", id)
-	var cs := CollisionShape3D.new()
-	var bs := BoxShape3D.new()
-	bs.size = Vector3(w, maxf(top, 2.5), d)
-	cs.shape = bs
-	cs.position = Vector3(0, maxf(top, 2.5) / 2.0, -d / 2.0)
-	body.add_child(cs)
+	var blockers: Array = [Rect2(-w / 2.0, -d, w, d)]
+	if real and city.pilot_active and id == "xom_bo_me":
+		blockers = city.pilot_home_blockers
+		architecture["front_pick_shapes"] = []
+	for rect: Rect2 in blockers:
+		var cs := CollisionShape3D.new()
+		var bs := BoxShape3D.new()
+		bs.size = Vector3(rect.size.x, maxf(top, 2.5), rect.size.y)
+		cs.shape = bs
+		cs.position = Vector3(rect.get_center().x, maxf(top, 2.5) / 2.0, rect.get_center().y)
+		body.add_child(cs)
+		if architecture.has("front_pick_shapes") and body.get_child_count() <= 2:
+			architecture.front_pick_shapes.append(cs)
 	holder.add_child(body)
+	if real and city.pilot_active and id == "xom_bo_me":
+		# The raised alley paving needs its own click surface. It intentionally has
+		# no location metadata: clicking the floor walks into the courtyard.
+		var paving := StaticBody3D.new()
+		paving.name = "WalkableCourtyard"
+		for rect: Rect2 in [Rect2(-1.5, -4, 3, 4), Rect2(-3.5, -d + 0.3, 7, d - 4.3)]:
+			var shape := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			box.size = Vector3(rect.size.x, 0.14, rect.size.y)
+			shape.shape = box
+			shape.position = Vector3(rect.get_center().x, 0.07, rect.get_center().y)
+			paving.add_child(shape)
+		holder.add_child(paving)
 	# Tên địa điểm: thẻ nhỏ ngang cửa (như "Bánh kẹp" trong Nobody), chỉ hiện khi An tới gần.
 	var loc_tag := _label3d(str(loc.name), Vector3(0, 3.0, city.door_out + 0.4), 22)
 	loc_tag.add_to_group("near_tag")
 	loc_tag.set_meta("range", LOC_TAG_RANGE)
+	if real and city.pilot_active and id in StreetPrototype.LOCATIONS:
+		loc_tag.set_meta("physical_sign", true)
 	holder.add_child(loc_tag)
 	var occ := {"node": bld, "rect": CityMap.footprint(p), "h": top}
 	if real:
-		occ.merge(_cut_stand_in(p, holder, color, top))
+		if not architecture.is_empty():
+			occ.merge(_architecture_cut(p, architecture, top))
+		else:
+			occ.merge(_cut_stand_in(p, holder, color, top))
 	occluders.append(occ)
 
 	# Vòng sáng trước cửa: điểm tương tác.
@@ -655,12 +708,18 @@ func _build_location(id: String, loc: Dictionary) -> void:
 	var torus := TorusMesh.new()
 	torus.inner_radius = 0.55
 	torus.outer_radius = 0.72
+	if real and city.pilot_active:
+		torus.inner_radius = 0.59
+		torus.outer_radius = 0.64
 	ring.mesh = torus
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color("f2c14e")
 	mat.emission_enabled = true
 	mat.emission = Color("f2c14e")
 	mat.emission_energy_multiplier = 0.6
+	if real and city.pilot_active:
+		mat.albedo_color = Color("a99a6c")
+		mat.emission_energy_multiplier = 0.12
 	ring.material_override = mat
 	ring.position = Vector3(0, 0.2, city.door_out)
 	ring.scale = Vector3(1, 0.3, 1)
@@ -708,6 +767,17 @@ func _build_tube(id: String, loc: Dictionary, holder: Node3D, width: float, dept
 
 ## Map thật: đường viền lô (để xét có che An không) và khối thay thế khi hạ nhà của địa điểm: hộp màu tường cao 1 m
 ## (co giãn theo độ cao đang hạ), mặt trên màu vữa sáng như nhà thật bị hạ.
+func _architecture_cut(p: Dictionary, kit: Dictionary, top: float) -> Dictionary:
+	var n: Vector2 = p.normal
+	var t := Vector2(n.y, -n.x)
+	var c: Vector2 = p.center
+	var w := float(p.w)
+	var d := float(p.d)
+	return {"architecture": kit, "cap": top, "interior_rect": Rect2(-w / 2.0, -d, w, d), "poly": PackedVector2Array([
+		c - t * w / 2.0, c + t * w / 2.0,
+		c + t * w / 2.0 - n * d, c - t * w / 2.0 - n * d])}
+
+
 func _cut_stand_in(p: Dictionary, holder: Node3D, color: Color, top: float) -> Dictionary:
 	var w := float(p.w)
 	var d := maxf(float(p.d), 6.0)
@@ -1321,6 +1391,10 @@ func _build_real() -> void:
 	for id in city.locs:
 		area.keep_clear.append(city.loc_door(id))
 		mid += city.loc_door(id)
+	if city.pilot_active:
+		area.tree_exclusion_regions.append(Rect2(12, -146, 64, 24))
+		for p in city.pilot_plots:
+			area.keep_clear.append(p.center)
 	# Đồ phố Việt quanh các địa điểm của truyện; biển hiệu, cổng hẻm, bảng tên đường có chữ ở gần, tên đường hư cấu.
 	area.dress_opts = {"center": mid / maxf(city.locs.size(), 1.0), "radius": 300.0, "label_radius": 190.0, "name_of": city.street_name}
 	area.build(city.data, city.clip, city.grid)
@@ -1334,6 +1408,8 @@ func _build_real() -> void:
 	for id in LOCATIONS:
 		if city.locs.has(id):
 			_build_location(id, LOCATIONS[id])
+	if city.pilot_active:
+		_build_pilot_street()
 	for h in city.homes:
 		homes.append({"pos": _v3(h.pos), "no": str(h.no), "name": "Nhà " + str(h.address)})
 	var i := 0
@@ -1370,6 +1446,35 @@ func _build_real() -> void:
 ## Kênh rạch trên map thật: bờ kè đá dọc mép nước (bỏ các cạnh trùng mép khung), ghe xuồng neo sát bờ,
 ## vài chiếc ghe chở hàng trôi chầm chậm qua lại giữa dòng.
 var boats: Array = []
+
+
+func _build_pilot_street() -> void:
+	add_child(PilotGround.build(self))
+	add_child(PilotDetails.build(self))
+	for p in city.pilot_plots:
+		var holder := _frame_node(p, "PilotFacade_%d" % int(p.seed))
+		add_child(holder)
+		var kit := StreetKit.build(holder, str(p.kind), float(p.w), float(p.d), int(p.seed))
+		var occ := {"node": holder, "rect": CityMap.footprint(p), "h": float(kit.height)}
+		occ.merge(_architecture_cut(p, kit, float(kit.height)))
+		occluders.append(occ)
+		var body := StaticBody3D.new()
+		var shape := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(float(p.w), float(kit.height), float(p.d))
+		shape.shape = box
+		shape.position = Vector3(0, float(kit.height) / 2.0, -float(p.d) / 2.0)
+		body.add_child(shape)
+		holder.add_child(body)
+	# Dress the quiet parts of the frontage sparingly; keep the pedestrian band clear.
+	for p in city.pilot_plots:
+		if str(p.get("use", "")) != "grocer":
+			continue
+		var holder := _frame_node(p, "PilotGrocer")
+		add_child(holder)
+		StreetPrototype.signboard(self, holder, "TẠP HÓA · NƯỚC UỐNG", Vector3(0, 2.85, 0.08), float(p.w) - 0.35, Color("545c49"))
+		StreetPrototype.scanned(holder, "plastic_crate_03", Vector3(-float(p.w) * 0.3, 0.1, 0.2), 0.48)
+		StreetPrototype.scanned(holder, "plastic_crate_01", Vector3(-float(p.w) * 0.3, 0.58, 0.2), 0.35, 0.08)
 
 
 func _build_real_canal() -> void:
@@ -1462,6 +1567,8 @@ func _build_real_lamps() -> void:
 			if placed.size() >= 36 or placed.any(func(q: Vector2) -> bool: return q.distance_to(p) < 30.0):
 				return
 			var q: Vector2 = p + d.orthogonal() * (float(r.width) / 2.0 + 0.6)
+			if city.pilot_active and StreetPrototype.LOCATIONS.any(func(id: String) -> bool: return city.loc_door(id).distance_to(q) < 4.0):
+				return
 			if city.walkable(q):
 				placed.append(p)
 				_lamp_spots.append(q)
@@ -1492,7 +1599,9 @@ func _build_real_traffic() -> void:
 	var hot: Array = []
 	for spot in CROWD_SPOTS:
 		if city.locs.has(spot[0]):
-			hot.append([city.loc_door(spot[0]), spot[1], spot[2]])
+			# The authored diners and service clusters already give this shop activity.
+			var number := 1 if city.pilot_active and spot[0] == "com_hanh" else int(spot[1])
+			hot.append([city.loc_door(spot[0]), number, spot[2]])
 	var stalls: Array = []
 	for t in _stall_tables:
 		if t.is_inside_tree():
@@ -1501,7 +1610,7 @@ func _build_real_traffic() -> void:
 	crowd = Crowd.new()
 	add_child(crowd)
 	crowd.build(area.dress, city.data.roads, area.dress.center, city.walkable, hot, stalls,
-		area.tree_spots() + area.dress.pole_spots + _lamp_spots, 0.65 if ScreenFit.low_power else 1.0)
+		area.tree_spots() + area.dress.pole_spots + _lamp_spots + (PilotLife.reservation_points(city) if city.pilot_active else []), 0.65 if ScreenFit.low_power else 1.0)
 	small.shuffle()
 	for k in mini(small.size(), 22):
 		var pth: Dictionary = small[k].duplicate()
@@ -1529,12 +1638,12 @@ static func _poly_at(poly: PackedVector2Array, s: float, off: float) -> Vector2:
 func cam_offset() -> Vector3:
 	if zoom > 1.0:
 		return CAM_OFFSET.lerp(CAM_FAR, zoom - 1.0)
-	return CAM_NEAR.lerp(CAM_OFFSET, zoom)
+	return (PILOT_CAM_NEAR if real and city.pilot_active else CAM_NEAR).lerp(CAM_OFFSET, zoom)
 
 
 ## Bật tắt nhìn toàn cảnh (nút kính lúp trên thanh trên cùng, cho máy cảm ứng): đang ở gần thì lùi ra xa hẳn, đang xa thì về góc chơi.
 func toggle_overview() -> void:
-	zoom = 0.3 if zoom > 1.0 else ZOOM_MAX
+	zoom = 0.12 if zoom > 1.0 else ZOOM_MAX
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1658,6 +1767,7 @@ func _process(delta: float) -> void:
 			key_dir += Vector3(jv.x, 0, jv.y) / maxf(jv.length(), 0.001) * minf(jv.length() * 1.3, 1.0)
 	_update_lane(delta)
 	_update_ride()
+	var motion_start := player.position
 	var step := Vector3.ZERO
 	if key_dir != Vector3.ZERO:
 		_target = null
@@ -1676,24 +1786,19 @@ func _process(delta: float) -> void:
 				_run_meters -= RUN_FATIGUE_M
 				game.add_fatigue(1.0)
 		_idle_t = 0.0
-		if not _riding:
-			audio.step(delta)
-		player.rotation.y = lerp_angle(player.rotation.y, atan2(step.x, step.z), 0.25)
-		if player_body.has_method("animate"):
-			player_body.animate(delta, _speed() / SPEED)
-		elif not Models.play(player_body, "walk"):
-			_walk_t += delta * 11.0
-			player_body.position.y = absf(sin(_walk_t)) * 0.06
-	elif player_body.has_method("animate"):
-		player_body.animate(delta, 0.0)
-	elif not Models.play(player_body, "idle"):
-		player_body.position.y = 0.0
+	# The final path segment can set position directly and return a zero step.
+	# Sampling around navigation also covers that segment, but ignores teleports
+	# that happened before this frame. A blocked player has zero wheel travel.
+	var actual_travel := player.position - motion_start
+	_update_player_motion(actual_travel, delta)
+	if not _riding and _player_motion.speed > 0.001:
+		audio.step(delta * _player_motion.speed / SPEED)
 	for c in idlers:
 		c.animate(delta, 0.0)
-	_tick_idle(delta, step)
+	_tick_idle(delta, actual_travel)
 
 	# Đã kéo màn hình nhìn chỗ khác: An đi tiếp thì máy quay trôi về An.
-	if step != Vector3.ZERO and not _panning:
+	if actual_travel != Vector3.ZERO and not _panning:
 		_pan = _pan.lerp(Vector3.ZERO, clampf(delta * 2.5, 0.0, 1.0))
 	var cam_goal := player.position + _pan + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
@@ -1702,7 +1807,7 @@ func _process(delta: float) -> void:
 	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
 	var far := clampf(zoom - 1.0, 0.0, 1.0)
 	sun.directional_shadow_max_distance = lerpf(50.0, 180.0, far) if ScreenFit.low_power else lerpf(70.0, 240.0, far)
-	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.light_shadows else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	var shadow_mode := DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if zoom > 1.3 or ScreenFit.light_shadows or (real and city.pilot_active) else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	if sun.directional_shadow_mode != shadow_mode:
 		sun.directional_shadow_mode = shadow_mode
 	_update_cutaway(delta)
@@ -1930,6 +2035,21 @@ func _update_cutaway(delta := 0.0) -> void:
 			o["cap"] = cur
 			var low := cur < top - 0.05
 			var node: Node3D = o.node
+			if o.has("architecture"):
+				# Authored houses reveal their real ground floor and courtyard. Never squash
+				# the facade or replace an open alley with a solid cutaway stand-in.
+				var kit: Dictionary = o.architecture
+				kit.roof.visible = not low
+				kit.upper.visible = not low
+				if kit.front_walls != null:
+					var local := node.to_local(player.global_position)
+					var inside := not overview and local.z < -3.8 and (o.interior_rect as Rect2).has_point(Vector2(local.x, local.z))
+					kit.front_walls.visible = not inside
+					# Navigation still blocks the rooms. Hidden walls must not intercept
+					# clicks aimed at the now-visible courtyard floor behind them.
+					for shape in kit.get("front_pick_shapes", []):
+						shape.set_deferred("disabled", inside)
+				continue
 			if o.stand == null:
 				# Cây (dừa): thu nhỏ dần, hạ hẳn thì ẩn.
 				node.scale = Vector3.ONE * clampf((cur - AreaBuilder.CUT.stub) / (top - AreaBuilder.CUT.stub), 0.0, 1.0)
@@ -2008,17 +2128,64 @@ func _update_ride() -> void:
 	if want == _riding or not player_body.has_method("sit"):
 		return
 	_riding = want
+	_player_motion.reset()
 	if _ride_bike == null:
-		_ride_bike = Props3D.instance(Props3D.motorbike("tay_ga", true), Color("b23a32"))
+		_ride_bike = Props3D.moving_instance(Props3D.motorbike("tay_ga", true), Color("733e38"))
 		player.add_child(_ride_bike)
+		_ride_headlight = SpotLight3D.new()
+		_ride_headlight.position = Vector3(0, 1.02, 0.61)
+		# Spot lights face -Z; the vehicle faces +Z. Aim gently down the road.
+		_ride_headlight.rotation = Vector3(-0.24, PI, 0)
+		_ride_headlight.light_color = Color("ffe1b5")
+		_ride_headlight.light_energy = 2.0
+		_ride_headlight.spot_range = 10.0
+		_ride_headlight.spot_angle = 28.0
+		_ride_headlight.spot_attenuation = 1.4
+		_ride_headlight.shadow_enabled = false
+		_ride_bike.add_child(_ride_headlight)
+	_ride_bike.transform = Transform3D.IDENTITY
 	_ride_bike.visible = want
-	player_body.position.z = Props3D.RIDER_Z if want else 0.0
+	Props3D.set_vehicle_distance(_ride_bike, 0.0)
+	player_body.transform = Transform3D(Basis.IDENTITY, Vector3(0, 0, Props3D.RIDER_Z if want else 0.0))
 	player_body.sit(want, Props3D.SEAT_H)
 	if player_body.has_method("hold"):
 		player_body.hold("ride" if want else "")
 	if player_body.has_method("wear"):
+		if want:
+			for kind in ["cap", "non_la"]:
+				player_body.wear(kind, false)
 		player_body.wear("helmet", want)
+	if not want:
+		update_outfit()
+	_update_ride_light()
 	_float_text("Lên xe đi giao" if want else "Dựng xe", Color("ffd27a"))
+
+
+func _update_player_motion(travel: Vector3, delta: float) -> void:
+	player.rotation.y = _player_motion.advance(travel, delta, player.rotation.y, _riding)
+	if player_body.has_method("set_ride_motion"):
+		player_body.set_ride_motion(_player_motion.speed if _riding else 0.0, _player_motion.turn)
+	if player_body.has_method("animate"):
+		player_body.animate(delta, _player_motion.speed / SPEED)
+	elif _player_motion.speed > 0.001:
+		if not Models.play(player_body, "walk"):
+			_walk_t += delta * 11.0 * _player_motion.speed / SPEED
+			player_body.position.y = absf(sin(_walk_t)) * 0.06
+	elif not Models.play(player_body, "idle"):
+		player_body.position.y = 0.0
+	if _riding and _ride_bike != null:
+		_ride_bike.transform = _player_motion.visual_transform(Vector3.ZERO)
+		player_body.transform = _player_motion.visual_transform(Vector3(0, 0, Props3D.RIDER_Z))
+		Props3D.set_vehicle_distance(_ride_bike, _player_motion.distance)
+	_update_ride_light()
+
+
+func _update_ride_light() -> void:
+	if _ride_headlight == null:
+		return
+	var strength := smoothstep(0.15, 0.75, _night_factor)
+	_ride_headlight.visible = _riding and strength > 0.001
+	_ride_headlight.light_energy = strength * 2.0
 
 
 ## Đồ trong tủ (túi mù) vừa thay: áo có thân người thật thì thay thân, mũ thì đội lên đầu (màu theo món).
@@ -2033,8 +2200,8 @@ func update_outfit() -> void:
 				colors[slot[1]] = str(game.cloth(id).get("color", colors[slot[1]]))
 		player_body.set_colors(colors)
 		player_body.set_hair_style(str(game.s.get("hair_style", "natural")))
-		return
-	dress_player()
+	else:
+		dress_player()
 	if player_body == null or not player_body.has_method("wear"):
 		return
 	var hat_id: String = str(game.wardrobe().worn.get("mu", ""))
@@ -2459,20 +2626,20 @@ func _build_lanterns() -> void:
 			_neon.append({"label": l, "day": e.day, "neon": neon_cols[h % neon_cols.size()]})
 
 
-## Ánh sáng theo giờ trong game: sáng vàng ấm, trưa trong, chiều cam đậm, chạng vạng tím hồng, đêm xanh tím với vầng
-## đèn đường vàng, cửa sổ sáng đèn, biển neon, đèn lồng đỏ.
+## Ánh sáng theo giờ: nắng trung tính ban ngày, chiều ấm nhẹ; hắt sáng từ trời giữ
+## bóng đọc được mà không phủ sáng đều cả phố. Đêm vẫn thấy đường, đèn cửa tiệm nổi rõ.
 func _update_lighting(hour: float) -> void:
 	var t := clampf((hour - 6.0) / 16.0, 0.0, 1.0)
 	var elevation := lerpf(24.0, 60.0, sin(t * PI))
 	# Nắng chiếu từ phía sau dãy nhà ra đường: bóng nhà đổ dài trên vỉa hè như Nobody.
 	sun.rotation_degrees = Vector3(-elevation, 115.0 + t * 130.0, 0)
-	var warm := Color("ffcf96")
-	var noon := Color("fff1dc")
-	var dusk := Color("ff8a48")
-	var night := Color("6a74b8")
+	var warm := Color("ffdfb8")
+	var noon := Color("fff6eb")
+	var dusk := Color("ffc08a")
+	var night := Color("9caac4")
 	var c: Color
 	if hour < 9.0:
-		c = warm.lerp(noon, (hour - 6.0) / 3.0)
+		c = warm.lerp(noon, clampf((hour - 6.0) / 3.0, 0.0, 1.0))
 	elif hour < 16.0:
 		c = noon
 	elif hour < 19.0:
@@ -2486,20 +2653,31 @@ func _update_lighting(hour: float) -> void:
 	sun.light_color = c
 	# Đêm: trăng yếu, để đèn đường, cửa sổ, neon nổi lên.
 	var nf := clampf((hour - 17.8) / 1.7, 0.0, 1.0) if not rain else clampf((hour - 16.5) / 1.5, 0.0, 1.0)
-	sun.light_energy = lerpf(1.1, 0.22, nf) * (0.35 if rain else 1.0)
+	_night_factor = nf
+	sun.light_energy = lerpf(1.05, 0.2, nf) * (0.35 if rain else 1.0)
 	# Vùng bóng hắt sáng xanh nhạt của trời (ngày nắng), xám khi mưa; nền trời sau mô hình cùng màu trời theo giờ.
-	var sky := Color("a9d4ee").lerp(Color("f6a36e"), clampf((hour - 16.5) / 2.0, 0.0, 1.0)).lerp(Color("2a2240"), clampf((hour - 18.3) / 1.2, 0.0, 1.0)).lerp(Color("121726"), clampf((hour - 19.5) / 1.5, 0.0, 1.0))
+	var sky := Color("a4b6c2").lerp(Color("c7aa8a"), clampf((hour - 16.5) / 2.0, 0.0, 1.0)).lerp(Color("3b3c48"), clampf((hour - 18.3) / 1.2, 0.0, 1.0)).lerp(Color("18202c"), clampf((hour - 19.5) / 1.5, 0.0, 1.0))
 	if rain:
 		sky = sky.lerp(Color("7d8794"), 0.75)
 	env.background_color = sky
-	env.ambient_light_color = c.lerp(Color("b9cde0"), 0.2 if rain else 0.5).lerp(Color("55609a"), nf * 0.7)
-	env.ambient_light_energy = lerpf(0.75 if rain else 0.9, 0.62, nf)
+	# Hắt sáng tách khỏi màu nắng để mái hiên, chân tường có bóng và da không nhuộm cam.
+	var bounce := Color("bfc6cb") if rain else Color("c4ccd0")
+	env.ambient_light_color = bounce.lerp(Color("aab4c4"), nf)
+	env.ambient_light_energy = lerpf(0.56 if rain else 0.55, 0.44, nf)
+	if real and city.pilot_active:
+		# Broad sky fill and weaker raking sun keep worn plaster/skin readable,
+		# with local shop lamps providing the warm accents after sunset.
+		sun.rotation_degrees = Vector3(-elevation, 28.0 + t * 45.0, 0)
+		sun.light_color = c.lerp(Color("d5d7d9"), 0.32 * (1.0 - nf))
+		sun.light_energy = lerpf(0.38, 0.14, nf) * (0.42 if rain else 1.0)
+		env.ambient_light_color = Color("c2c4ce").lerp(Color("929ead"), nf)
+		env.ambient_light_energy = lerpf(0.66 if rain else 0.62, 0.42, nf)
 	RenderingServer.global_shader_parameter_set("night", nf)
 	# Quầng sáng (glow) chỉ bật lúc tối: đèn lồng, chữ neon, cửa sổ lóa nhẹ. Điện thoại tắt cho nhẹ.
 	env.glow_enabled = nf > 0.05 and not ScreenFit.low_power
-	env.glow_intensity = 0.9 * nf
-	env.glow_hdr_threshold = 0.9
-	env.glow_bloom = 0.05
+	env.glow_intensity = 0.6 * nf
+	env.glow_hdr_threshold = 1.1
+	env.glow_bloom = 0.02
 	if _lantern_mat != null:
 		_lantern_mat.emission_energy_multiplier = lerpf(0.25, 3.2, nf)
 	if _pool_mat != null:
@@ -2517,8 +2695,8 @@ func _update_lighting(hour: float) -> void:
 		lamp.light_energy = lerpf(1.4, 3.4, nf) if on else 0.0
 	_set_rain(rain)
 	# Mưa: sương xám dày hơn, nhìn xa mờ hẳn; trời nắng chỉ hơi mờ xa cho có chiều sâu.
-	env.fog_light_color = Color("8f98a3") if rain else sky.lerp(Color.WHITE, 0.25)
-	env.fog_density = 0.0055 if rain else 0.0012
+	env.fog_light_color = Color("8f98a3") if rain else sky.lerp(Color.WHITE, 0.12)
+	env.fog_density = 0.0055 if rain else 0.0008
 	# Mức ngập: theo rainFlood trong config (ngày 15 mức 1, ngày 29 mức 2).
 	var lvl := 0
 	if rain:
@@ -2688,9 +2866,9 @@ var _tag_t := 0.0
 
 func _name_tag(text: String, pos: Vector3) -> Label3D:
 	var l := _label3d(text, pos, 18)
-	l.outline_size = 8
+	l.outline_size = 4 if real and city.pilot_active else 8
 	l.add_to_group("near_tag")
-	l.set_meta("range", NAME_RANGE)
+	l.set_meta("range", 3.8 if real and city.pilot_active else NAME_RANGE)
 	return l
 
 
@@ -2705,6 +2883,8 @@ func _update_tags(delta: float) -> void:
 			continue
 		var d := Vector2(lb.global_position.x - player.position.x, lb.global_position.z - player.position.z).length()
 		var on: bool = d < float(lb.get_meta("range", NAME_RANGE)) or zoom > 1.2
+		if lb.get_meta("physical_sign", false) and zoom < 0.75:
+			on = false
 		if on != (lb.modulate.a > 0.5):
 			lb.modulate.a = 1.0 if on else 0.0
 			lb.outline_modulate.a = 0.9 if on else 0.0

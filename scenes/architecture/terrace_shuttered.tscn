@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/architecture/terrace_shuttered_ground.res" id="1_whtpl"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/terrace_shuttered_upper.res" id="2_pr7ln"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/terrace_shuttered_roof.res" id="3_b0ajm"]
+
+[node name="terrace_shuttered" type="Node3D" unique_id=1961099542]
+metadata/kind = "residential"
+metadata/width = 5.8
+metadata/depth = 8.0
+metadata/height = 7.2
+metadata/seed = 0
+
+[node name="GroundArchitecture" type="Node3D" parent="." unique_id=1060641948]
+metadata/blockers = Array[Rect2]([Rect2(-2.9, -8, 0.3, 8), Rect2(2.6, -8, 0.3, 8), Rect2(-2.9, -8, 5.8, 0.3), Rect2(-2.9, -0.3, 1.305, 0.6), Rect2(1.595, -0.3, 1.305, 0.6)])
+
+[node name="MasonryAndDetails" type="MeshInstance3D" parent="GroundArchitecture" unique_id=1064256668]
+mesh = ExtResource("1_whtpl")
+
+[node name="UpperArchitecture" type="Node3D" parent="." unique_id=856723319]
+
+[node name="UpperAndBalcony" type="MeshInstance3D" parent="UpperArchitecture" unique_id=34421888]
+mesh = ExtResource("2_pr7ln")
+
+[node name="RoofArchitecture" type="Node3D" parent="." unique_id=64626001]
+
+[node name="RoofAndCornice" type="MeshInstance3D" parent="RoofArchitecture" unique_id=316429256]
+mesh = ExtResource("3_b0ajm")

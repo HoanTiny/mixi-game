@@ -11,6 +11,11 @@ var walk_clip := ""
 var idle_clip := ""
 var walking := false
 var idle_time := 0.0
+var sitting := false
+var _ride_pose: SkeletonModifier3D
+var _worn := {}
+var _unit_scale := 1.0
+var _walk_cadence := 0.78
 
 const PATH := "res://assets/characters/an/an-rigged.glb"
 
@@ -37,6 +42,13 @@ func setup(_shirt: Color, _pants: Color, _identity := "An") -> void:
 		animation = node
 	for node in model.find_children("*", "Skeleton3D", true, false):
 		skeleton = node
+	if skeleton:
+		var rig_transform := skeleton.transform
+		var ancestor := skeleton.get_parent()
+		while ancestor != model and ancestor is Node3D:
+			rig_transform = ancestor.transform * rig_transform
+			ancestor = ancestor.get_parent()
+		_unit_scale = rig_transform.basis.get_scale().y
 	_prepare_materials()
 	if animation:
 		for clip in animation.get_animation_list():
@@ -63,13 +75,17 @@ func setup(_shirt: Color, _pants: Color, _identity := "An") -> void:
 							a.track_set_key_value(track, key, value)
 		_create_idle()
 		animation.play(idle_clip)
+	if skeleton:
+		_ride_pose = _RidePose.new()
+		_ride_pose.unit_scale = _unit_scale
+		skeleton.add_child(_ride_pose)
 	set_colors(DEFAULT_COLORS)
 
 func _create_idle() -> void:
 	if not skeleton:
 		return
 	var idle := Animation.new()
-	idle.length = 4.0
+	idle.length = 8.0
 	idle.loop_mode = Animation.LOOP_LINEAR
 	var animation_root := animation.get_node(animation.root_node)
 	var skeleton_path := str(animation_root.get_path_to(skeleton))
@@ -80,15 +96,34 @@ func _create_idle() -> void:
 		for kind in [Animation.TYPE_POSITION_3D,Animation.TYPE_ROTATION_3D,Animation.TYPE_SCALE_3D]:
 			var track := idle.add_track(kind)
 			idle.track_set_path(track,track_path)
-			for time in [0.0,1.0,2.0,3.0,4.0]:
+			for key in 33:
+				var time := float(key) * 0.25
 				if kind == Animation.TYPE_POSITION_3D:
 					idle.position_track_insert_key(track,time,rest.origin)
 				elif kind == Animation.TYPE_SCALE_3D:
 					idle.scale_track_insert_key(track,time,rest.basis.get_scale())
 				else:
 					var rotation := rest.basis.get_rotation_quaternion()
+					var breath := sin(time * TAU / 4.0)
+					var settle := sin(time * TAU / 8.0)
 					if bone_name.to_lower() == "spine":
-						rotation *= Quaternion(Vector3.RIGHT, sin(time * TAU / 4.0) * 0.012)
+						# Shift through the upper body, leaving both feet planted.
+						rotation *= Quaternion(Vector3.RIGHT, breath * 0.012)
+						rotation *= Quaternion(Vector3.BACK, settle * 0.012)
+					elif bone_name.to_lower() == "head":
+						rotation *= Quaternion(Vector3.UP, sin(time * TAU / 8.0 + 0.5) * 0.035)
+						rotation *= Quaternion(Vector3.BACK, -settle * 0.010)
+					elif bone_name in ["LeftArm", "RightArm"]:
+						# Lower the relaxed arms slightly from the source scan's A pose.
+						var sign := -1.0 if bone_name == "LeftArm" else 1.0
+						var parent_rest := skeleton.get_bone_global_rest(skeleton.get_bone_parent(bone)).basis.orthonormalized()
+						var delta_rot := Basis(Quaternion(Vector3.BACK, sign * (0.10 + breath * 0.006)))
+						rotation = (parent_rest.inverse() * delta_rot * parent_rest * rest.basis).orthonormalized().get_rotation_quaternion()
+					elif bone_name in ["LeftForeArm", "RightForeArm"]:
+						var parent_rest := skeleton.get_bone_global_rest(skeleton.get_bone_parent(bone)).basis.orthonormalized()
+						var arm_phase := 0.6 if bone_name == "LeftForeArm" else -0.6
+						var relaxed := Basis(Vector3.RIGHT, -0.055 + sin(time * TAU / 8.0 + arm_phase) * 0.015)
+						rotation = (parent_rest.inverse() * relaxed * parent_rest * rest.basis).orthonormalized().get_rotation_quaternion()
 					idle.rotation_track_insert_key(track,time,rotation)
 	var library := AnimationLibrary.new()
 	library.add_animation("idle",idle)
@@ -137,6 +172,10 @@ func _prepare_materials() -> void:
 			mat.shader = SHADER
 			mat.set_shader_parameter("albedo_map", original.albedo_texture)
 			mat.set_shader_parameter("normal_map", original.normal_texture)
+			mat.set_shader_parameter("has_normal", original.normal_texture != null)
+			var orm := original.ao_texture if original.ao_texture != null else original.roughness_texture
+			mat.set_shader_parameter("orm_map", orm)
+			mat.set_shader_parameter("has_orm", orm != null)
 			rebuilt.surface_set_material(rebuilt.get_surface_count()-1, mat)
 			var cut_vertices := vertices.duplicate()
 			var crown := box.position.y + box.size.y * 0.965
@@ -152,7 +191,7 @@ func _prepare_materials() -> void:
 func set_colors(colors: Dictionary) -> void:
 	for mat in materials:
 		for part in DEFAULT_COLORS:
-			mat.set_shader_parameter(part+"_color", Color(str(colors.get(part,DEFAULT_COLORS[part]))).srgb_to_linear())
+			mat.set_shader_parameter(part+"_color", Color(str(colors.get(part,DEFAULT_COLORS[part]))))
 
 func set_hair_style(style: String) -> void:
 	for entry in hair_meshes:
@@ -161,11 +200,18 @@ func set_hair_style(style: String) -> void:
 func animate_motion(speed: float, delta: float) -> void:
 	if not animation or walk_clip.is_empty():
 		return
-	var moving := speed > 0.08
+	if sitting:
+		walking = false
+		return
+	# Hysteresis prevents a tiny joystick input from continually restarting clips.
+	var moving := speed > (0.04 if walking else 0.08)
 	if moving:
 		if not walking:
 			animation.play(walk_clip, 0.2)
-		animation.speed_scale = clampf(speed / 1.5,0.65,1.8)
+			_walk_cadence = 0.78
+		var target := clampf(speed / 1.5, 0.55, 1.8)
+		_walk_cadence = lerpf(_walk_cadence, target, 1.0 - exp(-11.0 * maxf(delta, 0.0)))
+		animation.speed_scale = _walk_cadence
 	elif walking or not animation.is_playing():
 		animation.speed_scale = 1.0
 		if not idle_clip.is_empty():
@@ -183,9 +229,163 @@ func animate(delta: float, speed_ratio: float) -> void:
 	animate_motion(speed_ratio * 1.5, delta)
 
 
-## Ngồi lên yên xe máy: hạ người xuống ngang yên (mô hình chưa có tư thế ngồi riêng).
+## Signed turn is normalized by world movement. Whole-bike banking stays outside
+## this rig; only the torso and gaze respond here, with contacts solved afterwards.
+func set_ride_motion(speed_mps: float, turn: float) -> void:
+	if _ride_pose != null:
+		_ride_pose.target_speed = clampf(speed_mps, 0.0, 20.0) if sitting else 0.0
+		_ride_pose.target_turn = clampf(turn, -1.0, 1.0) if sitting and speed_mps > 0.1 else 0.0
+
+
+## Riding uses the original skin with a two-bone solve for both hands and feet.
 func sit(on: bool, seat_h: float) -> void:
-	if model != null:
-		model.position.y = (seat_h - 0.55) if on else 0.0
-	if animation != null and on:
-		animation.pause()
+	sitting = on
+	if _ride_pose != null:
+		_ride_pose.enabled = on
+		_ride_pose.reset_motion()
+	if model != null and skeleton != null:
+		var hip := skeleton.find_bone("Hips")
+		var hip_y := skeleton.get_bone_global_rest(hip).origin.y * _unit_scale
+		model.position.y = seat_h + 0.09 - hip_y if on else 0.0
+		_ride_pose.model_offset = model.position.y
+	if animation != null:
+		animation.speed_scale = 1.0
+		animation.play(idle_clip, 0.18)
+		walking = false
+
+func hold(_kind: String) -> void:
+	# Grip solving is active for the entire seated pose, independent of walk speed.
+	pass
+
+func wear(kind: String, on: bool, tint := Color("344e5c")) -> void:
+	if not skeleton:
+		return
+	if on and not _worn.has(kind):
+		var Character = load("res://scripts/world/character.gd")
+		var index := skeleton.find_bone("Head")
+		if index < 0:
+			return
+		var attachment := BoneAttachment3D.new()
+		attachment.bone_name = "Head"
+		skeleton.add_child(attachment)
+		var fix := Node3D.new()
+		var rest := skeleton.get_bone_global_rest(index)
+		fix.basis = rest.basis.inverse()
+		fix.scale *= 1.0 / _unit_scale
+		attachment.add_child(fix)
+		var mesh := MeshInstance3D.new()
+		mesh.mesh = Character._acc(kind)
+		# The generated avatar has more hair volume than the Rocketbox heads.
+		# Fit the shell around that crown, without scaling its head or skin.
+		mesh.position = Vector3(0, -1.50, 0)
+		if kind == "helmet":
+			mesh.scale = Vector3(1.13, 1.08, 1.12)
+			mesh.position = Vector3(0, -1.50 - 1.605 * 0.08 + 0.024, 0)
+		var material := StandardMaterial3D.new()
+		material.vertex_color_use_as_albedo = true
+		material.albedo_color = tint
+		material.roughness = 0.48 if kind == "helmet" else 0.88
+		material.metallic_specular = 0.28
+		material.cull_mode = BaseMaterial3D.CULL_DISABLED
+		mesh.material_override = material
+		fix.add_child(mesh)
+		_worn[kind] = {"node": attachment, "material": material}
+	if _worn.has(kind):
+		_worn[kind].node.visible = on
+		_worn[kind].material.albedo_color = tint
+
+class _RidePose extends SkeletonModifier3D:
+	var enabled := false
+	var model_offset := 0.0
+	var unit_scale := 1.0
+	var target_speed := 0.0
+	var target_turn := 0.0
+	var speed := 0.0
+	var turn := 0.0
+	var elapsed := 0.0
+
+	func reset_motion() -> void:
+		target_speed = 0.0
+		target_turn = 0.0
+		speed = 0.0
+		turn = 0.0
+		elapsed = 0.0
+
+	func _process_modification_with_delta(delta: float) -> void:
+		advance_motion(delta)
+		_apply()
+
+	func advance_motion(delta: float) -> void:
+		if not enabled:
+			return
+		var dt := clampf(delta, 0.0, 0.1)
+		speed = lerpf(speed, target_speed, 1.0 - exp(-6.0 * dt))
+		turn = lerpf(turn, target_turn, 1.0 - exp(-8.0 * dt))
+		elapsed += dt
+
+	func _process_modification() -> void:
+		_apply()
+
+	func _apply() -> void:
+		if not enabled:
+			return
+		var sk := get_skeleton()
+		if not sk:
+			return
+		var hips := sk.find_bone("Hips")
+		var breath := sin(elapsed * TAU / 4.0) * 0.004
+		var lean := 0.52 + clampf(speed / 7.0, 0.0, 1.0) * 0.025 + breath
+		if hips >= 0:
+			var hip_rest := sk.get_bone_global_rest(hips)
+			# The scan's shoulders are well behind the handlebar. A seated forward
+			# lean makes the grips reachable without stretching the arms or skin.
+			sk.set_bone_global_pose(hips, Transform3D(Basis(Vector3.RIGHT, lean) * hip_rest.basis, hip_rest.origin))
+		# Counter-rotate neck/head to keep the rider looking ahead, not at his lap.
+		for spec in [["neck", -lean * 0.77], ["Head", -lean * 0.23]]:
+			var index := sk.find_bone(spec[0])
+			if index >= 0:
+				var pose := sk.get_bone_global_pose(index)
+				sk.set_bone_global_pose(index, Transform3D(Basis(Vector3.RIGHT, spec[1]) * pose.basis, pose.origin))
+		var head := sk.find_bone("Head")
+		if head >= 0:
+			var head_pose := sk.get_bone_global_pose(head)
+			sk.set_bone_global_pose(head, Transform3D(Basis(Vector3.UP, turn * 0.085) * head_pose.basis, head_pose.origin))
+		for side in ["Left", "Right"]:
+			var s := 1.0 if side == "Left" else -1.0
+			# Targets are in bike space minus avatar z=-.15 and model vertical offset.
+			# The wrist sits behind/above the grip; the palm extends over it.
+			var grip := Vector3(s * 0.30, 1.095 - model_offset, 0.475) / unit_scale
+			var foot := Vector3(s * 0.18, 0.43 - model_offset, 0.39) / unit_scale
+			_solve(sk, side + "Arm", side + "ForeArm", side + "Hand", grip, Vector3(s * 0.65, -0.8, -0.25), false)
+			_solve(sk, side + "UpLeg", side + "Leg", side + "Foot", foot, Vector3(s * 0.12, 0.35, 1.0), true)
+
+	func _solve(sk: Skeleton3D, upper: String, lower: String, end: String, target: Vector3, pole: Vector3, flat_foot: bool) -> void:
+		var a := sk.find_bone(upper)
+		var b := sk.find_bone(lower)
+		var c := sk.find_bone(end)
+		if mini(a, mini(b, c)) < 0:
+			return
+		var ra := sk.get_bone_global_rest(a)
+		var rb := sk.get_bone_global_rest(b)
+		var rc := sk.get_bone_global_rest(c)
+		var origin := sk.get_bone_global_pose(a).origin
+		var l1 := ra.origin.distance_to(rb.origin)
+		var l2 := rb.origin.distance_to(rc.origin)
+		var axis := (target - origin).normalized()
+		var distance := clampf(origin.distance_to(target), absf(l1 - l2) + 0.01, l1 + l2 - 0.01)
+		var bend := (pole - axis * pole.dot(axis)).normalized()
+		var along := (l1 * l1 - l2 * l2 + distance * distance) / (2.0 * distance)
+		var joint := origin + axis * along + bend * sqrt(maxf(l1 * l1 - along * along, 0.0))
+		var tip := origin + axis * distance
+		var rot_a := Basis(Quaternion((rb.origin - ra.origin).normalized(), (joint - origin).normalized()))
+		var rot_b := Basis(Quaternion((rc.origin - rb.origin).normalized(), (tip - joint).normalized()))
+		sk.set_bone_global_pose(a, Transform3D(rot_a * ra.basis, origin))
+		sk.set_bone_global_pose(b, Transform3D(rot_b * rb.basis, joint))
+		# Hands have no individual finger bones in this asset. Orient the palms
+		# across the grip instead of letting the scan's relaxed hands hang down.
+		# Matching only the finger direction preserves the scan's 40-degree hand
+		# roll, so one palm hangs beside the rubber grip. Establish both axes: the
+		# finger ray points along the road and the palm lies across the bar.
+		var palm_forward := Vector3(0, -0.15, 1).normalized()
+		var palm := Basis(Vector3.LEFT, palm_forward, Vector3.LEFT.cross(palm_forward))
+		sk.set_bone_global_pose(c, Transform3D(rc.basis if flat_foot else palm, tip))

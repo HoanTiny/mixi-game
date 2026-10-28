@@ -27,6 +27,18 @@ var plots: Array = []
 var streets := {}
 var order: Array = []
 var fillers: Array = []
+## Authored review slice. All coordinates/footprints live in data/street_pilot.json;
+## normal games never load its overrides or alter the baked city around it.
+var pilot_active := false
+var pilot_plots: Array = []
+var pilot_courtyard := Vector2.ZERO
+var pilot_walk_points: Dictionary = {}
+var pilot_home_blockers: Array[Rect2] = []
+var pilot_walk_surfaces: Array[PackedVector2Array] = []
+var pilot_definition: Dictionary = {}
+var pilot_origin := Vector2.ZERO
+var pilot_normal := Vector2.DOWN
+var pilot_length := 0.0
 ## Nhà có số để giao hàng: {pos: Vector2 (trên mép đường trước cửa), no, address}.
 var homes: Array = []
 ## Chỗ đặt thùng rác (mép đường).
@@ -48,6 +60,7 @@ func _init(map_id: String) -> void:
 	var m = JSON.parse_string(FileAccess.get_file_as_string("res://data/maps/%s.json" % map_id))
 	var st = JSON.parse_string(FileAccess.get_file_as_string("res://data/maps/%s_story.json" % map_id))
 	story = st if st is Dictionary else {}
+	_load_pilot(map_id)
 	var cfg = JSON.parse_string(FileAccess.get_file_as_string("res://data/realmap.json"))
 	data = AreaData.new(Geo.new(float(m.center[0]), float(m.center[1])), cfg)
 	data.from_dict(m.data)
@@ -62,10 +75,12 @@ func _init(map_id: String) -> void:
 	data.pois.clear()
 	_index_roads()
 	_place_locations()
+	_prepare_pilot()
 	grid = WalkGrid.new(data, bounds)
 	# Mép map: không đi ra ngoài phần đã dựng (ngoài đó trống trơn).
 	grid.block_outside(bounds.grow(-2.0))
 	_block_locations()
+	_block_pilot()
 	_place_homes()
 	_place_bins()
 	_place_floods()
@@ -79,6 +94,93 @@ func _init(map_id: String) -> void:
 		var c: Vector2 = loc_door(str(q.around)) if locs.has(str(q.get("around", ""))) else Vector2.ZERO
 		var r := float(q.get("radius", 80))
 		quest_areas[k] = [c.x - r, c.y - r, c.x + r, c.y + r]
+
+
+# ---------------------------------------------------------------- pilot street
+
+func _load_pilot(map_id: String) -> void:
+	if "--street-demo" not in OS.get_cmdline_user_args():
+		return
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://data/street_pilot.json"))
+	if not parsed is Dictionary or str(parsed.get("map", "")) != map_id:
+		return
+	pilot_definition = parsed
+	pilot_active = true
+	pilot_origin = _pilot_vec(parsed.frontage_origin)
+	pilot_normal = _pilot_vec(parsed.frontage_normal).normalized()
+	pilot_length = float(parsed.length)
+	for entry in parsed.locations:
+		var at := _pilot_point(Vector2(float(entry.along), -float(entry.d) * 0.5))
+		story.locations[str(entry.id)] = {"at": [at.x, at.y], "w": entry.w, "d": entry.d, "road": str(parsed.road)}
+	for entry in parsed.fillers:
+		pilot_plots.append({"center": _pilot_point(Vector2(float(entry.along), 0.0)),
+			"normal": pilot_normal, "w": float(entry.w), "d": float(entry.d),
+			"kind": str(entry.kind), "seed": int(entry.seed), "id": str(entry.id), "use": str(entry.get("use", "home"))})
+	for rect in parsed.home_blockers:
+		pilot_home_blockers.append(_pilot_rect(rect))
+	pilot_courtyard = _pilot_point(_pilot_vec(parsed.courtyard))
+	for key in parsed.walk_points:
+		pilot_walk_points[str(key)] = _pilot_point(_pilot_vec(parsed.walk_points[key]))
+	for rect in parsed.walk_surfaces:
+		pilot_walk_surfaces.append(_pilot_rect_poly(_pilot_rect(rect), pilot_origin, pilot_normal))
+
+
+func _prepare_pilot() -> void:
+	if not pilot_active:
+		return
+	for entry in pilot_definition.locations:
+		var plot: Dictionary = locs[str(entry.id)]
+		plot.kind = str(entry.kind)
+		plot.seed = int(entry.seed)
+	# Test polygon overlap, not just the centroid: no retained baked wall may hang
+	# across a new frontage, alley or courtyard after the walk grid is constructed.
+	for rect in pilot_definition.clear_regions:
+		var poly := _pilot_rect_poly(_pilot_rect(rect), Vector2.ZERO, Vector2.DOWN)
+		data.buildings = data.buildings.filter(func(b) -> bool:
+			return not _pilot_overlaps(b.poly, poly))
+	var height_region := _pilot_rect(pilot_definition.height_region)
+	var height_limit := float(pilot_definition.height_limit)
+	for b in data.buildings:
+		if height_region.has_point(Geo.centroid(b.poly)):
+			b.height = minf(float(b.height), height_limit) if float(b.height) > 0.0 else height_limit
+
+
+func _block_pilot() -> void:
+	if not pilot_active:
+		return
+	for p in pilot_plots:
+		var rect := Rect2(-float(p.w) / 2.0, -float(p.d), float(p.w), float(p.d))
+		grid.block_poly(_pilot_rect_poly(rect, p.center, p.normal))
+	# Lower travel cost only; never reopen a solid cell and accidentally carve a
+	# shortcut through a wall. The courtyard is reachable through its real gateway.
+	for poly in pilot_walk_surfaces:
+		grid._weigh_poly(poly, 1.0)
+
+
+func _pilot_point(local: Vector2) -> Vector2:
+	return pilot_origin + Vector2(pilot_normal.y, -pilot_normal.x) * local.x + pilot_normal * local.y
+
+
+static func _pilot_vec(value: Array) -> Vector2:
+	return Vector2(float(value[0]), float(value[1]))
+
+
+static func _pilot_rect(value: Array) -> Rect2:
+	return Rect2(float(value[0]), float(value[1]), float(value[2]), float(value[3]))
+
+
+## Local x follows the frontage, local y goes out toward the street (negative
+## goes into the house), matching the architecture kit and click-collision boxes.
+static func _pilot_rect_poly(rect: Rect2, center: Vector2, normal: Vector2) -> PackedVector2Array:
+	var tangent := Vector2(normal.y, -normal.x)
+	var poly := PackedVector2Array()
+	for p in [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]:
+		poly.append(center + tangent * p.x + normal * p.y)
+	return poly
+
+
+static func _pilot_overlaps(a: PackedVector2Array, b: PackedVector2Array) -> bool:
+	return Geo.bounds(a).intersects(Geo.bounds(b)) and not Geometry2D.intersect_polygons(a, b).is_empty()
 
 
 # ---------------------------------------------------------------- tên đường
@@ -179,6 +281,16 @@ func _block_locations() -> void:
 		var p: Dictionary = locs[k]
 		var c: Vector2 = p.center
 		var n: Vector2 = p.normal
+		if pilot_active and k == "xom_bo_me":
+			for rect in pilot_home_blockers:
+				# Reserve at least one cell for a thin wall: the 1 m grid's three
+				# scanlines can otherwise miss the 30 cm courtyard rear wall.
+				var nav_rect: Rect2 = rect
+				if nav_rect.size.y < 1.0:
+					nav_rect.position.y -= (1.0 - nav_rect.size.y) / 2.0
+					nav_rect.size.y = 1.0
+				grid.block_poly(_pilot_rect_poly(nav_rect, c, n))
+			continue
 		var t := Vector2(n.y, -n.x)
 		var hw := float(p.w) / 2.0
 		var front := c - n * 0.6
@@ -325,6 +437,16 @@ func walkable(p: Vector2) -> bool:
 
 ## Độ cao mặt đất chỗ p: trên mặt cầu thì cao hơn mặt đường (AreaBuilder.BRIDGE_Y), người đi qua cầu không bị lún.
 func ground_y(p: Vector2) -> float:
+	if pilot_active and locs.has("xom_bo_me"):
+		var lodging: Dictionary = locs.xom_bo_me
+		var offset: Vector2 = p - (lodging.center as Vector2)
+		var normal: Vector2 = lodging.normal
+		var along := offset.dot(Vector2(normal.y, -normal.x))
+		var out := offset.dot(normal)
+		# The architecture kit's alley and courtyard slab is raised 14 cm.
+		# Only its accessible interior gets this height, never the public street.
+		if absf(along) <= float(lodging.w) / 2.0 and out <= 0.0 and out >= -float(lodging.d) and walkable(p):
+			return 0.14
 	if _bridges.is_empty():
 		for r in data.roads:
 			if r.bridge:

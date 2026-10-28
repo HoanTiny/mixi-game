@@ -31,13 +31,19 @@ uniform sampler2D caps : filter_nearest;
 uniform int caps_w = 128;
 // Màu mặt cắt của nhà bị hạ.
 uniform vec3 cut_color;
+// Existing scanned plaster/concrete, repeated in meters; window masks stay above the texture.
+uniform sampler2D plaster_tex : source_color, hint_default_white, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D plaster_rough : hint_default_white, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D roof_tex : source_color, hint_default_white, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform bool has_surface_tex = false;
+varying vec3 v_world;
 // Cây: màu tint nhân độ sáng trong màu đỉnh (tán sáng trên sẫm dưới); cây đứng chắn trước An thì tán thu nhỏ lại,
 // thân hạ còn gốc (INSTANCE_CUSTOM.r: 1 bình thường, 0 khi thu hẳn; .g: sắc lá riêng từng cây, 0..1; .b = 1: cây
 // phượng, tán màu flame_tint). trunk: thân cây, lưới cao 2,4 m tâm ở giữa.
 uniform bool flat_color = false;
 uniform bool trunk = false;
-uniform vec3 tint = vec3(1.0);
-uniform vec3 flame_tint = vec3(0.86, 0.3, 0.12);
+uniform vec3 tint : source_color = vec3(1.0);
+uniform vec3 flame_tint : source_color = vec3(0.86, 0.3, 0.12);
 varying float v_cut;
 varying float v_up;
 varying float v_kind;
@@ -53,6 +59,7 @@ global uniform float focus_depth;
 global uniform float night;
 
 void vertex() {
+	v_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	v_cut = 0.0;
 	v_cap = 10000.0;
 	v_ly = VERTEX.y;
@@ -87,6 +94,7 @@ void vertex() {
 
 void fragment() {
 	vec3 win_emit = vec3(0.0);
+	float surface_rough = 0.88;
 	vec3 leaf = mix(tint, flame_tint, step(0.5, v_flame));
 	// Màu đỉnh của nhà là mã màu sRGB (như trong bảng màu), đổi sang tuyến tính; tán cây giữ màu tint nhân thẳng.
 	vec3 col = flat_color ? leaf * COLOR.rgb * mix(vec3(0.82, 0.86, 0.95), vec3(1.16, 1.12, 0.92), v_var) : pow(COLOR.rgb, vec3(2.2));
@@ -101,6 +109,15 @@ void fragment() {
 		float grout = step(tile.x, 0.05) + step(tile.y, 0.05);
 		col = mix(cut_color, col, 0.15) * (1.0 - 0.18 * min(grout, 1.0));
 	} else if (!flat_color && UV2.x > 0.5) {
+		if (has_surface_tex) {
+			vec2 plaster_uv = UV / 2.7 + vec2(fract(v_idx * 0.371), fract(v_idx * 0.719));
+			vec3 plaster = texture(plaster_tex, plaster_uv).rgb;
+			// Texture is decoded from sRGB once by source_color, like the linear vertex color above.
+			col *= mix(vec3(1.0), clamp(plaster * 1.85, vec3(0.35), vec3(1.2)), 0.7);
+			surface_rough = mix(0.75, 1.0, texture(plaster_rough, plaster_uv).r);
+			float damp = (1.0 - smoothstep(0.15, 1.35, UV.y)) * (0.16 + 0.08 * sin(UV.x * 2.1 + v_idx));
+			col *= 1.0 - damp;
+		}
 		// Tường: vạch sàn mỗi tầng, ô cửa sổ nhỏ có khung (xanh ngọc, trắng, nâu hay xanh dương tùy căn), kính tối;
 		// tầng trệt cửa cuốn rộng hơn; chân tường sẫm dần.
 		float fy = fract(UV.y / 3.2);
@@ -143,6 +160,10 @@ void fragment() {
 		float fv = fract(UV.y / 0.32);
 		float vis = 1.0 - smoothstep(0.2, 0.5, fwidth(UV.y) / 0.32);
 		col *= mix(1.0, 0.82 + 0.18 * smoothstep(0.0, 0.75, fv), vis);
+	} else if (!flat_color && v_up > 0.7 && v_kind < 1.5 && has_surface_tex) {
+		// Rooftops are weathered concrete, without bright uniform toy-like roof slabs.
+		vec3 concrete = texture(roof_tex, v_world.xz / 4.5).rgb;
+		col *= mix(vec3(1.0), clamp(concrete * 2.0, vec3(0.45), vec3(1.15)), 0.55);
 	}
 	float near = focus_depth > 0.0 ? 1.0 - smoothstep(focus_depth - 11.0, focus_depth - 4.0, -VERTEX.z) : 0.0;
 	float dim = near * 0.6;
@@ -152,7 +173,7 @@ void fragment() {
 	}
 	ALBEDO = col;
 	EMISSION = win_emit * night;
-	ROUGHNESS = 0.88;
+	ROUGHNESS = surface_rough;
 	if (v_kind > 1.5 && v_kind < 2.5) {
 		METALLIC = 0.6;
 		ROUGHNESS = 0.35;
@@ -307,6 +328,9 @@ var show_labels := true
 var ground_material: Material = null
 ## Chỗ không trồng cây ven đường (cửa các địa điểm của truyện), và các vật liệu có cắt khoét quanh An để màn phố cập nhật.
 var keep_clear: Array = []
+## Optional authored clearings in world x/z meters. Applied to all tree sources
+## before instance/cut indices and street dressing; an empty list preserves the map.
+var tree_exclusion_regions: Array[Rect2] = []
 ## Màu nước (màn phố của truyện dùng màu kênh đục, sẫm hơn).
 var water_color := Color("2b6a8f")
 ## Ô tô đậu dọc đường rộng từ chừng này mét (màn phố có dòng xe chạy thì chỉ đậu ở đường rộng, chừa làn).
@@ -343,6 +367,11 @@ func build(d, clip_poly: PackedVector2Array, walk = null) -> void:
 	sh.code = BUILDING_SHADER
 	building_mat.shader = sh
 	building_mat.set_shader_parameter("cut_color", CUT_COLOR)
+	if ResourceLoader.exists("res://assets/textures/tuong_albedo.jpg") and ResourceLoader.exists("res://assets/textures/tuong_rough.jpg") and ResourceLoader.exists("res://assets/textures/tuong_cu_albedo.jpg"):
+		building_mat.set_shader_parameter("plaster_tex", load("res://assets/textures/tuong_albedo.jpg"))
+		building_mat.set_shader_parameter("plaster_rough", load("res://assets/textures/tuong_rough.jpg"))
+		building_mat.set_shader_parameter("roof_tex", load("res://assets/textures/tuong_cu_albedo.jpg"))
+		building_mat.set_shader_parameter("has_surface_tex", true)
 	cut_materials.append(building_mat)
 	region = region_of(d.geo.lat0, d.geo.lon0) if d.get("geo") != null else "hcm"
 	_ground()
@@ -516,16 +545,16 @@ func _ground() -> void:
 
 func _parks() -> void:
 	for p in data.parks:
-		var col := Color("7cb24a")
+		var col := Color("697555")
 		match str(p.kind):
 			"pitch":
-				col = Color("6cae5a")
+				col = Color("647653")
 			"playground":
 				col = Color("c9b48c")
 			"cemetery":
-				col = Color("9fb08c")
+				col = Color("92947b")
 			"forest", "wood", "nature_reserve":
-				col = Color("5e9a45")
+				col = Color("566b49")
 			"sand", "beach":
 				# Bãi bồi cát vàng ven sông.
 				col = Color("d8c48e")
@@ -544,6 +573,31 @@ var _flame := {}
 ## Gốc các cây đã trồng (đám đông đi tránh).
 func tree_spots() -> Array:
 	return _trees
+
+
+func _tree_excluded(point: Vector2) -> bool:
+	for region_rect in tree_exclusion_regions:
+		if region_rect.has_point(point):
+			return true
+	return false
+
+
+## Filter after generation so RNG calls, positions and leaf variants outside the
+## authored region remain unchanged. Flame flags refer to the compacted indices.
+func _filter_tree_exclusions() -> void:
+	if tree_exclusion_regions.is_empty():
+		return
+	var kept: Array = []
+	var flames := {}
+	for old_index in _trees.size():
+		var point: Vector2 = _trees[old_index]
+		if _tree_excluded(point):
+			continue
+		if _flame.has(old_index):
+			flames[kept.size()] = true
+		kept.append(point)
+	_trees = kept
+	_flame = flames
 
 
 func _trees_in(poly: PackedVector2Array) -> void:
@@ -843,6 +897,9 @@ func _buildings() -> void:
 				h = lh * _rng.randi_range(int(lv[0]), int(lv[1])) + 0.4
 		var base := float(b.min_height)
 		var wall_col: Color = b.colour if b.colour != null else Color(str(palette[_rng.randi() % palette.size()]))
+		# Baked maps carry their own pastel colors, so weather those too, not just fallback colors.
+		if not b.worship:
+			wall_col = wall_col.lerp(Color("928774"), 0.3)
 		# Cao ốc từ 30 m: kính xanh xám.
 		if b.colour == null and h >= 30.0:
 			wall_col = Color(["5d7389", "4a5a6c", "7f8e9c", "d9dde2"][_rng.randi() % 4])
@@ -869,8 +926,10 @@ func _buildings() -> void:
 			roof_col = Color(str(bc.get("pitchedRoof", "a5523a")))
 		else:
 			# Mái bằng: sân thượng láng xi măng sáng hay quét sơn nhạt theo màu tường, như mô hình phố nhìn từ trên cao.
-			var flats := [Color("c4beb1"), Color("b7b1a4"), wall_col.darkened(0.08), wall_col.darkened(0.16), Color("aca699")]
+			var flats := [Color("928e80"), Color("8e897c"), wall_col.darkened(0.2), wall_col.darkened(0.28), Color("9c9789")]
 			roof_col = flats[_rng.randi() % flats.size()]
+		if not b.worship:
+			roof_col = roof_col.lerp(Color("766c5c"), 0.25)
 		var rh := 0.0
 		var rect := {}
 		if pitched:
@@ -1194,6 +1253,15 @@ func update_cut(cam: Vector3, pos: Vector3, delta: float) -> void:
 ## Tia nào đi xuyên qua đáy khối ở độ cao thấp hơn đỉnh khối là bị che; mức cắt lấy theo chỗ tia thấp nhất trong khối
 ## (gần An nhất), kẹp giữa BASE_H và GROUND_H.
 static func ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3) -> float:
+	# Clear a small band around the player, including companions and nearby doors.
+	var side := Vector3(cam.z - pos.z, 0, pos.x - cam.x).normalized() * 2.4
+	var cap := _single_ray_cap(poly, top, cam, pos)
+	for offset in [side, -side]:
+		cap = minf(cap, _single_ray_cap(poly, top, cam + offset, pos + offset))
+	return cap
+
+
+static func _single_ray_cap(poly: PackedVector2Array, top: float, cam: Vector3, pos: Vector3) -> float:
 	var p2 := Vector2(pos.x, pos.z)
 	if Geometry2D.is_point_in_polygon(p2, poly):
 		return BASE_H
@@ -1243,7 +1311,7 @@ func _update_crowns(cells: Array, cam: Vector3, pos: Vector3, delta: float) -> v
 
 ## Các ô lưới tia từ máy quay tới An đi qua (cộng một ô quanh An để bắt căn An đang đứng trong).
 func _cells_on_ray(cam: Vector3, pos: Vector3) -> Array:
-	var r := Rect2(Vector2(cam.x, cam.z), Vector2.ZERO).expand(Vector2(pos.x, pos.z)).grow(2.0)
+	var r := Rect2(Vector2(cam.x, cam.z), Vector2.ZERO).expand(Vector2(pos.x, pos.z)).grow(3.0)
 	var out := []
 	for gx in range(floori(r.position.x / CUT_CELL), floori(r.end.x / CUT_CELL) + 1):
 		for gz in range(floori(r.position.y / CUT_CELL), floori(r.end.y / CUT_CELL) + 1):
@@ -1280,8 +1348,8 @@ func _multimesh_trees() -> void:
 	var leaf := ShaderMaterial.new()
 	leaf.shader = building_mat.shader
 	leaf.set_shader_parameter("flat_color", true)
-	leaf.set_shader_parameter("tint", Color("5a9a35"))
-	leaf.set_shader_parameter("flame_tint", Color("e0441c"))
+	leaf.set_shader_parameter("tint", Color("4d6742"))
+	leaf.set_shader_parameter("flame_tint", Color("996344"))
 	cut_materials.append(leaf)
 	_tree_slot.resize(_trees.size())
 	for i in _trees.size():
@@ -1425,6 +1493,11 @@ func _street_trees() -> void:
 						_flame[_trees.size()] = true
 					_trees.append(q)
 					pits.append([q, d]))
+	# This includes park and OSM trees already accumulated above, not just the
+	# procedural roadside trees. Do not leave isolated tree pits in the clearing.
+	_filter_tree_exclusions()
+	if not tree_exclusion_regions.is_empty():
+		pits = pits.filter(func(pt: Array) -> bool: return not _tree_excluded(pt[0]))
 	counts.trees = _trees.size()
 	# Ô gốc cây trên vỉa hè: viền xi măng, đất bên trong.
 	if pits.is_empty():
@@ -1480,21 +1553,31 @@ func _vehicles() -> void:
 				# Mép đường lấn vào nền nhà (nhà vẽ sát đường) thì thôi, khỏi có xe nằm trong nhà.
 				if Geometry2D.is_point_in_polygon(q, clip) and walkable(q):
 					bikes.append([q, d.orthogonal()]))
-	# Ô tô, xe máy (tay ga, xe số xen nhau, bản nhẹ) dựng bằng code (props3d.gd), mỗi chiếc một màu sơn.
-	_vehicle_mm(cars, Props3D.car(), [Color("e8e6e1"), Color("2b2d33"), Color("b23a32"), Color("3a6ea5"), Color("c9ccd1"), Color("e0b23c"), Color("5a7d4f")])
+	# Identical parking positions and paint for both levels; detailed bodies only
+	# render in tiles near the camera, including the parked bikes beside shops.
+	_vehicle_mm(cars, Props3D.car(false), [Color("ded9ca"), Color("303638"), Color("753c35"), Color("435c68"), Color("929894"), Color("827349"), Color("536052")], Props3D.car(true))
 	var kinds := [[], []]
 	for i in bikes.size():
 		kinds[1 if i % 3 == 2 else 0].append(bikes[i])
-	var bike_palette := [Color("b23a32"), Color("2b2d33"), Color("e8e6e1"), Color("3a6ea5"), Color("c9ccd1"), Color("7a2a3a"), Color("e0b23c")]
-	_vehicle_mm(kinds[0], Props3D.motorbike("tay_ga", false), bike_palette)
-	_vehicle_mm(kinds[1], Props3D.motorbike("xe_so", false), bike_palette)
+	var bike_palette := [Color("783c36"), Color("303337"), Color("c5c3b9"), Color("40596a"), Color("9b9fa1"), Color("593039"), Color("8b7958")]
+	_vehicle_mm(kinds[0], Props3D.motorbike("tay_ga", false), bike_palette, Props3D.motorbike("tay_ga", true))
+	_vehicle_mm(kinds[1], Props3D.motorbike("xe_so", false), bike_palette, Props3D.motorbike("xe_so", true))
 	counts.cars = cars.size() + bikes.size()
 
 
 ## Một loại xe đậu thành một MultiMesh: [chỗ, hướng đầu xe] mỗi chiếc, màu sơn theo bảng xoay vòng; xe máy chiếc
 ## chẵn chiếc lẻ quay đầu ngược nhau.
-func _vehicle_mm(items: Array, mesh: Mesh, palette: Array) -> void:
-	var tiles := _tiles(items.map(func(it: Array) -> Vector2: return it[0]))
+func _vehicle_mm(items: Array, mesh: Mesh, palette: Array, detail_mesh: Mesh = null) -> void:
+	# The building TILE is 200m, too large for close vehicle culling: its centre
+	# could be far away even with a bike beside the player. Small independent
+	# tiles make the renderer's AABB-centre distance useful for this geometry.
+	var tiles := {}
+	for i in items.size():
+		var p: Vector2 = items[i][0]
+		var tile := Vector2i(floori(p.x / 24.0), floori(p.y / 24.0))
+		if not tiles.has(tile):
+			tiles[tile] = PackedInt32Array()
+		tiles[tile].append(i)
 	for key in tiles:
 		var ids: PackedInt32Array = tiles[key]
 		var mm := MultiMesh.new()
@@ -1504,18 +1587,60 @@ func _vehicle_mm(items: Array, mesh: Mesh, palette: Array) -> void:
 		mm.use_colors = true
 		mm.mesh = mesh
 		mm.instance_count = ids.size()
+		var poses: Array[Transform3D] = []
+		var paints: Array[Color] = []
+		var tile_bounds := AABB()
+		var vehicle_bounds := mesh.get_aabb()
+		if detail_mesh != null:
+			vehicle_bounds = vehicle_bounds.merge(detail_mesh.get_aabb())
 		for j in ids.size():
 			var i := ids[j]
 			var p: Vector2 = items[i][0]
 			var d: Vector2 = items[i][1]
 			var yaw := atan2(d.x, d.y) + (PI if i % 2 == 1 else 0.0)
-			mm.set_instance_transform(j, Transform3D(Basis(Vector3.UP, yaw), Vector3(p.x, 0.0, p.y)))
+			var pose := Transform3D(Basis(Vector3.UP, yaw), Vector3(p.x, 0.0, p.y))
+			poses.append(pose)
+			paints.append(palette[i % palette.size()])
+			mm.set_instance_transform(j, pose)
 			mm.set_instance_custom_data(j, palette[i % palette.size()])
 			mm.set_instance_color(j, Color.WHITE)
+			var bounds_at: AABB = pose * vehicle_bounds
+			tile_bounds = bounds_at if j == 0 else tile_bounds.merge(bounds_at)
+		# Both levels have the SAME bounds, so their distance switch uses the
+		# same centre even when a mirror or handlebar extends the detailed mesh.
+		mm.custom_aabb = tile_bounds.grow(0.05)
 		var mmi := MultiMeshInstance3D.new()
+		mmi.name = "ParkedVehiclesFar"
 		mmi.multimesh = mm
 		mmi.material_override = Props3D.instanced_material()
 		add_child(mmi)
+		mmi.set_meta("parking_tile", key)
+		mmi.set_meta("parking_lod", "far")
+		if detail_mesh != null:
+			var detail_mm := MultiMesh.new()
+			detail_mm.transform_format = MultiMesh.TRANSFORM_3D
+			detail_mm.use_custom_data = true
+			detail_mm.use_colors = true
+			detail_mm.mesh = detail_mesh
+			detail_mm.instance_count = ids.size()
+			detail_mm.custom_aabb = mm.custom_aabb
+			for j in ids.size():
+				detail_mm.set_instance_transform(j, poses[j])
+				detail_mm.set_instance_custom_data(j, paints[j])
+				detail_mm.set_instance_color(j, Color.WHITE)
+			var detail_node := MultiMeshInstance3D.new()
+			detail_node.name = "ParkedVehiclesNear"
+			detail_node.multimesh = detail_mm
+			detail_node.material_override = Props3D.instanced_material()
+			# HLOD dependency makes the pair complementary even exactly at 48m.
+			# Independent begin/end comparisons can disagree at that exact
+			# boundary in Compatibility. No transparent fade or doubled geometry.
+			mmi.visibility_range_begin = 48.0
+			mmi.visibility_range_begin_margin = 0.0
+			add_child(detail_node)
+			detail_node.visibility_parent = detail_node.get_path_to(mmi)
+			detail_node.set_meta("parking_tile", key)
+			detail_node.set_meta("parking_lod", "near")
 
 
 # ---------------------------------------------------------------- lưới đi bộ

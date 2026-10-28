@@ -26,16 +26,16 @@ const LOOKS := {
 		"pants": "1f1f24", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.5, "build": 0.95,
 		"female": true, "tunic": true},
 	# Chị Hạnh: áo thun cam, tạp dề, tóc búi.
-	"HANH": {"rb": "Chef_Female_01", "head": "Chef_Female_01", "scale": 0.95,
+	"HANH": {"rb": "Chef_Female_01", "head": "Female_Adult_03", "scale": 0.95, "cloth_profile": "cook",
 		"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "c0603a", "sleeve": "short",
 		"pants": "2c2f3a", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.58, "build": 1.04,
 		"female": true, "apron": true},
 	# Chú Sáu: sơ mi xanh bạc màu dài tay, quần kaki, nón kết.
 	"SAU": {"rb": "Male_Adult_14", "head": "Business_Male_02", "scale": 0.95, "hair_tone": "grey",
-		"skin": "b97d55", "hair": "9a9a9a", "hair_style": "short", "shirt": "3f6f8f", "sleeve": "long",
+		"skin": "b97d55", "hair": "9a9a9a", "hair_style": "short", "shirt": "525e5d", "sleeve": "long",
 		"pants": "6d5d4b", "shoes": "3b3b3b", "hat": "cap", "bag": false, "height": 1.64, "build": 1.08},
 	# Minh, tài xế giao hàng: áo khoác xanh, mũ bảo hiểm, giày.
-	"MINH": {"rb": "Male_Adult_10", "head": "Male_Adult_10", "scale": 0.97,
+	"MINH": {"rb": "Male_Adult_10", "head": "Male_Adult_10", "scale": 0.97, "cloth_profile": "delivery", "helmet": "394d45",
 		"skin": "c98f63", "hair": "1b1714", "hair_style": "short", "shirt": "2f8a5a", "sleeve": "long",
 		"pants": "2c3e50", "shoes": "f5f5f5", "footwear": "shoes", "hat": "helmet", "bag": false, "height": 1.74,
 		"build": 1.04},
@@ -531,9 +531,24 @@ static func _acc(kind: String) -> Mesh:
 			g.cap(head + Vector3(0, 0.035, -0.004), Vector3(0.106, 0.105, 0.116), 0, -1, deg_to_rad(80.0), deg_to_rad(95.0), 7, 16)
 			g.disc(head + Vector3(0, 0.05, 0.13), Vector2(0.085, 0.07), 0.012, Color(0.85, 0.85, 0.85))
 		"helmet":
-			g.cap(head + Vector3(0, 0.03, 0.0), Vector3(0.122, 0.128, 0.13), 0, -1, deg_to_rad(88.0), deg_to_rad(105.0), 8, 18)
-			g.disc(head + Vector3(0, 0.035, 0.12), Vector2(0.09, 0.05), 0.01, Color(0.25, 0.25, 0.28))
-			g.disc(head + Vector3(0, 0.12, -0.02), Vector2(0.03, 0.09), 0.02, Color(0.95, 0.95, 0.95))
+			# Open-face commuter helmet: smooth shell, rubber edge and actual chin
+			# straps. No toy-like white ridge floating above the crown.
+			var center := head + Vector3(0, 0.035, -0.006)
+			var radii := Vector3(0.125, 0.132, 0.142)
+			g.cap(center, radii, 0, -1, deg_to_rad(84.0), deg_to_rad(112.0), 12, 32)
+			for j in 32:
+				var edge := []
+				for k in 2:
+					var angle := TAU * float(j + k) / 32.0
+					var limit := deg_to_rad(84.0) + deg_to_rad(28.0) * (1.0 - cos(angle)) / 2.0 + 0.12 * pow(sin(angle), 2)
+					var p := center + radii * Vector3(sin(limit) * sin(angle), cos(limit), sin(limit) * cos(angle))
+					edge.append({"c": p, "rx": 0.006, "rz": 0.006, "c2": Color(0.12, 0.13, 0.13)})
+				g.tube(edge, 0, false, false, 5)
+			g.disc(head + Vector3(0, 0.046, 0.132), Vector2(0.092, 0.048), 0.008, Color(0.16, 0.18, 0.19))
+			for side in [-1.0, 1.0]:
+				g.tube([{"c": head + Vector3(side * 0.113, -0.012, 0.0), "rx": 0.007, "rz": 0.004, "c2": Color(0.13, 0.14, 0.14)},
+					{"c": head + Vector3(side * 0.085, -0.085, 0.035), "rx": 0.007, "rz": 0.004, "c2": Color(0.13, 0.14, 0.14)},
+					{"c": head + Vector3(side * 0.02, -0.111, 0.065), "rx": 0.007, "rz": 0.004, "c2": Color(0.13, 0.14, 0.14)}], 0, true, true, 5)
 		"bag":
 			# Ba lô đồ nghề: thân tròn cạnh, nắp, quai qua vai.
 			g.ellipsoid(Vector3(0, 1.27, -0.19), Vector3(0.15, 0.19, 0.08), 0, -1, 8, 12, Callable(), 1.0, true)

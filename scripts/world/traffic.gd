@@ -16,17 +16,21 @@ const MAX_BIKES := 480
 const MAX_CARS := 44
 const CLUSTER := 100.0
 const UPDATE_RANGE := 240.0
+## Detail is limited to the walking camera's neighbourhood; silhouettes farther
+## down the street remain the original cheap, baked batches.
+const DETAIL_ENTER := 20.0
+const DETAIL_EXIT := 24.0
 ## Đường rộng từ chừng này mét mới có ô tô đậu dọc lề (AreaBuilder.park_cars_from): xe máy chạy chừa chỗ.
 const PARKED_CARS_FROM := 12.0
 ## Tới gần đầu, cuối tuyến chừng này mét thì xe thu nhỏ dần (vòng lại đầu tuyến cho đỡ giật).
 const FADE := 3.0
 ## Ba kiểu xe máy chạy: tay ga một người, xe số một người, tay ga chở thêm người ngồi sau (tỉ lệ).
 const KINDS := [["tay_ga", false, 0.5], ["xe_so", false, 0.3], ["tay_ga", true, 0.2]]
-const BIKE_PAINT := ["b23a32", "2b2d33", "e8e6e1", "3a6ea5", "c9ccd1", "7a2a3a", "e0b23c", "2f6f4f"]
+const BIKE_PAINT := ["783c36", "303337", "c5c3b9", "40596a", "9b9fa1", "593039", "8b7958", "455b50"]
 ## Người lái xe máy (người thật nướng sẵn, xem props3d.gd rider_real), màu mũ bảo hiểm.
 const RIDERS := ["m1", "m2", "m3", "m4", "m5", "f1", "f2", "f3", "f4"]
-const HELMETS := ["c0392b", "f2f0ea", "2f6fb0", "1f1f24", "f1c40f", "d98fa0", "7d8c6a"]
-const CAR_PAINT := ["e8e6e1", "2b2d33", "b23a32", "3a6ea5", "c9ccd1", "e0b23c", "5a7d4f"]
+const HELMETS := ["713d37", "c8c6ba", "3f5564", "282a2b", "9b8c65", "71605c", "64705d"]
+const CAR_PAINT := ["c7c7bf", "303336", "713b37", "4c6171", "a2a7a8", "8e8067", "5c685c"]
 
 ## Tuyến: {line, cum (quãng đường tới từng đỉnh), len, width, y, rect}.
 var routes: Array = []
@@ -36,11 +40,21 @@ var counts := {"routes": 0, "groups": 0, "bikes": 0, "cars": 0}
 ## Phần xe còn chạy (ngày mưa vắng bớt): xe nào có hash theo số thứ tự nhỏ hơn density thì hiện.
 var density := 1.0
 var _rng := RandomNumberGenerator.new()
+var _focus := Vector2.ZERO
 
 
 ## roads: đường của khu (area_data); chỉ lấy đường lớn (từ 6 m) có đoạn nằm trong vòng radius mét quanh center.
 ## bridge_y: mặt cầu cao hơn mặt đường chừng này. amount: nhân số xe (điện thoại bớt xe).
 func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount := 1.0) -> void:
+	# build may run again when changing areas. Dispose the previous owned batches
+	# before replacing route indices so stale vehicles cannot remain on screen.
+	for g in groups:
+		(g.node as MultiMeshInstance3D).free()
+		if g.detail_node != null:
+			(g.detail_node as MultiMeshInstance3D).free()
+	groups.clear()
+	counts = {"routes": 0, "groups": 0, "bikes": 0, "cars": 0}
+	_focus = center
 	_rng.seed = 2024
 	var picked := roads.filter(func(r) -> bool:
 		return not r.small and not r.tunnel and float(r.width) >= 6.0 and r.line.size() >= 2 \
@@ -89,14 +103,15 @@ func build(roads: Array, center: Vector2, radius: float, bridge_y: float, amount
 				continue
 			var parts := str(kk).split("|")
 			if kk == "car":
-				_group(Props3D.car(), list, clusters[key].rect, true)
+				_group(Props3D.car(false), list, clusters[key].rect, true, true, Props3D.car(true))
 				continue
 			# Người lái chọn theo cụm và loại xe: mỗi cụm một vẻ (cụm nhỏ nên đi một đoạn đã thấy người khác).
 			var h := absi(hash(key)) + (1 if parts[0] == "xe_so" else 0) + (4 if parts[1] == "true" else 0)
 			var back: String = RIDERS[(h + 2) % RIDERS.size()] if parts[1] == "true" else ""
 			var real := Props3D.rider_real(parts[0], RIDERS[h % RIDERS.size()], back, Color(HELMETS[h % HELMETS.size()]))
 			if real != null:
-				_group(real, list, clusters[key].rect, false, false)
+				_group(real, list, clusters[key].rect, false, false,
+					Props3D.rider_real(parts[0], RIDERS[h % RIDERS.size()], back, Color(HELMETS[h % HELMETS.size()]), true))
 			else:
 				_group(Props3D.rider_bike(parts[0], parts[1] == "true"), list, clusters[key].rect, false)
 
@@ -124,7 +139,7 @@ func _add(kinds: Dictionary, kk: String, ri: int, m: int, lane: Vector2, speed: 
 
 ## Một nhóm (cụm, loại xe): MultiMesh khung bao cố định quanh các tuyến trong cụm. shadows: đổ bóng thật (ô tô); xe máy
 ## đông nên dùng bóng giả có sẵn trong lưới.
-func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := true) -> void:
+func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := true, detail_mesh: Mesh = null) -> void:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	# Màu sơn ở custom data (sắc áo ở kênh a); màu instance trắng (bản Compatibility nhân màu đỉnh với màu instance).
@@ -134,12 +149,18 @@ func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := tru
 	mm.instance_count = list.size()
 	mm.custom_aabb = AABB(Vector3(rect.position.x - 6.0, -0.5, rect.position.y - 6.0), Vector3(rect.size.x + 12.0, 4.0, rect.size.y + 12.0))
 	var g := {"mm": mm, "rect": rect, "rid": PackedInt32Array(), "s": PackedFloat32Array(), "dir": PackedFloat32Array(),
-		"off": PackedFloat32Array(), "speed": PackedFloat32Array(), "seg": PackedInt32Array()}
+		"off": PackedFloat32Array(), "speed": PackedFloat32Array(), "seg": PackedInt32Array(),
+		"node": null, "detail_mm": null, "detail_node": null, "detail_on": PackedByteArray(), "detail_count": 0,
+		"detail_slot": PackedInt32Array(), "paints": PackedColorArray(), "poses": [],
+		"wheel_phase": PackedFloat32Array(), "wheel_radius": Props3D.wheel_radius(detail_mesh) if detail_mesh != null else 0.27}
 	var rid := PackedInt32Array()
 	var s := PackedFloat32Array()
 	var dir := PackedFloat32Array()
 	var off := PackedFloat32Array()
 	var spd := PackedFloat32Array()
+	var paints := PackedColorArray()
+	var wheel_phase := PackedFloat32Array()
+	var poses: Array[Transform3D] = []
 	for i in list.size():
 		var it: Array = list[i]
 		rid.append(int(it[0]))
@@ -147,6 +168,9 @@ func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := tru
 		dir.append(float(it[2]))
 		off.append(float(it[3]))
 		spd.append(float(it[4]))
+		paints.append(it[5])
+		wheel_phase.append(float(it[5].a))
+		poses.append(Transform3D.IDENTITY)
 		mm.set_instance_custom_data(i, it[5])
 		mm.set_instance_color(i, Color.WHITE)
 	var seg := PackedInt32Array()
@@ -157,6 +181,9 @@ func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := tru
 	g["off"] = off
 	g["speed"] = spd
 	g["seg"] = seg
+	g.paints = paints
+	g.wheel_phase = wheel_phase
+	g.poses = poses
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
 	if override:
@@ -164,6 +191,38 @@ func _group(mesh: Mesh, list: Array, rect: Rect2, shadows: bool, override := tru
 	if not shadows:
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+	g.node = mi
+	var detail_on := PackedByteArray()
+	detail_on.resize(list.size())
+	g.detail_on = detail_on
+	var detail_slot := PackedInt32Array()
+	detail_slot.resize(list.size())
+	detail_slot.fill(-1)
+	g.detail_slot = detail_slot
+	if detail_mesh != null:
+		var detail_mm := MultiMesh.new()
+		detail_mm.transform_format = MultiMesh.TRANSFORM_3D
+		detail_mm.use_custom_data = true
+		detail_mm.use_colors = true
+		# The geometry cache is also used by parked/staging instances. Only this
+		# traffic copy changes its first material; rider and helmet surfaces stay intact.
+		var moving_mesh := detail_mesh.duplicate() as ArrayMesh
+		moving_mesh.surface_set_material(0, Props3D.moving_instanced_material())
+		detail_mm.mesh = moving_mesh
+		detail_mm.instance_count = list.size()
+		detail_mm.visible_instance_count = 0
+		detail_mm.custom_aabb = mm.custom_aabb
+		for i in list.size():
+			detail_mm.set_instance_color(i, Color.WHITE)
+		var detail_node := MultiMeshInstance3D.new()
+		detail_node.name = "TrafficNear"
+		detail_node.multimesh = detail_mm
+		# Close vehicles cast a proper contact shadow. Their own materials preserve
+		# rubber, paint, chrome and the photographed rider instead of one override.
+		detail_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		add_child(detail_node)
+		g.detail_mm = detail_mm
+		g.detail_node = detail_node
 	groups.append(g)
 	counts.groups += 1
 	_place(g, 0.0)
@@ -229,6 +288,7 @@ func near_vehicle(focus: Vector2, r := 60.0):
 
 ## Mỗi khung hình: xe chạy tiếp dọc tuyến; cụm gần chỗ focus (An) thì cập nhật hình.
 func update(delta: float, focus: Vector2) -> void:
+	_focus = focus
 	for g in groups:
 		_place(g, delta, (g.rect as Rect2).grow(UPDATE_RANGE).has_point(focus))
 
@@ -241,20 +301,35 @@ func _place(g: Dictionary, delta: float, near := true) -> void:
 	var dir: PackedFloat32Array = g.dir
 	var off: PackedFloat32Array = g.off
 	var speed: PackedFloat32Array = g.speed
+	var detail_mm: MultiMesh = g.detail_mm
+	var detail_on: PackedByteArray = g.detail_on
+	var detail_slot: PackedInt32Array = g.detail_slot
+	var paints: PackedColorArray = g.paints
+	var wheel_phase: PackedFloat32Array = g.wheel_phase
+	var poses: Array[Transform3D] = g.poses
+	var detail_count := 0
 	for i in s.size():
 		var r: Dictionary = routes[rid[i]]
 		var cum: PackedFloat32Array = r.cum
 		var total: float = r.len
 		var last := cum.size() - 2
-		var v := s[i] + dir[i] * speed[i] * delta
-		if v >= total:
-			v -= total
+		var travel := s[i] + dir[i] * speed[i] * delta
+		# Both directions drive forwards in their own +Z coordinate frame. Keep
+		# phase independent from route wrapping and update it even outside view.
+		wheel_phase[i] = fposmod(wheel_phase[i] + speed[i] * delta / (TAU * float(g.wheel_radius)), 1.0)
+		var v := fposmod(travel, total)
+		if travel >= total:
 			seg[i] = 0
-		elif v < 0.0:
-			v += total
+		elif travel < 0.0:
 			seg[i] = last
 		s[i] = v
 		if not near:
+			if detail_mm != null and detail_on[i] == 1:
+				# Preserve the last coarse pose when teleporting away; hiding the
+				# detailed batch must not leave its coarse instance scaled to zero.
+				mm.set_instance_transform(i, poses[i])
+				detail_on[i] = 0
+			detail_slot[i] = -1
 			continue
 		var line: PackedVector2Array = r.line
 		var k := seg[i]
@@ -279,6 +354,33 @@ func _place(g: Dictionary, delta: float, near := true) -> void:
 		var sc := clampf(minf(v, total - v) / FADE, 0.02, 1.0)
 		if density < 1.0 and fmod(float(i) * 0.618034, 1.0) >= density:
 			sc = 0.001
-		mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, atan2(d.x, d.y)).scaled(Vector3.ONE * sc), Vector3(p.x, float(r.y), p.y)))
+		var pose := Transform3D(Basis(Vector3.UP, atan2(d.x, d.y)).scaled(Vector3.ONE * sc), Vector3(p.x, float(r.y), p.y))
+		poses[i] = pose
+		var hidden_pose := Transform3D(Basis.from_scale(Vector3.ONE * 0.00001), pose.origin)
+		if detail_mm != null:
+			var radius := DETAIL_EXIT if detail_on[i] == 1 else DETAIL_ENTER
+			var close := sc > 0.01 and p.distance_squared_to(_focus) < radius * radius
+			detail_on[i] = 1 if close else 0
+			detail_slot[i] = detail_count if close else -1
+			if close:
+				# Compact into a contiguous draw prefix. Zero-scaling distant
+				# high-poly instances still submits all their vertices to the GPU.
+				detail_mm.set_instance_transform(detail_count, pose)
+				var moving_paint := paints[i]
+				moving_paint.a = wheel_phase[i]
+				detail_mm.set_instance_custom_data(detail_count, moving_paint)
+				detail_count += 1
+			mm.set_instance_transform(i, hidden_pose if close else pose)
+		else:
+			mm.set_instance_transform(i, pose)
 	g["s"] = s
 	g["seg"] = seg
+	g.poses = poses
+	g.wheel_phase = wheel_phase
+	if detail_mm != null:
+		# When a cluster is not updated it must not leave frozen near-detail cars.
+		(g.detail_node as MultiMeshInstance3D).visible = near and detail_count > 0
+		detail_mm.visible_instance_count = detail_count
+		g.detail_on = detail_on
+		g.detail_slot = detail_slot
+		g.detail_count = detail_count
