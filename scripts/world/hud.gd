@@ -9,6 +9,8 @@ const DialogLayer := preload("res://scripts/ui/dialog_layer.gd")
 const CharacterPanel := preload("res://scripts/ui/character_panel.gd")
 const StreetMap := preload("res://scripts/world/street_map.gd")
 const Billiards := preload("res://scripts/work/billiards.gd")
+const QuestGuide := preload("res://scripts/quest_guide.gd")
+const RepairBench := preload("res://scripts/world/repair_bench.gd")
 const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const MoodRing := preload("res://scripts/ui/mood_ring.gd")
 const Joystick := preload("res://scripts/ui/joystick.gd")
@@ -225,7 +227,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible or (_wardrobe != null and _wardrobe.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
+	return dialogs.visible or (_wardrobe != null and _wardrobe.visible) or (is_instance_valid(_bench) and _bench.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
 
 
 func location_open() -> String:
@@ -1400,6 +1402,21 @@ func _cloth_card(id: String) -> Control:
 	return card
 
 
+var _bench: Window
+
+
+## Bàn sửa 3D của đơn đang ở bước sửa (scripts/world/repair_bench.gd): kéo linh kiện, siết vít.
+func _open_bench() -> void:
+	if blocking() or _loc_id != "tiem_sau":
+		return
+	var job: Dictionary = game.s.street.job
+	if job.is_empty() or str(job.stage) not in ["repair", "test"]:
+		return
+	_bench = RepairBench.new()
+	_bench.game = game
+	add_child(_bench)
+
+
 ## Phím E cạnh hàng rong: mua món đầu tiên đang mua được.
 func quick_first() -> void:
 	if not _quick_ids.is_empty():
@@ -1615,6 +1632,10 @@ func _fill_objectives(s: Dictionary) -> void:
 		if e.has("window"):
 			where += " · %s–%s" % [GameLogic.hh(float(e.window[0])), GameLogic.hh(float(e.window[1]))]
 		_objective("Hôm nay: " + game.fill(str(e.title)), "Tới " + where, "current")
+	# Đơn sửa đồ đang nhận ở tiệm chú Sơn: bước tiếp theo, chỗ cần tới.
+	var repair: Dictionary = QuestGuide.active(game)
+	if not repair.is_empty():
+		_objective("Đơn sửa: " + str(repair.title), "%s · %s · %s" % [str(repair.step), str(world.location_info(str(repair.location)).name), str(repair.hint)], "current")
 	if game.chapter() == 2:
 		_refresh_objectives2(s)
 		return
@@ -2004,6 +2025,21 @@ func _refresh_location() -> void:
 		_loc_cards.add_child(_quest_card("★  " + str(game.quest_def(id).title), game.quest_progress_text(id) + "\n" + meta,
 			game.quest_step_lock(id), game.quest_visit.bind(id)))
 		found += 1
+	# Đơn sửa đồ (tiệm chú Sơn) và quầy linh kiện (chợ Long Biên): từng bước của đơn, bàn sửa 3D.
+	if _loc_id in ["tiem_sau", "cho_cau_nho"] and world.real:
+		_loc_cards.add_child(UI.wrap(game.Street.status(game), 12, UI.INK_SOFT, 320))
+		var job: Dictionary = game.s.street.job
+		if _loc_id == "tiem_sau" and not job.is_empty() and str(job.stage) == "repair":
+			_loc_cards.add_child(UI.choice("Mở bàn sửa 3D", "Kéo linh kiện hỏng ra, lắp linh kiện mới, siết hai vít", "", _open_bench))
+		for offer in game.Street.options(game, _loc_id):
+			var hint := str(offer.hint)
+			var meta := "%d phút" % roundi(float(offer.hours) * 60.0)
+			if int(offer.cost) > 0:
+				meta += " · −" + GameLogic.fmt_money(int(offer.cost))
+			var oid := str(offer.id)
+			_loc_cards.add_child(UI.choice(str(offer.name), meta + ("\n" + hint if hint != "" else ""), str(offer.reason),
+				func() -> void: game.Street.act(game, _loc_id, oid)))
+			found += 1
 	for g in GameLogic.GROUPS:
 		for a in game.visible_actions(g):
 			if game.action_loc(a) == _loc_id:

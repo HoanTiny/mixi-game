@@ -282,6 +282,7 @@ LOCATIONS = {
     # Đời sống phố: shop si-đa túi mù, quán bi-a.
     "shop_ao": ((-111, -100), 6, 8, "Phố Hàng Đào", False),
     "bi_a": ((30, -53.5), 8, 9, "Phố Lương Ngọc Quyến", True),
+    "tiem_toc": ((-80, -11), 5, 8, "Phố Hàng Bạc", True),
 }
 ## Địa điểm không dựng nhà (mái che, ghế đá): sát mép đường, không lùi.
 NO_INSET = ("ben_xe_6", "bai_boc_vac", "xe_tho", "ho_guom")
@@ -300,6 +301,7 @@ DESCRIPTIONS = {
     "cam_do": "Tiệm cầm đồ trong ngõ Gạch: cầm đồ lấy tiền ngay, hẹn mười ngày chuộc, có lãi.",
     "ve_so": "Đại lý vé số đầu phố Mã Mây: vé 10.000đ một tờ, chiều mở thưởng.",
     "shop_ao": "Shop quần áo si-đa của chị Vy trên phố Hàng Đào: hàng thùng về từ cửa khẩu, bán lẻ, bán túi mù 99.000đ, bóc ra gì mặc nấy.",
+    "tiem_toc": "Tiệm tóc nhỏ trên phố Hàng Bạc, mở 08:00–19:00: cắt gọn, tỉa tự nhiên, nhuộm đen, nâu hạt dẻ, nâu khói.",
     "bi_a": "Quán bi-a của anh Dũng trên phố Lương Ngọc Quyến: sáu bàn lỗ, quạt trần, tiếng bi chạm nhau lách cách tới khuya; tối thứ Bảy có giải.",
     "ho_guom": "Dãy ghế đá ven hồ Gươm, đầu đường dạo phía Đông Kinh Nghĩa Thục: sáng sớm các cụ tập dưỡng sinh, ngày nào cũng có mấy bàn cờ tướng, tối người ngồi hóng gió, có người ngủ lại.",
     "cau_tre": "Bên kia sông, phải đi qua cầu Long Biên. Dãy nhà trên phố Ngọc Thụy, lưng quay ra sông; phòng thoáng, có hiên rộng, đi làm xa hơn.",

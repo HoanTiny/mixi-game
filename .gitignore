@@ -3,3 +3,10 @@
 /android/
 *.tmp
 build/
+# Local runtime verification output
+*-test.log
+tests/*-preview.png
+tests/*-preview.png.import
+tests/*.log
+tests/pilot-report.png
+tests/pilot-report.png.import

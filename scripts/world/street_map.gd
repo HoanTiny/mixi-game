@@ -432,7 +432,7 @@ const CATS := {"home": ["Chỗ ở", Color("4f8fd6")], "food": ["Ăn uống", Co
 const LOC_CAT := {"xom_bo_me": "home", "hem_dua": "home", "cau_tre": "home", "nha_di_nam": "home", "com_hanh": "food",
 	"cho_cau_nho": "work", "tiem_sau": "work", "ben_can": "fun", "ben_xe_6": "bus", "bai_boc_vac": "work", "xe_tho": "work",
 	"nha_tro_giuong": "home", "quan_net": "fun", "ho_guom": "fun", "cam_do": "service", "ve_so": "service",
-	"shop_ao": "shop", "bi_a": "fun"}
+	"shop_ao": "shop", "bi_a": "fun", "tiem_toc": "shop"}
 ## Tên khu lớn hiện ở mọi mức phóng; tên nhỏ (đền, tháp) chỉ khi phóng từ 2.
 const SMALL_AREAS := ["THÁP RÙA", "ĐỀN NGỌC SƠN"]
 

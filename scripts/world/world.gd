@@ -16,6 +16,7 @@ const TubeHouse := preload("res://scripts/world/tube_house.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
 const RealCity := preload("res://scripts/world/real_city.gd")
 const Landmarks := preload("res://scripts/world/landmarks.gd")
+const AnCharacter := preload("res://scripts/world/an_character.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
 const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
@@ -89,7 +90,10 @@ const ALL_LOCATIONS := {
 		"npcs": [{"name": "Chị Vy", "id": "VY", "color": "d06a8a"}]},
 	"bi_a": {"name": "Quán bi-a anh Dũng", "desc": "Sáu bàn lỗ, quạt trần, tiếng bi lách cách tới khuya; tối thứ Bảy có giải.",
 		"tube": {"floors": 2, "sign": "BI-A · 30K/GIỜ"}, "color": "2f6a4a",
-		"npcs": [{"name": "Anh Dũng", "id": "DUNG", "color": "3a4a5a"}]}
+		"npcs": [{"name": "Anh Dũng", "id": "DUNG", "color": "3a4a5a"}]},
+	"tiem_toc": {"name": "Tiệm tóc Hàng Bạc", "desc": "Cắt gọn, tỉa tự nhiên, nhuộm đen, nâu hạt dẻ, nâu khói · 08:00–19:00.",
+		"tube": {"floors": 3, "sign": "CẮT TÓC · NHUỘM"}, "color": "827363",
+		"npcs": [{"name": "Anh thợ cắt tóc", "id": "", "color": "4a4a5a"}]}
 }
 const SPEED := 6.0
 ## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
@@ -2019,6 +2023,17 @@ func _update_ride() -> void:
 
 ## Đồ trong tủ (túi mù) vừa thay: áo có thân người thật thì thay thân, mũ thì đội lên đầu (màu theo món).
 func update_outfit() -> void:
+	# Mô hình An gắn xương: tô màu tóc (tiệm tóc), áo, quần theo món đang mặc trong tủ đồ.
+	if player_body != null and player_body.has_method("set_colors"):
+		var ap: Dictionary = game.s.get("appearance", AnCharacter.DEFAULT_COLORS)
+		var colors := {"hair": str(ap.get("hair", "28231e")), "shirt": str(ap.get("shirt", "969084")), "pants": str(ap.get("pants", "657b8c"))}
+		for slot in [["ao", "shirt"], ["quan", "pants"]]:
+			var id: String = str(game.wardrobe().worn.get(slot[0], ""))
+			if id != "":
+				colors[slot[1]] = str(game.cloth(id).get("color", colors[slot[1]]))
+		player_body.set_colors(colors)
+		player_body.set_hair_style(str(game.s.get("hair_style", "natural")))
+		return
 	dress_player()
 	if player_body == null or not player_body.has_method("wear"):
 		return
@@ -2714,6 +2729,14 @@ func _label3d(text: String, pos: Vector3, size: int) -> Label3D:
 ## (character.gd): An và nhân vật phụ có ngoại hình riêng, người đi đường ngẫu nhiên.
 ## Con đầu tiên luôn là phần thân (mô hình hoặc khối) để nhún nhảy hay phát hoạt cảnh.
 func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenerator = null, hat := "") -> Node3D:
+	# An: mô hình đã gắn xương (assets/characters/an, đổi màu tóc, áo, quần được); đặt "anModel": "rocketbox" trong
+	# config để dùng lại người thật Rocketbox.
+	if key == "player" and str(game.cfg.get("anModel", "rigged")) == "rigged" and AnCharacter.available():
+		var an := AnCharacter.new()
+		an.setup(shirt, pants, "An")
+		var holder := Node3D.new()
+		holder.add_child(an)
+		return holder
 	var m := models.spawn(key, rng)
 	if m == null:
 		var id := "AN" if key == "player" else key.trim_prefix("npc.")

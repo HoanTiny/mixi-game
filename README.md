@@ -15,6 +15,18 @@
 - **Ẩn nhà kiểu Nobody** (`AreaBuilder.update_cut`, `ray_cap`): bỏ hẳn lưới chấm bi. Chỉ căn nào bị tia từ máy quay tới đầu, ngực, gối của An xuyên qua mới bị cắt tầng như nhà búp bê: tầng trên, ban công, mái ẩn dần, còn tầng trệt (3,4 m) với mái hiên, biển hiệu; vẫn chắn thì thấp hơn nhưng không dưới 1 m; An đứng lọt trong lô thì còn 1 m. Nhà sau lưng An (An đi trên vỉa hè trước mặt tiền) không bao giờ bị cắt. Mặt cắt là sàn nâu sẫm. Máy quay đặt `near = 0.1`.
 - Sông Hồng bờ uốn lượn, bãi bồi cát vàng ở bờ Phúc Tân; đáy hồ là phố Hàng Khay nối sang Tràng Tiền.
 
+**Bản 1.3.1 · gộp nhánh `feature/thoi-gian-troi`** (bản sửa của Hoàn Tiny, dựng trên bản đời đầu). Những phần dùng được đã nối vào bản phố cổ:
+- **Mô hình An gắn xương** (`assets/characters/an/an-rigged.glb`, `scripts/world/an_character.gd`): An trên phố là mô hình này, có đi, đứng; đổi được màu tóc, áo, quần. Áo, quần đang mặc trong tủ đồ túi mù tô lên người An. Đặt `"anModel": "rocketbox"` trong `data/config.json` để dùng lại người thật Rocketbox.
+- **Đơn sửa đồ ở tiệm chú Sơn** (`scripts/street_life.gd`, `scripts/quest_guide.gd`):
+  - Các bước: nhận đơn → rút điện, đo kiểm → linh kiện (mua ở chợ Long Biên rẻ hơn, hay dùng đồ tiệm) → **bàn sửa 3D** (`scripts/world/repair_bench.gd`: kéo linh kiện hỏng ra, lắp linh kiện mới, siết hai vít) → chạy thử → trả khách đúng hẹn 17:00 hôm sau.
+  - Tay nghề tăng theo số món, mua đồng hồ đo riêng thì đo nhanh hơn, chọn hướng thợ sửa độc lập thì đơn tăng 10% tiền công.
+  - Bước tiếp theo của đơn hiện trong bảng mục tiêu.
+- **Tiệm tóc Hàng Bạc:** cắt gọn, tỉa tự nhiên, nhuộm đen, nâu hạt dẻ, nâu khói (`scripts/wardrobe.gd`, HAIR).
+- **Chưa nối, giữ trong repo:**
+  - Nhà chia gian (`neighborhood.gd`), cư dân có khớp (`citizen.gd`), tuyến vỉa hè (`resident_routes.gd`), người đi tránh nhau (`crowd_motion.gd`): đều dựng cho con phố thẳng đời đầu.
+  - Chế độ chơi thử 5 ngày, nhu cầu kiểu mới (No, Sạch, Tinh thần), bảng Nhân vật dạng cửa sổ, bảng màu giao diện tối: bản phố cổ đã có phần tương ứng.
+  - Các bản mô hình An thử nghiệm, ảnh tham chiếu nhân vật: không đưa vào bản xuất (`exclude_filter`).
+
 **Bản 1.3 · đời sống phố cổ** (gói nội dung `data/*_pho.json` nạp cùng năm chương, `GameLogic._merge_pack`; chỉ có trên map phố cổ):
 - **Shop si-đa Hàng Đào của chị Vy, túi mù** (`data/clothes.json`, `GameLogic._pull`):
   - Bóc một túi 99.000đ, hoặc năm túi 450.000đ (chắc chắn có món từ Khá).

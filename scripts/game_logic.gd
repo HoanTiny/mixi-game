@@ -38,6 +38,10 @@ var story5: Dictionary = {}
 var s: Dictionary = {}
 ## Ghi chú giữ lại qua các lượt (chưa dùng trong lát cắt, để dành cho Sổ tay).
 var notes: Array = []
+## Đơn sửa đồ ở tiệm chú Sơn và bàn sửa 3D (scripts/street_life.gd, scripts/world/repair_bench.gd).
+const Street := preload("res://scripts/street_life.gd")
+## Tiệm tóc: kiểu tóc, màu nhuộm cho mô hình An (scripts/wardrobe.gd, HAIR).
+const Wardrobe := preload("res://scripts/wardrobe.gd")
 ## Danh mục quần áo bóc túi mù (data/clothes.json): rarities, slots, items.
 var clothes: Dictionary = {}
 var _event_data: Dictionary = {}
@@ -612,6 +616,17 @@ func apply_effects(eff: Dictionary) -> void:
 
 
 func _special(name: String) -> void:
+	if name.begins_with("toc:"):
+		# Tiệm tóc: cắt (kiểu tóc) hay nhuộm (màu tóc) trên mô hình An.
+		var it: Dictionary = Wardrobe.HAIR.get(name.substr(4), {})
+		if it.has("style"):
+			s["hair_style"] = str(it.style)
+		if it.has("color"):
+			var ap: Dictionary = s.get("appearance", {"hair": "28231e", "shirt": "969084", "pants": "657b8c"})
+			ap["hair"] = str(it.color)
+			s["appearance"] = ap
+		need_adj("mood", 4.0)
+		return
 	match name:
 		"tui_mu_1":
 			wardrobe()["last"] = [_pull("")]
@@ -1301,6 +1316,20 @@ func walk(hours: float) -> void:
 		return
 	s["used"] = minf(float(s.used) + hours, day_end() - float(cfg.dayStart))
 	_commit()
+
+
+## Thời gian trôi khi làm việc ở tiệm, mua linh kiện (đơn sửa đồ, scripts/street_life.gd): nhu cầu tự tính theo giờ.
+func elapse(hours: float, working := false) -> void:
+	if not is_started() or is_over() or hours <= 0.0:
+		return
+	s["used"] = minf(float(s.used) + hours, day_end() - float(cfg.dayStart))
+	if working and has_needs():
+		need_adj("clean", -hours * 4.0)
+
+
+## Tên nhu cầu của nhánh thoi-gian-troi (satiety, hygiene, mood) đổi sang nhu cầu của bản này.
+func adjust_need(key: String, amount: float) -> void:
+	need_adj({"satiety": "fed", "hygiene": "clean"}.get(key, key), amount)
 
 
 func is_out_of_time() -> bool:

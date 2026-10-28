@@ -271,6 +271,81 @@
     "fatigue": 10,
     "rep.DUNG": 2
    }
+  },
+  {
+   "id": "toc_cut_neat",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Cắt gọn",
+   "hours": 0.5,
+   "cost": 40000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:cut_neat"
+   }
+  },
+  {
+   "id": "toc_cut_natural",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Tỉa tự nhiên",
+   "hours": 0.5,
+   "cost": 40000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:cut_natural"
+   }
+  },
+  {
+   "id": "toc_dye_black",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Nhuộm đen",
+   "hours": 1.0,
+   "cost": 80000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:dye_black"
+   }
+  },
+  {
+   "id": "toc_dye_brown",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Nhuộm nâu hạt dẻ",
+   "hours": 1.0,
+   "cost": 80000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:dye_brown"
+   }
+  },
+  {
+   "id": "toc_dye_ash",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Nhuộm nâu khói",
+   "hours": 1.0,
+   "cost": 100000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:dye_ash"
+   }
   }
  ],
  "minigames": {
