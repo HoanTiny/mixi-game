@@ -2202,8 +2202,9 @@ func _speed() -> float:
 			v *= SPRINT
 	if _wading():
 		v *= RainLayer.WADE_SPEED
-	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
-		v *= 0.7
+	# Đói lả, trầm cảm, Phong độ thấp thì chậm (lấy mức chậm nhất); Nhanh nhẹn chỉ cộng khi đi bộ (game_logic.move_mult).
+	if game.has_needs():
+		v *= minf(1.0, game.move_mult()) if _riding else game.move_mult()
 	# Đang khiêng đồ của việc nhờ (xe đạp, cơm suất, con mèo) thì đi chậm hơn một chút.
 	for id in game.quests_active():
 		var step: Dictionary = game.quest_step(id)

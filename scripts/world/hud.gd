@@ -602,6 +602,10 @@ func _build_skills(parent: Control) -> void:
 ## Mở trò chơi nhỏ của việc; xong thì chạy thanh thời gian như mọi việc khác với kết quả vừa chơi.
 func _open_minigame(id: String, a: Dictionary) -> void:
 	var mcfg: Dictionary = game.cfg.minigames[a.minigame]
+	# Nhanh nhẹn cho thêm giờ trong ca có chỉ tiêu (data/systems/attributes.json, mg.time).
+	if mcfg.has("seconds") and game.mod("mg.time") > 0.0:
+		mcfg = mcfg.duplicate()
+		mcfg["seconds"] = float(mcfg.seconds) * (1.0 + game.mod("mg.time"))
 	# Cảnh riêng (bàn bi-a) hay cảnh ca làm 3D; trò mới dùng lại cảnh có sẵn (cfg.kind: bricks, site, dishes, repair).
 	minigame = Billiards.new() if str(mcfg.get("scene", "")) == "billiards" else WorkSite.new()
 	minigame.cfg = mcfg
@@ -1548,6 +1552,17 @@ func _refresh_topbar(s: Dictionary) -> void:
 		var ic := ItemIcon.new(k)
 		ic.custom_minimum_size = Vector2(26, 26)
 		_mood_needs.add_child(ic)
+	# Trạng thái đang có (suy nhược, bốc mùi, trầm cảm, buff): thêm biểu tượng nếu chưa hiện, tên trong lời nhắc của vòng.
+	var conds: Array = game.Survival.active(game)
+	for c in conds:
+		if lows.has(str(c.icon)):
+			continue
+		lows.append(str(c.icon))
+		var ic := ItemIcon.new(str(c.icon))
+		ic.custom_minimum_size = Vector2(26, 26)
+		_mood_needs.add_child(ic)
+	if not conds.is_empty():
+		_mood.tooltip_text += "\nĐang: " + ", ".join(conds.map(func(c: Dictionary) -> String: return str(c.name)))
 
 
 func _tool_button(text: String, on_press: Callable) -> Button:
@@ -1601,6 +1616,9 @@ func _refresh() -> void:
 		_pd_label.text = "Phong độ %d · %s" % [int(pd), "đủ lương" if mult >= 1.0 else "chỉ được %d%% lương" % int(mult * 100.0)]
 		UI.set_bar(_pd_bar, pd, 100.0, UI.level_color(pd / 100.0))
 		_needs_label.text = "No bụng %d · Vệ sinh %d · Quần áo %d" % [int(game.need("fed")), int(game.need("clean")), int(game.need("neat"))]
+		var conds: Array = game.Survival.active(game)
+		if not conds.is_empty():
+			_needs_label.text += "\n" + " · ".join(conds.map(func(c: Dictionary) -> String: return str(c.name)))
 		var worst := minf(game.need("fed"), minf(game.need("clean"), game.need("neat")))
 		_needs_label.add_theme_color_override("font_color", UI.HUD_SOFT if worst >= 35.0 else (UI.GOLD if worst >= 15.0 else Color("ff8a7a")))
 	_end_day_btn.disabled = game.is_over() or not s.queue.is_empty() or _working

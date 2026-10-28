@@ -36,6 +36,9 @@ var _slots := {}
 var _face: Control
 var _pd_label: Label
 var _bars := {}
+## Trạng thái đang có (scripts/systems/survival.gd) và bốn thuộc tính {id: {bar, label}} (scripts/systems/attributes.gd).
+var _conds: HFlowContainer
+var _attrs := {}
 var _traits: HFlowContainer
 var _rels: VBoxContainer
 var _view: SubViewport
@@ -647,6 +650,30 @@ func _build_right(row: HBoxContainer) -> void:
 		var b := UI.bar(9)
 		col.add_child(b)
 		_bars[sp[0]] = {"bar": b, "label": lab, "title": sp[1]}
+	_conds = HFlowContainer.new()
+	_conds.add_theme_constant_override("h_separation", 8)
+	_conds.add_theme_constant_override("v_separation", 8)
+	v.add_child(_conds)
+	_heading(v, "Thuộc tính")
+	for at in game.Attributes.rows(game):
+		var r := HBoxContainer.new()
+		r.add_theme_constant_override("separation", 8)
+		r.tooltip_text = str(at.desc)
+		r.mouse_filter = Control.MOUSE_FILTER_PASS
+		v.add_child(r)
+		var ic := ItemIcon.new(str(at.icon), CREAM)
+		ic.custom_minimum_size = Vector2(34, 34)
+		r.add_child(ic)
+		var col := VBoxContainer.new()
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.add_theme_constant_override("separation", 1)
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		r.add_child(col)
+		var lab := UI.label("", 13, CREAM)
+		col.add_child(lab)
+		var b := UI.bar(9)
+		col.add_child(b)
+		_attrs[at.id] = {"bar": b, "label": lab}
 	_heading(v, "Đặc điểm tính cách", 290)
 	_traits = HFlowContainer.new()
 	_traits.add_theme_constant_override("h_separation", 8)
@@ -674,27 +701,20 @@ func _refresh_status() -> void:
 		var x: float = vals[k]
 		UI.set_bar(_bars[k].bar, x, 100.0, UI.level_color(x / 100.0))
 		(_bars[k].label as Label).text = "%s  %d/100" % [_bars[k].title, int(x)]
+	for c in _conds.get_children():
+		_conds.remove_child(c)
+		c.queue_free()
+	for t in game.Survival.active(game):
+		_conds.add_child(_chip(str(t.name) + ("  · còn %d giờ" % ceili(float(t.left)) if float(t.left) >= 0.0 else ""), str(t.tone), str(t.desc)))
+	for row in game.Attributes.rows(game):
+		var full: bool = int(row.next) == 0
+		UI.set_bar(_attrs[row.id].bar, 1.0 if full else float(row.xp), 1.0 if full else float(row.next), GOLDEN)
+		(_attrs[row.id].label as Label).text = "%s  cấp %d%s" % [row.name, int(row.lv), "  · tối đa" if full else "  · %d/%d XP" % [int(row.xp), int(row.next)]]
 	for c in _traits.get_children():
 		_traits.remove_child(c)
 		c.queue_free()
 	for t in game.traits():
-		var chip := PanelContainer.new()
-		var sb := StyleBoxFlat.new()
-		var col: Color = {"good": Color("2f8f4e"), "bad": Color("c56a1d"), "base": Color("2e6f9e")}.get(t.tone, Color("555555"))
-		sb.bg_color = col
-		sb.border_color = col.lightened(0.35)
-		sb.set_border_width_all(1)
-		sb.set_corner_radius_all(2)
-		sb.content_margin_left = 12
-		sb.content_margin_right = 12
-		sb.content_margin_top = 3
-		sb.content_margin_bottom = 3
-		chip.add_theme_stylebox_override("panel", sb)
-		chip.tooltip_text = str(t.desc)
-		chip.mouse_filter = Control.MOUSE_FILTER_PASS
-		var l := _hand(str(t.name), 20, Color.WHITE)
-		chip.add_child(l)
-		_traits.add_child(chip)
+		_traits.add_child(_chip(str(t.name), str(t.tone), str(t.desc)))
 	for c in _rels.get_children():
 		_rels.remove_child(c)
 		c.queue_free()
@@ -727,6 +747,26 @@ func _refresh_status() -> void:
 		var b := UI.bar(6)
 		UI.set_bar(b, val, 100.0, Color("4cc46a") if val >= 60 else (GOLDEN if val >= 35 else Color("e0604f")))
 		col2.add_child(b)
+
+
+## Thẻ chữ viết tay nền màu theo tone (good xanh lá, bad cam, base xanh dương), rê chuột hiện lời tả.
+func _chip(text: String, tone: String, desc: String) -> PanelContainer:
+	var chip := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	var col: Color = {"good": Color("2f8f4e"), "bad": Color("c56a1d"), "base": Color("2e6f9e")}.get(tone, Color("555555"))
+	sb.bg_color = col
+	sb.border_color = col.lightened(0.35)
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(2)
+	sb.content_margin_left = 12
+	sb.content_margin_right = 12
+	sb.content_margin_top = 3
+	sb.content_margin_bottom = 3
+	chip.add_theme_stylebox_override("panel", sb)
+	chip.tooltip_text = desc
+	chip.mouse_filter = Control.MOUSE_FILTER_PASS
+	chip.add_child(_hand(text, 20, Color.WHITE))
+	return chip
 
 
 func refresh() -> void:

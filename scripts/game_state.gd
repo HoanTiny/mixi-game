@@ -84,6 +84,13 @@ func _demo_chapter(n: int) -> void:
 		if not game.s.queue.is_empty():
 			game.resolve_first_available()
 			continue
+		# Máy không ăn, không nghỉ: giữ Độ no, Tâm trạng ở mức tắt Suy nhược, Trầm cảm (survival.json release) để không bị
+		# chặn việc như người chơi bỏ bê bản thân.
+		if game.has_needs():
+			for c in game.cfg.get("survival", {}).get("conditions", {}).values():
+				if c.has("need") and c.get("blocks", []).size() > 0:
+					game.s.needs[c.need] = maxf(game.need(str(c.need)), float(c.get("release", c.below)))
+			game.Survival.update(game)
 		game.do_action("ca_kho")
 		game.do_action("sua_do_le")
 		game.finish_day()
