@@ -7,7 +7,7 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const SETTINGS := "user://settings.json"
-const VERSION := "Bản 1.6 · phố gọn, nhiệm vụ liền mạch"
+const VERSION := "Bản 1.7 · ba ngày đầu và những lời hẹn"
 const BRUSH := preload("res://assets/fonts/SedgwickAveDisplay-Regular.ttf")
 const HAND := preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CREAM := Color("ece3d3")
