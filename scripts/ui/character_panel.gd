@@ -10,6 +10,8 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const TitleScreen := preload("res://scripts/ui/title_screen.gd")
 const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const Character := preload("res://scripts/world/character.gd")
+const AnCharacter := preload("res://scripts/world/an_character.gd")
+const Wardrobe := preload("res://scripts/wardrobe.gd")
 const CREAM := Color("ece3d3")
 const GOLDEN := Color("e8b45a")
 const PANEL_BG := Color(0.1, 0.09, 0.08, 0.93)
@@ -41,6 +43,7 @@ var _turn: Node3D
 var _body: Node3D
 var _drag := false
 var _spin := 0.0
+var _portrait_camera: Camera3D
 
 
 func _ready() -> void:
@@ -263,6 +266,24 @@ func _build_left(row: HBoxContainer) -> void:
 ## Đồ trong ngăn đang mở: [{id, name, kind, desc, count, used, action}].
 func _items(tab: String) -> Array:
 	var out := []
+	if tab=="clothes" and str(game.cfg.get("anModel","rigged"))=="rigged":
+		if game.s.get("inventory",{}).is_empty():
+			out.append({"id":"an_base","name":"Áo caro và jeans của An","kind":"shirt","count":1,
+				"used":str(game.wardrobe().worn.get("ao",""))=="" and str(game.wardrobe().worn.get("quan",""))=="",
+				"group":"Quần áo","desc":"Bộ đồ mang theo từ nhà.\nMua thêm đồ tại shop si-đa Hàng Đào; cắt và nhuộm tóc ở tiệm tóc."})
+		for id in game.s.get("inventory",{}):
+			var item: Dictionary=game.s.inventory[id]
+			var slot: String=str(item.slot)
+			var bag_slot := "ao" if slot=="shirt" else "quan"
+			var used: bool=str(game.s.equipped.get(slot,""))==id and str(game.wardrobe().worn.get(bag_slot,""))==""
+			out.append({"id":id,"name":item.name,"kind":"shirt" if slot=="shirt" else "pants","count":1,"used":used,"group":"Quần áo",
+				"desc":"Đồ đã sở hữu · Mặc không tốn tiền.\nMua thêm áo và jeans ở chợ; cắt, nhuộm tóc tại tiệm tóc."})
+		for id in game.wardrobe().owned:
+			var item: Dictionary=game.cloth(id)
+			if str(item.get("slot","")) not in ["ao","quan"]: continue
+			out.append({"id":id,"name":item.name,"kind":"shirt" if item.slot=="ao" else "pants","count":int(game.wardrobe().owned[id]),
+				"used":str(game.wardrobe().worn.get(item.slot,""))==id,"group":"Quần áo","desc":"Đồ từ cửa hàng si-đa · Màu vải hiển thị trên cùng nhân vật An."})
+		return out
 	var cfg_items: Dictionary = game.cfg.get("items", {})
 	match tab:
 		"tools", "clothes":
@@ -357,11 +378,18 @@ func _refresh_items() -> void:
 	_item_desc.text = str(chosen.desc)
 	if _tab == "clothes" and not chosen.used:
 		_item_btn.visible = true
-		_item_btn.text = "Mặc bộ này"
+		_item_btn.text = "Mặc món này"
 		for c in _item_btn.pressed.get_connections():
 			_item_btn.pressed.disconnect(c.callable)
 		var id := str(chosen.id)
-		_item_btn.pressed.connect(func() -> void: game.set_outfit(id))
+		_item_btn.pressed.connect(func() -> void:
+			if id=="an_base":
+				game.wardrobe().worn.erase("ao"); game.wardrobe().worn.erase("quan"); game._commit()
+			elif str(game.cfg.get("anModel","rigged"))=="rigged" and game.s.get("inventory",{}).has(id):
+				game.wardrobe().worn.erase("ao" if game.s.inventory[id].slot=="shirt" else "quan")
+				Wardrobe.equip(game,id)
+			elif str(game.cfg.get("anModel","rigged"))=="rigged": game.wear_item(id)
+			else: game.set_outfit(id))
 
 
 # ---------------------------------------------------------------- giữa: An 3D và các ô đang dùng
@@ -371,6 +399,13 @@ func _build_center(row: HBoxContainer) -> void:
 	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(c)
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var backdrop_mat := ShaderMaterial.new()
+	backdrop_mat.shader = preload("res://scripts/ui/portrait_backdrop.gdshader")
+	backdrop.material = backdrop_mat
+	c.add_child(backdrop)
 	var box := SubViewportContainer.new()
 	box.stretch = true
 	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -385,7 +420,7 @@ func _build_center(row: HBoxContainer) -> void:
 	_view.msaa_3d = Viewport.MSAA_4X
 	_view.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	box.add_child(_view)
-	var hint := UI.label("Kéo chuột để xoay", 13, Color(CREAM, 0.5))
+	var hint := UI.label("Kéo: xoay · Lăn: xem gần", 13, Color(CREAM, 0.7))
 	hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	hint.position.y -= 50
 	hint.position.x -= 55
@@ -422,21 +457,21 @@ func _build_model() -> void:
 	var e := Environment.new()
 	e.background_mode = Environment.BG_CLEAR_COLOR
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("e6e2dc")
-	e.ambient_light_energy = 0.5
+	e.ambient_light_color = Color("c8d2da")
+	e.ambient_light_energy = 0.35
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.environment = e
 	_view.add_child(env)
 	var key := DirectionalLight3D.new()
 	key.rotation_degrees = Vector3(-30, -35, 0)
 	key.light_color = Color("fff1e0")
-	key.light_energy = 1.0
+	key.light_energy = 0.55
 	key.shadow_enabled = true
 	_view.add_child(key)
 	var rim := DirectionalLight3D.new()
 	rim.rotation_degrees = Vector3(-15, 150, 0)
-	rim.light_color = Color("9fc3ff")
-	rim.light_energy = 0.6
+	rim.light_color = Color("c5d1df")
+	rim.light_energy = 0.28
 	_view.add_child(rim)
 	var floor_mesh := MeshInstance3D.new()
 	var disc := CylinderMesh.new()
@@ -451,6 +486,7 @@ func _build_model() -> void:
 	floor_mesh.material_override = fm
 	_view.add_child(floor_mesh)
 	var cam := Camera3D.new()
+	_portrait_camera = cam
 	cam.fov = 30
 	cam.position = Vector3(0, 1.0, 4.4)
 	_view.add_child(cam)
@@ -464,9 +500,19 @@ func _build_model() -> void:
 
 ## Dựng lại An trong khung xem theo bộ đang mặc.
 func _dress() -> void:
+	if str(game.cfg.get("anModel", "rigged")) == "rigged" and AnCharacter.available():
+		if not (_body is AnCharacter):
+			if is_instance_valid(_body):
+				_turn.remove_child(_body)
+				_body.queue_free()
+			_body = AnCharacter.new()
+			_turn.add_child(_body)
+			_body.setup(Color.WHITE, Color.WHITE, "An")
+		_body.apply_outfit(game)
+		return
 	var look := Character.an_look(game)
 	if _body != null:
-		if str(_body.get("look").get("rb", "")) == str(look.rb):
+		if not (_body is AnCharacter) and str(_body.get("look").get("rb", "")) == str(look.rb):
 			return
 		_body.queue_free()
 	_body = Character.make(look)
@@ -478,6 +524,8 @@ func _on_drag(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_drag = event.pressed
+	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		_portrait_camera.fov = clampf(_portrait_camera.fov + (-2.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 2.0), 21.0, 34.0)
 	elif event is InputEventMouseMotion and _drag:
 		_turn.rotation.y += event.relative.x * 0.012
 		_spin = event.relative.x * 0.4
@@ -496,6 +544,12 @@ func _refresh_slots() -> void:
 		if str(it.id) == game.outfit():
 			_slots.clothes.icon.set("kind", it.kind)
 			(_slots.clothes.panel as Control).tooltip_text = str(it.name)
+	if str(game.cfg.get("anModel","rigged"))=="rigged":
+		_slots.clothes.icon.set("kind","shirt")
+		var worn_names := PackedStringArray()
+		for item in _items("clothes"):
+			if item.used: worn_names.append(str(item.name))
+		(_slots.clothes.panel as Control).tooltip_text = "\n".join(worn_names)
 	_slots.home.icon.set("kind", "key")
 	var home_name := ""
 	if world != null and world.has_method("location_info"):

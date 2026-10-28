@@ -17,7 +17,7 @@ void fragment() {
 	// must be supplied as sRGB from script, never converted a second time.
 	float broad = dot(textureLod(albedo_map, UV, 2.0).rgb, vec3(0.2126, 0.7152, 0.0722));
 	float reference = OUTPUT_IS_SRGB ? 0.44 : 0.17;
-	float detail = clamp(pow(max(mix(lum, broad, 0.55), 0.001) / reference, 0.32), 0.66, 1.32);
+	float detail = clamp(pow(max(mix(lum, broad, 0.40), 0.001) / reference, 0.42), 0.62, 1.38);
 	vec3 adjusted = mix(base, cloth, 0.12) * 0.97;
 	float hair_reference = OUTPUT_IS_SRGB ? 0.16 : 0.023;
 	adjusted = mix(adjusted, hair_color.rgb * clamp(lum / hair_reference, 0.70, 1.25), COLOR.r);
@@ -29,11 +29,11 @@ void fragment() {
 	ALBEDO = adjusted;
 	METALLIC = 0.0;
 	float clothing = clamp(COLOR.g + COLOR.b, 0.0, 1.0);
-	ROUGHNESS = mix(mix(0.60, 0.76, COLOR.r), 0.91, clothing);
-	SPECULAR = mix(0.30, 0.16, clothing);
+	ROUGHNESS = mix(mix(0.68, 0.82, COLOR.r), 0.92, clothing);
+	SPECULAR = mix(0.24, 0.16, clothing);
 	if (has_normal) {
 		NORMAL_MAP = texture(normal_map, UV).rgb;
-		NORMAL_MAP_DEPTH = mix(0.22, 0.36, clothing);
+		NORMAL_MAP_DEPTH = mix(0.16, 0.32, clothing);
 	}
 	if (has_orm) {
 		vec3 orm = texture(orm_map, UV).rgb;

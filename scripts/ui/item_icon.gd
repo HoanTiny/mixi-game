@@ -95,6 +95,14 @@ func _draw() -> void:
 				draw_rect(Rect2(30, 82, 40, 6), Color("3d5a80"))
 			elif kind == "tshirt":
 				draw_rect(Rect2(30, 84, 40, 4), Color("3d5a80"))
+		"pants":
+			var pts := PackedVector2Array([Vector2(30,14),Vector2(70,14),Vector2(76,90),Vector2(55,90),Vector2(50,46),Vector2(45,90),Vector2(24,90)])
+			draw_colored_polygon(pts,Color("526b7e"))
+			pts.append(pts[0]); draw_polyline(pts,ink,w)
+			draw_line(Vector2(30,23),Vector2(70,23),Color("a1a99d"),2)
+			draw_line(Vector2(50,24),Vector2(50,44),ink,2)
+			draw_line(Vector2(33,32),Vector2(40,40),Color("8495a1"),2)
+			draw_line(Vector2(67,32),Vector2(60,40),Color("8495a1"),2)
 		"bottle":
 			_rrect(Rect2(36, 30, 28, 60), Color("a8d8ea", 0.8), ink, w)
 			draw_rect(Rect2(42, 12, 16, 20), Color("a8d8ea", 0.8))

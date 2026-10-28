@@ -1,5 +1,6 @@
 extends Window
 const UI := preload("res://scripts/ui/ui_kit.gd")
+const WP := preload("res://scripts/work/work_props.gd")
 const SOCKET := Vector3(0.4,0.75,0.25)
 const BIN := Vector3(2.15,0.75,0.65)
 const SOURCE := Vector3(-2.0,0.75,0.55)
@@ -25,10 +26,13 @@ var drag_origin := Vector3.ZERO
 var feedback := ""
 var orbit_yaw := 0.0
 var orbit_pitch := 0.92
+var step_labels: Array[Label] = []
+var socket_ring: MeshInstance3D
+var meter_readout: Label3D
 func _ready() -> void:
 	title = "Bàn sửa của An"
-	size = Vector2i(1040,690)
-	min_size = size
+	size = Vector2i(1040,660)
+	min_size = Vector2i(760,540)
 	transient = true
 	exclusive = true
 	theme = UI.make_theme()
@@ -37,17 +41,23 @@ func _ready() -> void:
 	token = str(game.s.street.accepted_day)+":"+str(kind)
 	var panel := PanelContainer.new()
 	# Nền tối cho chữ sáng của bàn sửa (giao diện chung của game là nền sáng).
-	panel.add_theme_stylebox_override("panel", UI.box(Color(0.09, 0.1, 0.12, 0.98), Color(1, 1, 1, 0.12), 6, 14))
+	panel.add_theme_stylebox_override("panel", UI.box(Color("1b2422"), Color("72664e"), 3, 14))
 	add_child(panel)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation",10)
 	panel.add_child(column)
 	column.add_child(UI.label("BÀN SỬA  ·  " + str(game.s.street.job.name),22,UI.GOLD))
-	details = UI.wrap(str(game.s.street.job.reading),15,UI.HUD_TEXT,980)
+	var steps := HBoxContainer.new()
+	steps.add_theme_constant_override("separation",24)
+	column.add_child(steps)
+	for text in ["01  THÁO ĐỒ HỎNG", "02  THAY LINH KIỆN", "03  SIẾT & THỬ"]:
+		var label := UI.label(text,14,UI.HUD_SOFT)
+		steps.add_child(label); step_labels.append(label)
+	details = UI.wrap(str(game.s.street.job.reading),15,UI.HUD_TEXT,720)
 	column.add_child(details)
 	surface = SubViewportContainer.new()
-	surface.custom_minimum_size = Vector2(980,430)
+	surface.custom_minimum_size = Vector2(720,300)
 	surface.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	surface.stretch = true
 	surface.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -55,10 +65,11 @@ func _ready() -> void:
 	viewport = SubViewport.new()
 	viewport.size = Vector2i(980,430)
 	viewport.own_world_3d = true
+	viewport.msaa_3d = Viewport.MSAA_2X
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	surface.add_child(viewport)
 	surface.gui_input.connect(_surface_input)
-	hint = UI.wrap("",16,UI.GOLD,980)
+	hint = UI.wrap("",16,UI.GOLD,720)
 	column.add_child(hint)
 	var buttons := HBoxContainer.new()
 	column.add_child(buttons)
@@ -78,7 +89,7 @@ func _ready() -> void:
 func material(color: String, metal := 0.0) -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(color)
-	mat.roughness = 0.74
+	mat.roughness = lerpf(0.82,0.36,metal)
 	mat.metallic = metal
 	return mat
 func box(parent: Node, pos: Vector3, dimensions: Vector3, color: String) -> MeshInstance3D:
@@ -106,9 +117,9 @@ func label3(text: String, pos: Vector3) -> void:
 	var label := Label3D.new()
 	label.text = text
 	label.position = pos
-	label.font_size = 20
-	label.outline_size = 4
-	label.pixel_size = 0.006
+	label.font_size = 22
+	label.outline_size = 2
+	label.pixel_size = 0.0045
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.modulate = Color("e5d7ad")
 	viewport.add_child(label)
@@ -119,15 +130,20 @@ func part(part_kind: int, pos: Vector3, worn := false) -> Node3D:
 	if part_kind==0:
 		box(root,Vector3(0,0.13,0),Vector3(0.43,0.26,0.23),"77634e" if worn else "2b4146")
 		for x in [-0.13,0.13]: box(root,Vector3(x,0.08,0.2),Vector3(0.025,0.025,0.24),"ba9b60")
+		box(root,Vector3(0,0.265,0),Vector3(0.32,0.008,0.17),"a1977c" if worn else "d1d1bc")
+		for z in [-0.045,0.0,0.045]: box(root,Vector3(-0.025,0.271,z),Vector3(0.20,0.003,0.008),"4c5750")
 	else:
 		var fuse := cylinder(root,Vector3(0,0.1,0),0.07,0.4,"796654" if worn else "c2b598")
 		fuse.rotation.z = PI/2
 		box(root,Vector3(0,0.1,0),Vector3(0.7,0.025,0.025),"a38b60")
+		for x in [-0.17,0.17]:
+			var cap := cylinder(root,Vector3(x,0.1,0),0.075,0.06,"909d9c")
+			cap.rotation.z=PI/2
 	return root
 func _build_scene() -> void:
 	camera = Camera3D.new()
 	viewport.add_child(camera)
-	camera.position = Vector3(0,5.7,4.0)
+	camera.position = Vector3(0.45,5.0,4.4)
 	camera.look_at(Vector3(0,0.5,0))
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	camera.keep_aspect = Camera3D.KEEP_WIDTH
@@ -135,43 +151,49 @@ func _build_scene() -> void:
 	var light := DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-55,-25,0)
 	light.shadow_enabled = true
+	light.light_color = Color("e5e9e5")
+	light.light_energy = 0.62
 	viewport.add_child(light)
 	var environment := WorldEnvironment.new()
 	environment.environment = Environment.new()
 	environment.environment.background_mode = Environment.BG_COLOR
 	environment.environment.background_color = Color("272c28")
 	environment.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.environment.ambient_light_color = Color("dfd6b9")
-	environment.environment.ambient_light_energy = 0.4
+	environment.environment.ambient_light_color = Color("c0ccd1")
+	environment.environment.ambient_light_energy = 0.32
+	environment.environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	viewport.add_child(environment)
 	var table := box(viewport,Vector3(0,0.45,0),Vector3(6,0.2,3.2),"67513a")
-	var wood := ShaderMaterial.new()
-	wood.shader = preload("res://scripts/world/bench_surface.gdshader")
-	table.material_override = wood
-	for i in range(15): box(viewport,Vector3(-2.8+i*0.4,0.553,0),Vector3(0.008,0.003,3.12),"45392e")
+	table.material_override = WP.tex("brown_planks_05",0.8,Color("a8a398"))
 	box(viewport,Vector3(0.35,0.57,0),Vector3(2.5,0.06,2.4),"33433e")
 	box(viewport,BIN-Vector3(0,0.16,0),Vector3(1.05,0.06,0.8),"766958")
 	for x in [-0.52,0.52]: box(viewport,BIN+Vector3(x,-0.08,0),Vector3(0.04,0.18,0.8),"90816b")
 	box(viewport,SOURCE-Vector3(0,0.16,0),Vector3(1.2,0.06,0.8),"414b44")
-	box(viewport,SOCKET-Vector3(0,0.1,0),Vector3(0.85,0.09,0.58),"b99c5c")
+	box(viewport,SOCKET-Vector3(0,0.1,0),Vector3(0.85,0.09,0.58),"506957")
+	for x in [-0.32,0.32]:
+		box(viewport,SOCKET+Vector3(x,-0.046,0),Vector3(0.10,0.012,0.35),"9a8954")
 	if kind==0:
 		cylinder(viewport,Vector3(0.35,0.73,-0.65),0.53,0.26,"73766d")
 		rotor = Node3D.new()
 		viewport.add_child(rotor)
 		rotor.position = Vector3(0.35,0.9,-0.65)
 		for angle in [0.0,TAU/3,TAU*2/3]:
-			var blade := box(rotor,Vector3(sin(angle)*0.24,0,cos(angle)*0.24),Vector3(0.18,0.035,0.45),"a3a896")
-			blade.rotation.y = angle
+			preload("res://scripts/work/repair_set.gd").blade(rotor,angle)
 		cylinder(rotor,Vector3.ZERO,0.1,0.07,"454e47")
 	else:
 		cylinder(viewport,Vector3(0.35,0.7,-0.55),0.65,0.15,"b7b6a6")
 		cylinder(viewport,Vector3(0.35,0.8,-0.55),0.48,0.08,"52584e")
 		box(viewport,Vector3(1.05,0.73,-0.55),Vector3(0.15,0.13,0.5),"2a342e")
 	# Leads between appliance and the replacement socket.
-	for x in [0.22,0.57]: box(viewport,Vector3(x,0.7,-0.1),Vector3(0.025,0.025,0.6),"a15b43")
 	# Meter and hand tools on the back edge of the work surface.
 	box(viewport,Vector3(2.15,0.65,-0.9),Vector3(0.5,0.16,0.7),"826b42")
 	box(viewport,Vector3(2.15,0.74,-1.06),Vector3(0.36,0.025,0.23),"829782")
+	meter_readout = Label3D.new()
+	meter_readout.position=Vector3(2.15,0.755,-1.06)
+	meter_readout.rotation.x=-PI/2
+	meter_readout.font_size=32; meter_readout.pixel_size=0.0018
+	meter_readout.outline_size=0; meter_readout.modulate=Color("22362d")
+	viewport.add_child(meter_readout)
 	cylinder(viewport,Vector3(2.15,0.76,-0.76),0.11,0.04,"282e29")
 	var driver := cylinder(viewport,Vector3(1.55,0.66,-0.85),0.065,0.44,"965b3e")
 	driver.rotation.x=PI/2
@@ -180,13 +202,18 @@ func _build_scene() -> void:
 	new_part = part(kind,SOURCE)
 	sample_part = part(1-kind,SAMPLE)
 	for point in SCREWS:
-		var screw := cylinder(viewport,point,0.095,0.08,"b3b5a9")
-		box(screw,Vector3(0,0.045,0),Vector3(0.12,0.012,0.025),"3b433b")
+		var screw := cylinder(viewport,point,0.065,0.05,"87928e")
+		box(screw,Vector3(0,0.027,0),Vector3(0.085,0.008,0.018),"3b433b")
+		box(screw,Vector3(0,0.028,0),Vector3(0.018,0.008,0.085),"3b433b")
 		screw_nodes.append(screw)
 	label3("LINH KIỆN MỚI",SOURCE+Vector3(0,0,-0.45))
 	label3("MẪU ĐỐI CHIẾU",SAMPLE+Vector3(0,0,-0.32))
 	label3("KHAY ĐỒ HỎNG",BIN+Vector3(0,0,-0.55))
 	label3("Ổ LẮP",SOCKET+Vector3(0,0,0.75))
+	preload("res://scripts/work/repair_set.gd").build(self)
+	var ring_root := Node3D.new()
+	viewport.add_child(ring_root)
+	socket_ring = preload("res://scripts/work/repair_set.gd").loop(ring_root,SOCKET-Vector3(0,0.05,0),0.43,"c8b47e",0.012)
 func progress() -> Dictionary:
 	return game.s.street.job.get("bench",{"removed":false,"installed":false,"screws":0})
 func refresh() -> void:
@@ -201,8 +228,14 @@ func refresh() -> void:
 		new_part.position = SOCKET if state.installed else SOURCE
 		sample_part.position = SAMPLE
 	for i in 2:
-		screw_nodes[i].material_override = material("789c6c" if int(state.screws)&(1<<i) else "b3b5a9")
+		screw_nodes[i].material_override = material("789c6c" if int(state.screws)&(1<<i) else "87928e",0.65)
+		screw_nodes[i].rotation.y = PI/4 if int(state.screws)&(1<<i) else 0.0
 	test_button.disabled = job.stage != "test"
+	var current_step := 2 if state.installed else (1 if state.removed else 0)
+	for i in step_labels.size():
+		step_labels[i].modulate = Color("d4bf89") if i==current_step else (Color("91aa91") if i<current_step else Color("737e78"))
+	socket_ring.visible = state.removed and not state.installed
+	meter_readout.text = ("1.5 µF" if kind==0 else "0.2 Ω") if job.stage=="deliver" else ("0.3 µF" if kind==0 else "OL")
 	var instruction := "1 / 3 · Kéo linh kiện hỏng từ ổ lắp sang khay bên phải."
 	if state.removed: instruction = "2 / 3 · Kéo linh kiện mới bên trái vào ổ lắp màu vàng."
 	if state.installed: instruction = "3 / 3 · Bấm hai vít bạc cạnh ổ lắp để siết chặt."

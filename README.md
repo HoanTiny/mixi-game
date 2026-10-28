@@ -1,5 +1,24 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.8 · nhân vật và minigame 3D**
+
+[Chơi thử bản mới](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.8).
+Phím **C** mở nhân vật: An dùng cùng model, rig và màu đồ như ngoài phố; kéo để
+xoay, lăn chuột để xem gần. Ngăn quần áo lấy đồ thực sự sở hữu ở shop si-đa,
+có thể mặc và trở về bộ gốc. Save cũ có túi áo/quần vẫn được đọc.
+
+- Bàn sửa có dây dẫn, lồng/cánh quạt cong, đáy ấm, đầu cầu chì, nhãn tụ,
+  đồng hồ hiện số, mặt bàn gỗ và ba bước thao tác rõ ràng. Giữ tiến độ kéo thả cũ.
+- Bi-a dùng bàn, bi, gậy và bóng 3D với máy quay nghiêng. Chuột và đường ngắm
+  quy đổi qua máy quay, khớp mô phỏng sau khi thay đổi kích thước cửa sổ.
+- Da và vải bớt bóng; màn nhân vật có nền riêng, ánh sáng dịu hơn; nắng và
+  ánh sáng hắt ở khu phố được cân lại. Vẫn chạy Compatibility cho web.
+
+Đây là lượt hoàn thiện hình ảnh trên asset hiện có: chưa tạo lại topology/mặt An,
+chưa có mesh riêng cho từng kiểu áo khoác, và chưa thay toàn bộ model NPC.
+Đồ mua hiển thị màu trên áo/jeans của An. Windows tải về vẫn là bản 1.6.
+Kiểm tra mới: `tests/visual_redesign.gd`; ảnh render ở `build/design-preview/`.
+
 **Bản web 1.7 · ba ngày đầu, chiếc quạt và cuộc hẹn với Linh**
 
 [Chơi thử ngày 1–3](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.7)

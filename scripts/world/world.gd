@@ -436,7 +436,7 @@ func _build_environment() -> void:
 	sun.shadow_blur = 1.5
 	if real and (city.pilot_active or city.street_upgrade):
 		sun.shadow_blur = 3.0
-		sun.shadow_opacity = 0.68
+		sun.shadow_opacity = 0.60
 	sun.directional_shadow_max_distance = 70.0
 	if ScreenFit.light_shadows:
 		# Điện thoại, trình duyệt: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
@@ -2863,9 +2863,9 @@ func _update_lighting(hour: float) -> void:
 		# with local shop lamps providing the warm accents after sunset.
 		sun.rotation_degrees = Vector3(-elevation, 28.0 + t * 45.0, 0)
 		sun.light_color = c.lerp(Color("d5d7d9"), 0.32 * (1.0 - nf))
-		sun.light_energy = lerpf(0.38, 0.14, nf) * (0.42 if rain else 1.0)
-		env.ambient_light_color = Color("c2c4ce").lerp(Color("929ead"), nf)
-		env.ambient_light_energy = lerpf(0.66 if rain else 0.62, 0.42, nf)
+		sun.light_energy = lerpf(0.48, 0.14, nf) * (0.42 if rain else 1.0)
+		env.ambient_light_color = Color("c6ced5").lerp(Color("929ead"), nf)
+		env.ambient_light_energy = lerpf(0.60 if rain else 0.52, 0.42, nf)
 	RenderingServer.global_shader_parameter_set("night", nf)
 	# Quầng sáng (glow) chỉ bật lúc tối: đèn lồng, chữ neon, cửa sổ lóa nhẹ. Điện thoại tắt cho nhẹ.
 	env.glow_enabled = nf > 0.05 and not ScreenFit.low_power
