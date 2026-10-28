@@ -2,6 +2,7 @@ extends RefCounted
 ## Authored street architecture in metres. +Z faces the pavement; rear is -depth.
 ## Ground, upper and roof are independently batched so camera cutaway never squashes a mesh.
 const Props := preload("res://scripts/work/work_props.gd")
+const Crafted := preload("res://scripts/work/higgsfield_materials.gd")
 static var _materials: Dictionary = {}
 
 class Batch:
@@ -85,7 +86,7 @@ static func _mat(key: String, seed: int) -> Material:
 	var m: StandardMaterial3D
 	match key:
 		"wall":
-			m = Props.tex("painted_plaster_wall", 0.65, Color(["c9bc9c", "b2b5a1", "b8a898", "aaa89a"][variant])).duplicate()
+			m = Crafted.surface("hanoi_plaster", 0.38, Color(["d3c7aa", "bec2b0", "c6b7a8", "bbb9ad"][variant])).duplicate()
 		"old":
 			m = Props.tex("plastered_wall_04", 0.7, Color("9a8d77")).duplicate()
 		"floor":

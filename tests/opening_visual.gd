@@ -73,6 +73,7 @@ func run() -> void:
 	check(is_instance_valid(bench),"HUD opens the actual repair bench")
 	if not is_instance_valid(bench): quit(1); return
 	for i in 10: await process_frame
+	bench.cover_button.pressed.emit()
 	await drag(bench,bench.old_part.position+Vector3(0,0.12,0),bench.BIN)
 	check(bench.progress().removed,"actual mouse drag removes old part")
 	await drag(bench,bench.new_part.position+Vector3(0,0.12,0),bench.SOCKET)

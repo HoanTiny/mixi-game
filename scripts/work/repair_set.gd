@@ -43,15 +43,10 @@ static func build(b) -> void:
 	# A shallow open chassis, copper windings and a removed guard read as a fan,
 	# rather than a three-bladed symbol sitting on an empty table.
 	if b.kind==0:
-		for r in [0.18,0.27,0.38,0.52]: loop(root,Vector3(0.35,0.90,-0.65),r,"747d79",0.012)
-		for i in 12:
-			var a := i*TAU/12
-			wire(root,Vector3(0.35,0.91,-0.65),Vector3(0.35+sin(a)*0.52,0.91,-0.65+cos(a)*0.52),"a0a79d",0.008)
-		for i in 10:
-			var a := i*TAU/10
-			loop(root,Vector3(0.35+sin(a)*0.23,0.72,-0.65+cos(a)*0.23),0.075,"ad784a",0.018)
-		var casing: MeshInstance3D = b.box(root,Vector3(0.35,0.59,-0.65),Vector3(1.22,0.08,1.20),"5c6961")
-		casing.material_override=WP.tex("rusty_metal_sheet",1.4,Color("83908a"))
+		# Motor windings sit beside the opened service compartment.
+		for i in 8:
+			var a := i*TAU/8
+			loop(root,Vector3(-.15+sin(a)*.10,.65,-.18+cos(a)*.10),.045,"ad784a",.010)
 	else:
 		# Open underside of the kettle: metal heating ring, thermostat, screws.
 		for r in [0.38,0.57,0.64]: loop(root,Vector3(0.35,0.84,-0.55),r,"c1c2b7",0.024)

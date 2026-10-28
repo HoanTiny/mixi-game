@@ -225,6 +225,9 @@ func _ready() -> void:
 	add_child(character)
 	character.closed.connect(func() -> void: _root.visible = true)
 	game.changed.connect(_refresh)
+	var repair_presenter := preload("res://scripts/work/repair_presenter.gd").new()
+	add_child(repair_presenter)
+	repair_presenter.setup(self)
 	ScreenFit.changed.connect(_apply_fit)
 	_apply_fit()
 
@@ -237,6 +240,13 @@ func blocking() -> bool:
 
 func location_open() -> String:
 	return _loc_id
+
+func _toggle_audio() -> void:
+	var muted := not AudioServer.is_bus_mute(0)
+	AudioServer.set_bus_mute(0,muted)
+	if _tb_icons.has("note"):
+		_tb_icons.note.button.tooltip_text="Bật âm thanh" if muted else "Tắt âm thanh"
+		_tb_icons.note.icon.modulate=Color("737b74") if muted else Color.WHITE
 
 
 func open_location(id: String) -> void:
@@ -528,6 +538,8 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 	var sit_down: bool=game.action_loc(a) in ["xom_bo_me","com_hanh","ho_guom"] and (bool(a.get("rest",false)) or id in ["nghi","com_voi_ba","an_com","an_com_quen"])
 	if sit_down: world.begin_rest_pose(game.action_loc(a))
 	else: world.set_player_inside(true)
+	if sit_down and id in ["com_voi_ba","an_com","an_com_quen"] and world.player_body.has_method("eat"):
+		world.player_body.eat(true)
 	_work_title.text = "Đang " + str(a.name).to_lower() if a.group == "work" else str(a.name)
 	_work.visible = true
 	_refresh()
@@ -1169,7 +1181,7 @@ func _build_topbar(root: Control) -> void:
 	var specs := [["person", "Nhân vật (C)", open_character], ["book", "Sổ: phải thu, phải trả, lời hứa", _toggle_skills],
 		["list", "Nhật ký", _toggle_log], ["phone_line", "Điện thoại", _toggle_phone],
 		["map", "Bản đồ (M)", func() -> void: _big_map.toggle()], ["zoom", "Toàn cảnh", func() -> void: world.toggle_overview()],
-		["house", "Về chỗ ở ngủ", _go_home]]
+		["house", "Về chỗ ở ngủ", _go_home], ["note", "Bật / tắt âm thanh", _toggle_audio]]
 	for sp in specs:
 		var b := Button.new()
 		b.flat = true
@@ -2129,9 +2141,10 @@ func _refresh_location() -> void:
 	if _loc_id in ["tiem_sau", "cho_cau_nho"] and world.real:
 		_loc_cards.add_child(UI.wrap(game.Street.status(game), 12, UI.INK_SOFT, 320))
 		var job: Dictionary = game.s.street.job
-		if _loc_id == "tiem_sau" and not job.is_empty() and str(job.stage) == "repair":
+		if _loc_id == "tiem_sau" and not job.is_empty() and str(job.stage) in ["repair","test"]:
 			_loc_cards.add_child(UI.choice("Mở bàn sửa 3D", "Kéo linh kiện hỏng ra, lắp linh kiện mới, siết hai vít", "", _open_bench))
 		for offer in game.Street.options(game, _loc_id):
+			if str(offer.id)=="test": continue # close the case and run visibly at the bench
 			# Assembly belongs to the bench, not a parallel one-click action.
 			if str(offer.id) in ["fix_cap", "fix_fuse"]: continue
 			if str(offer.id)=="accept" and game.is_full() and game.day()==1 and game.clock()<=10.5 and game.s.get("neighborhood",{}).get("stage","")=="intro": continue

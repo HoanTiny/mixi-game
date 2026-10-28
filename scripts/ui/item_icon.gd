@@ -32,6 +32,12 @@ func _draw() -> void:
 	var ink := Color(0.07, 0.06, 0.05)
 	var w := 3.0
 	match kind:
+		"note":
+			draw_line(Vector2(42,68),Vector2(42,24),tint,6,true)
+			draw_line(Vector2(42,24),Vector2(76,16),tint,6,true)
+			draw_line(Vector2(76,16),Vector2(76,60),tint,6,true)
+			draw_circle(Vector2(32,72),12,tint)
+			draw_circle(Vector2(66,64),12,tint)
 		"phone":
 			_rrect(Rect2(30, 10, 40, 80), Color("2a2d33"), ink, w)
 			draw_rect(Rect2(34, 18, 32, 60), Color("5b7c99"))

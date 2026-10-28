@@ -67,6 +67,7 @@ func layout(size: Vector2, table: Rect2, entries: Array, radius: float, pocket_r
 	WP.box(table_root, Vector3(w+0.66,0.35,d+0.66), WP.tex("brown_planks_05", 1.1, Color("6e4d35")), center+Vector3(0,-0.41,0))
 	var felt := ShaderMaterial.new()
 	felt.shader = preload("res://scripts/work/table_felt.gdshader")
+	felt.set_shader_parameter("felt_albedo", preload("res://assets/higgsfield/billiards_felt.png"))
 	WP.box(table_root, Vector3(w,0.025,d), felt, center+Vector3(0,-0.025,0))
 	var cushion := WP.plain(Color("244b43"),0.95)
 	var trim := WP.plain(Color("b39a69"),0.48,0.4)

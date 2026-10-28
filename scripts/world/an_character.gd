@@ -19,6 +19,35 @@ var held_kind := ""
 var _worn := {}
 var _unit_scale := 1.0
 var _walk_cadence := 0.78
+var _meal_props: Array[Node3D] = []
+
+func eat(on: bool) -> void:
+	if _task_pose==null: return
+	_task_pose.eating=on
+	for prop in _meal_props: prop.queue_free()
+	_meal_props.clear()
+	if not on: return
+	var Models=load("res://scripts/work/repair_models.gd")
+	for side in ["Left","Right"]:
+		var bone := skeleton.find_bone(side+"Hand")
+		if bone<0: continue
+		var a := BoneAttachment3D.new(); a.bone_name=side+"Hand"; skeleton.add_child(a)
+		var fix := Node3D.new()
+		a.add_child(fix); _meal_props.append(a)
+		if side=="Left":
+			Models.ellipsoid(fix,Vector3(0,.025,.025),Vector3(.13,.06,.13),Models.mat("c9c3ad"))
+			Models.ellipsoid(fix,Vector3(0,.052,.025),Vector3(.105,.02,.105),Models.mat("ddd1ad"))
+		else:
+			for x in [-.009,.009]: Models.rod(fix,Vector3(x,0,-.025),Vector3(x,0,.15),.003,Models.mat("8b724b"))
+	_align_meal_props()
+
+func _align_meal_props() -> void:
+	for a in _meal_props:
+		if not is_instance_valid(a) or a.is_queued_for_deletion(): continue
+		var pose_basis := skeleton.global_basis*skeleton.get_bone_global_pose(skeleton.find_bone(a.bone_name)).basis
+		var fix: Node3D=a.get_child(0)
+		fix.basis=pose_basis.inverse()*global_basis
+		fix.position=pose_basis.inverse()*(global_basis*Vector3(0,-.01,.08))
 
 const PATH := "res://assets/characters/an/an-rigged.glb"
 
@@ -96,6 +125,7 @@ func setup(_shirt: Color, _pants: Color, _identity := "An") -> void:
 		_task_pose = _TaskPose.new()
 		_task_pose.unit_scale = _unit_scale
 		skeleton.add_child(_task_pose)
+		_task_pose.modification_processed.connect(_align_meal_props)
 	set_colors(DEFAULT_COLORS)
 
 func _create_idle() -> void:
@@ -278,9 +308,20 @@ func hold(kind: String) -> void:
 func place() -> void:
 	if _task_pose != null: _task_pose.place_left=0.65
 
+## Workshop preview shares the street rig and wardrobe. Hands reach the work
+## surface through the existing two-bone solver, without root translation.
+func work(action: String) -> void:
+	if _task_pose != null:
+		_task_pose.repairing=not action.is_empty()
+		_task_pose.work_action=action
+	if animation != null and not action.is_empty():
+		animation.play(idle_clip,0.2)
+		walking=false
+
 ## A chair pose has feet on the floor, unlike the motorcycle pose.
 func rest(on: bool, seat_h := 0.46) -> void:
 	resting=on
+	if not on: eat(false)
 	if _task_pose==null: return
 	_task_pose.resting=on
 	if model!=null and skeleton!=null:
@@ -292,6 +333,9 @@ func rest(on: bool, seat_h := 0.46) -> void:
 		walking=false
 
 class _TaskPose extends _RidePose:
+	var eating := false
+	var repairing := false
+	var work_action := ""
 	var kind := ""
 	var carrying := false
 	var resting := false
@@ -301,7 +345,7 @@ class _TaskPose extends _RidePose:
 	func advance_motion(delta: float) -> void:
 		var dt := clampf(delta,0.0,0.1)
 		place_left=maxf(0.0,place_left-dt)
-		weight=move_toward(weight,1.0 if carrying or resting or place_left>0 else 0.0,dt*6.0)
+		weight=move_toward(weight,1.0 if carrying or resting or repairing or place_left>0 else 0.0,dt*6.0)
 		elapsed+=dt
 
 	func _apply() -> void:
@@ -320,6 +364,13 @@ class _TaskPose extends _RidePose:
 			if kind=="kettle" and place_left<=0:
 				hand=Vector3(0.24,1.16,0.44) if side=="Left" else Vector3(-0.06,1.01,0.44)
 			if resting: hand=Vector3(s*0.22,0.65,0.26)
+			if resting and eating:
+				hand=Vector3(.14,.76,.31) if side=="Left" else Vector3(-.12,.78,.34).lerp(Vector3(-.06,1.15,.16),pow(maxf(0.0,sin(elapsed*1.65)),2.0))
+			if repairing:
+				hand=Vector3(s*.20,.94,.57)
+				if side=="Right":
+					hand.y+=.04+sin(elapsed*5.0)*(.025 if work_action=="screw" else .009)
+					hand.x+=sin(elapsed*2.0)*.025
 			hand.y-=model_offset
 			_solve(sk,side+"Arm",side+"ForeArm",side+"Hand",hand/unit_scale,Vector3(s*0.8,-0.7,-0.2),false)
 			if resting:

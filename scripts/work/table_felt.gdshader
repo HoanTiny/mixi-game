@@ -1,10 +1,10 @@
 shader_type spatial;
 render_mode diffuse_burley;
+uniform sampler2D felt_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 void fragment() {
-	float thread = sin(UV.x*1800.0)*sin(UV.y*900.0);
-	float fade = smoothstep(0.05,0.62,length(UV-vec2(0.5)));
-	float aa = 1.0-smoothstep(0.3,1.0,max(fwidth(UV.x)*1800.0,fwidth(UV.y)*900.0));
-	ALBEDO = mix(vec3(0.095,0.255,0.20),vec3(0.065,0.19,0.155),fade)* (1.0+thread*0.035*aa);
+	// Dense fibres repeat at a small scale; mipmaps keep them stable at distance.
+	vec3 fibres = texture(felt_albedo, UV * vec2(7.0, 5.0)).rgb;
+	ALBEDO = mix(vec3(0.055,0.16,0.12), fibres, 0.72);
 	ROUGHNESS = 0.96;
 	SPECULAR = 0.12;
 }

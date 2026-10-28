@@ -30,6 +30,8 @@ uniform sampler2D normal_map : hint_normal, filter_linear_mipmap_anisotropic;
 uniform bool has_normal = false;
 uniform bool head_surface = false;
 uniform int outfit_profile = 0;
+uniform vec4 cloth_tint : source_color = vec4(1.0);
+uniform float cloth_mix = 0.0;
 vec3 to_srgb(vec3 c) {
 	return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c));
 }
@@ -59,6 +61,11 @@ void fragment() {
 		skin *= 1.0 - red_cloth;
 	}
 	toned *= head_surface ? vec3(0.97, 0.965, 0.95) : vec3(0.96);
+	if (!head_surface && cloth_mix > 0.0) {
+		float fabric = (1.0-skin) * smoothstep(0.18,0.35,lum);
+		vec3 dye = OUTPUT_IS_SRGB ? cloth_tint.rgb : to_srgb(cloth_tint.rgb);
+		toned = mix(toned, dye * clamp(lum / 0.5,0.4,1.3), fabric*cloth_mix);
+	}
 	ALBEDO = OUTPUT_IS_SRGB ? toned : to_linear(toned);
 	ROUGHNESS = mix(0.91, 0.62, skin);
 	SPECULAR = mix(0.16, 0.30, skin);
@@ -81,6 +88,8 @@ var _female := false
 var _seen: VisibleOnScreenNotifier3D
 var _worn := {}
 var _walk_cadence := 0.85
+var _activity := ""
+var _activity_props: Array[Node3D] = []
 
 
 static func make(look_in: Dictionary) -> Node3D:
@@ -123,6 +132,8 @@ func _build() -> void:
 		_swap_head(name, head)
 	# Người Việt thấp hơn người mẫu Rocketbox (nam chừng 1,75 m, nữ 1,65 m).
 	_model.scale = Vector3.ONE * float(look.get("scale", 1.0))
+	_model.scale.x *= clampf(float(look.get("build",1.0)),0.90,1.12)
+	_model.scale.z *= sqrt(clampf(float(look.get("build",1.0)),0.90,1.12))
 	# Trình chạy động tác sẵn có trong fbx (rỗng): nạp thư viện đứng, đi, ngồi, nói.
 	_ap = _model.get_node_or_null("AnimationPlayer")
 	if _ap == null:
@@ -164,7 +175,7 @@ func _skin(name: String, hair: String, only: MeshInstance3D = null) -> void:
 	for mi in ([only] if only != null else _sk.find_children("*", "MeshInstance3D", true, false)):
 		var mesh: Mesh = (mi as MeshInstance3D).mesh
 		for i in mesh.get_surface_count():
-			(mi as MeshInstance3D).set_surface_override_material(i, _material(name, _part(mesh, i), hair, str(look.get("cloth_profile", ""))))
+			(mi as MeshInstance3D).set_surface_override_material(i, _material(name, _part(mesh, i), hair, str(look.get("cloth_profile", "")),str(look.get("cloth_tint",""))))
 
 
 static func _part(mesh: Mesh, i: int) -> String:
@@ -215,8 +226,8 @@ static func _parts(name: String, parts: Array) -> ArrayMesh:
 	return out
 
 
-static func _material(name: String, part: String, hair := "", profile := "") -> Material:
-	var key := name + "|" + part + "|" + hair + "|" + profile
+static func _material(name: String, part: String, hair := "", profile := "", tint := "") -> Material:
+	var key := name + "|" + part + "|" + hair + "|" + profile + "|" + tint
 	if _mats.has(key):
 		return _mats[key]
 	var dir := "%s/%s/" % [ROOT, name]
@@ -245,6 +256,9 @@ static func _material(name: String, part: String, hair := "", profile := "") -> 
 			color = dir + "body_color.jpg"
 		skin_mat.set_shader_parameter("color_map", load(color))
 		skin_mat.set_shader_parameter("head_surface", part == "head")
+		if tint!="" and part=="body":
+			skin_mat.set_shader_parameter("cloth_tint",Color(tint))
+			skin_mat.set_shader_parameter("cloth_mix",0.42)
 		skin_mat.set_shader_parameter("outfit_profile", 1 if profile == "cook" else (2 if profile == "delivery" else 0))
 		var nor := dir + part + "_normal.jpg"
 		if ResourceLoader.exists(nor):
@@ -350,13 +364,38 @@ func hold(kind: String) -> void:
 	_hold = kind
 	_arms.kind = kind
 
+func perform_activity(kind: String) -> void:
+	if kind==_activity: return
+	_activity=kind
+	for prop in _activity_props: prop.queue_free()
+	_activity_props.clear()
+	hold(kind if kind in ["eat","sweep","repair","box"] else "")
+	if kind not in ["eat","sweep","repair","box"]: return
+	var Models=load("res://scripts/work/repair_models.gd")
+	var attach := BoneAttachment3D.new(); attach.bone_name="Bip01 R Hand"; _sk.add_child(attach)
+	var fix := Node3D.new()
+	fix.basis=_sk.get_bone_global_rest(_sk.find_bone(attach.bone_name)).basis.inverse()
+	attach.add_child(fix); _activity_props.append(attach)
+	match kind:
+		"eat":
+			for x in [-.012,.012]: Models.rod(fix,Vector3(x,0,-.035),Vector3(x,-.018,.15),.003,Models.mat("98754a"))
+		"repair":
+			var tool: Node3D=Models.screwdriver(fix); tool.position.y=-.13
+		"sweep":
+			Models.rod(fix,Vector3(0,-.85,0),Vector3(0,.24,0),.012,Models.mat("8e7449"))
+			for i in 13: Models.rod(fix,Vector3(0,-.80,0),Vector3((i-6)*.023,-1.02,.025*sin(i)),.006,Models.mat("a8915e"))
+		"box":
+			Models.box(fix,Vector3(.18,-.04,.10),Vector3(.42,.3,.3),Models.mat("927654"))
+
 
 ## Đặt lại hai tay sau khi động tác chạy: cánh tay, cẳng tay, bàn tay chỉ theo hướng muốn (không gian người,
 ## mặt nhìn +z, bên trái là +x).
 class _HoldArms extends SkeletonModifier3D:
 	var kind := ""
+	var elapsed := 0.0
 
 	func _process_modification_with_delta(_d: float) -> void:
+		elapsed+=minf(_d,.1)
 		_apply()
 
 	func _process_modification() -> void:
@@ -377,6 +416,16 @@ class _HoldArms extends SkeletonModifier3D:
 					continue
 				up_dir = Vector3(-0.35, -0.15, 0.55)
 				fore_dir = Vector3(0.15, 0.85, -0.25)
+			elif kind == "eat":
+				var lift := pow(maxf(0.0,sin(elapsed*1.35)),2.0) if side=="R" else 0.0
+				up_dir=Vector3(s*.15,-.85,.45)
+				fore_dir=Vector3(-s*.16,lerpf(.12,1.0,lift),lerpf(1.0,.05,lift))
+			elif kind == "sweep":
+				up_dir=Vector3(s*.18,-.85,.45)
+				fore_dir=Vector3(sin(elapsed*2)*.40,-.35,.85)
+			elif kind == "repair":
+				up_dir=Vector3(s*.25,-.85,.50)
+				fore_dir=Vector3(-s*.15,-.25+sin(elapsed*6)*.04,1.0)
 			elif kind == "ride":
 				# Lái xe máy: vai xuống chéo ra trước tới tay lái.
 				up_dir = Vector3(s * 0.18, -0.6, 0.78)

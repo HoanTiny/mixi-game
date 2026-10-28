@@ -38,6 +38,7 @@ func run() -> void:
 	if not is_instance_valid(bench): quit(1); return
 	for i in 12: await process_frame
 	check("90 phút" in bench.details.text,"bench shows actual duration")
+	bench.cover_button.pressed.emit()
 	await drag(bench,bench.old_part.position+Vector3(0,0.12,0),bench.BIN)
 	await drag(bench,bench.new_part.position+Vector3(0,0.12,0),bench.SOCKET)
 	for point in bench.SCREWS:

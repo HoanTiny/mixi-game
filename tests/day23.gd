@@ -38,6 +38,7 @@ func measured(g) -> void:
 	act(g,"arc_diagnose_fuse")
 func bench(g) -> void:
 	var token := str(g.s.street.accepted_day)+":1"
+	g.Street.bench_action(g,"open",0,token)
 	for step in [["remove",0],["install",1],["screw",0],["screw",1]]:
 		check(g.Street.bench_action(g,step[0],step[1],token)=="","saved 3D bench "+str(step))
 	check(g.s.street.job.stage=="test","bench completed")

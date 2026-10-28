@@ -198,5 +198,6 @@ static func build(world, parent: Node3D, id: String, width: float, depth: float,
 			for i in 5:
 				laundry(parent, Vector3(-2.3 + i * 1.05, 2.58, -depth + 0.9), i)
 	kit["owns_dressing"] = true
+	preload("res://scripts/architecture/lived_in_interiors.gd").build(kit.ground,id,width,depth)
 	kit["identity"] = kinds[id]
 	return kit

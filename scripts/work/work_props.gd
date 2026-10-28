@@ -142,69 +142,12 @@ static func pipes() -> Node3D:
 
 ## Quạt bàn: đế tròn, thân, lồng quạt xanh.
 static func fan() -> Node3D:
-	var n := Node3D.new()
-	var body := plain(Color("82938b"), 0.78)
-	cyl(n, 0.16, 0.05, body, Vector3(0, 0.025, 0))
-	cyl(n, 0.025, 0.35, body, Vector3(0, 0.22, 0))
-	cyl(n, 0.07, 0.12, body, Vector3(0, 0.42, -0.04), Vector3.BACK)
-	var wire := plain(Color("4f5751"),0.6,0.5)
-	for r in [0.08,0.14,0.20]:
-		var ring := MeshInstance3D.new()
-		var torus := TorusMesh.new()
-		torus.inner_radius=r-0.003
-		torus.outer_radius=r+0.003
-		torus.rings=32
-		torus.ring_segments=6
-		ring.mesh=torus
-		ring.material_override=wire
-		ring.rotation.x=PI/2.0
-		ring.position=Vector3(0,0.42,0.105)
-		n.add_child(ring)
-	for i in 8:
-		var spoke := box(n,Vector3(0.004,0.4,0.004),wire,Vector3.ZERO)
-		spoke.position=Vector3(0,0.42,0.106)
-		spoke.rotation.z=i*PI/8.0
-	var rotor := Node3D.new()
-	rotor.name="Rotor"
-	rotor.position=Vector3(0,0.42,0.07)
-	n.add_child(rotor)
-	for i in 3:
-		var blade := MeshInstance3D.new()
-		var shape := SphereMesh.new()
-		shape.radius=0.5
-		shape.height=1.0
-		blade.mesh=shape
-		blade.scale=Vector3(0.075,0.16,0.012)
-		blade.position=Vector3(sin(i*TAU/3.0),cos(i*TAU/3.0),0)*0.095
-		blade.rotation.z=-i*TAU/3.0+0.3
-		blade.material_override=plain(Color("b4b39b"),0.75)
-		rotor.add_child(blade)
-	cyl(n,0.035,0.025,body,Vector3(0,0.42,0.13),Vector3.BACK)
-	return n
+	return preload("res://scripts/work/repair_models.gd").fan()
 
 
 static func kettle() -> Node3D:
-	var n := Node3D.new()
-	var steel := plain(Color("969b96"),0.43,0.65)
-	var black := plain(Color("292e2b"),0.8)
-	cyl(n,0.12,0.25,steel,Vector3(0,0.14,0))
-	cyl(n,0.13,0.035,black,Vector3(0,0.02,0))
-	cyl(n,0.11,0.025,black,Vector3(0,0.275,0))
-	var handle := MeshInstance3D.new()
-	var torus := TorusMesh.new()
-	torus.inner_radius=0.09
-	torus.outer_radius=0.115
-	torus.rings=24
-	torus.ring_segments=8
-	handle.mesh=torus
-	handle.material_override=black
-	handle.rotation.x=PI/2
-	handle.position=Vector3(0.13,0.15,0)
-	n.add_child(handle)
-	var spout := box(n,Vector3(0.08,0.07,0.09),steel,Vector3(-0.12,0.21,0))
-	spout.rotation.z=-0.4
-	box(n,Vector3(0.025,0.02,0.04),plain(Color("a85e3f")),Vector3(0.1,0.27,0))
-	return n
+	return preload("res://scripts/work/repair_models.gd").kettle()
+
 
 static func rice_cooker() -> Node3D:
 	var n := Node3D.new()

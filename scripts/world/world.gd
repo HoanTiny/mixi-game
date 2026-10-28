@@ -302,6 +302,10 @@ func _ready() -> void:
 	audio.world = self
 	audio.game = game
 	add_child(audio)
+	if real and city.street_upgrade:
+		var neighborhood_audio := preload("res://scripts/world/neighborhood_audio.gd").new()
+		add_child(neighborhood_audio)
+		neighborhood_audio.setup(self)
 	hud.dialogs.visibility_changed.connect(func() -> void:
 		if hud.dialogs.visible:
 			audio.play("dialog"))

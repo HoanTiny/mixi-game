@@ -41,6 +41,7 @@ func street(g, action: String, loc := "tiem_sau") -> void:
 
 func bench(g) -> void:
 	var token := str(g.s.street.accepted_day)+":"+str(int(g.s.street.job.kind))
+	g.Street.bench_action(g,"open",0,token)
 	check(g.Street.bench_action(g,"install",0,token)!="","cannot install before removal")
 	check(g.Street.bench_action(g,"remove",0,token)=="","remove component")
 	check(g.Street.bench_action(g,"install",1,token)!="","wrong part rejected")

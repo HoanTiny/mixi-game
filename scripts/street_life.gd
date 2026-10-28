@@ -233,6 +233,13 @@ static func bench_action(g, step: String, component: int, token: String) -> Stri
 			reason = offer.reason
 	if not allowed: return reason
 	var progress: Dictionary = job.get("bench",{"removed":false,"installed":false,"screws":0})
+	# Existing saves with a partly assembled repair already have an open case.
+	if step=="open":
+		job.cover_open=true
+		g._commit()
+		return "Đã rút điện và mở nắp khoang điện."
+	if not bool(job.get("cover_open",job.has("bench"))):
+		return "Rút điện và mở nắp khoang điện trước."
 	match step:
 		"remove":
 			if progress.removed: return "Đã tháo linh kiện hỏng"

@@ -87,6 +87,7 @@ func run() -> void:
 	check(is_instance_valid(bench),"bench opens")
 	if not is_instance_valid(bench): quit(1); return
 	await snapshot("05_repair_fan")
+	bench.cover_button.pressed.emit()
 	await drag(bench,bench.old_part.position+Vector3(0,0.12,0),bench.BIN)
 	check(bench.progress().removed and bench.socket_ring.visible,"remove reveals socket")
 	await drag(bench,bench.new_part.position+Vector3(0,0.12,0),bench.SOCKET)

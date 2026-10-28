@@ -46,6 +46,7 @@ func _initialize() -> void:
 			act(g,"own_part")
 		else: act(g,"shop_part")
 		var token := str(g.s.street.accepted_day)+":0"
+		g.Street.bench_action(g,"open",0,token)
 		check(g.Street.bench_action(g,"remove",0,token)=="","remove actual part")
 		g=reload_game(g)
 		check(g.Street.bench_action(g,"install",1,token)!="","wrong component rejected")
