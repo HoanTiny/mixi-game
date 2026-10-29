@@ -130,6 +130,7 @@ func refresh() -> void:
 		_selected=""
 		var empty:=UI.label("Balo chưa có đồ dùng.\nGhé tạp hóa ở Phúc Tân để mua đồ mang theo.",16,UI.HUD_SOFT)
 		empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		empty.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		_grid.add_child(empty)
 	else:
 		if not rows.any(func(r): return str(r.id)==_selected): _selected=str(rows[0].id)
