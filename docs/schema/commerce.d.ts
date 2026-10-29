@@ -125,7 +125,7 @@ export interface LiveConfig {
   seconds: number;
   beats: number;
   baseViewers: number;
-  /** Người xem tăng theo uy tín shop: viewers × (0.5 + uyTin/100). */
+  /** Người xem tăng theo uy tín shop: viewers × (0.4 + 1.2 × uyTin/100), uy tín 50 là ×1, 90 là ×1,48. */
   scripts: Record<string, LiveScript>;
   /** Phần người xem có ý mua mỗi nhịp, trước hệ số. */
   intent: number;

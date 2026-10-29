@@ -1,8 +1,8 @@
 # Trên Phố · Trước mùa mưa
 
-**Bản web 1.10 · quan hệ NPC và buôn bán**
+**Bản web 1.10.1 · quan hệ NPC và buôn bán**
 
-[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.10). Chi tiết thiết kế ở
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.10.1). 1.10.1 cân lại tiền buôn bán cho sát chương đầu: bán rong ngang việc làm thường, live gấp khoảng 1,5–2,4 lần, hàng đắt khó bán rong. Chi tiết thiết kế ở
 [docs/RELATIONSHIPS_COMMERCE.md](docs/RELATIONSHIPS_COMMERCE.md), kiểu dữ liệu TypeScript ở `docs/schema/`.
 
 - **Quan hệ NPC** (`data/systems/relationships.json`):

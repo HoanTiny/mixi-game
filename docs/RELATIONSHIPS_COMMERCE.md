@@ -106,7 +106,7 @@ Quy trình theo tài liệu thiết kế: xem giá, nhập sỉ, chở về, ch�
     - Kể chuyện phố cổ;
     - Xả kho giá sốc: chốt ×1,5 nhưng hoàn ×1,8 và dễ bị khóa kênh;
     - Review thật thà: hoàn ×0,45.
-  - Thuê người chốt đơn (thêm 6 đơn mỗi nhịp) và người đóng gói (thêm 25 đơn); trả công sau buổi.
+  - Thuê người chốt đơn (30.000đ, thêm 4 đơn mỗi nhịp; An tự chốt 1 đơn) và người đóng gói (35.000đ, thêm 25 đơn; An tự đóng 12 đơn); trả công sau buổi.
 - **Trong buổi live (12 nhịp, 60 giây):**
   - Người xem tăng dần, đông nhất ở một nhịp ngẫu nhiên giữa buổi, nhân theo uy tín shop.
   - Tung voucher: dùng một lần, giảm 10%, chốt ×1,5, gấp đôi nếu bấm lúc đông người xem nhất.
@@ -118,17 +118,39 @@ Quy trình theo tài liệu thiết kế: xem giá, nhập sỉ, chở về, ch�
   - Sau 2 ngày, mỗi món trong đơn hoặc được nhận (tiền về sau phí sàn 8%, uy tín +0,15) hoặc bị hoàn: mất ship hai chiều, hàng về kho, uy tín −0,8.
   - Xác suất hoàn = gốc 12% × kịch bản, cộng 18% nếu giao trễ, trừ phần uy tín bảo vệ.
 
+### Cân bằng với chương đầu (bản 1.10.1)
+
+Mốc so sánh: việc làm thường ở chương đầu trả 37–65 nghìn đồng một giờ, trung vị khoảng 42 nghìn, tức khoảng 85 nghìn cho 2 giờ.
+
+- **Bán rong:** ngang việc làm thường nhưng phải bỏ vốn, chọn đúng món, đúng chỗ, đúng giờ, và chịu rủi ro. Trúng thời tiết hay cuối tuần thì lãi gấp đôi.
+- **Hàng đắt** (`appeal` thấp: quạt mini 0,2, áo phông 0,12): ít người mua ngẫu hứng ngoài đường, hợp bán live hơn.
+- **Livestream:** khoảng 1,5–2,4 lần việc thường, chưa trừ tiền kho 30 nghìn mỗi ngày. Lãi tăng dần theo uy tín shop: người xem nhân (0,4 + 1,2 × uy tín/100).
+- **Người phụ:** chỉ đáng thuê khi người xem đông. An tự chốt được 1 đơn mỗi nhịp, mỗi người chốt đơn thêm 4 đơn.
+
+Lãi ròng trung bình của một buổi 2 giờ, tính cả giá vốn, tiền phạt, hàng hoàn và hàng còn lại (hoa còn lại tính 30% vì sắp héo):
+
+| Buổi | Lãi ròng |
+|---|---|
+| Hoa hồng ở bờ hồ, 19 giờ, ngày thường / cuối tuần | 55.000đ / 109.000đ |
+| Áo mưa ở điểm xe buýt lúc tan tầm, trời mưa / trời khô | 177.000đ / 23.000đ |
+| Đồ chơi ở bờ hồ, cuối tuần / ngày thường | 114.000đ / 14.000đ |
+| Quạt mini ở điểm xe buýt; áo phông ở Tạ Hiện | 30.000đ; 16.000đ |
+| Live kể chuyện, tự làm, uy tín 50 | 126.000đ (7 đơn) |
+| Live kể chuyện, thêm 1 người chốt đơn | 146.000đ (12 đơn) |
+| Live, thuê 2 người chốt và 1 người đóng gói lúc uy tín 50 (thuê thừa) | 71.000đ |
+| Live kể chuyện, uy tín 90, đủ người phụ | 200.000đ (18 đơn) |
+| Live xả kho / review thật thà, uy tín 50 | 105.000đ / 113.000đ |
+
 ### Số đo từ `tests/relationships_commerce.gd`
 
 | Phép thử | Kết quả |
 |---|---|
-| Một tối bán 50 bông hồng ở bờ hồ | bán khoảng 28 bông, lãi khoảng 170.000đ |
-| 40 tối bán ở bờ hồ | bị trật tự đô thị bắt 7 lần, thu trung bình 242.000đ một tối |
+| 40 tối bán hoa ở bờ hồ | bị trật tự đô thị bắt 7 lần |
 | Áo mưa ở điểm xe buýt lúc tan tầm | ngày khô bán 5 chiếc, ngày mưa bán 29 chiếc |
-| Voucher | bấm lúc đông người xem: 15 đơn; bấm lúc mở sóng: 10 đơn |
-| Tỷ lệ hoàn theo kịch bản | xả kho 28%, review 2% |
-| Tỷ lệ hoàn theo giao hàng | giao trễ 17%, đúng hẹn 7% |
-| Kho không quạt hút ẩm, 5 ngày mưa | còn 6/10 áo |
+| Voucher | bấm lúc đông người xem: 9 đơn; bấm lúc mở sóng: 6 đơn |
+| Tỷ lệ hoàn theo kịch bản | xả kho 17%, review 2% |
+| Tỷ lệ hoàn theo giao hàng | giao trễ 20%, đúng hẹn 7% |
+| Kho không quạt hút ẩm, 5 ngày mưa | còn 7/10 áo |
 
 ## Mở rộng
 
