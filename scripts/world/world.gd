@@ -1837,7 +1837,10 @@ func interact() -> void:
 			game.s["zone"] = zone
 			game._commit()
 	if near != "":
+		if hud.reveal_prompt(): return
 		hud.open_location(near)
+	elif zones_enabled():
+		hud.reveal_prompt()
 
 
 ## Chụm, mở hai ngón trên màn cảm ứng để kéo máy quay gần, xa (như con lăn chuột). Trả true khi đã dùng sự kiện.

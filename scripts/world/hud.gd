@@ -52,6 +52,11 @@ var _fatigue_label: Label
 var _fatigue_bar: ProgressBar
 var _prompt: PanelContainer
 var _prompt_label: Label
+var _prompt_details: VBoxContainer
+var _prompt_close: Button
+var _prompt_expanded := false
+var _prompt_origin := Vector3.ZERO
+var _prompt_caption := ""
 var _location: PanelContainer
 var _loc_title: Label
 var _loc_desc: Label
@@ -288,6 +293,7 @@ func _toggle_audio() -> void:
 func open_location(id: String) -> void:
 	if not game.is_started() or blocking():
 		return
+	_prompt_expanded = false
 	if _loc_id != id:
 		_loc_scroll.scroll_vertical = 0
 	_loc_id = id
@@ -363,6 +369,7 @@ func set_prompt(id: String) -> void:
 		return
 	_seen_zone = zone
 	_prompt_id = id
+	_prompt_expanded = false
 	if id.begins_with("bin:"):
 		var lock: String = game.scrap_lock(id.substr(4))
 		_prompt_label.text = _key("E") + "Lục thùng rác tìm đồ đồng nát" if lock == "" else "Thùng rác · " + lock
@@ -377,6 +384,7 @@ func set_prompt(id: String) -> void:
 	if world.zones_enabled() and game.is_started():
 		_refresh_zone_header()
 		if id == "": _prompt_label.text = "Bạn đang ở " + str(MapManager.definitions(game)[zone].name)
+	_prompt_caption = _prompt_label.text
 	_fill_quick(id)
 	_update_prompt()
 
@@ -413,6 +421,10 @@ func _input(event: InputEvent) -> void:
 		return
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and _prompt_expanded and _prompt.visible:
+		_collapse_prompt()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_B,KEY_I]:
 		open_inventory()
 		get_viewport().set_input_as_handled()
@@ -435,7 +447,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_1, KEY_2, KEY_3] \
-			and _prompt.visible and _quick.visible and not blocking():
+			and _prompt.visible and _quick.is_visible_in_tree() and not blocking():
 		var i: int = int(event.keycode - KEY_1)
 		if i < _quick_ids.size():
 			_quick_run(str(_quick_ids[i]))
@@ -567,19 +579,28 @@ func _build_prompt(parent: Control) -> void:
 	var pv := VBoxContainer.new()
 	pv.add_theme_constant_override("separation", 2)
 	_prompt.add_child(pv)
+	var header := HBoxContainer.new()
+	pv.add_child(header)
 	_prompt_label = UI.label("", 16, UI.HUD_TEXT)
 	_prompt_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	pv.add_child(_prompt_label)
+	_prompt_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(_prompt_label)
+	_prompt_close = _zone_btn("Thu gọn · Esc", _collapse_prompt)
+	header.add_child(_prompt_close)
+	_prompt_close.hide()
+	_prompt_details = VBoxContainer.new()
+	pv.add_child(_prompt_details)
+	_prompt_details.hide()
 	_zone_button = _zone_btn("Chuyển khu vực", _open_zones)
-	pv.add_child(_zone_button)
+	_prompt_details.add_child(_zone_button)
 	_zone_people = HFlowContainer.new()
 	_zone_people.add_theme_constant_override("h_separation", 6)
 	_zone_people.add_theme_constant_override("v_separation", 4)
-	pv.add_child(_zone_people)
+	_prompt_details.add_child(_zone_people)
 	_quick = VBoxContainer.new()
 	_quick.add_theme_constant_override("separation", 0)
 	_quick.visible = false
-	pv.add_child(_quick)
+	_prompt_details.add_child(_quick)
 	_prompt.visible = false
 
 
@@ -1067,6 +1088,8 @@ func _build_order_strip(parent: Control) -> void:
 func _process(delta: float) -> void:
 	if not game.is_started() or game.is_over():
 		return
+	if _prompt_expanded and world.player.position.distance_to(_prompt_origin) > 0.8:
+		_collapse_prompt()
 	var active: Dictionary = game.delivery_active()
 	# Đơn mới tới khi app đang bật, rảnh tay và không có hộp thoại.
 	if _app_on and active.is_empty() and _offer.is_empty() and not blocking():
@@ -2068,7 +2091,8 @@ func _fill_quick(id: String) -> void:
 		_quick.visible = false
 		return
 	# Người đứng ở xe hàng rong (Hân bán hoa): nói chuyện là mục đầu tiên.
-	var talkers: Array = Relationships.npcs_at(game, id)
+	# Empty anchors are not NPCs standing beside An in the street.
+	var talkers: Array = [] if id in ["", "-"] else Relationships.npcs_at(game, id).slice(0, 3)
 	for who in talkers:
 		var npc := str(who.id)
 		var lock: String = game.talk_lock(npc)
@@ -2291,6 +2315,35 @@ func _refresh() -> void:
 
 func _update_prompt() -> void:
 	_prompt.visible = game.is_started() and (world.zones_enabled() or (_prompt_id != "" and _prompt_id != "-")) and _loc_id == "" and not blocking()
+	if not _prompt.visible: _prompt_expanded = false
+	_prompt_details.visible = _prompt_expanded
+	_prompt_close.visible = _prompt_expanded
+	_prompt_label.text = _prompt_caption
+	if not _prompt_expanded and world.zones_enabled() and game.is_started() and _prompt_id in ["", "-"]:
+		_prompt_label.text = _key("E") + str(MapManager.definitions(game)[MapManager.current(game)].name) + " · tùy chọn"
+	elif not _prompt_expanded and _prompt_id != "" and _prompt_id != "-" and not _prompt_id.begins_with("bin:") and not _prompt_id.begins_with("vendor:"):
+		_prompt_label.text = _key("E") + str(world.location_info(_prompt_id).name) + " · xem lựa chọn"
+	_prompt.reset_size.call_deferred()
+
+
+func _collapse_prompt() -> void:
+	_prompt_expanded = false
+	_update_prompt()
+
+
+## First E reveals choices; E again at a venue retains the normal entrance action.
+func reveal_prompt() -> bool:
+	if not game.is_started() or blocking() or _loc_id != "": return false
+	if not world.zones_enabled() and _prompt_id in ["", "-"]: return false
+	if _prompt_expanded:
+		if _prompt_id in ["", "-"]:
+			_collapse_prompt()
+			return true
+		return false
+	_prompt_expanded = true
+	_prompt_origin = world.player.position
+	_update_prompt()
+	return true
 
 
 func _refresh_objectives(s: Dictionary) -> void:
@@ -2997,6 +3050,7 @@ func _refresh_zone_header() -> void:
 	_zone_people.visible = world.zones_enabled()
 	if not world.zones_enabled() or not game.is_started(): return
 	var zone := MapManager.current(game)
+	if zone != _seen_zone: _prompt_expanded = false
 	_seen_zone = zone
 	_zone_button.text = "Chuyển khu vực · " + str(MapManager.definitions(game)[zone].name)
 	for child in _zone_people.get_children():

@@ -53,6 +53,14 @@ var _walkers: Array = []
 var _idlers: Array = []
 ## Đồ đang cầm trên tay: danh sách khóa (loại hàng, món ăn, "dirty", "may:<i>", "part:<k>").
 var _carry: Array = []
+var max_held_items := 2
+var _repair_pressed := false
+var _repair_phase := ""
+var _repair_part := ""
+var _repair_bar: ProgressBar
+var _repair_label: Label
+var _repair_float: Label3D
+var _repair_tween: Tween
 
 # Giao diện
 var _hud: PanelContainer
@@ -574,6 +582,11 @@ func _build_tiem() -> void:
 		for j in 3:
 			WP.box(_world, Vector3(0.22, 0.14, 0.22), WP.plain(_type_color(k), 0.5), Vector3(-6.0, 0.95, z - 0.3 + j * 0.3))
 		_spot("shelf", -5.2, z, 1.1, _type_name(k)).merge({"key": k})
+	# Khay trả linh kiện; đồ trả không sinh collider trên sàn.
+	WP.box(_world, Vector3(1.1, 0.7, 0.65), WP.plain(Color("455954")), Vector3(-4.9, 0, 3.0))
+	WP.box(_world, Vector3(0.94, 0.04, 0.5), WP.plain(Color("202c29")), Vector3(-4.9, 0.72, 3.0))
+	_blocks.append(Rect2(-5.45, 2.675, 1.1, 0.65))
+	_spot("return_tray", -4.9, 3.0, 1.4, "Khay hoàn trả\nE · trả linh kiện trên tay")
 	# Tủ đồ nghề, xe dụng cụ, máy chờ sửa xếp góc.
 	_prop(WP.model("metal_tool_chest", 1.2), 5.6, -4.9, 0.0, 0.9, 0.6)
 	_prop(WP.model("industrial_storage_cart", 0.8), 3.9, -4.9, 0.0, 1.4, 0.9)
@@ -612,15 +625,6 @@ func _repair_tick(delta: float) -> void:
 				_miss += 1
 				_note("Khách chờ lâu quá, mang máy về.")
 				_counter_leave(s)
-	# Đứng ở bàn sửa có máy và đúng linh kiện thì sửa dần.
-	var b := _bench()
-	if not (b.machine as Dictionary).is_empty() and bool(b.machine.get("part_ok", false)) and not bool(b.machine.get("fixed", false)):
-		if _dist(b) <= float(b.reach):
-			b["progress"] = float(b.progress) + delta
-			if float(b.progress) >= float(cfg.repairSec):
-				b.machine["fixed"] = true
-				_note("Sửa xong %s, đem trả khách." % str(b.machine.name).to_lower(), true)
-		_bench_label(b)
 
 
 func _customer(s: Dictionary) -> void:
@@ -629,6 +633,7 @@ func _customer(s: Dictionary) -> void:
 	m["slot"] = _counters().find(s)
 	m["fixed"] = false
 	m["part_ok"] = false
+	m["diagnosed"] = false
 	var c = _person(Character.random_look(_rng), (s.pos as Vector2).x, 4.7, PI)
 	s["cust"] = c
 	s["machine"] = m
@@ -661,6 +666,7 @@ func _counter_leave(s: Dictionary) -> void:
 	if not (b.machine as Dictionary).is_empty() and int(b.machine.slot) == idx:
 		_clear_bench(b)
 	s["machine"] = {}
+	_refresh_carry()
 	_counter_label(s)
 	if c != null:
 		_walkers.append({"node": c, "to": Vector3(c.position.x + 6.0, 0, 6.5)})
@@ -673,13 +679,14 @@ func _bench_label(b: Dictionary) -> void:
 		l.text = "Bàn sửa"
 	elif bool(m.get("fixed", false)):
 		l.text = "%s · sửa xong\nđem trả khách" % str(m.name)
-	elif bool(m.get("part_ok", false)):
-		l.text = "%s · đang sửa %d%%\n(đứng tại bàn)" % [str(m.name), int(100.0 * float(b.progress) / float(cfg.repairSec))]
+	elif not bool(m.get("diagnosed", false)):
+		l.text = "%s · chưa kiểm tra\nGiữ E · kiểm tra 2 giây" % str(m.name)
 	else:
-		l.text = "%s · %s\ncần: %s" % [str(m.name), str(m.fault), _type_name(str(m.part))]
+		l.text = "%s · %s\nCần: %s · giữ E lắp 3 giây" % [str(m.name), str(m.fault), _type_name(str(m.part))]
 
 
 func _clear_bench(b: Dictionary) -> void:
+	_cancel_repair_hold()
 	if b.get("node") != null:
 		(b.node as Node3D).queue_free()
 	b["node"] = null
@@ -745,24 +752,139 @@ func _repair_act(s: Dictionary) -> void:
 				b["node"] = null
 				b["machine"] = {}
 				_bench_label(b)
-			elif not bool(m.get("part_ok", false)):
+			elif not bool(m.get("diagnosed", false)):
+				_begin_repair_hold("diagnose")
+			else:
 				var parts := _carry.filter(func(k) -> bool: return str(k).begins_with("part:"))
 				if parts.is_empty():
 					_note("Cần %s, lấy ở kệ bên trái." % _type_name(str(m.part)).to_lower())
 					return
 				var want := "part:" + str(m.part)
-				if not _carry.has(want):
-					_note("Không phải hỏng chỗ này. Máy cần %s." % _type_name(str(m.part)).to_lower())
+				# Món lấy gần nhất là món định lắp. Q bỏ món sai trước khi thử lại.
+				if str(parts.back()) != want:
+					_cancel_repair_hold()
+					_time_left = maxf(0.0, _time_left - 5.0)
+					_repair_feedback("Sai linh kiện! −5 giây. Bấm Q bỏ món sai.")
+					_update_hud()
+					if _time_left <= 0.0: _show_end()
 					return
-				_carry.erase(want)
-				m["part_ok"] = true
-				_bench_label(b)
+				_begin_repair_hold("assemble", want)
 		"shelf":
-			if _carry.size() >= 2:
-				_note("Tay đầy rồi.")
+			if _carry.size() >= max_held_items or _carry.any(func(k): return str(k).begins_with("may:")):
+				_repair_feedback("Đầy tay rồi, không cầm thêm được!")
 				return
 			_carry.append("part:" + str(s.key))
 			_cool = 0.25
+		"return_tray":
+			if _carry.is_empty():
+				_note("Khay hoàn trả · tay đang trống.")
+			else:
+				while not _carry.is_empty(): _drop_repair_item()
+
+
+func _drop_repair_item() -> void:
+	if _mode != "repair" or _state != "play" or _carry.is_empty(): return
+	_cancel_repair_hold()
+	var key: String = str(_carry.back())
+	var item_name := _carry_name(key)
+	_carry.pop_back()
+	# Máy thuộc khách được đặt lại quầy, không bị xóa mất hay làm kẹt đơn.
+	if key.begins_with("may:"):
+		var counter: Dictionary = _counters()[int(key.substr(4))]
+		counter["node"] = _place_item(str(counter.machine.name), Vector3(counter.pos.x, 1.0, 3.6), PI)
+		_counter_label(counter)
+		_repair_feedback("Đã đặt lại %s ở quầy." % item_name, true)
+	else:
+		_repair_feedback("Đã bỏ %s · trả vào khay." % item_name, true)
+	_refresh_carry()
+	if _body.has_method("place"): _body.place()
+
+
+func _repair_feedback(text: String, good := false) -> void:
+	_note(text, good)
+	if _repair_tween != null: _repair_tween.kill()
+	if is_instance_valid(_repair_float):
+		_repair_float.hide()
+		_repair_float.queue_free()
+	var label := _label(text, _player.position.x, _player.position.z, 2.2)
+	_repair_float = label
+	label.modulate = Color("8fe0a0") if good else Color("ffb38a")
+	var tween := create_tween().set_parallel(true)
+	_repair_tween = tween
+	tween.tween_property(label, "position:y", 3.1, 1.5)
+	tween.tween_property(label, "modulate:a", 0.0, 1.5)
+	tween.chain().tween_callback(label.queue_free)
+
+
+func _begin_repair_hold(phase: String, part := "") -> void:
+	if not _repair_pressed:
+		_note("Giữ E hoặc giữ nút thao tác để %s." % ("kiểm tra máy" if phase == "diagnose" else "lắp linh kiện"))
+		return
+	if _repair_phase != "": return
+	_target = null
+	_pending = null
+	_repair_phase = phase
+	_repair_part = part
+	_note_l.text = ""
+	_note_t = 0.0
+	if is_instance_valid(_repair_float): _repair_float.hide()
+	var toward: Vector2 = _bench().pos - Vector2(_player.position.x, _player.position.z)
+	_player.rotation.y = atan2(toward.x, toward.y)
+	if _body.has_method("work"): _body.work("inspect" if phase == "diagnose" else "screw")
+	_bench()["progress"] = 0.0
+	_repair_label.text = "Đang kiểm tra..." if phase == "diagnose" else "Đang lắp linh kiện..."
+	_repair_label.show()
+	_repair_bar.max_value = 2.0 if phase == "diagnose" else 3.0
+	_repair_bar.value = 0.0
+	_repair_bar.show()
+
+
+func _cancel_repair_hold() -> void:
+	if _mode != "repair": return
+	_repair_phase = ""
+	_repair_part = ""
+	if is_instance_valid(_body) and _body.has_method("work"): _body.work("")
+	var b := _bench()
+	if not b.is_empty(): b["progress"] = 0.0
+	if is_instance_valid(_repair_bar): _repair_bar.hide()
+	if is_instance_valid(_repair_label): _repair_label.hide()
+
+
+func _advance_repair_hold(delta: float) -> void:
+	if _repair_phase == "": return
+	var b := _bench()
+	if _state != "play" or _time_left <= 0.0 or not _repair_pressed or _dist(b) > float(b.reach) or b.machine.is_empty():
+		_cancel_repair_hold()
+		return
+	if _repair_phase == "assemble" and not _carry.has(_repair_part):
+		_cancel_repair_hold()
+		return
+	b["progress"] = float(b.progress) + delta
+	_repair_bar.value = b.progress
+	if float(b.progress) < _repair_bar.max_value: return
+	if _repair_phase == "diagnose":
+		b.machine["diagnosed"] = true
+		_repair_feedback("Đã kiểm tra · cần %s." % _type_name(str(b.machine.part)), true)
+	else:
+		# Chỉ tiêu hao một linh kiện sau khi giữ đủ thời gian.
+		var index := _carry.rfind(_repair_part)
+		_carry.remove_at(index)
+		b.machine["part_ok"] = true
+		b.machine["fixed"] = true
+		_refresh_carry()
+		_repair_feedback("Lắp xong · đem máy trả khách.", true)
+	_cancel_repair_hold()
+	_bench_label(b)
+
+
+func _set_repair_pressed(pressed: bool) -> void:
+	_repair_pressed = pressed
+	if not pressed: _cancel_repair_hold()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_set_repair_pressed(false)
 
 
 # ---------------------------------------------------------------- An: đi lại, cầm đồ
@@ -871,6 +993,9 @@ func _refresh_carry() -> void:
 		for k in _carry:
 			names.append(_carry_name(str(k)))
 		_carry_l.text = "Đang cầm: " + (", ".join(names) if not names.is_empty() else "tay không")
+		if _mode == "repair":
+			var hands := max_held_items if _carry.any(func(k): return str(k).begins_with("may:")) else _carry.size()
+			_carry_l.text += " · %d/%d tay · Q bỏ món cuối" % [hands, max_held_items]
 
 
 func _carry_name(k: String) -> String:
@@ -912,6 +1037,7 @@ func _process(delta: float) -> void:
 			dir.y += 1
 		var step := Vector2.ZERO
 		if dir != Vector2.ZERO:
+			_cancel_repair_hold()
 			_target = null
 			_pending = null
 			step = _move(dir.normalized() * SPEED * delta)
@@ -933,9 +1059,11 @@ func _process(delta: float) -> void:
 					_pending = null
 					_target = null
 		if step != Vector2.ZERO:
+			_cancel_repair_hold()
 			_player.position += Vector3(step.x, 0, step.y)
 			_player.rotation.y = lerp_angle(_player.rotation.y, atan2(step.x, step.y), 0.3)
 			moving = 1.0
+		if _mode == "repair": _advance_repair_hold(delta)
 		_update_hud()
 		if _time_left <= 0.0:
 			_show_end()
@@ -965,6 +1093,13 @@ func _update_walkers(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if _state != "play":
 		return
+	if _mode == "repair" and event is InputEventKey:
+		if event.keycode == KEY_E and not event.echo:
+			_set_repair_pressed(event.pressed)
+		if event.pressed and not event.echo and event.keycode == KEY_Q:
+			_drop_repair_item()
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]:
 		_act(_nearest_spot())
 		get_viewport().set_input_as_handled()
@@ -981,6 +1116,7 @@ func _gui_input(event: InputEvent) -> void:
 	else:
 		return
 	accept_event()
+	_cancel_repair_hold()
 	# Tọa độ màn hình đổi sang tọa độ khung nhìn 3D (khung nhìn co giãn theo cả màn).
 	var vp_pos := pos * Vector2(_vp.size) / size
 	var from := _cam.project_ray_origin(vp_pos)
@@ -1034,11 +1170,30 @@ func _build_ui() -> void:
 	_carry_l = UI.label("Đang cầm: tay không", 15, UI.HUD_TEXT)
 	_carry_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	v.add_child(_carry_l)
+	if _mode == "repair":
+		_repair_label = UI.label("", 15, UI.GOLD)
+		v.add_child(_repair_label)
+		_repair_label.hide()
+		_repair_bar = UI.bar(12)
+		v.add_child(_repair_bar)
+		_repair_bar.hide()
+		var controls := HBoxContainer.new()
+		v.add_child(controls)
+		var hold := Button.new()
+		hold.text = "Giữ E · kiểm tra / lắp"
+		hold.button_down.connect(func(): _set_repair_pressed(true); _act(_nearest_spot()))
+		hold.button_up.connect(func(): _set_repair_pressed(false))
+		controls.add_child(hold)
+		var drop := Button.new()
+		drop.text = "Q · Bỏ món cuối"
+		drop.pressed.connect(_drop_repair_item)
+		controls.add_child(drop)
 	_note_l = UI.label("", 15, Color("ffb38a"))
 	_note_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_note_l.custom_minimum_size = Vector2(400, 0)
 	v.add_child(_note_l)
 	_hint_l = UI.label("WASD hay bấm xuống sàn để đi · tới gần rồi bấm E (hay bấm thẳng vào chỗ đó) để lấy, đặt, sửa", 13, UI.HUD_TEXT)
+	if _mode == "repair": _hint_l.text = "WASD · E lấy / đặt · Giữ E: kiểm tra 2s, lắp 3s · Q bỏ món cuối · Khay: trả đồ"
 	_hint_l.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_hint_l.offset_top = -40
 	_hint_l.offset_bottom = -14
@@ -1091,7 +1246,7 @@ func _how_to() -> String:
 		"serve":
 			return "Khách ngồi bàn gọi món (nhãn trên đầu). Tới quầy lấy món (cầm tối đa %d), bưng ra đúng bàn. Khách ăn xong để lại bát dơ: dọn bát đem ra chậu rửa thì được thưởng, bàn dơ thì khách mới không ngồi. Khách chờ lâu quá sẽ bỏ đi. Đủ %d bàn trong %d giây thì đủ công." % [int(cfg.carry), int(cfg.target), int(cfg.seconds)]
 		"repair":
-			return "Khách mang máy tới quầy. Lấy máy đặt lên bàn sửa, nhãn trên bàn ghi máy hư gì và cần linh kiện nào. Lấy đúng linh kiện ở kệ bên trái, đem tới bàn, đứng tại bàn cho tới khi sửa xong, rồi đem máy trả đúng khách. Trả %d máy trong %d giây thì đủ công; trả nhanh được thưởng thêm." % [int(cfg.target), int(cfg.seconds)]
+			return "Lấy máy ở quầy đặt lên bàn, giữ E 2 giây để kiểm tra mới biết cần linh kiện gì. Cầm tối đa 2 linh kiện; món lấy cuối được lắp trước. Mang đúng món về bàn, giữ E 3 giây rồi đem máy trả khách. Thả E hoặc đi khỏi bàn sẽ phải thao tác lại. Sai linh kiện mất 5 giây: Q bỏ món cuối hoặc E ở khay để trả đồ. Máy cần hai tay trống. Trả %d máy trong %d giây thì đủ công." % [int(cfg.target), int(cfg.seconds)]
 	return "Tới đống hàng bên trái bưng (tối đa %d %s), đem sang chỗ xếp bên phải đúng loại nhãn ghi. Mỗi chỗ chỉ nhận một loại. Đủ %d chỗ trong %d giây thì đủ công; chỗ càng nhiều món thưởng càng cao." % [int(cfg.carry), str(cfg.get("unit", "món")), int(cfg.target), int(cfg.seconds)]
 
 
@@ -1130,6 +1285,7 @@ func _ratio() -> float:
 
 func _show_end() -> void:
 	_state = "end"
+	_set_repair_pressed(false)
 	_hud.visible = false
 	_hint_l.visible = false
 	_menu_wrap.visible = true
