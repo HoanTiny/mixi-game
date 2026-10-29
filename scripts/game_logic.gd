@@ -51,6 +51,8 @@ const Attributes := preload("res://scripts/systems/attributes.gd")
 const GameClock := preload("res://scripts/systems/game_clock.gd")
 ## Tay nghề, bằng cấp (data/systems/careers.json) và tầng luật của trò chơi nhỏ (data/systems/minigames.json).
 const Careers := preload("res://scripts/systems/careers.gd")
+const Relationships := preload("res://scripts/systems/relationships.gd")
+const Commerce := preload("res://scripts/systems/commerce.gd")
 const MiniGames := preload("res://scripts/minigames/minigames.gd")
 ## Kết quả trò chơi nhỏ vừa tính xong (MiniGames.on_action) để giao diện báo; không lưu vào bản lưu.
 var last_minigame: Dictionary = {}
@@ -108,12 +110,13 @@ func load_data(dir := "res://data") -> void:
 	_merge_pack(dir, "_pho.json")
 	if FileAccess.file_exists(dir + "/clothes.json"):
 		clothes = _read_json(dir + "/clothes.json")
-	for sys in ["survival", "attributes", "careers"]:
+	for sys in ["survival", "attributes", "careers", "relationships", "commerce"]:
 		if FileAccess.file_exists(dir + "/systems/" + sys + ".json"):
 			cfg[sys] = _read_json(dir + "/systems/" + sys + ".json")
 	if FileAccess.file_exists(dir + "/systems/minigames.json"):
 		cfg["minigame_catalog"] = _read_json(dir + "/systems/minigames.json")
 		MiniGames.register(self)
+	Commerce.register(self)
 
 
 func _merge_pack(dir: String, suffix: String) -> void:
@@ -459,12 +462,15 @@ func set_difficulty(diff: String) -> void:
 
 func add_fatigue(d: float) -> void:
 	if d > 0.0:
-		d *= float(_diff().get("fatigueRate", 1.0))
+		# Trạng thái tốt (Cặp đôi…) làm mệt chậm hơn: fatigue.rate trong mods của survival.json.
+		d *= float(_diff().get("fatigueRate", 1.0)) * maxf(0.0, 1.0 + mod("fatigue.rate"))
 	s["fatigue"] = clampf(float(s.fatigue) + d, 0.0, float(cfg.fatigue.max))
 
 
 func add_rep(k: String, d: float) -> void:
 	s.rep[k] = clampi(int(s.rep.get(k, 50)) + int(d), 0, 100)
+	if d > 0.0:
+		Relationships.touch(self, k)
 
 
 func _find(list: Array, id: String) -> Variant:
@@ -633,7 +639,8 @@ func apply_effects(eff: Dictionary) -> void:
 					if not s.has("scores"):
 						s["scores"] = {}
 					s.scores[key.substr(6)] = int(s.scores.get(key.substr(6), 0)) + int(v)
-				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)):
+				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)
+						or Relationships.effect(self, key, v) or Commerce.effect(self, key, v)):
 					push_warning("Hiệu ứng không rõ: " + str(key))
 
 
@@ -1058,6 +1065,10 @@ func check(req: Dictionary) -> String:
 				r = Attributes.check(self, key, v)
 			if r == null:
 				r = Careers.check(self, key, v)
+			if r == null:
+				r = Relationships.check(self, key, v)
+			if r == null:
+				r = Commerce.check(self, key, v)
 			if r == null:
 				push_warning("Điều kiện không rõ: " + str(key))
 			else:
@@ -2259,9 +2270,14 @@ func traits() -> Array:
 	if count("com_voi_ba") + count("dua_ba_di_cho") >= 3:
 		out.append({"name": "Thương nhà", "tone": "good", "desc": "Bận mấy cũng về ăn cơm với bà, đưa bà đi chợ."})
 	var rep_sum := 0
+	var rep_n := 0
 	for k in s.rep:
+		# Tuyến tình cảm (Hân) không tính vào chuyện được lòng xóm.
+		if Relationships.npc_def(self, k).get("romance", false):
+			continue
 		rep_sum += int(s.rep[k])
-	if s.rep.size() > 0 and rep_sum / s.rep.size() >= 60:
+		rep_n += 1
+	if rep_n > 0 and rep_sum / rep_n >= 60:
 		out.append({"name": "Được lòng xóm", "tone": "good", "desc": "Hàng xóm, người quen trung bình thân từ 60 trở lên."})
 	if float(s.fatigue) >= float(cfg.fatigue.warn) or int(s.get("warn_days", 0)) >= 3:
 		out.append({"name": "Cố quá sức", "tone": "bad", "desc": "Làm tới kiệt sức. Mệt cao thì đi chậm, dễ hỏng việc."})
@@ -2400,6 +2416,8 @@ func _commit() -> void:
 	migrate_save()
 	_tick_needs()
 	Survival.update(self)
+	Commerce.tick(self)
+	Relationships.tick(self)
 	_check_quests()
 	Day23.tick(self)
 	changed.emit()
@@ -2411,6 +2429,8 @@ func migrate_save() -> void:
 	Survival.migrate(self)
 	Attributes.migrate(self)
 	Careers.migrate(self)
+	Relationships.migrate(self)
+	Commerce.migrate(self)
 
 
 func neighborhood_target() -> Dictionary:
@@ -2588,6 +2608,9 @@ func _tick_needs() -> void:
 	var starving := need("fed") <= 0.0
 	for k in cfg.needs.perHour:
 		need_adj(k, float(cfg.needs.perHour[k]) * dt * float(_diff().get("needsRate", 1.0)) * Survival.rate(self, k))
+		# Hồi đều mỗi giờ từ trạng thái tốt (regen.mood của Cặp đôi).
+		if mod("regen." + k) != 0.0:
+			need_adj(k, mod("regen." + k) * dt)
 	if starving or need("fed") <= 0.0:
 		add_fatigue(float(cfg.needs.starveFatiguePerHour) * dt)
 

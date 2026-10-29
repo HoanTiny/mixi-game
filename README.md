@@ -1,5 +1,24 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.10 · quan hệ NPC và buôn bán**
+
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.10). Chi tiết thiết kế ở
+[docs/RELATIONSHIPS_COMMERCE.md](docs/RELATIONSHIPS_COMMERCE.md), kiểu dữ liệu TypeScript ở `docs/schema/`.
+
+- **Quan hệ NPC** (`data/systems/relationships.json`):
+  - Bậc quan hệ theo điểm 0–100.
+  - Mốc mở tin nhắn và cảnh truyện.
+  - Trạng thái **Cặp đôi**: Tâm trạng hồi +1,5 mỗi giờ, mệt chậm hơn 15%. Lâu không gặp thì quan hệ nguội đi.
+  - Tuyến tình cảm mới với **Hân bán hoa xe đạp**, có 4 cảnh truyện.
+  - Điện thoại có thêm app **Tin nhắn**, trả lời được.
+- **Buôn bán** (`data/systems/commerce.json`):
+  - Nhập sỉ ở chợ Long Biên theo giá thị trường đổi hằng ngày.
+  - Xe đẩy và kho thuê (hàng mốc nếu kho chưa có quạt hút ẩm).
+  - Bày bán hàng rong ở bờ hồ, Tạ Hiện, điểm xe buýt, cổng chợ; ở chỗ không được phép thì có rủi ro trật tự đô thị.
+  - App **Shippy**: giá sỉ, đơn chờ, uy tín, định giá.
+  - **Livestream** học từ chị Vy: chọn kịch bản, thuê người, tung voucher đúng lúc. Đơn có thể bị hoàn (boom hàng).
+- Kiểm thử: `tests/relationships_commerce.gd`.
+
 **Bản web 1.8 · nhân vật và minigame 3D**
 
 [Chơi thử bản mới](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.8).

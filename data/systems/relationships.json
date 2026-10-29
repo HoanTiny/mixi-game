@@ -1,0 +1,117 @@
+{
+  "_ghi_chu": "Quan hệ NPC (scripts/systems/relationships.gd, kiểu dữ liệu ở docs/schema/relationships.d.ts). Điểm thân thiết 0–100 vẫn là s.rep. tiers: bậc mặc định. npcs.X: bậc riêng (tiers), mốc (milestones: qua điểm at lần đầu thì mở tin nhắn, đẩy sự kiện truyện, chạy effects), trạng thái quan hệ (statuses: bật kèm một trạng thái của survival.json để có buff), tin nhắn trên điện thoại (messages: tới máy khi thỏa when hay được mốc mở, có lựa chọn trả lời), anchor: chỗ nói chuyện khi người này đứng ở xe hàng rong. decays: lâu không gặp thì điểm tụt (decay). Hân bán hoa xe đạp là tuyến tình cảm chính; chị Vy mở đường livestream Shippy.",
+  "tiers": [
+    {"min": 0, "name": "Có hiềm khích", "color": "e08c75"},
+    {"min": 25, "name": "Xa cách", "color": "b7b6a6"},
+    {"min": 45, "name": "Quen", "color": "e8e2d2"},
+    {"min": 70, "name": "Thân thiết", "color": "a3b995"},
+    {"min": 88, "name": "Tri kỷ", "color": "d3bd86"}
+  ],
+  "decay": {"graceDays": 3, "perDay": 2, "floor": 30},
+  "replyRep": 1,
+  "npcs": {
+    "HAN": {
+      "name": "Hân",
+      "start": 20,
+      "anchor": "vendor:hoa",
+      "romance": true,
+      "decays": true,
+      "tiers": [
+        {"min": 0, "name": "Người lạ", "color": "b7b6a6"},
+        {"min": 35, "name": "Quen mặt", "color": "e8e2d2"},
+        {"min": 55, "name": "Bạn", "color": "a3b995"},
+        {"min": 72, "name": "Hơn cả bạn", "color": "e8a0b0"},
+        {"min": 88, "name": "Người thương", "color": "e85d75"}
+      ],
+      "actions": ["han_bo_hoa", "han_ca_phe", "han_tang_qua"],
+      "milestones": [
+        {"id": "quen_mat", "at": 35, "unlockMessages": ["han_xin_so"],
+          "effects": {"log": "Hân cho An số điện thoại để báo hôm nào xe hoa đứng chỗ khác."}},
+        {"id": "chuot_kho", "at": 50, "event": "rel_han_chuot", "unlockMessages": ["han_cam_on_chuot"]},
+        {"id": "con_do", "at": 65, "event": "rel_han_con_do"},
+        {"id": "to_tinh", "at": 82, "event": "rel_han_to_tinh", "when": {"flag.phoHanQuaChuyen": true}}
+      ],
+      "statuses": {
+        "cap_doi": {
+          "name": "Cặp đôi",
+          "condition": "cap_doi",
+          "breakBelow": 60,
+          "breakEvent": "rel_han_nguoi",
+          "desc": "Có người để nhắn lúc khuya: Tâm trạng hồi dần mỗi giờ, mệt chậm hơn. Lâu không gặp hay làm Hân buồn thì có thể nguội đi."
+        }
+      },
+      "messages": [
+        {"id": "han_xin_so", "unlockOnly": true, "after": 20,
+          "lines": ["Em Hân xe hoa đây. Mai em đứng đầu Hàng Mã chứ không ra bờ hồ, có ai hỏi thì anh chỉ giúp em nhé 🌼"],
+          "replies": [
+            {"label": "Ok em, anh chỉ đường cho", "answer": "Cảm ơn anh. Bó cúc hôm trước bà anh có thích không?", "effects": {"rep.HAN": 2}},
+            {"label": "Hoa cúc hôm qua tươi lắm, bà khen", "answer": "Thật á? Lần sau em để dành mấy cành đẹp nhất cho bà.", "effects": {"rep.HAN": 3, "need.mood": 2}}
+          ]},
+        {"id": "han_cam_on_chuot", "unlockOnly": true, "after": 21,
+          "lines": ["Kho hoa sáng nay không còn vết chuột gặm nữa.", "Em nợ anh một bữa bún ốc nhé."],
+          "replies": [
+            {"label": "Bún ốc thì anh không từ chối", "answer": "Chủ nhật em rảnh từ chiều. Anh đừng có quên đấy.", "effects": {"rep.HAN": 3, "flag.phoHanHenBun": true}},
+            {"label": "Có gì đâu, em giữ tiền mà nhập hoa", "answer": "Anh tính hộ em kỹ thế. Ừ thì để em nhớ.", "effects": {"rep.HAN": 1}}
+          ]},
+        {"id": "han_mua_dem", "when": {"rep.HAN": 55, "rain_today": true}, "after": 21,
+          "lines": ["Mưa to quá, hoa em chưa kịp che hết.", "Anh về tới phòng chưa?"],
+          "replies": [
+            {"label": "Anh về rồi. Em có cần anh ra phụ không?", "answer": "Thôi, anh nghỉ đi. Em chỉ muốn có người nói chuyện lúc mưa thôi.", "effects": {"rep.HAN": 3, "need.mood": 4}},
+            {"label": "Chưa, anh còn đang chạy việc", "answer": "Đi đứng cẩn thận nhé. Nhớ mặc áo mưa.", "effects": {"rep.HAN": 1}}
+          ]},
+        {"id": "han_chuc_ngu", "when": {"rel_status.HAN": "cap_doi"}, "after": 22,
+          "lines": ["Hôm nay anh mệt không?", "Em để phần anh cành sen cuối mùa ở ngoài cửa rồi đấy."],
+          "replies": [
+            {"label": "Thấy cành sen là hết mệt", "answer": "Xạo ghê. Ngủ sớm đi anh 🌙", "effects": {"rep.HAN": 2, "need.mood": 5}},
+            {"label": "Mệt, nhưng nói chuyện với em thì đỡ", "answer": "Vậy mai em đứng gần chỗ anh làm, trưa ra uống trà đá nhé.", "effects": {"rep.HAN": 3, "need.mood": 4}}
+          ]}
+      ]
+    },
+    "VY": {
+      "decays": true,
+      "milestones": [
+        {"id": "day_live", "at": 60, "event": "rel_vy_live", "unlockMessages": ["vy_live_tips"]}
+      ],
+      "messages": [
+        {"id": "vy_live_tips", "unlockOnly": true, "after": 20,
+          "lines": ["Mẹo đầu tiên của chị: đừng hét giá rồi giảm. Khách xem live tinh lắm.", "Voucher để dành lúc người xem đông nhất, đừng tung lúc mới mở sóng."],
+          "replies": [
+            {"label": "Em ghi lại rồi chị", "answer": "Ừ. Còn hàng thì để kho có quạt, hàng thùng mốc là hoàn sạch đấy.", "effects": {"rep.VY": 2, "xp.per": 6}}
+          ]}
+      ]
+    },
+    "DUNG": {"decays": true},
+    "HANH": {
+      "milestones": [
+        {"id": "moi_si", "at": 70, "unlockMessages": ["hanh_moi_si"]}
+      ],
+      "messages": [
+        {"id": "hanh_moi_si", "unlockOnly": true, "after": 20,
+          "lines": ["An ơi, chị quen cô bán áo mưa sỉ ở cổng chợ Long Biên.", "Ra nói tên chị, cô ấy bớt cho mấy giá."],
+          "replies": [
+            {"label": "Em cảm ơn chị, mai em ra", "answer": "Nhớ đừng ôm nhiều quá, hết mưa là ế đấy.", "effects": {"flag.phoSiHanh": true, "rep.HANH": 1}}
+          ]}
+      ]
+    },
+    "LINH": {
+      "messages": [
+        {"id": "linh_hoi_hoa", "when": {"rep.HAN": 50, "rep.LINH": 50}, "after": 19,
+          "lines": ["Anh, cái chị bán hoa hay đứng đầu ngõ là ai thế 👀", "Bà bảo dạo này anh mua hoa nhiều."],
+          "replies": [
+            {"label": "Bạn thôi, đừng có đồn", "answer": "Vâng, bạn. Bạn mà anh cười một mình nhìn điện thoại.", "effects": {"rep.LINH": 1}},
+            {"label": "Hôm nào anh dẫn về chào bà", "answer": "Thật á? Để em dọn cái góc nhà cho đỡ xấu hổ.", "effects": {"rep.LINH": 2, "rep.BA_TU": 1}}
+          ]}
+      ]
+    },
+    "BA_TU": {
+      "messages": [
+        {"id": "ba_an_com", "when": {"rep.BA_TU": 60}, "after": 12,
+          "lines": ["Con ăn cơm chưa?", "(Bà nhờ Linh nhắn hộ)"],
+          "replies": [
+            {"label": "Con ăn rồi bà ạ", "answer": "Ừ. Tối về sớm bà hâm lại canh.", "effects": {"rep.BA_TU": 1, "need.mood": 2}},
+            {"label": "Chưa bà, con đang làm", "answer": "Làm gì thì làm, ăn đã. Bà gửi Linh mang ra hộp cơm.", "effects": {"rep.BA_TU": 2, "need.fed": 10}}
+          ]}
+      ]
+    }
+  }
+}
