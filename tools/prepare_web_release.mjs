@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
 
-const [siteArg, packArg, revision, version = '1.6', windowsVersion = '1.3.2'] = process.argv.slice(2);
+const [siteArg, packArg, revision, version = '1.11', windowsVersion = '1.6'] = process.argv.slice(2);
 assert(siteArg && packArg && /^[a-f0-9]{40}$/.test(revision ?? ''),
   'Usage: node tools/prepare_web_release.mjs SITE_DIR WEB_PCK SOURCE_SHA [VERSION] [WINDOWS_VERSION]');
 assert(/^\d+\.\d+(?:\.\d+)?$/.test(version) && /^\d+\.\d+(?:\.\d+)?$/.test(windowsVersion), 'Invalid release version');

@@ -4,25 +4,25 @@
 [ext_resource type="ArrayMesh" path="res://assets/architecture/repair_workshop_upper.res" id="2_go12a"]
 [ext_resource type="ArrayMesh" path="res://assets/architecture/repair_workshop_roof.res" id="3_x1tvd"]
 
-[node name="repair_workshop" type="Node3D" unique_id=609660170]
+[node name="repair_workshop" type="Node3D" unique_id=1122233358]
 metadata/kind = "repair"
 metadata/width = 9.0
 metadata/depth = 8.0
 metadata/height = 4.75
 metadata/seed = 1
 
-[node name="GroundArchitecture" type="Node3D" parent="." unique_id=676645003]
+[node name="GroundArchitecture" type="Node3D" parent="." unique_id=1939986898]
 metadata/blockers = Array[Rect2]([Rect2(-4.5, -8, 0.3, 8), Rect2(4.2, -8, 0.3, 8), Rect2(-4.5, -8, 9, 0.3), Rect2(-4.5, -0.3, 0.55, 0.6), Rect2(3.95, -0.3, 0.55, 0.6)])
 
-[node name="MasonryAndDetails" type="MeshInstance3D" parent="GroundArchitecture" unique_id=1358029477]
+[node name="MasonryAndDetails" type="MeshInstance3D" parent="GroundArchitecture" unique_id=1721101025]
 mesh = ExtResource("1_6t32m")
 
-[node name="UpperArchitecture" type="Node3D" parent="." unique_id=135262200]
+[node name="UpperArchitecture" type="Node3D" parent="." unique_id=887338541]
 
-[node name="UpperAndBalcony" type="MeshInstance3D" parent="UpperArchitecture" unique_id=2130217747]
+[node name="UpperAndBalcony" type="MeshInstance3D" parent="UpperArchitecture" unique_id=1342568823]
 mesh = ExtResource("2_go12a")
 
-[node name="RoofArchitecture" type="Node3D" parent="." unique_id=1601506341]
+[node name="RoofArchitecture" type="Node3D" parent="." unique_id=1976982247]
 
-[node name="RoofAndCornice" type="MeshInstance3D" parent="RoofArchitecture" unique_id=1684906790]
+[node name="RoofAndCornice" type="MeshInstance3D" parent="RoofArchitecture" unique_id=1629356721]
 mesh = ExtResource("3_x1tvd")

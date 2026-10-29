@@ -1,5 +1,17 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.11 · Chị Hạnh và góc phố mới**
+
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.11) ·
+[Xem phố trong chế độ thử](https://hoantiny.github.io/mixi-game/?street-demo&v=1.11).
+
+- Thay Chị Hạnh bằng mô hình Higgsfield gắn xương, có đứng thở và đi bộ.
+- Xe đồ ăn mới ở quán cơm: kính trong, nan bánh dựng lại, hai trục bánh riêng và va chạm đơn giản.
+- Thêm mái tôn có gân, cửa xếp, cửa gỗ và ô thông gió cho quán cơm, tiệm sửa xe và nhà trọ.
+- Giữ gameplay, quan hệ và cân bằng buôn bán của 1.10.1. Đây là đợt asset đầu, chưa thay toàn bộ bản đồ.
+- Chi tiết phạm vi: [manifest tích hợp](art/higgsfield/runtime-integration.json).
+- Bản tải Windows vẫn là 1.6; đợt phát hành này cập nhật web.
+
 **Bản web 1.10.1 · quan hệ NPC và buôn bán**
 
 [Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.10.1). 1.10.1 cân lại tiền buôn bán cho sát chương đầu: bán rong ngang việc làm thường, live gấp khoảng 1,5–2,4 lần, hàng đắt khó bán rong. Chi tiết thiết kế ở
