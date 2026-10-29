@@ -1,3 +1,7 @@
+## Bản 1.15
+
+Ca sửa Tiệm Chú Sơn: Q bỏ món cuối, khay hoàn trả, tối đa hai linh kiện; giữ E 2 giây để kiểm tra và 3 giây để lắp, sai linh kiện trừ 5 giây. Khung hành động phố mặc định thu gọn, mở bằng E/chạm, đóng bằng Esc hoặc khi đi tiếp; không liệt kê NPC có anchor trống ở giữa đường. Kiểm tra bằng `tests/repair_work_site.gd` và `tests/prompt_declutter.gd`, bao gồm ảnh 3D. Web 1.15 giữ gói Windows 1.13.
+
 ## Bản 1.14
 
 Ghép nền 1.13 (đồ họa, tổng kết ngày, thưởng nóng, scheduler, buôn bán và quan hệ) với Balo, chuyển khu, QTE quán bia và phản hồi Phúc Tân. Ví mở đầu 46.000đ, quỹ cọc khóa 1.400.000đ. Hai nút trả trọ dùng chung `today.rent_paid`; vòng thu tiền đêm giữ Hardship để không thu hai lần. Giá việc làm do 1.13/scheduler công bố được giữ nguyên; QTE bia có bảng thưởng riêng. Kiểm thêm inventory, phuc_tan_economy, phuc_tan_visual, map_zones và service_minigame. Bản web 1.14 giữ gói Windows 1.13 hiện có.

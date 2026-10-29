@@ -7,7 +7,7 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const SETTINGS := "user://settings.json"
-const VERSION := "Bản 1.14 · balo, chuyển khu và nhịp sống Phúc Tân"
+const VERSION := "Bản 1.15 · sửa đồ theo bước, giao diện phố thu gọn"
 const BRUSH := preload("res://assets/fonts/SedgwickAveDisplay-Regular.ttf")
 const HAND := preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CREAM := Color("ece3d3")
