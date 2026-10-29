@@ -10,6 +10,7 @@ extends RefCounted
 ## Số liệu và nội dung nằm trong data/*.json; file này chỉ đọc và xử lý.
 
 signal changed
+const EventScheduler := preload("res://scripts/systems/EventSchedulerSystem.gd")
 signal notes_changed
 
 const WEEKDAYS := ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"]
@@ -117,6 +118,7 @@ func load_data(dir := "res://data") -> void:
 		cfg["minigame_catalog"] = _read_json(dir + "/systems/minigames.json")
 		MiniGames.register(self)
 	Commerce.register(self)
+	EventScheduler.register(self)
 
 
 func _merge_pack(dir: String, suffix: String) -> void:
@@ -640,7 +642,7 @@ func apply_effects(eff: Dictionary) -> void:
 						s["scores"] = {}
 					s.scores[key.substr(6)] = int(s.scores.get(key.substr(6), 0)) + int(v)
 				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)
-						or Relationships.effect(self, key, v) or Commerce.effect(self, key, v)):
+						or Relationships.effect(self, key, v) or Commerce.effect(self, key, v) or EventScheduler.effect(self, key, v)):
 					push_warning("Hiệu ứng không rõ: " + str(key))
 
 
@@ -1159,6 +1161,9 @@ func actions_at(location: String) -> Array:
 func action_status(a: Dictionary) -> Dictionary:
 	if is_over() or not s.queue.is_empty():
 		return {"ok": false, "reason": ""}
+	var schedule_lock := EventScheduler.job_lock(self, a)
+	if not schedule_lock.is_empty():
+		return {"ok":false,"reason":schedule_lock}
 	var reason := check(a.get("require", {}))
 	if reason != "":
 		return {"ok": false, "reason": reason}
@@ -1231,6 +1236,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	Survival.on_action(self, a, float(a.hours))
 	Attributes.on_action(self, a, result)
 	MiniGames.on_action(self, a, result)
+	EventScheduler.on_action(self, a)
 	if a.group == "work" and finish > float(cfg.lateHour) + 0.001:
 		add_fatigue(float(cfg.lateFatigue))
 		add_log("Làm tới cuối tối: Mệt +%d" % int(cfg.lateFatigue), "warn")
@@ -2431,6 +2437,7 @@ func migrate_save() -> void:
 	Careers.migrate(self)
 	Relationships.migrate(self)
 	Commerce.migrate(self)
+	EventScheduler.tick(self)
 
 
 func neighborhood_target() -> Dictionary:

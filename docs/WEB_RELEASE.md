@@ -1,4 +1,16 @@
-# Triển khai bản web 1.11
+# Triển khai bản web và Windows 1.12
+
+Bản 1.12 thêm EventSchedulerSystem: thưởng nóng lúc 06:00, chợ đêm
+18:00–23:00 và sự kiện theo ngày/giờ/bốn Zone. Kiểm tra bằng
+`tests/event_scheduler.gd`, `tests/event_scheduler_world.gd` và
+`tests/relationships_commerce.gd`. Dữ liệu tiền trong events_and_jobs.json
+dùng money_unit_vnd=1000. Phát tờ rơi và mascot hiện là ca tự động.
+
+Xuất Windows bằng preset Windows (PCK nhúng trong EXE); đóng gói cùng
+licenses và hướng dẫn vào ZIP. Khi staging dùng phiên bản web/Windows
+`1.12 1.12`, thay ZIP tải về bằng bản mới và giữ nguyên các PCK cũ.
+
+## Quy trình và lịch sử 1.11
 
 Bản 1.11 ghép asset mới với toàn bộ cập nhật đến 1.10.1. Windows tiếp tục
 ở 1.6; giữ nguyên ZIP hiện có trên Pages. Gói web kiểm bằng
