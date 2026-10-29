@@ -390,7 +390,7 @@ static func live_beat(g, st: Dictionary, inp: Dictionary) -> Dictionary:
 	if inp.get("reply", false):
 		st["boost"] = float(st.boost) + float(lv.get("reply", {}).get("viewers", 0.12))
 	var curve := 0.55 + 1.45 * exp(-pow(float(beat - int(st.peak)) / 2.5, 2.0))
-	var viewers := float(lv.get("baseViewers", 60)) * (0.4 + 1.2 * float(biz(g).rep) / 100.0) * float(sc.viewers) * (1.0 + float(st.boost)) * curve * randf_range(0.9, 1.1)
+	var viewers := float(lv.get("baseViewers", 60)) * (0.4 + 1.2 * float(biz(g).rep) / 100.0) * (1.2 if g.s.flags.get("phoSmartphone", false) else 1.0) * float(sc.viewers) * (1.0 + float(st.boost)) * curve * randf_range(0.9, 1.1)
 	var close: float = float(lv.get("baseClose", 0.35)) * float(sc.close) * (1.0 + float(data(g).vending.get("closePerPer", 0.06)) * (g.Attributes.level(g, "per") - 1))
 	close *= 1.0 + g.mod("biz.close")
 	if inp.get("voucher", false) and not st.voucher:

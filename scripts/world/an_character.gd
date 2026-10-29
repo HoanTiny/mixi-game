@@ -5,6 +5,7 @@ const DEFAULT_COLORS := {"hair":"28231e", "shirt":"969084", "pants":"657b8c"}
 var model: Node3D
 var animation: AnimationPlayer
 var skeleton: Skeleton3D
+var _mood_pose: SkeletonModifier3D
 var materials: Array[ShaderMaterial] = []
 var hair_meshes: Array[Dictionary] = []
 var walk_clip := ""
@@ -126,6 +127,8 @@ func setup(_shirt: Color, _pants: Color, _identity := "An") -> void:
 		_task_pose.unit_scale = _unit_scale
 		skeleton.add_child(_task_pose)
 		_task_pose.modification_processed.connect(_align_meal_props)
+		_mood_pose = _MoodPose.new()
+		skeleton.add_child(_mood_pose)
 	set_colors(DEFAULT_COLORS)
 
 func _create_idle() -> void:
@@ -414,6 +417,43 @@ func wear(kind: String, on: bool, tint := Color("344e5c")) -> void:
 	if _worn.has(kind):
 		_worn[kind].node.visible = on
 		_worn[kind].material.albedo_color = tint
+
+## Đói hay buồn (juice.gd gọi khi Độ no hay Tâm trạng dưới 30): lưng khom, vai rũ, cúi đầu. 0..1, đổi mượt.
+func set_mood_pose(amount: float) -> void:
+	if _mood_pose != null:
+		_mood_pose.target = clampf(amount, 0.0, 1.0)
+
+
+## Dáng rũ vai chạy sau mọi tư thế khác: xoay thêm lưng, cổ, đầu về trước và hạ hai vai, theo trục của khung xương.
+class _MoodPose extends SkeletonModifier3D:
+	var target := 0.0
+	var amount := 0.0
+
+	func _process_modification_with_delta(delta: float) -> void:
+		amount = move_toward(amount, target, clampf(delta, 0.0, 0.1) * 1.5)
+		_apply()
+
+	func _process_modification() -> void:
+		_apply()
+
+	func _apply() -> void:
+		if amount < 0.001:
+			return
+		var sk := get_skeleton()
+		if sk == null:
+			return
+		for spec in [["Spine01", 0.12], ["Spine02", 0.08], ["neck", 0.16], ["Head", 0.14]]:
+			var i := sk.find_bone(spec[0])
+			if i >= 0:
+				var pose := sk.get_bone_global_pose(i)
+				sk.set_bone_global_pose(i, Transform3D(Basis(Vector3.RIGHT, float(spec[1]) * amount) * pose.basis, pose.origin))
+		for side in [["LeftShoulder", 1.0], ["RightShoulder", -1.0]]:
+			var i := sk.find_bone(side[0])
+			if i >= 0:
+				var pose := sk.get_bone_global_pose(i)
+				var drop := Basis(Vector3.BACK, -float(side[1]) * 0.16 * amount) * Basis(Vector3.RIGHT, 0.1 * amount)
+				sk.set_bone_global_pose(i, Transform3D(drop * pose.basis, pose.origin))
+
 
 class _RidePose extends SkeletonModifier3D:
 	var enabled := false

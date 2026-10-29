@@ -5,11 +5,11 @@
   "mode": "full",
   "title": "Tờ giấy trên cánh cửa",
   "who": "Bà Thoa",
-  "text": "Chuyến xe đêm thả An ở đầu phố lúc trời vừa sáng. Anh về tới xóm trọ Phúc Tân. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Thoa nhờ An đọc to lên, \"chữ in nhỏ quá\", rồi đi lấy phần cá kho để trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn 1.200.000đ. Tiệm cũ còn nợ 3.600.000đ tiền công.",
+  "text": "Chuyến xe đêm thả An ở đầu phố lúc trời vừa sáng. Anh về tới xóm trọ Phúc Tân. Trên cửa dán tờ thông báo: cuối tháng cả xóm phải dọn đi để chủ đất sửa nền, dựng kho. Bà Thoa nhờ An đọc to lên, \"chữ in nhỏ quá\", rồi đi lấy phần cá kho để trong lồng bàn. Linh gạch danh sách đồ đạc ở mặt sau tờ lịch.\nLinh: \"Mai anh đi làm lại mấy giờ?\"\nTrong túi An còn đúng 50.000đ, vé xe đêm đã ngốn gần hết. Tiệm cũ còn nợ 3.600.000đ tiền công. Cô Duyên dặn với theo: từ nay mỗi đêm 60.000đ tiền giường, trả trước khi ngủ.",
   "quote": "Bà Thoa: \"Cơm còn nóng. Chuyện nào khó thì ăn xong rồi nói, đừng để nguội cả hai.\"",
   "choices": [
    {
-    "label": "Nói thật: anh nghỉ ở tiệm rồi, chỉ còn 1,2 triệu",
+    "label": "Nói thật: anh nghỉ ở tiệm rồi, trong túi còn năm chục nghìn",
     "hint": "Không có tiền thưởng. Cả nhà biết số thật, mở sổ thu chi chung",
     "effects": {
      "flag.daNoiThat": true,
@@ -21,7 +21,7 @@
       "text": "Nói thật chuyện mất việc ngay ngày đầu"
      },
      "log": "Linh kéo ghế: \"Thế mình tính bằng tiền đang có trước.\"",
-     "diary": "Nói thật rồi: mất việc, còn 1,2 triệu. Bà múc thêm cá kho. Linh lật mặt sau tờ lịch, ghi số tiền lên đầu trang."
+     "diary": "Nói thật rồi: mất việc, còn năm chục nghìn. Bà múc thêm cá kho. Linh lật mặt sau tờ lịch, ghi số tiền lên đầu trang."
     }
    },
    {

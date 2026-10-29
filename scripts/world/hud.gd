@@ -21,6 +21,8 @@ const MiniGameViews := preload("res://scripts/minigames/views/registry.gd")
 const LiveSession := preload("res://scripts/ui/live_session.gd")
 const Relationships := preload("res://scripts/systems/relationships.gd")
 const Commerce := preload("res://scripts/systems/commerce.gd")
+const Hardship := preload("res://scripts/systems/hardship.gd")
+const DaySummary := preload("res://scripts/ui/day_summary.gd")
 
 var world
 var game
@@ -63,6 +65,10 @@ var _work: PanelContainer
 var _pd_label: Label
 var _pd_bar: ProgressBar
 var _needs_label: Label
+var _st_bill: Label
+var _st_hot: Label
+var _st_goal: Label
+var _st_goal_bar: Control
 var _phone: PanelContainer
 var _phone_box: VBoxContainer
 var _order_strip: PanelContainer
@@ -248,7 +254,7 @@ func _ready() -> void:
 # ---------------------------------------------------------------- API cho world.gd
 
 func blocking() -> bool:
-	return dialogs.visible or (_wardrobe != null and _wardrobe.visible) or (is_instance_valid(_bench) and _bench.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
+	return (_summary != null and is_instance_valid(_summary)) or dialogs.visible or (_wardrobe != null and _wardrobe.visible) or (is_instance_valid(_bench) and _bench.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
 
 
 func location_open() -> String:
@@ -425,7 +431,8 @@ func _light_panel(parent: Control) -> PanelContainer:
 
 func _build_objectives(parent: Control) -> void:
 	_objectives = _dark_panel(parent)
-	_objectives.add_theme_stylebox_override("panel", UI.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6))
+	# Nền đậm 0,85 để chữ trắng không chìm vào mặt phố phía sau.
+	_objectives.add_theme_stylebox_override("panel", UI.box(Color(0.05, 0.05, 0.04, 0.85), Color(1, 1, 1, 0.08), 8, 10))
 	_objectives.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 4)
@@ -586,6 +593,7 @@ func _open_live(id: String) -> void:
 		live.queue_free()
 		minigame = null
 		if r.has("state"):
+			world.juice.celebrate(int(r.state.total) > 0, "%d đơn!" % int(r.state.total))
 			Commerce.live_store(game, r.state)
 			_perform(id, {"live": true, "auto": true})
 		else:
@@ -669,6 +677,10 @@ func _open_minigame(id: String, a: Dictionary) -> void:
 		minigame.queue_free()
 		minigame = null
 		if not r.is_empty():
+			# Xong ván: hạt bung, rung nhẹ, chữ khen (juice.gd), rồi chạy thanh thời gian như mọi việc.
+			var score := float(r.get("score", r.get("ratio", 1.0)))
+			if not bool(r.get("auto", false)):
+				world.juice.celebrate(score >= 0.6, "Đạt %d%%!" % int(score * 100.0) if score >= 0.6 else "Chưa đạt chỉ tiêu")
 			_perform(id, r))
 	add_child(minigame)
 	_refresh()
@@ -921,6 +933,7 @@ func _process(delta: float) -> void:
 	_phone_tick -= delta
 	if _phone_tick <= 0.0:
 		_phone_tick = 0.25
+		_morning_toast()
 		_refresh_guide_distance()
 		_warn_needs()
 		_update_tip(0.25)
@@ -946,7 +959,7 @@ func _warn_needs() -> void:
 func _new_offer() -> void:
 	var d: Dictionary = game.cfg.delivery
 	var r: Array = d.offerSec if game.delivery_rush() else d.offPeakSec
-	_offer_wait = randf_range(float(r[0]), float(r[1]))
+	_offer_wait = randf_range(float(r[0]), float(r[1])) * (0.7 if game.s.flags.get("phoSmartphone", false) else 1.0)
 	if game.delivery_lock() != "":
 		return
 	_offer = world.make_offer()
@@ -1364,6 +1377,102 @@ func _open_board() -> void:
 	get_tree().change_scene_to_file("res://scenes/board.tscn")
 
 
+## Đi ngủ: chơi đủ 30 ngày thì mở màn Tổng kết cuối ngày (day_summary.gd), lát cắt và đêm cuối giữ hộp "Đi ngủ?" cũ.
+var _summary: Control
+
+
+func open_night() -> void:
+	if not game.is_full() or game.night_preview().slice_end or (_summary != null and is_instance_valid(_summary)):
+		dialogs.open_night()
+		return
+	_summary = DaySummary.new()
+	_summary.game = game
+	_summary.sleep.connect(func() -> void:
+		_summary.queue_free()
+		_summary = null
+		world.audio.play("done")
+		dialogs._end_day())
+	_summary.back.connect(func() -> void:
+		_summary.queue_free()
+		_summary = null
+		_refresh())
+	add_child(_summary)
+
+
+## Điện thoại báo lúc 06:00 mỗi sáng: việc thưởng nóng ×2 lương, tin nhắn mới, tiền trọ, mục tiêu. Bấm để mở điện thoại.
+var _toast: PanelContainer
+var _toast_day := -1
+
+
+func _morning_toast() -> void:
+	if not game.is_started() or game.is_over() or _toast_day == game.day() or blocking() or not game.s.queue.is_empty():
+		return
+	if game.clock() > float(game.cfg.dayStart) + 1.5:
+		_toast_day = game.day()
+		return
+	_toast_day = game.day()
+	var lines := []
+	var hot := Hardship.hot(game)
+	if hot != "":
+		var a: Dictionary = game.get_action(hot)
+		lines.append(["Giao Nhanh · Việc thưởng nóng", "%s: lương ×2 hôm nay (%s)" % [str(a.get("name", "")), GameLogic.fmt_money(int(a.get("pay", 0)) * 2)], Color("0f9d58")])
+	var unread: int = Relationships.unread(game)
+	if unread > 0:
+		var who := []
+		for t in Relationships.threads(game):
+			if int(t.unread) > 0:
+				who.append(str(t.name))
+		lines.append(["Tin nhắn", "%d tin mới từ %s" % [unread, ", ".join(who.slice(0, 3))], Color("2f7de1")])
+	if Hardship.on(game):
+		lines.append(["Cô Duyên", "Tối nay nhớ %s tiền trọ nhé" % GameLogic.fmt_money(Hardship.rent(game)), Color("c27c0e")])
+	if lines.is_empty():
+		return
+	if _toast != null and is_instance_valid(_toast):
+		_toast.queue_free()
+	_toast = PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.97, 0.97, 0.98, 0.97)
+	sb.set_corner_radius_all(16)
+	sb.set_content_margin_all(12)
+	sb.shadow_color = Color(0, 0, 0, 0.35)
+	sb.shadow_size = 10
+	_toast.add_theme_stylebox_override("panel", sb)
+	_toast.custom_minimum_size = Vector2(minf(420.0, ScreenFit.view_size().x - 24.0), 0)
+	_toast.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	_toast.add_child(v)
+	v.add_child(UI.label("06:00 · ĐIỆN THOẠI · Ngày %d" % game.day(), 11, Color("7a8090")))
+	for ln in lines:
+		var row := VBoxContainer.new()
+		row.add_theme_constant_override("separation", 0)
+		v.add_child(row)
+		row.add_child(UI.label(str(ln[0]), 13, ln[2]))
+		var t := UI.label(str(ln[1]), 14, Color("15181f"))
+		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		t.custom_minimum_size.x = _toast.custom_minimum_size.x - 24.0
+		row.add_child(t)
+	var hint := UI.label("Bấm để mở điện thoại", 11, Color("7a8090"))
+	v.add_child(hint)
+	_toast.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed:
+			_phone_app = "tin" if unread > 0 and hot == "" else "giao"
+			if not _phone.visible:
+				_toggle_phone()
+			_toast.queue_free())
+	add_child(_toast)
+	_toast.reset_size()
+	_toast.position = Vector2((ScreenFit.view_size().x - _toast.custom_minimum_size.x) / 2.0, -160.0)
+	world.audio.play("dialog")
+	var tw := create_tween()
+	tw.tween_property(_toast, "position:y", 14.0, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(7.0)
+	tw.tween_property(_toast, "position:y", -200.0, 0.4).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func() -> void:
+		if is_instance_valid(_toast):
+			_toast.queue_free())
+
+
 func _go_home() -> void:
 	if _end_day_btn.disabled:
 		return
@@ -1520,7 +1629,7 @@ func _build_topbar(root: Control) -> void:
 
 func _build_stats(parent: Control) -> void:
 	_stats = PanelContainer.new()
-	_stats.add_theme_stylebox_override("panel", UI.box(Color(0.06, 0.06, 0.08, 0.62), Color(1, 1, 1, 0.08), 8, 10))
+	_stats.add_theme_stylebox_override("panel", UI.box(Color(0.05, 0.05, 0.04, 0.85), Color(1, 1, 1, 0.08), 8, 10))
 	_stats.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_stats.mouse_filter = Control.MOUSE_FILTER_PASS
 	_stats.tooltip_text = "Bấm để mở bảng Nhân vật (C)"
@@ -1555,7 +1664,8 @@ func _build_stats(parent: Control) -> void:
 	cash_row.add_child(_st_cash)
 	var specs := [["stamina", "Thể lực", "bolt", "100 trừ Mệt. Ngủ, nghỉ, ngồi trà đá để hồi; chạy nhanh (Shift) và làm việc nặng thì tụt."],
 		["mood", "Tâm trạng", "heart", "Nghỉ ngơi, trà đá, ăn cơm với bà, nói chuyện với người quen thì vui lên; việc bẩn, ngủ ngoài đường thì xuống."],
-		["fed", "Độ no", "bowl", "Ăn ở quán cơm, bánh mì buổi sáng. Đói tới 0 thì Mệt tăng nhanh."]]
+		["fed", "Độ no", "bowl", "Ăn ở quán cơm, bánh mì buổi sáng. Đói tới 0 thì Mệt tăng nhanh."],
+		["clean", "Vệ sinh", "drop", "Tắm ở vòi chung (+40, dễ cảm lạnh) hay nhà tắm công cộng (+100). Dưới 30 thì bốc mùi, người ta né."]]
 	for sp in specs:
 		var r := HBoxContainer.new()
 		r.add_theme_constant_override("separation", 6)
@@ -1578,6 +1688,20 @@ func _build_stats(parent: Control) -> void:
 		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		r.add_child(n)
 		_st_bars[sp[0]] = {"bar": b, "num": n}
+	# Hôm nay: tiền trọ đêm nay, việc thưởng nóng, mục tiêu ngắn hạn (scripts/systems/hardship.gd).
+	_st_bill = UI.label("", 12, UI.HUD_TEXT)
+	_st_bill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_bill)
+	_st_hot = UI.label("", 12, Color("ffb27a"))
+	_st_hot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_hot)
+	_st_goal = UI.label("", 12, UI.GOLD)
+	_st_goal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_goal)
+	_st_goal_bar = UI.bar(6)
+	_st_goal_bar.custom_minimum_size = Vector2(220, 6)
+	_st_goal_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_goal_bar)
 
 
 func _refresh_stats(s: Dictionary) -> void:
@@ -1586,11 +1710,28 @@ func _refresh_stats(s: Dictionary) -> void:
 	_st_clock.text = GameLogic.hh(minf(hour, 22.0))
 	_st_day.text = "%s · Ngày %d, %s" % [part, game.day(), game.weekday_name()]
 	_st_cash.text = GameLogic.fmt_money(int(s.cash))
-	var vals := {"stamina": 100.0 - float(s.fatigue), "mood": game.need("mood"), "fed": game.need("fed")}
+	var vals := {"stamina": 100.0 - float(s.fatigue), "mood": game.need("mood"), "fed": game.need("fed"), "clean": game.need("clean")}
 	for k in _st_bars:
 		var x: float = vals[k]
 		UI.set_bar(_st_bars[k].bar, x, 100.0, UI.level_color(x / 100.0))
 		(_st_bars[k].num as Label).text = str(int(x))
+	var hard := Hardship.on(game)
+	_st_bill.visible = hard
+	_st_hot.visible = hard and Hardship.hot(game) != ""
+	if hard:
+		var paid := Hardship.paid(game)
+		_st_bill.text = ("✓ Đã trả tiền trọ đêm nay" if paid else "Tiền trọ đêm nay: %s · chưa trả" % GameLogic.fmt_money(Hardship.rent(game)))
+		_st_bill.add_theme_color_override("font_color", UI.HUD_SOFT if paid else (Color("ff8a7a") if int(s.cash) < Hardship.rent(game) else UI.HUD_TEXT))
+		if _st_hot.visible:
+			var ha: Dictionary = game.get_action(Hardship.hot(game))
+			_st_hot.text = "Thưởng nóng ×2 hôm nay: %s" % str(ha.get("name", ""))
+	var goal := Hardship.goal(game)
+	_st_goal.visible = not goal.is_empty()
+	_st_goal_bar.visible = not goal.is_empty()
+	if not goal.is_empty():
+		_st_goal.text = "Mục tiêu: %s · %s/%s" % [goal.name, GameLogic.fmt_k(int(goal.have)), GameLogic.fmt_money(int(goal.need))]
+		_st_goal.tooltip_text = str(goal.hint)
+		UI.set_bar(_st_goal_bar, float(goal.pct) * 100.0, 100.0, UI.GOLD)
 
 
 ## Hành động nhanh trước cửa địa điểm: tối đa ba việc sinh hoạt (ăn, tắm, nghỉ…) làm được ngay, ghi giá, tác dụng,
@@ -2413,10 +2554,11 @@ func _refresh_location() -> void:
 		found+=1
 	if _loc_id == world.home:
 		var n: Dictionary = game.night_preview()
-		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d · Mệt −%d qua đêm" % [game.day(), int(n.recover)],
+		var rent_note := "" if Hardship.paid(game) else " · chưa trả tiền trọ %s" % GameLogic.fmt_money(Hardship.rent(game))
+		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d · Mệt −%d qua đêm%s" % [game.day(), int(n.recover), rent_note],
 			"" if game.s.queue.is_empty() else "Còn việc phải chọn", func() -> void:
 				close_location()
-				dialogs.open_night()))
+				open_night()))
 	for id in game.scene_cards_at(_loc_id):
 		var e: Dictionary = game.scene_info(id)
 		var meta := "Cảnh chính hôm nay · %d phút" % roundi(float(e.get("hours", 0.5)) * 60.0)

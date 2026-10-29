@@ -5,6 +5,7 @@ extends Node3D
 ## (phím E khi đứng gần). Nhà nào nằm giữa camera và An thì tạm ẩn đi cho khỏi che.
 ## Nhà cửa, người, xe lấy mô hình thật theo data/models.json; thiếu file thì dựng khối hình tạm.
 
+const Juice := preload("res://scripts/world/juice.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const QuestGuide := preload("res://scripts/quest_guide.gd")
 const Hud := preload("res://scripts/world/hud.gd")
@@ -204,6 +205,7 @@ var _path_i := 0
 var _target_loc := ""
 var _pending_click = null
 var _last_money := -1
+var juice: Node3D
 var _last_day := -1
 var _walk_t := 0.0
 ## Quãng đường đã đi nhưng chưa quy ra giờ; cộng dồn rồi trừ giờ theo từng nấc 5 phút.
@@ -315,6 +317,10 @@ func _ready() -> void:
 	_on_changed()
 	print("[world] dựng màn phố %d ms (map %s)" % [Time.get_ticks_msec() - t0, _map_id()])
 	# Vào thẳng chế độ Dựng khu thật: bản web có "?khu" trên địa chỉ, hay đối số "--realmap-auto=…" khi thử tự động.
+	# Phản hồi trực quan: chữ nổi, rung máy quay, hạt, mây đen, bốc mùi (scripts/world/juice.gd).
+	juice = Juice.new()
+	add_child(juice)
+	juice.setup(self)
 	var to_realmap := false
 	for arg in OS.get_cmdline_user_args():
 		to_realmap = to_realmap or arg.begins_with("--realmap-auto=")
@@ -1810,6 +1816,8 @@ func _process(delta: float) -> void:
 	var cam_goal := player.position + _pan + cam_offset()
 	camera.position = camera.position.lerp(cam_goal, clampf(delta * 4.0, 0.0, 1.0))
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, minf(zoom, 1.0)), 0), Vector3.UP)
+	if juice != null:
+		juice.update(delta, game)
 	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút), hai tầng bóng cho đỡ lần vẽ; góc chơi giữ bốn tầng để mặt
 	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
 	var far := clampf(zoom - 1.0, 0.0, 1.0)
@@ -2563,7 +2571,7 @@ func _check_day_end() -> void:
 		if _night_prompt_day != game.day():
 			_night_prompt_day = game.day()
 			hud.close_location()
-			hud.dialogs.open_night()
+			hud.open_night()
 	else:
 		hud.close_location()
 		game.sleep_outside()
@@ -2694,12 +2702,8 @@ func _on_changed() -> void:
 	elif not game.is_over() and _ending_home != null:
 		# Chơi tiếp chương sau từ màn kết: dọn hình ảnh khép lại của chương trước.
 		_clear_ending_home()
-	var money := int(game.s.cash)
-	if _last_money >= 0 and money != _last_money:
-		_float_text(GameLogic.fmt_money(money - _last_money) if money < _last_money else "+" + GameLogic.fmt_money(money - _last_money),
-			Color("7fe0a0") if money > _last_money else Color("ff8a7a"))
-		audio.play("earn" if money > _last_money else "spend")
-	_last_money = money
+	# Tiền, nhu cầu đổi: chữ nổi do juice.gd hiện (track mỗi khung).
+	_last_money = int(game.s.cash)
 	# Sang ngày mới: An thức dậy trước cửa chỗ ở.
 	if game.day() != _last_day:
 		if _last_day != -1:

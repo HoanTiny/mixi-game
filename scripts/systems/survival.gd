@@ -171,8 +171,16 @@ static func action_effects(g, a: Dictionary) -> Dictionary:
 	return out
 
 
-## Khóa hiệu ứng: "cond.X": số giờ (true: theo định nghĩa, false: gỡ), "cond_clear.X": gỡ. true nếu đã xử lý.
+## Khóa hiệu ứng: "cond.X": số giờ (true: theo định nghĩa, false: gỡ), "cond_clear.X": gỡ, "cond_chance.X": xác suất
+## bật (tắm nước lạnh 25% cảm lạnh); lúc mới bật trừ thêm onset (Tâm trạng…). true nếu đã xử lý.
 static func effect(g, k: String, v) -> bool:
+	if k.begins_with("cond_chance."):
+		var id := k.substr(12)
+		if not has(g, id) and randf() < float(v):
+			add(g, id, 0.0, "chance")
+			for need_k in def(g, id).get("onset", {}):
+				g.need_adj(str(need_k), float(def(g, id).onset[need_k]))
+		return true
 	if k.begins_with("cond."):
 		if v is bool and not v:
 			clear(g, k.substr(5))

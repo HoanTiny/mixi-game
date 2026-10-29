@@ -413,6 +413,78 @@
    },
    "hideIfFlag": "phoVyLive",
    "note": "Mở app Shippy: lên sóng ở phòng trọ hay quán net"
+  },
+  {
+   "id": "tra_tien_tro",
+   "group": "life",
+   "location": "home",
+   "name": "Trả tiền trọ đêm nay cho cô Duyên",
+   "hours": 0.05,
+   "cost": 60000,
+   "perDay": 1,
+   "showIf": {
+    "rent_paid": false
+   },
+   "effects": {
+    "rent_pay": true
+   },
+   "note": "Chưa trả thì không ngủ, không nghỉ ở phòng được"
+  },
+  {
+   "id": "giat_tiem",
+   "group": "life",
+   "location": "home",
+   "name": "Gửi tiệm giặt đầu ngõ",
+   "hours": 0.2,
+   "cost": 20000,
+   "perDay": 1,
+   "effects": {
+    "need.neat": 100
+   },
+   "note": "Tối lấy về, quần áo thơm mùi nước xả"
+  },
+  {
+   "id": "mua_xa_phong",
+   "group": "life",
+   "location": "cho_cau_nho",
+   "name": "Mua bánh xà phòng giặt (3 lần giặt)",
+   "hours": 0.1,
+   "cost": 15000,
+   "perDay": 2,
+   "effects": {
+    "item.xa_phong": 3
+   }
+  },
+  {
+   "id": "tam_nong",
+   "group": "life",
+   "location": "nha_tro_giuong",
+   "name": "Tắm nước nóng ở nhà tắm công cộng",
+   "hours": 0.4,
+   "cost": 25000,
+   "perDay": 1,
+   "effects": {
+    "need.clean": 100,
+    "need.mood": 4,
+    "cond.cam_lanh": false
+   },
+   "note": "Nước nóng, xà phòng thơm: trị dứt cảm lạnh"
+  },
+  {
+   "id": "mua_smartphone",
+   "group": "life",
+   "location": "cam_do",
+   "name": "Mua lại chiếc smartphone đời mới khách cầm quá hạn",
+   "hours": 0.3,
+   "cost": 1500000,
+   "perDay": 1,
+   "hideIfFlag": "phoSmartphone",
+   "effects": {
+    "flag.phoSmartphone": true,
+    "need.mood": 10,
+    "log": "Màn hình không vết nứt, pin cả ngày. App Giao Nhanh báo đơn nhanh hơn hẳn.",
+    "diary": "Mua được cái điện thoại tử tế đầu tiên từ hồi mất việc."
+   }
   }
  ],
  "minigames": {

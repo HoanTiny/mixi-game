@@ -1,0 +1,19 @@
+{
+  "_ghi_chu": "Áp lực sinh tồn chương 1 khi chơi đủ 30 ngày (scripts/systems/hardship.gd). startCash: tiền trong túi An sáng ngày 1. nightRent: tiền trọ mỗi đêm trả cho cô Duyên (rentTo) ở chỗ ở; chưa trả thì không ngủ, không nghỉ được ở phòng (lockActions); hết ngày mà chưa trả, đủ tiền thì tự trừ, thiếu thì nợ: mất rep, Tâm trạng, Mệt (unpaid). livingCost thay tiền sinh hoạt cả nhà 120.000đ mỗi tối của chương 1 (ăn uống giờ tự trả từng bữa). hotJob: mỗi sáng một việc kiếm tiền được trả mult lần (từ danh sách pool, việc đó phải còn làm được hôm nay); morning: tin trên điện thoại lúc 06:00. goals: mục tiêu ngắn hạn hiện trên HUD theo thứ tự, cái đầu tiên chưa xong (done: điều kiện) là mục tiêu đang theo.",
+  "startCash": 50000,
+  "nightRent": 60000,
+  "rentTo": "DUYEN",
+  "livingCost": 0,
+  "lockActions": ["nghi"],
+  "unpaid": {"rep": -4, "mood": -8, "fatigue": 6, "log": "Không đủ tiền trọ: cô Duyên cho ngủ tạm ngoài hành lang, ghi nợ một đêm"},
+  "hotJob": {
+    "mult": 2,
+    "pool": ["phat_to_roi", "giao_com", "ca_phu_quan", "sua_do_le", "chay_ban_ta_hien", "keo_xe_tho", "xe_om", "boc_vac_toi", "lam_shop_vy", "lam_bia", "thu_dong_nat"]
+  },
+  "goals": [
+    {"id": "phong", "name": "Cọc phòng Ngọc Thụy", "need": 1800000, "done": {"housing_state": ["reserved", "signed"]},
+      "hint": "Ngày 26 phải chốt chỗ ở. Đủ tiền cọc thì có chỗ cho cả nhà."},
+    {"id": "dien_thoai", "name": "Smartphone cũ đời mới", "need": 1500000, "done": {"flag.phoSmartphone": true},
+      "hint": "Mua ở tiệm cầm đồ ngõ Gạch: đơn Giao Nhanh tới nhanh hơn, live Shippy nét hơn."}
+  ]
+}
