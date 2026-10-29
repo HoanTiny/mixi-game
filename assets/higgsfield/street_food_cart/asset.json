@@ -1,0 +1,18 @@
+{
+  "source": "art/higgsfield/source-3d/street_food_cart-web.glb",
+  "output": "assets/higgsfield/street_food_cart/cart.glb",
+  "removed_triangles": {
+    "wheel": 893,
+    "glass": 86
+  },
+  "unique_mesh_triangles": 6754,
+  "instanced_triangles": 7762,
+  "wheel_radius_m": 0.294,
+  "wheel_axis": "X",
+  "height_m": 1.8,
+  "textures_max_px": 1024,
+  "limitations": [
+    "Static pot lid remains part of body",
+    "Glass uses alpha blend; no refraction in Compatibility renderer"
+  ]
+}

@@ -13,3 +13,13 @@ void fragment() {
     ALBEDO=base_color.rgb*(0.85+wear+folds*0.035);
     ROUGHNESS=0.96;
 }
+
+// Đổ bóng bậc thang 3 cấp kiểu Nobody (scripts/world/ink.gd, CEL_LIGHT): sáng, nửa tối, tối; ranh giới mềm vài phần
+// trăm. Phần bóng đổ (ATTENUATION) cũng rơi vào bậc tối.
+void light() {
+	float lit = clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION;
+	float band = mix(0.22, 0.55, smoothstep(0.08, 0.12, lit));
+	band = mix(band, 1.0, smoothstep(0.48, 0.52, lit));
+	DIFFUSE_LIGHT += band * LIGHT_COLOR / PI;
+	SPECULAR_LIGHT += LIGHT_COLOR * smoothstep(0.93, 0.96, clamp(dot(NORMAL, normalize(LIGHT + VIEW)), 0.0, 1.0)) * ATTENUATION * 0.06;
+}

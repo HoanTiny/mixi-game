@@ -278,7 +278,57 @@ static func _rail(b: Batch, x0: float, x1: float, y: float, z: float, seed: int)
 		var x := lerpf(x0, x1, float(i) / n)
 		b.rod(iron, Vector3(x, y, z), Vector3(x, y + 0.95, z), 0.014)
 
-static func _sloped_roof(b: Batch, width: float, depth: float, eave: float, ridge: float, seed: int) -> void:
+## Silhouette ridges are modelled only on the three authored hero fronts. Background
+## terraces retain their cheaper normal-mapped sheets. All faces share one material.
+static func _corrugated_sheet(b: Batch, width: float, rear: Vector2, front: Vector2, seed: int, center_x := 0.0) -> void:
+	# Vector2 is (z,y). Sheets drain along z; ribs run from ridge to eave.
+	var strips := maxi(8, ceili(width / 0.18) * 4)
+	var mat := _mat("roof", seed)
+	var sheet_normal := Vector3(0, front.x - rear.x, rear.y - front.y).normalized()
+	for i in strips:
+		var x0 := -width / 2.0 + width * i / strips
+		var x1 := -width / 2.0 + width * (i + 1) / strips
+		var rib0 := cos(float(i) * PI * 0.5) * 0.018
+		var rib1 := cos(float(i + 1) * PI * 0.5) * 0.018
+		var points := [Vector3(center_x + x0, front.y + rib0, front.x), Vector3(center_x + x1, front.y + rib1, front.x), Vector3(center_x + x1, rear.y + rib1, rear.x), Vector3(center_x + x0, rear.y + rib0, rear.x)]
+		var normal: Vector3 = (points[1] - points[0]).cross(points[2] - points[0]).normalized()
+		var uv := [Vector2(x0, front.x), Vector2(x1, front.x), Vector2(x1, rear.x), Vector2(x0, rear.x)]
+		b.quad(mat, points, normal, uv)
+		var underside: Array = []
+		for p in points:
+			underside.append(p - sheet_normal * 0.012)
+		underside.reverse()
+		var back_uv := uv.duplicate()
+		back_uv.reverse()
+		b.quad(mat, underside, -normal, back_uv, [Color("9e9e94"), Color("9e9e94"), Color("9e9e94"), Color("9e9e94")])
+		# A folded leading lip gives the edge thickness from a street-level camera.
+		b.quad(mat, [points[0], points[0] - Vector3.UP * 0.035, points[1] - Vector3.UP * 0.035, points[1]], Vector3.BACK, [Vector2(x0, 0), Vector2(x0, 0.035), Vector2(x1, 0.035), Vector2(x1, 0)])
+	for t in [0.12, 0.83]:
+		var at: Vector2 = rear.lerp(front, t)
+		b.box(_mat("iron", seed), Vector3(center_x, at.y - 0.055, at.x), Vector3(width - 0.08, 0.06, 0.045))
+
+static func _vent(b: Batch, x: float, y: float, z: float, seed: int) -> void:
+	var dark := _mat("glass", seed)
+	var lime := _mat("old", seed)
+	b.box(dark, Vector3(x, y, z), Vector3(0.62, 0.22, 0.025))
+	for shift in [-0.12, 0.12]:
+		b.box(lime, Vector3(x, y + shift, z + 0.025), Vector3(0.72, 0.045, 0.065))
+	for i in 5:
+		b.box(lime, Vector3(x - 0.31 + i * 0.155, y, z + 0.025), Vector3(0.035, 0.22, 0.06), Basis(Vector3.BACK, 0.26))
+
+static func _timber_door(b: Batch, x: float, y: float, z: float, width: float, height: float, seed: int) -> void:
+	var wood := _mat("wood", seed)
+	var frame := _mat("shutter", seed)
+	b.box(wood, Vector3(x, y + height * 0.5, z - 0.1), Vector3(width, height, 0.065))
+	for s in [-1.0, 1.0]:
+		b.box(frame, Vector3(x + s * (width * 0.5 + 0.035), y + height * 0.5, z), Vector3(0.07, height + 0.1, 0.18))
+	for yy in [0.06, height * 0.47, height - 0.06]:
+		b.box(frame, Vector3(x, y + yy, z - 0.04), Vector3(width, 0.07, 0.08))
+	for xx in [-width * 0.38, width * 0.38]:
+		b.box(frame, Vector3(x + xx, y + height * 0.5, z - 0.04), Vector3(0.055, height, 0.08))
+	b.rod(_mat("iron", seed), Vector3(x + width * 0.33, y + 0.88, z + 0.015), Vector3(x + width * 0.33, y + 1.04, z + 0.015), 0.016)
+
+static func _sloped_roof(b: Batch, width: float, depth: float, eave: float, ridge: float, seed: int, detailed := false) -> void:
 	var mat := _mat("roof", seed)
 	var z0 := 0.45
 	var z1 := -depth - 0.3
@@ -291,7 +341,10 @@ static func _sloped_roof(b: Batch, width: float, depth: float, eave: float, ridg
 		var normal := Vector3(0, absf(part[0] - part[2]), part[3] - part[1]).normalized()
 		if part[0] == middle:
 			normal.z = -absf(normal.z)
-		b.quad(mat, [a, Vector3(x1, a.y, a.z), c, Vector3(x0, c.y, c.z)], normal, [Vector2(0, 0), Vector2(width, 0), Vector2(width, depth / 2.0), Vector2(0, depth / 2.0)])
+		if detailed:
+			_corrugated_sheet(b, width + 0.5, Vector2(part[2], part[3]), Vector2(part[0], part[1]), seed)
+		else:
+			b.quad(mat, [a, Vector3(x1, a.y, a.z), c, Vector3(x0, c.y, c.z)], normal, [Vector2(0, 0), Vector2(width, 0), Vector2(width, depth / 2.0), Vector2(0, depth / 2.0)])
 	# Folded ridge and gutters have thickness rather than a zero-thickness silhouette.
 	b.box(mat, Vector3(0, ridge + 0.025, middle), Vector3(width + 0.55, 0.08, 0.18))
 	for z in [z0, z1]:
@@ -377,7 +430,8 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			var x: float = s * (corridor / 2.0 + wing / 2.0)
 			var door_width := minf(1.2, wing - 0.5)
 			_opening(fw, wall, x, 0.14, -0.2, wing, 3.2, door_width, 2.25)
-			fw.box(_mat("wood", seed), Vector3(x, 1.3, -0.49), Vector3(door_width - 0.1, 2.3, 0.07))
+			_timber_door(fw, x, 0.15, -0.39, door_width - 0.1, 2.3, seed)
+			_vent(fw, x, 2.76, -0.035, seed)
 			var front_pier := (wing - door_width) / 2.0
 			for sx in [-1.0, 1.0]:
 				_pier_weather(fw, x + sx * (door_width / 2.0 + front_pier / 2.0), front_pier, -0.044, seed + int(s * 5 + sx * 7), sx == s)
@@ -404,7 +458,7 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			for sx in [-1.0, 1.0]:
 				u.box(wall, Vector3(x + sx * (wing / 2.0 - 0.12), 4.72, -front_depth / 2.0), Vector3(0.24, 2.7, front_depth))
 			u.box(wall, Vector3(x, 4.72, -front_depth + 0.12), Vector3(wing, 2.7, 0.24))
-			r.box(_mat("roof", seed), Vector3(x, 6.13, -front_depth / 2.0), Vector3(wing + 0.1, 0.16, front_depth + 0.25))
+			_corrugated_sheet(r, wing + 0.1, Vector2(-front_depth - 0.05, 6.27), Vector2(0.18, 6.1), seed, x)
 			r.box(old, Vector3(x, 6.05, 0.09), Vector3(wing + 0.16, 0.25, 0.38))
 			# Low rear rooms leave a genuine open-air court, rather than a roof gap.
 			var rear_x: float = s * (courtyard / 2.0 + rear_wing / 2.0)
@@ -416,7 +470,7 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			_lower_wall(g, Vector3(s * (courtyard / 2.0 - 0.004), 0, rear_z), rear_depth - 0.1, Vector3(-s, 0, 0), seed + int(s * 11))
 			_lower_wall(g, Vector3(rear_x, 0, -front_depth + 0.003), rear_wing - 0.1, Vector3.BACK, seed + int(s * 23))
 			_weather_patch(u, Vector3(x, 5.75, 0.008), Vector2(wing * 0.72, 0.32), Vector3.BACK, seed + int(s * 5), false, 0.37)
-			r.box(_mat("roof", seed), Vector3(rear_x, 3.08, rear_z), Vector3(rear_wing + 0.25, 0.12, rear_depth + 0.2))
+			_corrugated_sheet(r, rear_wing + 0.25, Vector2(rear_z - rear_depth / 2.0 - 0.1, 3.22), Vector2(rear_z + rear_depth / 2.0 + 0.1, 3.07), seed, rear_x)
 			blockers.append(Rect2(rear_x - rear_wing / 2.0, -d + 0.3, rear_wing, rear_depth))
 		blockers.append(Rect2(-w / 2.0, -d, w, 0.3))
 		# Keep the room plan legible when the tall shell yields to the camera.
@@ -452,7 +506,11 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			var wx := -bay + i * bay
 			_opening(u, wall, wx, 3.4, -0.14, bay, 0.9, minf(1.27, w * 0.2 + 0.07), 0.7)
 			_window(u, wx, 3.55, 0.02, minf(1.2, w * 0.2), 0.42, seed, false)
-		_sloped_roof(r, w, d, 4.3, h, seed)
+		_sloped_roof(r, w, d, 4.3, h, seed, true)
+		# Shallow steel weather hood, above the sign and the open roller door.
+		_corrugated_sheet(g, w - 0.12, Vector2(-0.05, 3.94), Vector2(0.68, 3.74), seed)
+		for s in [-1.0, 1.0]:
+			g.rod(iron, Vector3(s * (w / 2.0 - 0.35), 3.3, 0), Vector3(s * (w / 2.0 - 0.35), 3.72, 0.62), 0.022)
 	else:
 		var restaurant := kind == "restaurant"
 		var shop := kind in ["shop", "service"]
@@ -470,7 +528,11 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 		for i in bays:
 			var x := -w / 2.0 + 0.2 + (i + 0.5) * bay
 			_opening(u, wall, x, 3.45, -0.14, bay, 3.05, minf(1.25, bay - 0.6), 2.3)
-			_window(u, x, 3.6, 0.025, minf(1.18, bay - 0.67), 2.05, seed, profile != 2 and profile != 4)
+			if restaurant and i == bays - 1:
+				_timber_door(u, x, 3.6, 0.025, minf(1.18, bay - 0.67), 2.05, seed)
+				_vent(u, x, 6.06, 0.018, seed)
+			else:
+				_window(u, x, 3.6, 0.025, minf(1.18, bay - 0.67), 2.05, seed, profile != 2 and profile != 4)
 		for s in [-1.0, 1.0]:
 			u.box(wall, Vector3(s * (w / 2.0 - 0.14), 4.95, -d / 2.0), Vector3(0.28, 3.0, d))
 			u.box(old, Vector3(s * (w / 2.0 - 0.15), 3.55, 0.42), Vector3(0.18, 0.35, 1.0))
@@ -495,15 +557,14 @@ static func build(parent: Node3D, kind: String, width: float, depth: float, seed
 			if profile == 5:
 				_rail(r, -w / 2.0 + 0.25, w / 2.0 - 0.25, 6.7, -d + 0.12, seed)
 		else:
-			_sloped_roof(r, w, d, 6.62, h, seed)
+			_sloped_roof(r, w, d, 6.62, h, seed, restaurant)
 		if restaurant:
-			# Segmented cloth canopy above the actual recess, supported by slim steel arms.
-			var segments := maxi(4, ceili(w / 0.8))
-			for i in segments:
-				var x := -w / 2.0 + (i + 0.5) * w / segments
-				g.box(shutter if i % 2 == 0 else _mat("old", seed), Vector3(x, 2.66, 0.5), Vector3(w / segments - 0.015, 0.045, 1.2), Basis(Vector3.RIGHT, 0.15))
+			_corrugated_sheet(g, w - 0.08, Vector2(-0.12, 2.98), Vector2(1.08, 2.59), seed)
 			for s in [-1.0, 1.0]:
 				g.rod(iron, Vector3(s * (w / 2.0 - 0.4), 2.3, -0.1), Vector3(s * (w / 2.0 - 0.4), 2.55, 1.05), 0.022)
+				# Retracted accordion gate, with real alternating folds at the jamb.
+				for fold in 6:
+					g.box(shutter, Vector3(s * (ground_opening / 2.0 - 0.045), 1.39, -0.16 - fold * 0.075), Vector3(0.13, 2.46, 0.06), Basis(Vector3.UP, s * (0.42 if fold % 2 else -0.42)))
 		else:
 			# Recessed folding residential entry, leaving central 2.5 m as an open passage.
 			for s in [-1.0, 1.0]:

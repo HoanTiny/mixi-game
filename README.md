@@ -1,5 +1,56 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.13 · phố bụi bặm, ngày khắc nghiệt**
+
+- **Đồ họa kiểu "Nobody":**
+  - lọc màu gritty (bão hòa 0,8, tương phản 1,15, ám vàng bụi, tối góc);
+  - viền đen inverted hull, đổ bóng cel 3 cấp;
+  - nắng 45° bóng đậm 0,75, bóng chân dưới người và đồ vật;
+  - đèn đường kèm quầng sáng từ 18:00;
+  - vỉa hè gạch lục giác hay gạch vuông có vân bẩn, bó vỉa 15 cm, vạch trắng đứt;
+  - vết bẩn, lá rơi, vũng nước, thùng rác xanh, biển quảng cáo đứng, xe máy dựng, bàn ghế nhựa.
+- **Ngày 1 khắc nghiệt:**
+  - An còn 50.000đ; tiền trọ 60.000đ mỗi đêm trả trước khi ngủ.
+  - Tắm nước lạnh +40 Vệ sinh và dễ cảm lạnh; giặt đồ cần xà phòng hoặc gửi tiệm 20.000đ.
+  - Mỗi sáng có việc thưởng nóng ×2; mục tiêu ngắn hạn hiện ngay trên HUD.
+- **Độ cuốn:**
+  - chữ nổi nảy khi tiền và nhu cầu đổi;
+  - rung máy quay và hạt bung khi xong trò chơi nhỏ;
+  - đói hay buồn thì rũ vai, mây đen trên đầu; bốc mùi thì người qua đường né;
+  - màn Tổng kết cuối ngày; điện thoại báo lúc 06:00.
+- Chi tiết ở [docs/NOBODY_STYLE.md](docs/NOBODY_STYLE.md). Từng phần đồ họa bật tắt bằng `look` trong `data/config.json`.
+
+**Bản web 1.11 · Chị Hạnh và góc phố mới**
+
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.11) ·
+[Xem phố trong chế độ thử](https://hoantiny.github.io/mixi-game/?street-demo&v=1.11).
+
+- Thay Chị Hạnh bằng mô hình Higgsfield gắn xương, có đứng thở và đi bộ.
+- Xe đồ ăn mới ở quán cơm: kính trong, nan bánh dựng lại, hai trục bánh riêng và va chạm đơn giản.
+- Thêm mái tôn có gân, cửa xếp, cửa gỗ và ô thông gió cho quán cơm, tiệm sửa xe và nhà trọ.
+- Giữ gameplay, quan hệ và cân bằng buôn bán của 1.10.1. Đây là đợt asset đầu, chưa thay toàn bộ bản đồ.
+- Chi tiết phạm vi: [manifest tích hợp](art/higgsfield/runtime-integration.json).
+- Bản tải Windows vẫn là 1.6; đợt phát hành này cập nhật web.
+
+**Bản web 1.10.1 · quan hệ NPC và buôn bán**
+
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.10.1). 1.10.1 cân lại tiền buôn bán cho sát chương đầu: bán rong ngang việc làm thường, live gấp khoảng 1,5–2,4 lần, hàng đắt khó bán rong. Chi tiết thiết kế ở
+[docs/RELATIONSHIPS_COMMERCE.md](docs/RELATIONSHIPS_COMMERCE.md), kiểu dữ liệu TypeScript ở `docs/schema/`.
+
+- **Quan hệ NPC** (`data/systems/relationships.json`):
+  - Bậc quan hệ theo điểm 0–100.
+  - Mốc mở tin nhắn và cảnh truyện.
+  - Trạng thái **Cặp đôi**: Tâm trạng hồi +1,5 mỗi giờ, mệt chậm hơn 15%. Lâu không gặp thì quan hệ nguội đi.
+  - Tuyến tình cảm mới với **Hân bán hoa xe đạp**, có 4 cảnh truyện.
+  - Điện thoại có thêm app **Tin nhắn**, trả lời được.
+- **Buôn bán** (`data/systems/commerce.json`):
+  - Nhập sỉ ở chợ Long Biên theo giá thị trường đổi hằng ngày.
+  - Xe đẩy và kho thuê (hàng mốc nếu kho chưa có quạt hút ẩm).
+  - Bày bán hàng rong ở bờ hồ, Tạ Hiện, điểm xe buýt, cổng chợ; ở chỗ không được phép thì có rủi ro trật tự đô thị.
+  - App **Shippy**: giá sỉ, đơn chờ, uy tín, định giá.
+  - **Livestream** học từ chị Vy: chọn kịch bản, thuê người, tung voucher đúng lúc. Đơn có thể bị hoàn (boom hàng).
+- Kiểm thử: `tests/relationships_commerce.gd`.
+
 **Bản web 1.8 · nhân vật và minigame 3D**
 
 [Chơi thử bản mới](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.8).

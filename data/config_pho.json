@@ -346,6 +346,145 @@
    "effects": {
     "special": "toc:dye_ash"
    }
+  },
+  {
+   "id": "han_bo_hoa",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Phụ Hân bó hoa, tỉa lá",
+   "hours": 0.5,
+   "window": [
+    6,
+    11
+   ],
+   "effects": {
+    "rep.HAN": 4,
+    "need.mood": 3,
+    "xp.per": 2
+   },
+   "note": "Hân bán hoa xe đạp: cành nào cắt chéo, lá nào phải tỉa, chị chỉ rất kỹ"
+  },
+  {
+   "id": "han_ca_phe",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Mua hai cốc cà phê muối, mời Hân một cốc",
+   "hours": 0.3,
+   "cost": 50000,
+   "effects": {
+    "rep.HAN": 3,
+    "need.mood": 4
+   },
+   "require": {
+    "rep.HAN": 35
+   }
+  },
+  {
+   "id": "han_tang_qua",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Tặng Hân con gấu bông ném vòng được",
+   "hours": 0.1,
+   "effects": {
+    "rep.HAN": 8,
+    "need.mood": 3,
+    "item.gau_bong": -1
+   },
+   "require": {
+    "has_item": "gau_bong"
+   },
+   "perDay": 1,
+   "note": "Gấu bông lấy ở trò ném vòng"
+  },
+  {
+   "id": "vy_hoc_live",
+   "group": "optional",
+   "location": "shop_ao",
+   "name": "Nhờ chị Vy chỉ cách bán hàng livestream",
+   "hours": 1.0,
+   "effects": {
+    "flag.phoVyLive": true,
+    "xp.per": 8,
+    "xp.int": 4,
+    "rep.VY": 2
+   },
+   "require": {
+    "rep.VY": 60
+   },
+   "hideIfFlag": "phoVyLive",
+   "note": "Mở app Shippy: lên sóng ở phòng trọ hay quán net"
+  },
+  {
+   "id": "tra_tien_tro",
+   "group": "life",
+   "location": "home",
+   "name": "Trả tiền trọ đêm nay cho cô Duyên",
+   "hours": 0.05,
+   "cost": 60000,
+   "perDay": 1,
+   "showIf": {
+    "rent_paid": false
+   },
+   "effects": {
+    "rent_pay": true
+   },
+   "note": "Chưa trả thì không ngủ, không nghỉ ở phòng được"
+  },
+  {
+   "id": "giat_tiem",
+   "group": "life",
+   "location": "home",
+   "name": "Gửi tiệm giặt đầu ngõ",
+   "hours": 0.2,
+   "cost": 20000,
+   "perDay": 1,
+   "effects": {
+    "need.neat": 100
+   },
+   "note": "Tối lấy về, quần áo thơm mùi nước xả"
+  },
+  {
+   "id": "mua_xa_phong",
+   "group": "life",
+   "location": "cho_cau_nho",
+   "name": "Mua bánh xà phòng giặt (3 lần giặt)",
+   "hours": 0.1,
+   "cost": 15000,
+   "perDay": 2,
+   "effects": {
+    "item.xa_phong": 3
+   }
+  },
+  {
+   "id": "tam_nong",
+   "group": "life",
+   "location": "nha_tro_giuong",
+   "name": "Tắm nước nóng ở nhà tắm công cộng",
+   "hours": 0.4,
+   "cost": 25000,
+   "perDay": 1,
+   "effects": {
+    "need.clean": 100,
+    "need.mood": 4,
+    "cond.cam_lanh": false
+   },
+   "note": "Nước nóng, xà phòng thơm: trị dứt cảm lạnh"
+  },
+  {
+   "id": "mua_smartphone",
+   "group": "life",
+   "location": "cam_do",
+   "name": "Mua lại chiếc smartphone đời mới khách cầm quá hạn",
+   "hours": 0.3,
+   "cost": 1500000,
+   "perDay": 1,
+   "hideIfFlag": "phoSmartphone",
+   "effects": {
+    "flag.phoSmartphone": true,
+    "need.mood": 10,
+    "log": "Màn hình không vết nứt, pin cả ngày. App Giao Nhanh báo đơn nhanh hơn hẳn.",
+    "diary": "Mua được cái điện thoại tử tế đầu tiên từ hồi mất việc."
+   }
   }
  ],
  "minigames": {

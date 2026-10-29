@@ -217,6 +217,27 @@ float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
+float vnoise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+
+// Bụi bẩn kiểu "Nobody": loang ố lớn, vệt bẩn vừa, chấm kẹo cao su, vết nứt chân chim (đường vân của nhiễu).
+vec3 grime(vec3 col, vec2 w, float amount) {
+	float big = vnoise(w * 0.18) * 0.6 + vnoise(w * 0.55) * 0.4;
+	col *= mix(1.0, 0.68, smoothstep(0.52, 0.85, big) * amount);
+	float stain = vnoise(w * 1.7 + 17.0);
+	col *= mix(1.0, 0.8, smoothstep(0.72, 0.9, stain) * amount);
+	float crack = abs(vnoise(w * 2.3 + 5.0) - 0.5);
+	float cm = (1.0 - smoothstep(0.0, 0.012, crack)) * smoothstep(0.55, 0.75, vnoise(w * 0.4 + 9.0));
+	col *= 1.0 - cm * 0.55 * amount;
+	float gum = step(0.992, hash(floor(w / 0.09)));
+	col *= 1.0 - gum * 0.35 * amount;
+	return col;
+}
+
 void fragment() {
 	// Lòng đường giữ cách tô cũ (màu đỉnh nhân texture); các mặt khác màu đỉnh là mã sRGB, đổi sang tuyến tính.
 	vec3 col = COLOR.a > 0.8 ? COLOR.rgb : pow(COLOR.rgb, vec3(2.2));
@@ -227,6 +248,39 @@ void fragment() {
 			NORMAL_MAP = texture(normal_tex, w / meters).rgb;
 			NORMAL_MAP_DEPTH = 0.8;
 		}
+		// Nhựa đường cũ: mảng vá đậm nhạt, vệt dầu loang, vết nứt, đá dăm lộ lấm tấm.
+		float patch = vnoise(w * 0.09 + 3.0);
+		col *= mix(1.0, 0.78, smoothstep(0.62, 0.66, patch));
+		col *= mix(1.0, 1.12, smoothstep(0.2, 0.16, patch));
+		col *= 0.92 + 0.16 * hash(floor(w / 0.03));
+		col = grime(col, w, 0.9);
+	} else if (COLOR.a > 0.53 && COLOR.a <= 0.58) {
+		// Gạch lục giác 25 cm (vỉa hè phố cổ): mỗi viên đậm nhạt khác nhau, mạch vữa sẫm, viên vỡ, bụi ở mạch.
+		vec2 q = w / 0.25;
+		vec2 r = vec2(1.0, 1.7320508);
+		vec2 h = r * 0.5;
+		vec2 a = mod(q, r) - h;
+		vec2 b = mod(q - h, r) - h;
+		vec2 gv = dot(a, a) < dot(b, b) ? a : b;
+		vec2 id = q - gv;
+		vec2 ab = abs(gv);
+		float edge = 0.5 - max(dot(ab, normalize(vec2(1.0, 1.7320508))), ab.x);
+		float vis = 1.0 - smoothstep(0.25, 0.7, max(fwidth(q.x), fwidth(q.y)));
+		col *= mix(1.0, 0.82 + 0.3 * hash(floor(id * 7.0)), vis);
+		col = mix(col, col * 0.42, (1.0 - smoothstep(0.02, 0.05, edge)) * vis);
+		col *= mix(1.0, 0.6, step(0.985, hash(floor(id * 3.0) + 4.0)) * vis);
+		col = grime(col, w, 1.0);
+	} else if (COLOR.a > 0.48 && COLOR.a <= 0.53) {
+		// Gạch vuông 40 cm đỏ đất xen xám, mạch vữa đen, mép mẻ, rêu bẩn đọng ở mạch.
+		vec2 p = w / 0.4;
+		vec2 cell = floor(p);
+		vec2 f = fract(p);
+		float vis = 1.0 - smoothstep(0.25, 0.7, max(fwidth(p.x), fwidth(p.y)));
+		if (hash(cell + 2.0) > 0.7) col = mix(col, col * vec3(0.78, 0.8, 0.84), vis);
+		col *= mix(1.0, 0.84 + 0.26 * hash(cell), vis);
+		float g = max(max(step(f.x, 0.035), step(1.0 - f.x, 0.035)), max(step(f.y, 0.035), step(1.0 - f.y, 0.035)));
+		col = mix(col, col * 0.4, g * vis);
+		col = grime(col, w, 1.0);
 	} else if (COLOR.a > 0.74) {
 		// Gạch block tự chèn "con sâu" (các tỉnh): viên 22,5 × 11,2 cm xếp so le, mạch đứng lượn sóng.
 		vec2 p = w / vec2(0.225, 0.112);
@@ -263,7 +317,7 @@ void fragment() {
 		col *= mix(1.0, d < 0.2 ? 1.07 : (d < 0.26 ? 0.86 : 1.0), vis);
 		float g = max(max(step(f.x, 0.025), step(1.0 - f.x, 0.025)), max(step(f.y, 0.025), step(1.0 - f.y, 0.025)));
 		col = mix(col, col * 0.6, g * vis);
-	} else if (COLOR.a > 0.45) {
+	} else if (COLOR.a > 0.58) {
 		vec2 p = w / 0.32;
 		p.x += 0.5 * mod(floor(p.y), 2.0);
 		vec2 f = fract(p);
@@ -285,6 +339,9 @@ void fragment() {
 		float g = max(step(f.x, 0.002), step(f.y, 0.003));
 		col = mix(col, col * 0.82, g * vis);
 	}
+	if (COLOR.a > 0.15 && COLOR.a < 0.8 && !(COLOR.a > 0.48 && COLOR.a <= 0.58)) {
+		col = grime(col, w, 0.75);
+	}
 	ALBEDO = col;
 	ROUGHNESS = 0.92;
 }
@@ -297,6 +354,9 @@ const GROUND_GRANITE := 0.72
 const GROUND_TERRAZZO_GREY := 0.68
 const GROUND_TERRAZZO := 0.64
 const GROUND_BRICK := 0.6
+## Gạch lục giác 25 cm, gạch vuông 40 cm (vỉa hè phố cổ Hà Nội, có vân bẩn).
+const GROUND_HEX := 0.555
+const GROUND_SQUARE := 0.505
 const GROUND_CONCRETE := 0.3
 const GROUND_PLAIN := 0.0
 ## Vỉa hè theo vùng: [kiểu (alpha màu đỉnh), màu chính, tỉ lệ]. Trung tâm TP.HCM, Hà Nội lát đá granite tự nhiên; TP.HCM
@@ -305,13 +365,13 @@ const PAVINGS := {
 	"hcm_center": [[GROUND_GRANITE, "aaa29a", 1.0]],
 	"hcm": [[GROUND_TERRAZZO, "a65842", 0.45], [GROUND_TERRAZZO_GREY, "a19d95", 0.25], [GROUND_BLOCK, "8e8b86", 0.15],
 		[GROUND_GRANITE, "a8a098", 0.15]],
-	"hanoi_center": [[GROUND_GRANITE, "8e9193", 1.0]],
+	"hanoi_center": [[GROUND_HEX, "a8a08e", 0.5], [GROUND_SQUARE, "a06a52", 0.3], [GROUND_GRANITE, "8e9193", 0.2]],
 	"hanoi": [[GROUND_GRANITE, "8e9193", 0.45], [GROUND_TERRAZZO, "a65842", 0.3], [GROUND_BLOCK, "8e8b86", 0.25]],
 	"tinh": [[GROUND_BLOCK, "8e8b86", 0.35], [GROUND_BLOCK, "9a5c48", 0.15], [GROUND_TERRAZZO, "a65842", 0.35],
 		[GROUND_TERRAZZO_GREY, "a19d95", 0.15]],
 }
 ## Bó vỉa đá (cao, rộng mét), rãnh biên xi măng sát bó vỉa, ga thu nước mỗi chừng này mét.
-const CURB_H := 0.12
+const CURB_H := 0.15
 const CURB_W := 0.18
 const GUTTER_W := 0.32
 const DRAIN_STEP := 26.0
@@ -694,7 +754,7 @@ func _roads() -> void:
 		_strip(_st("ground"), r.line, w, y, Color("4a4b4e") if w >= 7.0 else Color("66676a"))
 		if w >= 6.0 and not r.bridge:
 			for side in [-1.0, 1.0]:
-				_strip(_st("ground"), _offset(r.line, side * (w / 2.0 - GUTTER_W / 2.0)), GUTTER_W, y + 0.002, Color("9d988e", GROUND_PLAIN))
+				_strip(_st("ground"), _offset(r.line, side * (w / 2.0 - GUTTER_W / 2.0)), GUTTER_W, y + 0.002, Color("5f5a52", GROUND_CONCRETE))
 		_markings(r.line, w, y + 0.005)
 		if r.bridge:
 			_bridge_rails(r.line, w)
@@ -714,6 +774,9 @@ func _markings(line: PackedVector2Array, w: float, y: float) -> void:
 				_dashes(_offset(line, side * w / 4.0), y, white)
 	elif w >= 6.0:
 		_dashes(line, y, yellow)
+	elif w >= 4.5:
+		# Phố cổ một chiều: vạch trắng đứt ở tim đường.
+		_dashes(line, y, white)
 
 
 ## Vùng theo tọa độ gốc của khu: trung tâm TP.HCM (quanh chợ Bến Thành 2 km), TP.HCM, trung tâm Hà Nội (quanh hồ
@@ -776,7 +839,7 @@ func _curbs() -> void:
 	var stone := Color("a39f97")
 	for r in data.roads:
 		var w := float(r.width)
-		if r.small or r.bridge or r.tunnel or w < 6.0:
+		if r.small or r.bridge or r.tunnel or w < 4.5 or AreaData.sidewalk(r) <= 0.0:
 			continue
 		for side in [-1.0, 1.0]:
 			var line := _offset(r.line, side * (w / 2.0 + CURB_W / 2.0))

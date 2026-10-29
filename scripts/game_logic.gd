@@ -10,6 +10,7 @@ extends RefCounted
 ## Số liệu và nội dung nằm trong data/*.json; file này chỉ đọc và xử lý.
 
 signal changed
+const EventScheduler := preload("res://scripts/systems/EventSchedulerSystem.gd")
 signal notes_changed
 
 const WEEKDAYS := ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"]
@@ -51,6 +52,8 @@ const Attributes := preload("res://scripts/systems/attributes.gd")
 const GameClock := preload("res://scripts/systems/game_clock.gd")
 ## Tay nghề, bằng cấp (data/systems/careers.json) và tầng luật của trò chơi nhỏ (data/systems/minigames.json).
 const Careers := preload("res://scripts/systems/careers.gd")
+const Commerce := preload("res://scripts/systems/commerce.gd")
+const Hardship := preload("res://scripts/systems/hardship.gd")
 const MiniGames := preload("res://scripts/minigames/minigames.gd")
 const MapManager := preload("res://scripts/systems/map_manager.gd")
 const Relationships := preload("res://scripts/systems/relationships.gd")
@@ -115,7 +118,7 @@ func load_data(dir := "res://data") -> void:
 	_merge_pack(dir, "_pho.json")
 	if FileAccess.file_exists(dir + "/clothes.json"):
 		clothes = _read_json(dir + "/clothes.json")
-	for sys in ["survival", "attributes", "careers", "zones", "relationships", "economy"]:
+	for sys in ["survival","attributes","careers","zones","relationships","economy","commerce","hardship"]:
 		if FileAccess.file_exists(dir + "/systems/" + sys + ".json"):
 			cfg[sys] = _read_json(dir + "/systems/" + sys + ".json")
 	if FileAccess.file_exists(dir + "/systems/minigames.json"):
@@ -126,6 +129,8 @@ func load_data(dir := "res://data") -> void:
 	if FileAccess.file_exists(dir + "/systems/inventory.json"):
 		cfg["consumables"] = _read_json(dir + "/systems/inventory.json")
 		Inventory.register(self)
+	Commerce.register(self)
+	EventScheduler.register(self)
 
 
 func _merge_pack(dir: String, suffix: String) -> void:
@@ -190,6 +195,8 @@ func new_game(mode: String, diff := "thuong") -> void:
 	Economy.initialize(self)
 	s["difficulty"] = diff if cfg.get("difficulty", {}).has(diff) else "thuong"
 	if full:
+		# Áp lực sinh tồn (hardship.json): sáng ngày 1 An chỉ còn tiền đủ một bữa.
+		Hardship.new_game(self)
 		s["cash"] = int(s.cash) + int(_diff().get("cashBonus", 0))
 	for r in p.receivables:
 		_add_receivable(r)
@@ -476,12 +483,15 @@ func set_difficulty(diff: String) -> void:
 
 func add_fatigue(d: float) -> void:
 	if d > 0.0:
-		d *= float(_diff().get("fatigueRate", 1.0))
+		# Trạng thái tốt (Cặp đôi…) làm mệt chậm hơn: fatigue.rate trong mods của survival.json.
+		d *= float(_diff().get("fatigueRate", 1.0)) * maxf(0.0, 1.0 + mod("fatigue.rate"))
 	s["fatigue"] = clampf(float(s.fatigue) + d, 0.0, float(cfg.fatigue.max))
 
 
 func add_rep(k: String, d: float) -> void:
 	s.rep[k] = clampi(int(s.rep.get(k, 50)) + int(d), 0, 100)
+	if d > 0.0:
+		Relationships.touch(self, k)
 
 
 func _find(list: Array, id: String) -> Variant:
@@ -650,7 +660,9 @@ func apply_effects(eff: Dictionary) -> void:
 					if not s.has("scores"):
 						s["scores"] = {}
 					s.scores[key.substr(6)] = int(s.scores.get(key.substr(6), 0)) + int(v)
-				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)):
+				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)
+						or Relationships.effect(self, key, v) or Commerce.effect(self, key, v) or EventScheduler.effect(self, key, v)
+						or Hardship.effect(self, key, v)):
 					push_warning("Hiệu ứng không rõ: " + str(key))
 
 
@@ -1079,6 +1091,12 @@ func check(req: Dictionary) -> String:
 			if r == null:
 				r = Careers.check(self, key, v)
 			if r == null:
+				r = Relationships.check(self, key, v)
+			if r == null:
+				r = Commerce.check(self, key, v)
+			if r == null:
+				r = Hardship.check(self, key, v)
+			if r == null:
 				push_warning("Điều kiện không rõ: " + str(key))
 			else:
 				fail = str(r)
@@ -1178,11 +1196,16 @@ func action_status(a: Dictionary) -> Dictionary:
 		return {"ok": false, "reason": relation_reason}
 	var economy_reason := Economy.action_block(self, a)
 	if economy_reason != "": return {"ok":false,"reason":economy_reason}
+	var schedule_lock := EventScheduler.job_lock(self, a)
+	if not schedule_lock.is_empty():
+		return {"ok":false,"reason":schedule_lock}
 	var reason := choice_lock(a)
 	if reason != "":
 		return {"ok": false, "reason": reason}
 	# Đói lả không bê vác, bốc mùi không phục vụ khách, trầm cảm không đi làm (scripts/systems/survival.gd).
 	reason = Survival.block(self, a)
+	if reason == "":
+		reason = Hardship.block(self, a)
 	if reason != "":
 		return {"ok": false, "reason": reason}
 	if today_count(a.id) >= int(a.get("perDay", 1)):
@@ -1273,6 +1296,9 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 			s.job_last[id] = {"ratio": float(result.get("ratio", 1.0)), "bonus": int(result.get("bonus", 0))}
 	if pay > 0 and perk_pay(id) > 0.0:
 		pay = round_k(float(pay) * (1.0 + perk_pay(id)))
+	if pay > 0 and Hardship.pay_mult(self, id) > 1.0:
+		pay = round_k(float(pay) * Hardship.pay_mult(self, id))
+		add_log("Việc thưởng nóng hôm nay: lương ×%d" % int(Hardship.pay_mult(self, id)), "event")
 	if a.group == "work" and pay > 0 and pay_mult() < 1.0:
 		pay = round_k(float(pay) * pay_mult())
 		add_log("Phong độ kém, chỉ được %d%% tiền công" % int(pay_mult() * 100.0), "warn")
@@ -1296,6 +1322,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 		if a.group == "work":
 			last_minigame["text"] = str(last_minigame.text) + " · Thực nhận " + fmt_money(pay)
 	Relationships.on_action(self, a)
+	EventScheduler.on_action(self, a)
 	if a.group == "work" and finish > float(cfg.lateHour) + 0.001:
 		add_fatigue(float(cfg.lateFatigue))
 		add_log("Làm tới cuối tối: Mệt +%d" % int(cfg.lateFatigue), "warn")
@@ -1322,6 +1349,7 @@ func sleep_away(kind: String, loc: String) -> void:
 		need_adj("mood", float(c.get("mood", 0)))
 	add_log(str(c.get("log", "Ngủ qua đêm ngoài nhà")), "event")
 	s["wake_at"] = loc
+	s.today["slept_away"] = true
 	finish_day()
 	if not is_over() and c.has("event"):
 		s.queue.push_front({"id": str(c.event), "data": {}})
@@ -1621,7 +1649,9 @@ func living_cost() -> int:
 			var cn: Dictionary = cfg.get("chapter%d" % chapter(), {})
 			var ma_here: bool = s.flags.get("maVe", false) and not s.flags.get("maDaDi", false)
 			return int(cn.get("livingCostPerDay" if ma_here else "livingCostAlone", cfg.livingCostPerDay))
-	return Economy.living_cost(self, int(cfg.livingCostPerDay))
+	if Hardship.living_cost(self) >= 0:
+		return Hardship.living_cost(self)
+	return Economy.living_cost(self,int(cfg.livingCostPerDay))
 
 
 ## Tiền nhà còn phải đóng: chương 2 tối ngày 60 (tiền nhà tháng sau, hay phần còn lại của phòng đã đặt cọc), chương 3
@@ -1776,8 +1806,11 @@ func finish_day() -> void:
 		s["needs_t"] = float(cfg.dayStart)
 		if style() > 0:
 			need_adj("mood", minf(8.0, float(style()) * 0.5))
-	Economy.nightly(self)
-	spend(living_cost(), Economy.living_label(self))
+	if Hardship.on(self):
+		Hardship.night(self,bool(s.today.get("slept_away",false)))
+	else:
+		Economy.nightly(self)
+	if living_cost() > 0: spend(living_cost(),Economy.living_label(self))
 
 	# Mệt: đếm ngày ở mức cảnh báo và những lần bỏ qua cơ hội nghỉ, rồi hồi qua đêm.
 	# Mệt cuối ngày dùng cho kết E6; sáng ngày 30 kết thúc ngay nên giữ số của tối ngày 29.
@@ -2347,9 +2380,14 @@ func traits() -> Array:
 	if count("com_voi_ba") + count("dua_ba_di_cho") >= 3:
 		out.append({"name": "Thương nhà", "tone": "good", "desc": "Bận mấy cũng về ăn cơm với bà, đưa bà đi chợ."})
 	var rep_sum := 0
+	var rep_n := 0
 	for k in s.rep:
+		# Tuyến tình cảm (Hân) không tính vào chuyện được lòng xóm.
+		if Relationships.npc_def(self, k).get("romance", false):
+			continue
 		rep_sum += int(s.rep[k])
-	if s.rep.size() > 0 and rep_sum / s.rep.size() >= 60:
+		rep_n += 1
+	if rep_n > 0 and rep_sum / rep_n >= 60:
 		out.append({"name": "Được lòng xóm", "tone": "good", "desc": "Hàng xóm, người quen trung bình thân từ 60 trở lên."})
 	if float(s.fatigue) >= float(cfg.fatigue.warn) or int(s.get("warn_days", 0)) >= 3:
 		out.append({"name": "Cố quá sức", "tone": "bad", "desc": "Làm tới kiệt sức. Mệt cao thì đi chậm, dễ hỏng việc."})
@@ -2488,6 +2526,9 @@ func _commit() -> void:
 	migrate_save()
 	_tick_needs()
 	Survival.update(self)
+	Commerce.tick(self)
+	Relationships.tick(self)
+	Hardship.tick(self)
 	_check_quests()
 	Day23.tick(self)
 	changed.emit()
@@ -2503,6 +2544,9 @@ func migrate_save() -> void:
 	Relationships.migrate(self)
 	Inventory.migrate(self)
 	Economy.migrate(self)
+	Commerce.migrate(self)
+	Hardship.migrate(self)
+	EventScheduler.tick(self)
 
 
 func neighborhood_target() -> Dictionary:
@@ -2702,7 +2746,20 @@ func move_mult() -> float:
 	var slow := Survival.move_factor(self)
 	if has_needs() and phong_do() < float(cfg.needs.slowBelow):
 		slow = minf(slow, 0.7)
+	# Đói hay buồn (dưới 30): lê bước, đi chậm hơn (nhân vật rũ vai, mây đen trên đầu: world.gd).
+	if low_spirits():
+		slow = minf(slow, 0.82)
 	return slow * (1.0 + Attributes.mod(self, "move"))
+
+
+## Độ no hay Tâm trạng dưới 30: đi chậm, rũ vai, mây đen trên đầu.
+func low_spirits() -> bool:
+	return has_needs() and (need("fed") < 30.0 or need("mood") < 30.0)
+
+
+## Vệ sinh dưới 30: bốc mùi, người qua đường né.
+func smelly() -> bool:
+	return has_needs() and need("clean") < 30.0
 
 
 ## Hệ số tiền công theo phong độ: đủ thì 100%, kém thì 70%, tệ thì 50%.

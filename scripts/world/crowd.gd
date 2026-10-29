@@ -76,6 +76,8 @@ var _w_lat := PackedFloat32Array()
 var _w_speed := PackedFloat32Array()
 ## Người đi bộ đang né An: chỉ số -> độ lệch ngang thêm (m) và còn bao lâu đi chậm lại.
 var _dodge := {}
+## Nhân khoảng né (An bốc mùi thì người đi bộ né xa hơn: juice.gd đặt).
+var dodge_mult := 1.0
 var _hold := {}
 ## Trẻ con: MultiMesh trẻ con, MultiMesh trái banh, mỗi nhóm {c, d (hướng hẻm), kids: [pha], from, to, t}.
 var _kid_mm: MultiMesh
@@ -517,8 +519,9 @@ func _dodge_step(i: int, base: Vector2, n: Vector2, fwd: Vector2, focus: Vector2
 	var gap := rel.dot(n) + _w_lat[i]
 	var want := 0.0
 	if ahead > -0.5 and ahead < 2.6:
-		want = maxf(0.0, DODGE_GAP - gap) if gap >= 0.0 else minf(0.0, -DODGE_GAP - gap)
-		want = clampf(want, -DODGE_MAX, DODGE_MAX)
+		var gap_need := DODGE_GAP * dodge_mult
+		want = maxf(0.0, gap_need - gap) if gap >= 0.0 else minf(0.0, -gap_need - gap)
+		want = clampf(want, -DODGE_MAX * dodge_mult, DODGE_MAX * dodge_mult)
 	cur = move_toward(cur, want, delta * 2.4)
 	if absf(gap + cur) < DODGE_GAP * 0.8 and ahead > 0.0 and ahead < 1.4:
 		_hold[i] = true

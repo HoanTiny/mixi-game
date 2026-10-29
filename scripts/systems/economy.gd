@@ -7,11 +7,12 @@ static func configure(g) -> void:
 	if g.cfg.has("full") and data(g).has("initialCash"):
 		g.cfg.full.cash = int(data(g).initialCash)
 	if g.get_action("tra_tro_dem").is_empty():
-		g.cfg.actions.append({"id":"tra_tro_dem","name":"Trả tiền trọ cho cô Duyên","group":"life","location":"xom_bo_me","hours":0.0833333333,"perDay":1,"days":[1,30],"cost":int(data(g).get("nightlyRent",60000)),"effects":{},"require":{"mode":"full"}})
+		g.cfg.actions.append({"id":"tra_tro_dem","name":"Trả tiền trọ cho cô Duyên","group":"life","location":"xom_bo_me","hours":0.0833333333,"perDay":1,"days":[1,30],"cost":int(data(g).get("nightlyRent",60000)),"effects":{"rent_pay":true},"require":{"mode":"full"}})
 	var bath: Dictionary = g.get_action("tam_rua")
 	if not bath.is_empty():
 		bath.name = "Tắm nước lạnh"
 		bath.effects["need.clean"] = 40
+	if g.cfg.has("hardship"): g.cfg.hardship.startCash = int(data(g).get("initialCash",46000))
 
 static func initialize(g) -> void:
 	g.s["housing_fund"] = int(data(g).get("initialHousingFund",1400000)) if g.is_full() else 0
@@ -51,6 +52,8 @@ static func active(g) -> bool:
 	return g.is_started() and g.is_full() and g.chapter() == 1 and not data(g).is_empty()
 
 static func base_pay(g, a: Dictionary, pay: int) -> int:
+	# 1.13 authored job-board/hot-job quotes own their economy. Preserve those contracts.
+	if g.Hardship.on(g) and str(a.get("id","")) != "bia_service": return pay
 	if not active(g) or str(a.get("group","")) != "work" or pay <= 0: return pay
 	var overrides: Dictionary = data(g).get("basePayOverrides",{})
 	if overrides.has(str(a.id)): return mini(pay,int(overrides[str(a.id)]))
@@ -70,7 +73,7 @@ static func living_label(g) -> String:
 
 static func rent_due(g) -> int:
 	if not active(g): return 0
-	if g.today_count("tra_tro_dem") > 0: return 0
+	if g.today_count("tra_tro_dem") > 0 or bool(g.s.today.get("rent_paid",false)): return 0
 	# Paid lodging (or choosing a rough night) replaces today's daily room.
 	for id in g.s.today.get("list",[]):
 		if g.get_action(str(id)).has("sleepAway"): return 0

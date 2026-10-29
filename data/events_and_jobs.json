@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "money_unit_vnd": 1000,
+  "daily_refresh_hour": 6,
+  "bonus_pay": {
+    "count": 2,
+    "percent_range": [
+      15,
+      35
+    ]
+  },
+  "zones": {
+    "Zone1_SlumAndNightMarket": {
+      "locations": [
+        "xom_bo_me",
+        "cho_cau_nho",
+        "hem_dua",
+        "nha_di_nam"
+      ],
+      "radius_m": 24
+    },
+    "Zone2_ParkAndEntertainment": {
+      "locations": [
+        "ho_guom",
+        "quan_bia",
+        "quan_net"
+      ],
+      "radius_m": 24
+    },
+    "Zone3_IndustrialAndLogistics": {
+      "locations": [
+        "bai_boc_vac",
+        "tiem_sau",
+        "ben_xe_6"
+      ],
+      "radius_m": 24
+    },
+    "Zone4_CommercialDistrict": {
+      "locations": [
+        "shop_ao",
+        "com_hanh",
+        "ve_so",
+        "cam_do",
+        "tiem_toc"
+      ],
+      "radius_m": 24
+    }
+  },
+  "job_board_location": "bai_boc_vac",
+  "night_market": {
+    "zone": "Zone1_SlumAndNightMarket",
+    "location": "cho_cau_nho",
+    "open_hour": 18,
+    "close_hour": 23,
+    "slot_offsets": [
+      [
+        -3,
+        1
+      ],
+      [
+        3,
+        1
+      ]
+    ],
+    "light_color": "ffd28a",
+    "light_energy": 1.4
+  },
+  "runtime_adapters": {
+    "npc_ids": {
+      "han_tiem_hoa": "HAN",
+      "anh_tu": "ANH_TU",
+      "ong_lao_phe_lieu": "ONG_LAO_PHE_LIEU"
+    },
+    "minigames": {
+      "carry_bricks": "be_gach",
+      "ring_toss": "nem_vong"
+    }
+  },
+  "daily_job_pool": [
+    {
+      "job_id": "carry_bricks",
+      "title": "Bốc vác gạch công trường",
+      "zone": "Zone3_IndustrialAndLogistics",
+      "minigame_scene": "res://scenes/minigames/BrickCarryingGame.tscn",
+      "duration_hours": 5,
+      "base_pay": 120,
+      "broker_fee_percent": 10,
+      "requirements": {
+        "strength": 1
+      },
+      "stat_changes": {
+        "hunger": -25,
+        "hygiene": -35,
+        "mood": -15
+      },
+      "rewards": {
+        "strength_exp": 15,
+        "skill_points": 1
+      },
+      "injury_risk_percent": 10
+    },
+    {
+      "job_id": "handout_flyers",
+      "title": "Phát tờ rơi ngã tư",
+      "zone": "Zone4_CommercialDistrict",
+      "minigame_scene": "res://scenes/minigames/FlyerQTEGame.tscn",
+      "duration_hours": 5,
+      "base_pay": 100,
+      "broker_fee_percent": 10,
+      "requirements": {
+        "agility": 1
+      },
+      "stat_changes": {
+        "hunger": -15,
+        "hygiene": -15,
+        "mood": -10
+      },
+      "rewards": {
+        "intelligence_exp": 15,
+        "skill_points": 1
+      },
+      "injury_risk_percent": 2
+    },
+    {
+      "job_id": "mascot_panda",
+      "title": "Nhảy Mascot Gấu Trúc TTTM",
+      "zone": "Zone4_CommercialDistrict",
+      "minigame_scene": "res://scenes/minigames/MascotRhythmGame.tscn",
+      "duration_hours": 5,
+      "base_pay": 220,
+      "broker_fee_percent": 0,
+      "requirements": {
+        "strength": 2,
+        "agility": 2
+      },
+      "stat_changes": {
+        "hunger": -30,
+        "hygiene": -40,
+        "mood": -10
+      },
+      "rewards": {
+        "agility_exp": 20,
+        "skill_points": 2
+      },
+      "injury_risk_percent": 15
+    }
+  ],
+  "entertainment_minigames": [
+    {
+      "game_id": "ring_toss",
+      "title": "Ném vòng cổ chai",
+      "zone": "Zone2_ParkAndEntertainment",
+      "minigame_scene": "res://scenes/minigames/RingTossGame.tscn",
+      "open_hour": 7,
+      "close_hour": 23,
+      "cost": 5,
+      "duration_hours": 1,
+      "stat_changes": {
+        "mood": 15,
+        "satisfaction": 10
+      },
+      "loot_table": [
+        "teddy_bear",
+        "soda_can",
+        "piggy_bank"
+      ]
+    },
+    {
+      "game_id": "plaza_aerobic",
+      "title": "Nhảy đầm dưỡng sinh cùng các cụ",
+      "zone": "Zone2_ParkAndEntertainment",
+      "minigame_scene": "res://scenes/minigames/AerobicQTEGame.tscn",
+      "open_hour": 17,
+      "close_hour": 21,
+      "cost": 0,
+      "duration_hours": 1,
+      "stat_changes": {
+        "mood": 20,
+        "strength_exp": 5
+      }
+    }
+  ],
+  "scheduled_story_events": [
+    {
+      "day": 4,
+      "event_id": "construction_halt_and_scrap_guild",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        7,
+        18
+      ],
+      "title": "Công trường ngừng thi công & Gia nhập Bang Phế Liệu",
+      "description": "Anh Tứ làm ẩu bị sếp mắng, công trình tạm đóng cửa 1 ngày. Ông lão thu gom phế liệu mở khóa tính năng mua sỉ sắt vụn giá cao.",
+      "effects": {
+        "disable_job_today": "carry_bricks",
+        "unlock_feature": "wholesale_scrap_trading",
+        "npc_affinity_add": {
+          "anh_tu": 10,
+          "ong_lao_phe_lieu": 15
+        }
+      }
+    },
+    {
+      "day": 10,
+      "event_id": "scam_cambodia_offer",
+      "trigger_zone": "Zone1_SlumAndNightMarket",
+      "trigger_hour_range": [
+        12,
+        22
+      ],
+      "title": "Cạm bẫy Việc nhẹ lương cao",
+      "description": "Một gã lạ mặt trước quán lẩu gạ làm IT lương 20.000 đồng/tháng, chỉ cần nộp hộ chiếu.",
+      "choices": [
+        {
+          "text": "Nghi ngờ và lên Đồn Cảnh Sát trình báo (Yêu cầu Nhạy bén >= 2)",
+          "condition": {
+            "perception": 2
+          },
+          "outcome": {
+            "money": 500,
+            "reputation": 10,
+            "intelligence_exp": 20
+          }
+        },
+        {
+          "text": "Từ chối khéo rồi bỏ đi",
+          "outcome": {
+            "mood": 5
+          }
+        }
+      ]
+    },
+    {
+      "day": 37,
+      "event_id": "han_flower_shop_mouse",
+      "trigger_zone": "Zone4_CommercialDistrict",
+      "trigger_hour_range": [
+        8,
+        20
+      ],
+      "title": "Bắt chuột giúp Hân ở tiệm hoa",
+      "description": "Hân hoảng sợ vì có chuột trong góc tiệm hoa. Lao vào bắt chuột giúp cô ấy để mở khóa kết bạn Zalo.",
+      "effects": {
+        "unlock_zalo_contact": "han_tiem_hoa",
+        "npc_affinity_add": {
+          "han_tiem_hoa": 25
+        },
+        "mood": 20
+      }
+    },
+    {
+      "day": 57,
+      "event_id": "han_flower_shop_robbery",
+      "trigger_zone": "Zone4_CommercialDistrict",
+      "trigger_hour_range": [
+        6,
+        12
+      ],
+      "title": "Tiệm hoa bị trộm đập phá",
+      "description": "Quán hoa của Hân bị kẻ xấu phá hoại. Báo công an và phụ cô ấy dọn dẹp để tiến tới tỏ tình.",
+      "effects": {
+        "npc_affinity_add": {
+          "han_tiem_hoa": 40
+        },
+        "unlock_confession_quest": true
+      }
+    }
+  ]
+}

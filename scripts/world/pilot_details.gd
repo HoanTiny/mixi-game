@@ -6,6 +6,7 @@ const WorkProps := preload("res://scripts/work/work_props.gd")
 const Models := preload("res://scripts/world/models.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const CityMap := preload("res://scripts/world/city_map.gd")
+const FoodCart := preload("res://assets/higgsfield/street_food_cart/cart.tscn")
 
 const FLOOR_Y := 0.15
 const PAVEMENT_Y := 0.052
@@ -14,7 +15,7 @@ const PAVEMENT_Y := 0.052
 static func build(world) -> Node3D:
 	var root := Node3D.new()
 	root.name = "PilotDetails"
-	if not world.real or not world.city.pilot_active:
+	if not world.real or not (world.city.pilot_active or world.city.street_upgrade):
 		return root
 	for id in ["com_hanh", "tiem_sau", "xom_bo_me"]:
 		if not world.city.locs.has(id):
@@ -57,24 +58,18 @@ static func _scan(parent: Node3D, asset: String, pos: Vector3, height: float, ya
 
 
 static func _serving_cart(world, parent: Node3D, width: float) -> void:
-	# Fits beside the right dining table, wholly behind the threshold. The left
-	# table and its two animated diners remain untouched.
-	var position := Vector3(width * 0.4, FLOOR_Y, -0.46)
-	var cart := _scan(parent, "industrial_storage_cart", position, 1.06)
+	# Right bay is now a serving counter. The two seated customers and their left
+	# table stay in place. The cart, including canopy, stays behind the threshold.
+	var position := Vector3(width * 0.27, FLOOR_Y, -0.72)
+	var cart := FoodCart.instantiate()
 	cart.name = "ServingCart"
-	# Measured horizontal shelves of this source mesh are y=1.28 and y=.76;
-	# the 1.377m bounding-box top belongs to its handle, not a support surface.
-	var scale_factor := float(cart.get_meta("source_scale"))
-	var source_bottom := float(cart.get_meta("source_bottom"))
-	var top := FLOOR_Y + (1.28 - source_bottom) * scale_factor
-	var middle := FLOOR_Y + (0.76 - source_bottom) * scale_factor
-	_scan(parent, "pot_enamel_01", Vector3(position.x - 0.27, top, position.z - 0.08), 0.23, 0.08)
-	_scan(parent, "pot_enamel_01", Vector3(position.x + 0.27, top, position.z - 0.08), 0.18, -0.28)
-	_scan(parent, "wooden_bowl_02", Vector3(position.x + 0.06, top, position.z + 0.23), 0.085)
-	_scan(parent, "plastic_crate_03", Vector3(position.x + 0.12, middle, position.z), 0.23)
+	cart.position = position
+	cart.rotation.y = -PI / 2.0
+	parent.add_child(cart)
 	var steam := _steam(world)
-	steam.position = Vector3(position.x - 0.27, top + 0.23, position.z - 0.08)
-	parent.add_child(steam)
+	# Lid centre measured in the normalized cart, steam rises below its canopy.
+	steam.position = Vector3(0, 1.21, -0.39)
+	cart.add_child(steam)
 
 
 static func _service_corner(parent: Node3D, width: float) -> void:

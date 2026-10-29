@@ -20,6 +20,11 @@ const Joystick := preload("res://scripts/ui/joystick.gd")
 const WorkSite := preload("res://scripts/work/work_site.gd")
 const MapManager := preload("res://scripts/systems/map_manager.gd")
 const MiniGameViews := preload("res://scripts/minigames/views/registry.gd")
+const LiveSession := preload("res://scripts/ui/live_session.gd")
+const Relationships := preload("res://scripts/systems/relationships.gd")
+const Commerce := preload("res://scripts/systems/commerce.gd")
+const Hardship := preload("res://scripts/systems/hardship.gd")
+const DaySummary := preload("res://scripts/ui/day_summary.gd")
 
 var world
 var game
@@ -63,6 +68,10 @@ var _work: PanelContainer
 var _pd_label: Label
 var _pd_bar: ProgressBar
 var _needs_label: Label
+var _st_bill: Label
+var _st_hot: Label
+var _st_goal: Label
+var _st_goal_bar: Control
 var _phone: PanelContainer
 var _phone_box: VBoxContainer
 var _order_strip: PanelContainer
@@ -86,6 +95,15 @@ var _phone_scroll: ScrollContainer
 var _phone_clock: Label
 var _phone_batt: ColorRect
 var _phone_status: Label
+## App đang mở trên điện thoại: "giao" (Giao Nhanh), "tin" (Tin nhắn), "shop" (Shippy); cuộc trò chuyện đang xem.
+var _phone_app := "giao"
+var _msg_npc := ""
+var _phone_head: StyleBoxFlat
+var _phone_logo: Label
+var _phone_logo_bg: StyleBoxFlat
+var _phone_title: Label
+var _phone_dock: HBoxContainer
+const PHONE_APPS := {"giao": ["GN", "Giao Nhanh", "0f9d58"], "tin": ["TN", "Tin nhắn", "2f7de1"], "shop": ["S", "Shippy", "ee4d2d"]}
 ## Điện thoại: bề ngang, chiều cao phần nội dung, màu app Giao Nhanh.
 const PHONE_W := 320.0
 const PHONE_BODY_H := 430.0
@@ -253,7 +271,7 @@ func _ready() -> void:
 
 func blocking() -> bool:
 	if is_instance_valid(inventory) and inventory.visible: return true
-	return (is_instance_valid(_zone_menu) and _zone_menu.visible) or dialogs.visible or (_wardrobe != null and _wardrobe.visible) or (is_instance_valid(_bench) and _bench.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
+	return (_summary != null and is_instance_valid(_summary)) or (is_instance_valid(_zone_menu) and _zone_menu.visible) or dialogs.visible or (_wardrobe != null and _wardrobe.visible) or (is_instance_valid(_bench) and _bench.visible) or _working or minigame != null or (_big_map != null and _big_map.visible) or (character != null and character.visible)
 
 
 func location_open() -> String:
@@ -420,7 +438,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			and _prompt.visible and _quick.visible and not blocking():
 		var i: int = int(event.keycode - KEY_1)
 		if i < _quick_ids.size():
-			_quick_action(str(_quick_ids[i]))
+			_quick_run(str(_quick_ids[i]))
 			get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
@@ -466,7 +484,8 @@ func _light_panel(parent: Control) -> PanelContainer:
 
 func _build_objectives(parent: Control) -> void:
 	_objectives = _dark_panel(parent)
-	_objectives.add_theme_stylebox_override("panel", UI.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6))
+	# Nền đậm 0,85 để chữ trắng không chìm vào mặt phố phía sau.
+	_objectives.add_theme_stylebox_override("panel", UI.box(Color(0.05, 0.05, 0.04, 0.85), Color(1, 1, 1, 0.08), 8, 10))
 	_objectives.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 4)
@@ -603,8 +622,11 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 	if a.has("minigame") and result.is_empty():
 		_open_minigame(id, a)
 		return
-	if id in ["tam_rua","com_voi_ba","tra_tro_dem"] and game.action_loc(a) == "xom_bo_me":
+	if id in ["tam_rua","com_voi_ba","tra_tro_dem","tra_tien_tro"] and game.action_loc(a) == "xom_bo_me":
 		_home_feedback(id)
+		return
+	if a.get("live", false) and result.is_empty():
+		_open_live(id)
 		return
 	var start: float = st.start
 	var finish: float = start + float(a.hours)
@@ -633,6 +655,24 @@ func _perform(id: String, result: Dictionary = {}) -> void:
 		world.audio.play("done")
 		game.do_action(id, result)
 		_minigame_report())
+
+
+## Màn livestream Shippy (scripts/ui/live_session.gd); xong thì giữ buổi live lại cho việc "Lên sóng" chốt khi trừ giờ.
+func _open_live(id: String) -> void:
+	var live := LiveSession.new()
+	live.game = game
+	minigame = live
+	live.finished.connect(func(r: Dictionary) -> void:
+		live.queue_free()
+		minigame = null
+		if r.has("state"):
+			world.juice.celebrate(int(r.state.total) > 0, "%d đơn!" % int(r.state.total))
+			Commerce.live_store(game, r.state)
+			_perform(id, {"live": true, "auto": true})
+		else:
+			_refresh())
+	add_child(live)
+	_refresh()
 
 
 ## Kết quả trò chơi nhỏ vừa tính (game.last_minigame: mức thưởng, chấn thương) hiện thành chữ nổi trên đầu An.
@@ -681,7 +721,7 @@ func _home_feedback(id: String) -> void:
 			"com_voi_ba":
 				world.audio.play("meal")
 				line = "Bà Thoa: Cơm còn nóng, ăn thêm miếng nữa đi con."
-			"tra_tro_dem":
+			"tra_tro_dem", "tra_tien_tro":
 				world.audio.play("spend")
 				line = "Cô Duyên: Cô nhận đủ tiền trọ đêm nay rồi nhé."
 		_feedback_line.text = line)
@@ -785,6 +825,7 @@ func _open_minigame(id: String, a: Dictionary) -> void:
 		minigame = null
 		if not r.is_empty():
 			r["session"] = token
+			if not bool(r.get("auto",false)): world.juice.celebrate(float(r.get("score",1.0))>=0.6,"Hoàn tất")
 			_perform(id, r)
 		else:
 			game.cancel_minigame(token)
@@ -878,6 +919,7 @@ func _build_phone(parent: Control) -> void:
 	# Thanh tiêu đề app.
 	var head := PanelContainer.new()
 	var hs := StyleBoxFlat.new()
+	_phone_head = hs
 	hs.bg_color = PHONE_GREEN
 	hs.content_margin_left = 16
 	hs.content_margin_right = 16
@@ -889,11 +931,13 @@ func _build_phone(parent: Control) -> void:
 	head.add_child(hrow)
 	var logo := PanelContainer.new()
 	var ls := StyleBoxFlat.new()
+	_phone_logo_bg = ls
 	ls.bg_color = Color.WHITE
 	ls.set_corner_radius_all(8)
 	ls.set_content_margin_all(4)
 	logo.add_theme_stylebox_override("panel", ls)
 	var lg := UI.label("GN", 13, PHONE_GREEN)
+	_phone_logo = lg
 	lg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lg.custom_minimum_size = Vector2(22, 0)
 	logo.add_child(lg)
@@ -903,7 +947,8 @@ func _build_phone(parent: Control) -> void:
 	titles.add_theme_constant_override("separation", 0)
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hrow.add_child(titles)
-	titles.add_child(UI.label("Giao Nhanh", 18, Color.WHITE))
+	_phone_title = UI.label("Giao Nhanh", 18, Color.WHITE)
+	titles.add_child(_phone_title)
 	_phone_status = UI.label("", 12, Color(1, 1, 1, 0.88))
 	titles.add_child(_phone_status)
 	# Nội dung cuộn được.
@@ -921,6 +966,10 @@ func _build_phone(parent: Control) -> void:
 	_phone_box.add_theme_constant_override("separation", 10)
 	_phone_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pad.add_child(_phone_box)
+	# Thanh app ở đáy màn hình: Giao Nhanh, Tin nhắn (có số tin chưa đọc), Shippy.
+	_phone_dock = HBoxContainer.new()
+	_phone_dock.add_theme_constant_override("separation", 0)
+	col.add_child(_phone_dock)
 	# Vạch home.
 	var home := CenterContainer.new()
 	home.custom_minimum_size.y = 22
@@ -1032,6 +1081,7 @@ func _process(delta: float) -> void:
 	_phone_tick -= delta
 	if _phone_tick <= 0.0:
 		_phone_tick = 0.25
+		_morning_toast()
 		_refresh_guide_distance()
 		_warn_needs()
 		_update_tip(0.25)
@@ -1057,13 +1107,14 @@ func _warn_needs() -> void:
 func _new_offer() -> void:
 	var d: Dictionary = game.cfg.delivery
 	var r: Array = d.offerSec if game.delivery_rush() else d.offPeakSec
-	_offer_wait = randf_range(float(r[0]), float(r[1]))
+	_offer_wait = randf_range(float(r[0]), float(r[1])) * (0.7 if game.s.flags.get("phoSmartphone", false) else 1.0)
 	if game.delivery_lock() != "":
 		return
 	_offer = world.make_offer()
 	if _offer.is_empty():
 		return
 	_offer_left = 12.0
+	_phone_app = "giao"
 	_phone.visible = true
 	_skills.visible = false
 	_log.visible = false
@@ -1089,6 +1140,14 @@ func _update_order_strip(o: Dictionary) -> void:
 func _refresh_phone() -> void:
 	if not _phone.visible:
 		return
+	# Tin nhắn, Shippy: chỉ dựng lại khi dữ liệu đổi (đơn giao hàng thì đếm giờ nên dựng lại liên tục).
+	if _phone_app != "giao":
+		var sig := "%s|%s|%d|%d|%d|%s|%d|%s|%d" % [_phone_app, _msg_npc, Relationships.unread(game), game.s.get("rel", {}).get("inbox", []).size(),
+			int(game.s.cash), str(Commerce.biz(game).get("tier", "")), Commerce.qty(game), str(Commerce.biz(game).get("staff", {})), game.day()]
+		_phone_clock.text = GameLogic.hh(game.clock())
+		if sig == _phone_sig:
+			return
+		_phone_sig = sig
 	for c in _phone_box.get_children():
 		c.queue_free()
 	# Thanh trạng thái: giờ trong game; pin tụt dần trong ngày.
@@ -1097,6 +1156,15 @@ func _refresh_phone() -> void:
 	var charge := clampf(1.0 - (clock - 6.0) / 20.0, 0.15, 1.0)
 	_phone_batt.size.x = 20.0 * charge
 	_phone_batt.color = Color("111318") if charge > 0.25 else Color("d93025")
+	_refresh_dock()
+	if _phone_app == "tin":
+		_phone_messages()
+		_fit_phone.call_deferred()
+		return
+	if _phone_app == "shop":
+		_phone_shop()
+		_fit_phone.call_deferred()
+		return
 	var lock: String = game.delivery_lock()
 	var rush: bool = game.delivery_rush()
 	_phone_status.text = ("● Đang nhận đơn" if _app_on else "○ Đã tắt nhận đơn") + (" · giờ cao điểm" if rush else "")
@@ -1168,6 +1236,226 @@ func _refresh_phone() -> void:
 	_fit_phone.call_deferred()
 
 
+var _phone_sig := ""
+
+
+## Đầu app và thanh app ở đáy: app đang mở tô màu, Tin nhắn có số tin chưa đọc.
+func _refresh_dock() -> void:
+	var info: Array = PHONE_APPS[_phone_app]
+	var col := Color(info[2])
+	_phone_head.bg_color = col
+	_phone_logo.text = info[0]
+	_phone_logo.add_theme_color_override("font_color", col)
+	_phone_title.text = info[1]
+	for c in _phone_dock.get_children():
+		c.queue_free()
+	for app in ["giao", "tin", "shop"]:
+		var b := Button.new()
+		var unread: int = Relationships.unread(game) if app == "tin" else 0
+		b.text = str(PHONE_APPS[app][1]) + (" (%d)" % unread if unread > 0 else "")
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size.y = 36
+		var on: bool = app == _phone_app
+		for stn in ["normal", "hover", "pressed", "focus"]:
+			var sb := StyleBoxFlat.new()
+			sb.bg_color = Color("ffffff") if on else Color("e6e9ef")
+			sb.border_color = Color(PHONE_APPS[app][2])
+			sb.border_width_top = 3 if on else 0
+			b.add_theme_stylebox_override(stn, sb)
+		b.add_theme_font_size_override("font_size", 12)
+		for fc in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+			b.add_theme_color_override(fc, Color(PHONE_APPS[app][2]) if on else (Color("d93025") if unread > 0 else Color("4a5060")))
+		b.pressed.connect(func() -> void:
+			_phone_app = app
+			_msg_npc = ""
+			_phone_sig = ""
+			_refresh_phone())
+		_phone_dock.add_child(b)
+
+
+func _phone_text(parent: Control, text: String, size := 13, color := Color("15181f")) -> Label:
+	var l := UI.label(text, size, color)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size.x = 240
+	parent.add_child(l)
+	return l
+
+
+## App Tin nhắn: danh sách cuộc trò chuyện, bấm vào thì xem tin và chọn câu trả lời (relationships.gd).
+func _phone_messages() -> void:
+	_phone_status.text = "%d tin chưa đọc" % Relationships.unread(game) if Relationships.unread(game) > 0 else "Không có tin mới"
+	if _msg_npc == "":
+		var threads: Array = Relationships.threads(game)
+		if threads.is_empty():
+			var card := _phone_card()
+			_phone_text(card, "Chưa có tin nhắn nào.")
+			_phone_text(card, "Thân hơn với ai đó thì họ sẽ nhắn cho An.", 12, Color("7a8090"))
+		for t in threads:
+			var npc := str(t.npc)
+			var card := _phone_card(Color("2f7de1") if int(t.unread) > 0 else Color(0, 0, 0, 0))
+			var head := HBoxContainer.new()
+			card.add_child(head)
+			var nm := UI.label(str(t.name), 15, Color("15181f"))
+			nm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			head.add_child(nm)
+			var rc: Dictionary = Relationships.card(game, npc)
+			head.add_child(UI.label(str(rc.status) if str(rc.status) != "" else str(rc.tier), 11, Color("e85d75") if str(rc.status) != "" else Color("7a8090")))
+			_phone_text(card, str(t.last), 12, Color("4a5060")).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			if int(t.unread) > 0:
+				card.add_child(UI.label("● %d tin mới" % int(t.unread), 11, Color("2f7de1")))
+			var open := Button.new()
+			open.flat = true
+			open.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			open.pressed.connect(func() -> void:
+				_msg_npc = npc
+				_phone_sig = ""
+				_refresh_phone())
+			card.get_parent().add_child(open)
+		return
+	_phone_btn("‹ Tất cả tin nhắn", "ghost", "", "", func() -> void:
+		_msg_npc = ""
+		_phone_sig = ""
+		_refresh_phone())
+	var rc: Dictionary = Relationships.card(game, _msg_npc)
+	var who := _phone_card()
+	who.add_child(UI.label(game.rep_name(_msg_npc), 16, Color("15181f")))
+	_phone_text(who, "%s · thân thiết %d/100%s%s" % [rc.tier, int(game.s.rep.get(_msg_npc, 0)),
+		(" · " + str(rc.status)) if str(rc.status) != "" else "", ("\nBậc sau: " + str(rc.next)) if str(rc.next) != "" else ""], 11, Color("7a8090"))
+	for m in Relationships.thread(game, _msg_npc):
+		for line in m.lines:
+			_bubble(str(line), false)
+		if int(m.replied) >= 0:
+			_bubble(str(m.mine), true)
+			if str(m.answer) != "":
+				_bubble(str(m.answer), false)
+		else:
+			var idx := int(m.i)
+			for k in m.replies.size():
+				var r: Dictionary = m.replies[k]
+				var lock: String = game.check(r.get("require", {}))
+				_phone_btn(str(r.label), "ghost", "", lock, func() -> void:
+					Relationships.reply(game, idx, k)
+					_phone_sig = ""
+					_refresh_phone())
+
+
+## Bong bóng tin: người kia bên trái nền xám, An bên phải nền xanh.
+func _bubble(text: String, mine: bool) -> void:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_END if mine else BoxContainer.ALIGNMENT_BEGIN
+	_phone_box.add_child(row)
+	var p := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("2f7de1") if mine else Color.WHITE
+	sb.set_corner_radius_all(14)
+	sb.set_content_margin_all(9)
+	p.add_theme_stylebox_override("panel", sb)
+	var l := UI.label(text, 13, Color.WHITE if mine else Color("15181f"))
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size.x = 200
+	p.add_child(l)
+	row.add_child(p)
+
+
+## App Shippy: uy tín shop, đơn chờ, giá sỉ hôm nay, hàng trên xe và trong kho, mức giá bán rong, người phụ live.
+func _phone_shop() -> void:
+	var b: Dictionary = Commerce.biz(game)
+	if b.is_empty():
+		_phone_status.text = ""
+		return
+	var orange := Color("ee4d2d")
+	var learned: bool = game.check(Commerce.data(game).live.get("unlock", {})) == ""
+	_phone_status.text = ("Uy tín shop %d" % int(b.rep)) if learned else "Bán hàng rong · chưa mở livestream"
+	var pend: Dictionary = Commerce.pending(game)
+	var shop := _phone_card(orange)
+	shop.add_child(UI.label("CỬA HÀNG CỦA AN", 11, orange))
+	_phone_line(shop, "Xe đẩy", "%d/%d món" % [Commerce.qty(game, "", "cart"), Commerce.cart_cap(game)])
+	var w: Dictionary = b.warehouse
+	_phone_line(shop, "Kho", ("%d/%d món · thuê tới ngày %d%s" % [Commerce.qty(game, "", "kho"), Commerce.kho_cap(game), int(w.paidTo), " · có quạt hút ẩm" if w.vent else " · chưa có quạt hút ẩm"])
+		if w.rented else ("chưa thuê" if Commerce.qty(game, "", "kho") == 0 else "hết hạn, còn %d món bị khóa" % Commerce.qty(game, "", "kho")))
+	if learned:
+		_phone_line(shop, "Đơn chờ", "%d món · %s%s" % [int(pend.count), GameLogic.fmt_money(int(pend.value)), (" · %d giao trễ" % int(pend.late)) if int(pend.late) > 0 else ""], true)
+		_phone_line(shop, "Đã bán", "%d đơn live · hoàn %d" % [int(b.stats.liveOrders), int(b.stats.returned)])
+	_phone_line(shop, "Bán rong", "%d món · %s" % [int(b.stats.streetSold), GameLogic.fmt_money(int(b.stats.streetRevenue))])
+	if not str(b.get("last", {}).get("text", "")).is_empty():
+		_phone_text(shop, str(b.last.text), 12, Color("4a5060"))
+	var mk := _phone_card()
+	mk.add_child(UI.label("GIÁ SỈ HÔM NAY · CHỢ LONG BIÊN", 11, orange))
+	for r in Commerce.market_rows(game):
+		var line := HBoxContainer.new()
+		mk.add_child(line)
+		var nm := UI.label(str(r.name), 13, Color("15181f"))
+		nm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		line.add_child(nm)
+		var up: bool = str(r.arrow) == "↑"
+		line.add_child(UI.label("%s %s" % [r.arrow, GameLogic.fmt_k(int(r.buy))], 13, Color("d93025") if up else (Color("0f9d58") if str(r.arrow) == "↓" else Color("4a5060"))))
+		var sub := "bán ~%s/%s" % [GameLogic.fmt_k(int(r.sell)), r.unit]
+		if int(r.cart) + int(r.kho) > 0:
+			sub += " · có %d trên xe, %d trong kho" % [int(r.cart), int(r.kho)]
+		if str(r.news) != "":
+			sub += " · " + str(r.news)
+		_phone_text(mk, sub, 11, Color("7a8090"))
+	var tiers := _phone_card()
+	tiers.add_child(UI.label("CÁCH ĐỊNH GIÁ KHI BÁN RONG", 11, orange))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	tiers.add_child(row)
+	var pt: Dictionary = Commerce.data(game).vending.priceTiers
+	for id in pt:
+		var bt := Button.new()
+		bt.text = str(pt[id].name)
+		bt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bt.add_theme_font_size_override("font_size", 12)
+		var on: bool = str(b.tier) == id
+		for stn in ["normal", "hover", "pressed", "focus"]:
+			var sb := StyleBoxFlat.new()
+			sb.bg_color = orange if on else Color("f1f2f5")
+			sb.set_corner_radius_all(12)
+			sb.set_content_margin_all(6)
+			bt.add_theme_stylebox_override(stn, sb)
+		for fc in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+			bt.add_theme_color_override(fc, Color.WHITE if on else Color("15181f"))
+		var tid: String = id
+		bt.pressed.connect(func() -> void:
+			Commerce.set_tier(game, tid)
+			_phone_sig = ""
+			_refresh_phone())
+		row.add_child(bt)
+	var cur: Dictionary = pt.get(str(b.tier), {})
+	_phone_text(tiers, "Giá ×%.2f · tỷ lệ chốt ×%.2f. Đang chốt khoảng %d%% khách để ý tới gánh hàng." % [float(cur.get("price", 1.0)), float(cur.get("close", 1.0)), int(Commerce.street_close(game) * 100.0)], 11, Color("7a8090"))
+	var lv := _phone_card()
+	lv.add_child(UI.label("LIVESTREAM", 11, orange))
+	var lock: String = Commerce.live_lock(game)
+	if not learned:
+		_phone_text(lv, "Thân với chị Vy (shop si-đa Hàng Đào) để chị chỉ cách bán hàng livestream.", 12, Color("4a5060"))
+	elif lock != "":
+		_phone_text(lv, lock, 13, Color("d93025"))
+	else:
+		_phone_text(lv, "Sẵn sàng lên sóng. Về phòng trọ hay ra quán net Hàng Bạc, chọn \"Lên sóng livestream Shippy\".", 12, Color("4a5060"))
+	for role in ["closer", "packer"]:
+		var info: Dictionary = Commerce.data(game).live.staff[role]
+		var n := int(b.staff.get(role, 0))
+		var sr := HBoxContainer.new()
+		lv.add_child(sr)
+		var nl := UI.label("%s: %d" % [info.name, n], 13, Color("15181f"))
+		nl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		sr.add_child(nl)
+		for step in [-1, 1]:
+			var sb := Button.new()
+			sb.text = "−" if step < 0 else "+"
+			sb.custom_minimum_size = Vector2(34, 30)
+			sb.disabled = n + step < 0 or n + step > int(info.max)
+			var rr: String = role
+			sb.pressed.connect(func() -> void:
+				Commerce.hire(game, rr, n + step)
+				_phone_sig = ""
+				_refresh_phone())
+			sr.add_child(sb)
+	_phone_text(lv, "Người phụ trả công sau mỗi buổi live: chốt đơn %s, đóng gói %s." % [GameLogic.fmt_money(int(Commerce.data(game).live.staff.closer.wage)),
+		GameLogic.fmt_money(int(Commerce.data(game).live.staff.packer.wage))], 11, Color("7a8090"))
+
+
 func _fit_phone() -> void:
 	# Màn hình điện thoại cao như máy thật; chỗ trống từ đầu máy tới đáy màn game ít hơn thì co lại, nội dung cuộn.
 	var chrome := _phone.size.y - _phone_scroll.size.y
@@ -1235,6 +1523,102 @@ func _toggle_log() -> void:
 
 func _open_board() -> void:
 	get_tree().change_scene_to_file("res://scenes/board.tscn")
+
+
+## Đi ngủ: chơi đủ 30 ngày thì mở màn Tổng kết cuối ngày (day_summary.gd), lát cắt và đêm cuối giữ hộp "Đi ngủ?" cũ.
+var _summary: Control
+
+
+func open_night() -> void:
+	if not game.is_full() or game.night_preview().slice_end or (_summary != null and is_instance_valid(_summary)):
+		dialogs.open_night()
+		return
+	_summary = DaySummary.new()
+	_summary.game = game
+	_summary.sleep.connect(func() -> void:
+		_summary.queue_free()
+		_summary = null
+		world.audio.play("done")
+		dialogs._end_day())
+	_summary.back.connect(func() -> void:
+		_summary.queue_free()
+		_summary = null
+		_refresh())
+	add_child(_summary)
+
+
+## Điện thoại báo lúc 06:00 mỗi sáng: việc thưởng nóng ×2 lương, tin nhắn mới, tiền trọ, mục tiêu. Bấm để mở điện thoại.
+var _toast: PanelContainer
+var _toast_day := -1
+
+
+func _morning_toast() -> void:
+	if not game.is_started() or game.is_over() or _toast_day == game.day() or blocking() or not game.s.queue.is_empty():
+		return
+	if game.clock() > float(game.cfg.dayStart) + 1.5:
+		_toast_day = game.day()
+		return
+	_toast_day = game.day()
+	var lines := []
+	var hot := Hardship.hot(game)
+	if hot != "":
+		var a: Dictionary = game.get_action(hot)
+		lines.append(["Giao Nhanh · Việc thưởng nóng", "%s: lương ×2 hôm nay (%s)" % [str(a.get("name", "")), GameLogic.fmt_money(int(a.get("pay", 0)) * 2)], Color("0f9d58")])
+	var unread: int = Relationships.unread(game)
+	if unread > 0:
+		var who := []
+		for t in Relationships.threads(game):
+			if int(t.unread) > 0:
+				who.append(str(t.name))
+		lines.append(["Tin nhắn", "%d tin mới từ %s" % [unread, ", ".join(who.slice(0, 3))], Color("2f7de1")])
+	if Hardship.on(game):
+		lines.append(["Cô Duyên", "Tối nay nhớ %s tiền trọ nhé" % GameLogic.fmt_money(Hardship.rent(game)), Color("c27c0e")])
+	if lines.is_empty():
+		return
+	if _toast != null and is_instance_valid(_toast):
+		_toast.queue_free()
+	_toast = PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.97, 0.97, 0.98, 0.97)
+	sb.set_corner_radius_all(16)
+	sb.set_content_margin_all(12)
+	sb.shadow_color = Color(0, 0, 0, 0.35)
+	sb.shadow_size = 10
+	_toast.add_theme_stylebox_override("panel", sb)
+	_toast.custom_minimum_size = Vector2(minf(420.0, ScreenFit.view_size().x - 24.0), 0)
+	_toast.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	_toast.add_child(v)
+	v.add_child(UI.label("06:00 · ĐIỆN THOẠI · Ngày %d" % game.day(), 11, Color("7a8090")))
+	for ln in lines:
+		var row := VBoxContainer.new()
+		row.add_theme_constant_override("separation", 0)
+		v.add_child(row)
+		row.add_child(UI.label(str(ln[0]), 13, ln[2]))
+		var t := UI.label(str(ln[1]), 14, Color("15181f"))
+		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		t.custom_minimum_size.x = _toast.custom_minimum_size.x - 24.0
+		row.add_child(t)
+	var hint := UI.label("Bấm để mở điện thoại", 11, Color("7a8090"))
+	v.add_child(hint)
+	_toast.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed:
+			_phone_app = "tin" if unread > 0 and hot == "" else "giao"
+			if not _phone.visible:
+				_toggle_phone()
+			_toast.queue_free())
+	add_child(_toast)
+	_toast.reset_size()
+	_toast.position = Vector2((ScreenFit.view_size().x - _toast.custom_minimum_size.x) / 2.0, -160.0)
+	world.audio.play("dialog")
+	var tw := create_tween()
+	tw.tween_property(_toast, "position:y", 14.0, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(7.0)
+	tw.tween_property(_toast, "position:y", -200.0, 0.4).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func() -> void:
+		if is_instance_valid(_toast):
+			_toast.queue_free())
 
 
 func _go_home() -> void:
@@ -1404,7 +1788,7 @@ func _build_topbar(root: Control) -> void:
 
 func _build_stats(parent: Control) -> void:
 	_stats = PanelContainer.new()
-	_stats.add_theme_stylebox_override("panel", UI.box(Color(0.06, 0.06, 0.08, 0.62), Color(1, 1, 1, 0.08), 8, 10))
+	_stats.add_theme_stylebox_override("panel", UI.box(Color(0.05, 0.05, 0.04, 0.85), Color(1, 1, 1, 0.08), 8, 10))
 	_stats.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_stats.mouse_filter = Control.MOUSE_FILTER_PASS
 	_stats.tooltip_text = "Bấm để mở bảng Nhân vật (C)"
@@ -1449,7 +1833,8 @@ func _build_stats(parent: Control) -> void:
 	fund_row.add_child(_st_fund)
 	var specs := [["stamina", "Thể lực", "bolt", "100 trừ Mệt. Ngủ, nghỉ, ngồi trà đá để hồi; chạy nhanh (Shift) và làm việc nặng thì tụt."],
 		["mood", "Tâm trạng", "heart", "Nghỉ ngơi, trà đá, ăn cơm với bà, nói chuyện với người quen thì vui lên; việc bẩn, ngủ ngoài đường thì xuống."],
-		["fed", "Độ no", "bowl", "Ăn ở quán cơm, bánh mì buổi sáng. Đói tới 0 thì Mệt tăng nhanh."]]
+		["fed", "Độ no", "bowl", "Ăn ở quán cơm, bánh mì buổi sáng. Đói tới 0 thì Mệt tăng nhanh."],
+		["clean", "Vệ sinh", "drop", "Tắm ở vòi chung (+40, dễ cảm lạnh) hay nhà tắm công cộng (+100). Dưới 30 thì bốc mùi, người ta né."]]
 	for sp in specs:
 		var r := HBoxContainer.new()
 		r.add_theme_constant_override("separation", 6)
@@ -1472,6 +1857,20 @@ func _build_stats(parent: Control) -> void:
 		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		r.add_child(n)
 		_st_bars[sp[0]] = {"bar": b, "num": n}
+	# Hôm nay: tiền trọ đêm nay, việc thưởng nóng, mục tiêu ngắn hạn (scripts/systems/hardship.gd).
+	_st_bill = UI.label("", 12, UI.HUD_TEXT)
+	_st_bill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_bill)
+	_st_hot = UI.label("", 12, Color("ffb27a"))
+	_st_hot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_hot)
+	_st_goal = UI.label("", 12, UI.GOLD)
+	_st_goal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_goal)
+	_st_goal_bar = UI.bar(6)
+	_st_goal_bar.custom_minimum_size = Vector2(220, 6)
+	_st_goal_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(_st_goal_bar)
 
 
 func _refresh_stats(s: Dictionary) -> void:
@@ -1481,11 +1880,28 @@ func _refresh_stats(s: Dictionary) -> void:
 	_st_day.text = "%s · Ngày %d, %s" % [part, game.day(), game.weekday_name()]
 	_st_cash.text = GameLogic.fmt_money(int(s.cash)) + " · Trong ví"
 	_st_fund.text = GameLogic.fmt_money(game.Economy.fund(game)) + " · Quỹ cọc nhà"
-	var vals := {"stamina": 100.0 - float(s.fatigue), "mood": game.need("mood"), "fed": game.need("fed")}
+	var vals := {"stamina": 100.0 - float(s.fatigue), "mood": game.need("mood"), "fed": game.need("fed"), "clean":game.need("clean")}
 	for k in _st_bars:
 		var x: float = vals[k]
 		UI.set_bar(_st_bars[k].bar, x, 100.0, UI.level_color(x / 100.0))
 		(_st_bars[k].num as Label).text = str(int(x))
+	var hard := Hardship.on(game)
+	_st_bill.visible = hard
+	_st_hot.visible = hard and Hardship.hot(game) != ""
+	if hard:
+		var paid := Hardship.paid(game)
+		_st_bill.text = ("✓ Đã trả tiền trọ đêm nay" if paid else "Tiền trọ đêm nay: %s · chưa trả" % GameLogic.fmt_money(Hardship.rent(game)))
+		_st_bill.add_theme_color_override("font_color", UI.HUD_SOFT if paid else (Color("ff8a7a") if int(s.cash) < Hardship.rent(game) else UI.HUD_TEXT))
+		if _st_hot.visible:
+			var ha: Dictionary = game.get_action(Hardship.hot(game))
+			_st_hot.text = "Thưởng nóng ×2 hôm nay: %s" % str(ha.get("name", ""))
+	var goal := Hardship.goal(game)
+	_st_goal.visible = not goal.is_empty()
+	_st_goal_bar.visible = not goal.is_empty()
+	if not goal.is_empty():
+		_st_goal.text = "Mục tiêu: %s · %s/%s" % [goal.name, GameLogic.fmt_k(int(goal.have)), GameLogic.fmt_money(int(goal.need))]
+		_st_goal.tooltip_text = str(goal.hint)
+		UI.set_bar(_st_goal_bar, float(goal.pct) * 100.0, 100.0, UI.GOLD)
 
 
 ## Hành động nhanh trước cửa địa điểm: tối đa ba việc sinh hoạt (ăn, tắm, nghỉ…) làm được ngay, ghi giá, tác dụng,
@@ -1640,7 +2056,7 @@ func _open_bench() -> void:
 ## Phím E cạnh hàng rong: mua món đầu tiên đang mua được.
 func quick_first() -> void:
 	if not _quick_ids.is_empty():
-		_perform(str(_quick_ids[0]))
+		_quick_run(str(_quick_ids[0]))
 
 
 func _fill_quick(id: String) -> void:
@@ -1651,6 +2067,28 @@ func _fill_quick(id: String) -> void:
 	if (not world.zones_enabled() and (id == "" or id == "-")) or id.begins_with("bin:") or id.begins_with("vendor:") or not game.is_started():
 		_quick.visible = false
 		return
+	# Người đứng ở xe hàng rong (Hân bán hoa): nói chuyện là mục đầu tiên.
+	var talkers: Array = Relationships.npcs_at(game, id)
+	for who in talkers:
+		var npc := str(who.id)
+		var lock: String = game.talk_lock(npc)
+		var rc: Dictionary = Relationships.card(game, npc)
+		var tb := Button.new()
+		tb.flat = true
+		tb.focus_mode = Control.FOCUS_NONE
+		tb.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		tb.add_theme_font_size_override("font_size", 13)
+		var info := "%s %d/100%s" % [rc.tier, int(game.s.rep.get(npc, 0)), (" · " + str(rc.status)) if str(rc.status) != "" else ""]
+		if lock == "":
+			tb.text = "[%d]  Nói chuyện với %s  ·  %s" % [_quick_ids.size() + 1, who.name, info]
+			tb.add_theme_color_override("font_color", UI.GOLD)
+			tb.pressed.connect(func() -> void: _quick_run("talk:" + npc))
+			_quick_ids.append("talk:" + npc)
+		else:
+			tb.text = "      Nói chuyện với %s  ·  %s" % [who.name, lock if lock != "-" else info]
+			tb.disabled = true
+			tb.add_theme_color_override("font_disabled_color", Color(UI.HUD_SOFT, 0.7))
+		_quick.add_child(tb)
 	var picks: Array = []
 	if world.zones_enabled():
 		picks = MapManager.actions(game)
@@ -1660,7 +2098,7 @@ func _fill_quick(id: String) -> void:
 		picks.sort_custom(func(x, y) -> bool: return bool(game.action_status(x).ok) and not bool(game.action_status(y).ok))
 	if id == "xom_bo_me" and game.is_full() and game.chapter() == 1:
 		picks = [game.get_action("tam_rua"),game.get_action("com_voi_ba"),game.get_action("tra_tro_dem")]
-	for a in picks.slice(0, 3):
+	for a in picks.slice(0,maxi(0,3-talkers.size())):
 		var st: Dictionary = game.action_status(a)
 		var parts := [str(a.name)]
 		if world.zones_enabled() and not bool(a.get("portable", false)):
@@ -1696,7 +2134,16 @@ func _fill_quick(id: String) -> void:
 			b.add_theme_color_override("font_disabled_color", Color(UI.HUD_SOFT, 0.7))
 		b.tooltip_text = b.text
 		_quick.add_child(b)
-	_quick.visible = _quick.get_child_count() > 0
+	_quick.visible = not _quick_ids.is_empty() or not picks.is_empty() or not talkers.is_empty()
+
+
+## Mục trong danh sách nhanh: id việc, hay "talk:<người>" để nói chuyện.
+func _quick_run(id: String) -> void:
+	if id.begins_with("talk:"):
+		game.talk(id.substr(5))
+		_fill_quick(_prompt_id)
+	else:
+		_quick_action(id)
 
 
 func _build_mood(root: Control) -> void:
@@ -2283,6 +2730,8 @@ func _refresh_location() -> void:
 	for c in _loc_cards.get_children():
 		c.queue_free()
 	var found := 0
+	# Giá sỉ hôm nay, hàng trên xe ghi lên thẻ nhập hàng và bày bán (commerce.gd).
+	Commerce.refresh(game)
 	for offer in game.Day23.social_options(game,_loc_id):
 		var aid: String=offer.id
 		_loc_cards.add_child(UI.choice(offer.name,"%d phút · %s"%[roundi(offer.hours*60.0),offer.hint],offer.reason,
@@ -2295,10 +2744,11 @@ func _refresh_location() -> void:
 		found+=1
 	if _loc_id == world.home:
 		var n: Dictionary = game.night_preview()
-		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d · Mệt −%d qua đêm\nTiền trọ %s · góp sinh hoạt %s" % [game.day(), int(n.recover), GameLogic.fmt_money(int(n.get("rent", 0))), GameLogic.fmt_money(int(n.get("upkeep", n.living)))],
+		var rent_note := "" if Hardship.paid(game) else " · chưa trả tiền trọ %s" % GameLogic.fmt_money(Hardship.rent(game))
+		_loc_cards.add_child(UI.choice("Đi ngủ", "Kết thúc ngày %d · Mệt −%d qua đêm%s" % [game.day(), int(n.recover), rent_note],
 			"" if game.s.queue.is_empty() else "Còn việc phải chọn", func() -> void:
 				close_location()
-				dialogs.open_night()))
+				open_night()))
 	for id in game.scene_cards_at(_loc_id):
 		var e: Dictionary = game.scene_info(id)
 		var meta := "Cảnh chính hôm nay · %d phút" % roundi(float(e.get("hours", 0.5)) * 60.0)
@@ -2322,6 +2772,13 @@ func _refresh_location() -> void:
 		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(who.name),
 			"%d phút · Thân thiết %d/100" % [roundi(float(game.cfg.get("talkHours", 0.5)) * 60.0), int(game.s.rep.get(npc, 0))],
 			game.talk_lock(npc), game.talk.bind(npc)))
+	# Người đứng ở xe hàng rong (Hân bán hoa): thẻ nói chuyện, kèm bậc quan hệ (relationships.gd).
+	for who in Relationships.npcs_at(game, _loc_id):
+		var npc := str(who.id)
+		var rc: Dictionary = Relationships.card(game, npc)
+		_loc_cards.add_child(UI.choice("Nói chuyện với " + str(who.name),
+			"%d phút · %s %d/100%s" % [roundi(float(game.cfg.get("talkHours", 0.5)) * 60.0), rc.tier, int(game.s.rep.get(npc, 0)),
+				(" · " + str(rc.status)) if str(rc.status) != "" else ""], game.talk_lock(npc), game.talk.bind(npc)))
 	# Người quen của chỗ này đang đi việc riêng: ghi đi đâu, mấy giờ về.
 	for note in world.life.notes_at(_loc_id):
 		_loc_cards.add_child(UI.choice("%s %s" % [note.name, note.what], "", "Vắng · khoảng %s về" % GameLogic.hh(float(note.back)),

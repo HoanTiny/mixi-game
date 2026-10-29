@@ -90,6 +90,18 @@
         "rate.mood": -0.5
       },
       "desc": "Sau buổi dưỡng sinh: Tâm trạng tụt chậm một nửa trong 6 giờ."
+    },
+    "cam_lanh": {
+      "name": "Cảm lạnh", "tone": "bad", "icon": "drop",
+      "hours": 20,
+      "onset": {"mood": -6},
+      "mods": {"rate.mood": 0.5, "move": -0.1},
+      "desc": "Tắm nước lạnh ở buồng tắm dột: sổ mũi, Tâm trạng tụt nhanh hơn, đi chậm hơn. Tắm nước nóng ở nhà tắm công cộng thì khỏi."
+    },
+    "cap_doi": {
+      "name": "Cặp đôi", "tone": "good", "icon": "heart",
+      "mods": {"regen.mood": 1.5, "fatigue.rate": -0.15},
+      "desc": "Có người thương (relationships.json): Tâm trạng hồi 1,5 mỗi giờ, mệt tăng chậm hơn 15%. Mất khi quan hệ nguội đi."
     }
   },
   "actionConds": {

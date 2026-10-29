@@ -12,6 +12,7 @@ const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const Character := preload("res://scripts/world/character.gd")
 const AnCharacter := preload("res://scripts/world/an_character.gd")
 const Wardrobe := preload("res://scripts/wardrobe.gd")
+const Relationships := preload("res://scripts/systems/relationships.gd")
 const CREAM := Color("ece3d3")
 const GOLDEN := Color("e8b45a")
 const PANEL_BG := Color(0.1, 0.09, 0.08, 0.93)
@@ -744,8 +745,16 @@ func _refresh_status() -> void:
 		col2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		col2.add_theme_constant_override("separation", 1)
 		r.add_child(col2)
-		var word := "Thân thiết" if val >= 70 else ("Quen" if val >= 45 else ("Xa cách" if val >= 25 else "Có hiềm khích"))
-		col2.add_child(UI.label("%s · %s %d" % [who, word, val], 13, CREAM))
+		# Bậc quan hệ theo data/systems/relationships.json (tuyến tình cảm có bậc riêng), kèm trạng thái như Cặp đôi.
+		var rc: Dictionary = Relationships.card(game, k)
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 6)
+		col2.add_child(line)
+		line.add_child(UI.label("%s · %s %d" % [who, rc.tier, val], 13, CREAM))
+		if str(rc.status) != "":
+			line.add_child(UI.label("♥ " + str(rc.status), 12, Color("e85d75")))
+		if str(rc.next) != "":
+			line.tooltip_text = "Bậc sau: " + str(rc.next)
 		var b := UI.bar(6)
 		UI.set_bar(b, val, 100.0, Color("4cc46a") if val >= 60 else (GOLDEN if val >= 35 else Color("e0604f")))
 		col2.add_child(b)

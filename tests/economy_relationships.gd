@@ -11,6 +11,7 @@ func fresh():
 	var g = Logic.new(); g.load_data(); g.new_game("full")
 	# Isolate repeatable systems from authored events, contracts and one-off
 	# rewards; finish_day and all action/needs/money rules stay real.
+	g.cfg.hardship={} # Isolated legacy economy benchmark; 1.13 survival is tested separately.
 	g.events=[]; g.quests=[]; g.s.queue=[]; g.s.scenes=[]; g.s.receivables=[]; g.s.payables=[]; g.s.promises=[]; g.s.route="A"
 	g.s.used=0.0; g.s.needs_t=6.0
 	for k in g.s.needs: g.s.needs[k]=80.0

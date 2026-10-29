@@ -1,0 +1,11 @@
+{
+  "method": "pose-fitted transfer from project An rig",
+  "forward": "+Z",
+  "height_m": 1.58,
+  "bones": 24,
+  "max_donor_distance_m": 0.08162318845168966,
+  "apron_vertices_pinned": 2527,
+  "source_mesh": "hanh-neutral-front.glb",
+  "rig_template": "assets/characters/an/an-rigged.glb",
+  "automatic_rig_rejected": "Side-facing Tripo input produced mismatched joints; replacement generation blocked by credit balance"
+}

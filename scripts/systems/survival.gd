@@ -132,13 +132,16 @@ static func advance(g, hours: float) -> void:
 	while left > 0.0000001:
 		var step := left
 		var active_rates := {}
+		var regeneration := {}
 		for k in rates:
 			var modifier := 0.0
+			regeneration[k] = 0.0
 			for id in conds(g):
 				var until := float(conds(g)[id].get("until", -1.0))
 				if until >= 0.0 and until <= at + 0.0000001: continue
 				if until > at: step = minf(step, until - at)
 				modifier += float(def(g, id).get("mods", {}).get("rate." + str(k), 0.0))
+				regeneration[k] += float(def(g,id).get("mods",{}).get("regen."+str(k),0.0))
 			active_rates[k] = float(rates[k]) * difficulty * maxf(0.0, 1.0 + modifier)
 		for k in ["fed", "clean"]:
 			var v: float = g.need(k)
@@ -158,7 +161,7 @@ static func advance(g, hours: float) -> void:
 		for k in active_rates:
 			var delta := float(active_rates[k]) * step
 			if k == "stamina": g.add_fatigue(-delta)
-			else: g.need_adj(str(k), delta * (mood_mult if k == "mood" and delta < 0.0 else 1.0))
+			else: g.need_adj(str(k), delta * (mood_mult if k == "mood" and delta < 0.0 else 1.0) + float(regeneration.get(k,0.0))*step)
 		if starved: g.add_fatigue(float(g.cfg.needs.get("starveFatiguePerHour", 3.0)) * step)
 		at += step
 		left -= step
@@ -229,8 +232,19 @@ static func action_effects(g, a: Dictionary) -> Dictionary:
 	return out
 
 
-## Khóa hiệu ứng: "cond.X": số giờ (true: theo định nghĩa, false: gỡ), "cond_clear.X": gỡ. true nếu đã xử lý.
+## Khóa hiệu ứng: "cond.X": số giờ (true: theo định nghĩa, false: gỡ), "cond_clear.X": gỡ, "cond_chance.X": xác suất
+## bật (tắm nước lạnh 25% cảm lạnh); lúc mới bật trừ thêm onset (Tâm trạng…). true nếu đã xử lý.
 static func effect(g, k: String, v) -> bool:
+	if k.begins_with("cond_chance."):
+		var id := k.substr(12)
+		# Băm theo ngày, giờ, tiền đã chi: cùng một ván luôn ra cùng kết quả (mô phỏng, tải lại save).
+		var roll := float(absi(hash([int(g.s.get("seed", 0)), g.day(), snappedf(float(g.s.get("used", 0.0)), 0.01), id,
+			int(g.s.get("stats", {}).get("spent", 0))])) % 10000) / 10000.0
+		if not has(g, id) and roll < float(v):
+			add(g, id, 0.0, "chance")
+			for need_k in def(g, id).get("onset", {}):
+				g.need_adj(str(need_k), float(def(g, id).onset[need_k]))
+		return true
 	if k.begins_with("cond."):
 		if v is bool and not v:
 			clear(g, k.substr(5))
