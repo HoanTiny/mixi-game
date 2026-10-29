@@ -43,6 +43,7 @@ func _init() -> void:
 	var gain := 0.0
 	for i in 200:
 		var gt := _new()
+		gt.s["seed"] = i
 		gt.s.needs["clean"] = 10.0
 		gt.do_action("tam_rua")
 		gain += gt.need("clean") - 10.0

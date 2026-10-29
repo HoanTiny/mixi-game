@@ -6,6 +6,9 @@ extends Node3D
 ## Nhà cửa, người, xe lấy mô hình thật theo data/models.json; thiếu file thì dựng khối hình tạm.
 
 const Juice := preload("res://scripts/world/juice.gd")
+const Ink := preload("res://scripts/world/ink.gd")
+const PostFx := preload("res://scripts/world/post_fx.gd")
+const StreetGrit := preload("res://scripts/world/street_grit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const QuestGuide := preload("res://scripts/quest_guide.gd")
 const Hud := preload("res://scripts/world/hud.gd")
@@ -179,6 +182,9 @@ var _ride_headlight: SpotLight3D
 var _night_factor := 0.0
 var font: SystemFont
 var lamps: Array = []
+var lamp_halos: Array = []
+var post_fx: CanvasLayer
+var grit
 var door_rings := {}
 var walkers: Array = []
 var bikes: Array = []
@@ -317,6 +323,7 @@ func _ready() -> void:
 	_on_changed()
 	print("[world] dựng màn phố %d ms (map %s)" % [Time.get_ticks_msec() - t0, _map_id()])
 	# Vào thẳng chế độ Dựng khu thật: bản web có "?khu" trên địa chỉ, hay đối số "--realmap-auto=…" khi thử tự động.
+	_ink_pass()
 	# Phản hồi trực quan: chữ nổi, rung máy quay, hạt, mây đen, bốc mùi (scripts/world/juice.gd).
 	juice = Juice.new()
 	add_child(juice)
@@ -442,12 +449,22 @@ func _build_environment() -> void:
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
+	# Hậu kỳ gritty (post_fx.gd) lo bão hòa, tương phản: môi trường để trung tính cho khỏi chỉnh hai lần.
+	if look("postFx"):
+		env.adjustment_contrast = 1.0
+		env.adjustment_saturation = 1.0
+		post_fx = PostFx.new()
+		add_child(post_fx)
 	sun = DirectionalLight3D.new()
 	sun.shadow_enabled = true
 	sun.shadow_blur = 1.5
 	if real and (city.pilot_active or city.street_upgrade):
 		sun.shadow_blur = 3.0
 		sun.shadow_opacity = 0.60
+	# Kiểu "Nobody" (config look): bóng đổ đen sắc, đậm 0,75, nắng nghiêng 45° (_update_lighting).
+	if look("sun45"):
+		sun.shadow_opacity = 0.75
+		sun.shadow_blur = 1.0
 	sun.directional_shadow_max_distance = 70.0
 	if ScreenFit.light_shadows:
 		# Điện thoại, trình duyệt: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
@@ -1105,6 +1122,81 @@ func _lamp(pos: Vector3, rot := 0.0) -> void:
 	lamp.visible = false
 	add_child(lamp)
 	lamps.append(lamp)
+	# Quầng sáng vàng ấm quanh bóng đèn (tối mới hiện, cùng lúc đèn bật).
+	var halo := Sprite3D.new()
+	halo.texture = _halo_texture()
+	halo.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	halo.pixel_size = 0.012
+	halo.position = lamp.position
+	halo.modulate = Color(1.0, 0.78, 0.45, 0.0)
+	halo.shaded = false
+	halo.no_depth_test = false
+	halo.render_priority = 2
+	halo.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
+	halo.visible = false
+	halo.set_meta("no_ink", true)
+	add_child(halo)
+	lamp_halos.append(halo)
+
+
+static var _halo_tex: ImageTexture
+
+
+## Ảnh quầng sáng tròn mờ dần (vẽ một lần, dùng chung cho mọi đèn).
+static func _halo_texture() -> ImageTexture:
+	if _halo_tex == null:
+		var n := 128
+		var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+		for y in n:
+			for x in n:
+				var d := Vector2(x - n / 2.0, y - n / 2.0).length() / (n / 2.0)
+				var a := pow(clampf(1.0 - d, 0.0, 1.0), 2.2)
+				img.set_pixel(x, y, Color(1.0, 0.92, 0.75, a))
+		_halo_tex = ImageTexture.create_from_image(img)
+	return _halo_tex
+
+
+## Nét mực kiểu Nobody (ink.gd) sau khi dựng xong phố: viền nhà, cây (pass phụ cắt theo nhà quanh An), viền và bóng
+## chân cho An, người quen, cư dân, hàng rong, người đi bộ, xe; đổ bóng toon cho người; vết bẩn, đồ phố (street_grit.gd).
+func _ink_pass() -> void:
+	Ink.enabled = look("ink")
+	if look("grit") and real and area != null:
+		grit = StreetGrit.new()
+		add_child(grit)
+		grit.build(self)
+	if not Ink.enabled:
+		return
+	# Điện thoại yếu: bỏ viền nhà, cây (pass phụ vẽ lại cả khu), giữ viền người và đồ vật.
+	if area != null and not ScreenFit.low_power:
+		var outs: Array = []
+		for m in area.cut_materials:
+			if m is ShaderMaterial and m.next_pass == null:
+				m.next_pass = Ink.building_outline(m)
+				m.next_pass.set_shader_parameter("cut_on", m.get_shader_parameter("cut_on"))
+				outs.append(m.next_pass)
+		area.cut_materials.append_array(outs)
+	var actors: Array = [player]
+	for id in npc_nodes:
+		actors.append(npc_nodes[id].node)
+	if life != null:
+		for id in life.npcs:
+			actors.append(life.npcs[id].node)
+		for v in life.vendors:
+			actors.append(v.node)
+	actors.append_array(idlers)
+	if crowd != null:
+		for k in crowd._pool:
+			actors.append_array(crowd._pool[k])
+	for a in actors:
+		if a is Node3D and is_instance_valid(a) and a.get_node_or_null("InkBlob") == null:
+			Ink.toonify(a)
+			Ink.blob(a, 0.4 if a != player else 0.44)
+	Ink.outline_props(self)
+
+
+## Bật tắt kiểu đồ họa "Nobody" theo config look (postFx, ink, sun45, grit); không có thì bật hết.
+func look(key: String) -> bool:
+	return bool(game.cfg.get("look", {}).get(key, true))
 
 
 ## Cổng khu công nghiệp, cổng hẻm "khu phố văn hóa", bảng tên hẻm và đường ở đầu mỗi lối, cây dừa đầu Hẻm Dừa.
@@ -2841,6 +2933,10 @@ func _update_lighting(hour: float) -> void:
 	var elevation := lerpf(24.0, 60.0, sin(t * PI))
 	# Nắng chiếu từ phía sau dãy nhà ra đường: bóng nhà đổ dài trên vỉa hè như Nobody.
 	sun.rotation_degrees = Vector3(-elevation, 115.0 + t * 130.0, 0)
+	if look("sun45"):
+		# Nắng xiên 45° cả ngày (lệch vài độ theo giờ), bóng đổ chéo xuống phải màn hình: cùng hướng bóng chân (ink.gd).
+		elevation = 45.0 + sin(t * PI) * 5.0 - 2.5
+		sun.rotation_degrees = Vector3(-elevation, 45.0 + (t - 0.5) * 16.0, 0)
 	var warm := Color("ffdfb8")
 	var noon := Color("fff6eb")
 	var dusk := Color("ffc08a")
@@ -2895,7 +2991,12 @@ func _update_lighting(hour: float) -> void:
 		var col: Color = (e.day as Color).lerp(Color(e.neon) * 2.4, nf)
 		col.a = 1.0
 		l.modulate = col
-	var on := hour >= (16.0 if rain else 17.8)
+	var on := hour >= (16.0 if rain else 18.0)
+	if post_fx != null:
+		post_fx.set_night(nf)
+	for h in lamp_halos:
+		h.visible = on
+		h.modulate.a = clampf(nf * 1.4, 0.35, 1.0)
 	if crowd != null:
 		crowd.set_time(hour, rain)
 	for lamp in lamps:
@@ -3277,6 +3378,10 @@ func _spawn_npc(e: Dictionary) -> void:
 	nb.add_child(ncs)
 	npc.add_child(nb)
 	npc_nodes[id] = {"node": npc, "body": nb, "name": str(e.name), "loc": loc, "color": str(e.color)}
+	if Ink.enabled and juice != null:
+		Ink.apply_outline(npc)
+		Ink.toonify(npc)
+		Ink.blob(npc)
 	life.add_npc(id, e.get("when", {}))
 	if str(e.loc) == "home":
 		_npc_home = ""

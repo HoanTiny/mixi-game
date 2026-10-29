@@ -1,4 +1,6 @@
 {
+  "_look": "Kiểu đồ họa Nobody (world.gd look()): postFx lớp lọc màu gritty (post_fx.gd), ink viền đen + bóng chân + cel (ink.gd), sun45 nắng xiên 45° bóng đậm 0,75, grit vết bẩn + đồ phố (street_grit.gd). Đặt false để tắt từng phần.",
+  "look": {"postFx": true, "ink": true, "sun45": true, "grit": true},
   "dayStart": 6,
   "dayEnd": 22,
   "lateHour": 20,

@@ -1,4 +1,10 @@
-# Triển khai bản web và Windows 1.12
+# Triển khai bản web và Windows 1.13
+
+Bản 1.13: đồ họa kiểu Nobody (post_fx.gd, ink.gd, street_grit.gd, mặt đất mới trong area_builder.gd), áp lực sinh tồn
+ngày 1 (hardship.json), tổng kết cuối ngày, thông báo 06:00, game juice (juice.gd). Xem docs/NOBODY_STYLE.md. Kiểm
+tra thêm `tests/hardship.gd`. Staging dùng phiên bản web/Windows `1.13 1.13`, quy trình như 1.12 bên dưới.
+
+## Quy trình 1.12
 
 Bản 1.12 thêm EventSchedulerSystem: thưởng nóng lúc 06:00, chợ đêm
 18:00–23:00 và sự kiện theo ngày/giờ/bốn Zone. Kiểm tra bằng

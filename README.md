@@ -1,5 +1,25 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.13 · phố bụi bặm, ngày khắc nghiệt**
+
+- **Đồ họa kiểu "Nobody":**
+  - lọc màu gritty (bão hòa 0,8, tương phản 1,15, ám vàng bụi, tối góc);
+  - viền đen inverted hull, đổ bóng cel 3 cấp;
+  - nắng 45° bóng đậm 0,75, bóng chân dưới người và đồ vật;
+  - đèn đường kèm quầng sáng từ 18:00;
+  - vỉa hè gạch lục giác hay gạch vuông có vân bẩn, bó vỉa 15 cm, vạch trắng đứt;
+  - vết bẩn, lá rơi, vũng nước, thùng rác xanh, biển quảng cáo đứng, xe máy dựng, bàn ghế nhựa.
+- **Ngày 1 khắc nghiệt:**
+  - An còn 50.000đ; tiền trọ 60.000đ mỗi đêm trả trước khi ngủ.
+  - Tắm nước lạnh +40 Vệ sinh và dễ cảm lạnh; giặt đồ cần xà phòng hoặc gửi tiệm 20.000đ.
+  - Mỗi sáng có việc thưởng nóng ×2; mục tiêu ngắn hạn hiện ngay trên HUD.
+- **Độ cuốn:**
+  - chữ nổi nảy khi tiền và nhu cầu đổi;
+  - rung máy quay và hạt bung khi xong trò chơi nhỏ;
+  - đói hay buồn thì rũ vai, mây đen trên đầu; bốc mùi thì người qua đường né;
+  - màn Tổng kết cuối ngày; điện thoại báo lúc 06:00.
+- Chi tiết ở [docs/NOBODY_STYLE.md](docs/NOBODY_STYLE.md). Từng phần đồ họa bật tắt bằng `look` trong `data/config.json`.
+
 **Bản web 1.11 · Chị Hạnh và góc phố mới**
 
 [Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.11) ·

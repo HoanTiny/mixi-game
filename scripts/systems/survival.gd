@@ -176,7 +176,10 @@ static func action_effects(g, a: Dictionary) -> Dictionary:
 static func effect(g, k: String, v) -> bool:
 	if k.begins_with("cond_chance."):
 		var id := k.substr(12)
-		if not has(g, id) and randf() < float(v):
+		# Băm theo ngày, giờ, tiền đã chi: cùng một ván luôn ra cùng kết quả (mô phỏng, tải lại save).
+		var roll := float(absi(hash([int(g.s.get("seed", 0)), g.day(), snappedf(float(g.s.get("used", 0.0)), 0.01), id,
+			int(g.s.get("stats", {}).get("spent", 0))])) % 10000) / 10000.0
+		if not has(g, id) and roll < float(v):
 			add(g, id, 0.0, "chance")
 			for need_k in def(g, id).get("onset", {}):
 				g.need_adj(str(need_k), float(def(g, id).onset[need_k]))
