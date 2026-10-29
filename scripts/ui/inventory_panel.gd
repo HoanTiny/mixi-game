@@ -17,6 +17,7 @@ var _shop_tab: Button
 var _quantity: SpinBox
 var _selected := ""
 var _shop := false
+var _empty := true
 
 func _ready() -> void:
 	layer = 45
@@ -91,7 +92,7 @@ func _fit() -> void:
 	if _panel == null: return
 	var size: Vector2=get_viewport().get_visible_rect().size
 	_panel.custom_minimum_size.x=minf(690,size.x-32)
-	_grid.columns=4 if size.x>=700 else (3 if size.x>=490 else 2)
+	_grid.columns=1 if _empty else (4 if size.x>=700 else (3 if size.x>=490 else 2))
 	_scroll.custom_minimum_size.y=clampf(size.y-390,95,275)
 
 func open(shop := false) -> void:
@@ -126,6 +127,8 @@ func refresh() -> void:
 			var item: Dictionary=Inventory.definition(game,id)
 			if bool(item.get("purchasable",true)): rows.append(item)
 	else: rows=Inventory.owned(game)
+	_empty=rows.is_empty()
+	_fit()
 	if rows.is_empty():
 		_selected=""
 		var empty:=UI.label("Balo chưa có đồ dùng.\nGhé tạp hóa ở Phúc Tân để mua đồ mang theo.",16,UI.HUD_SOFT)
