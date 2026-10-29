@@ -1,34 +1,40 @@
 [gd_scene format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_ground.res" id="1_y6fw1"]
-[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_upper.res" id="2_n5xw3"]
-[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_roof.res" id="3_xyrah"]
-[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_front_walls.res" id="4_1tnec"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_ground.res" id="1_n5xw3"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_upper.res" id="2_xyrah"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_roof.res" id="3_1tnec"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_front_walls.res" id="4_e0uhs"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/lodging_courtyard_occluding_shell.res" id="5_l2y7o"]
 
-[node name="lodging_courtyard" type="Node3D" unique_id=1522188995]
+[node name="lodging_courtyard" type="Node3D" unique_id=308760031]
 metadata/kind = "lodging"
 metadata/width = 13.0
 metadata/depth = 8.0
 metadata/height = 6.3
 metadata/seed = 2
 
-[node name="GroundArchitecture" type="Node3D" parent="." unique_id=121322466]
+[node name="GroundArchitecture" type="Node3D" parent="." unique_id=317352940]
 metadata/blockers = Array[Rect2]([Rect2(-6.5, -4, 5, 4), Rect2(-6.5, -7.7, 3, 3.7), Rect2(1.5, -4, 5, 4), Rect2(3.5, -7.7, 3, 3.7), Rect2(-6.5, -8, 13, 0.3)])
 
-[node name="MasonryAndDetails" type="MeshInstance3D" parent="GroundArchitecture" unique_id=1719949345]
-mesh = ExtResource("1_y6fw1")
+[node name="MasonryAndDetails" type="MeshInstance3D" parent="GroundArchitecture" unique_id=5654792]
+mesh = ExtResource("1_n5xw3")
 
-[node name="UpperArchitecture" type="Node3D" parent="." unique_id=1034528946]
+[node name="UpperArchitecture" type="Node3D" parent="." unique_id=1115079715]
 
-[node name="UpperAndBalcony" type="MeshInstance3D" parent="UpperArchitecture" unique_id=1603609215]
-mesh = ExtResource("2_n5xw3")
+[node name="UpperAndBalcony" type="MeshInstance3D" parent="UpperArchitecture" unique_id=285071260]
+mesh = ExtResource("2_xyrah")
 
-[node name="RoofArchitecture" type="Node3D" parent="." unique_id=1932029801]
+[node name="RoofArchitecture" type="Node3D" parent="." unique_id=382598776]
 
-[node name="RoofAndCornice" type="MeshInstance3D" parent="RoofArchitecture" unique_id=1743885032]
-mesh = ExtResource("3_xyrah")
+[node name="RoofAndCornice" type="MeshInstance3D" parent="RoofArchitecture" unique_id=1320137606]
+mesh = ExtResource("3_1tnec")
 
-[node name="FrontWingWalls" type="Node3D" parent="." unique_id=1040726260]
+[node name="FrontWingWalls" type="Node3D" parent="." unique_id=754180016]
 
-[node name="FrontWallsAndDoors" type="MeshInstance3D" parent="FrontWingWalls" unique_id=1073509762]
-mesh = ExtResource("4_1tnec")
+[node name="FrontWallsAndDoors" type="MeshInstance3D" parent="FrontWingWalls" unique_id=688226404]
+mesh = ExtResource("4_e0uhs")
+
+[node name="CourtyardShell" type="Node3D" parent="." unique_id=1614035092]
+
+[node name="CourtyardWalls" type="MeshInstance3D" parent="CourtyardShell" unique_id=2104137138]
+mesh = ExtResource("5_l2y7o")

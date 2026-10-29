@@ -147,7 +147,8 @@ static func build(world, parent: Node3D, id: String, width: float, depth: float,
 	match id:
 		"com_hanh":
 			signboard(world, parent, "CƠM HẠNH\nCƠM BÌNH DÂN · MANG VỀ", sign_pos, sign_width, Color("794f43"))
-			for x in [-width * 0.3, width * 0.3]:
+			# The right bay belongs to the new serving cart (PilotDetails).
+			for x in [-width * 0.3]:
 				placed(parent, WorkProps.steel_table(), Vector3(x, 0.15, -1.15))
 				for dx in [-0.78, 0.78]:
 					scanned(parent, "metal_stool_01", Vector3(x + dx, 0.15, -1.12), 0.44, 0.12 if dx < 0.0 else -0.18)

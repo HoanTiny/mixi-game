@@ -66,7 +66,14 @@ func _validate_plan() -> void:
 		var points: PackedVector3Array = permanent_mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
 		for point in points:
 			if point.z > -3.99:
-				assert(point.y <= 0.2, "Front-wing occluder left in permanent ground mesh")
+				# The compact-map cutaway keeps 40 cm masonry courses inside closed
+				# room footprints. Nothing above the floor may enter the open passage.
+				assert(point.y <= 0.401, "Tall front-wing occluder left in permanent ground mesh")
+				if point.y > 0.2:
+					var inside_room := false
+					for blocker in plan.blockers:
+						inside_room = inside_room or blocker.grow(0.001).has_point(Vector2(point.x, point.z))
+					assert(inside_room, "Permanent masonry blocks the lodging passage")
 	for point in [Vector2(0, -0.2), Vector2(-1.49, -3.9), Vector2(1.49, -3.9), Vector2(-3.49, -5.5), Vector2(3.49, -5.5), Vector2(0, -7.6)]:
 		for blocker in plan.blockers:
 			assert(not blocker.has_point(point), "Lodging courtyard/passage blocked")
@@ -83,6 +90,8 @@ func _run() -> void:
 	DirAccess.make_dir_recursive_absolute("res://scenes/architecture")
 	var metrics: Array = []
 	for cfg in TYPES:
+		if "--hero-only" in OS.get_cmdline_user_args() and cfg.kind == "residential":
+			continue
 		var node := Node3D.new()
 		node.name = cfg.id
 		root.add_child(node)

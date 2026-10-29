@@ -33,6 +33,7 @@ const StreetKit := preload("res://scripts/architecture/street_kit.gd")
 const PilotLife := preload("res://scripts/world/pilot_life.gd")
 const PilotGround := preload("res://scripts/world/pilot_ground.gd")
 const PilotDetails := preload("res://scripts/world/pilot_details.gd")
+const NamedCharacter := preload("res://scripts/world/named_character.gd")
 const NeighborhoodTravel := preload("res://scripts/neighborhood_travel.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
@@ -1421,6 +1422,10 @@ func _build_real() -> void:
 			_build_location(id, LOCATIONS[id])
 	if city.pilot_active:
 		_build_pilot_street()
+	elif city.street_upgrade:
+		# Layout 2 retired the isolated pilot, but its authored working props still
+		# belong at the same three named locations in the compact story map.
+		add_child(PilotDetails.build(self))
 	for h in city.homes:
 		homes.append({"pos": _v3(h.pos), "no": str(h.no), "name": "Nhà " + str(h.address)})
 	var i := 0
@@ -3084,6 +3089,14 @@ func _label3d(text: String, pos: Vector3, size: int) -> Label3D:
 ## (character.gd): An và nhân vật phụ có ngoại hình riêng, người đi đường ngẫu nhiên.
 ## Con đầu tiên luôn là phần thân (mô hình hoặc khối) để nhún nhảy hay phát hoạt cảnh.
 func _character(key: String, shirt: Color, pants: Color, rng: RandomNumberGenerator = null, hat := "") -> Node3D:
+	if key.begins_with("npc.") and NamedCharacter.available(key.trim_prefix("npc.")):
+		var hero := NamedCharacter.make(key.trim_prefix("npc."))
+		# Shop NPC placements expect a -Z-facing model; the authored hero is +Z.
+		hero.rotation.y = PI
+		var holder := Node3D.new()
+		holder.add_child(hero)
+		idlers.append(hero)
+		return holder
 	# An: mô hình đã gắn xương (assets/characters/an, đổi màu tóc, áo, quần được); đặt "anModel": "rocketbox" trong
 	# config để dùng lại người thật Rocketbox.
 	if key == "player" and str(game.cfg.get("anModel", "rigged")) == "rigged" and AnCharacter.available():
