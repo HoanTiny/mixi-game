@@ -684,7 +684,16 @@ func streets() -> void:
 		var poles: Array = []
 		_along(r.line, step, func(p: Vector2, d: Vector2) -> void:
 			var q: Vector2 = p + d.orthogonal() * off * side
-			if not _near(q, radius) or not b.walkable(q) or b.keep_clear.any(func(c: Vector2) -> bool: return c.distance_to(q) < 3.0):
+			# Tall poles in front of the four story fronts obscure both An and the
+			# service counter from the high camera, even when their base is clear.
+			var sightline_blocked := false
+			if b.street_upgrade:
+				for c in b.keep_clear:
+					var offset: Vector2=q-c
+					if absf(offset.x)<3.8 and offset.y>-1.0 and offset.y<10.0:
+						sightline_blocked=true
+						break
+			if sightline_blocked or not _near(q, radius) or not b.walkable(q) or b.keep_clear.any(func(c: Vector2) -> bool: return c.distance_to(q) < 3.0):
 				poles.append(null)
 				return
 			_pole(q, d)

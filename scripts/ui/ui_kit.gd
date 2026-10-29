@@ -134,6 +134,19 @@ static func choice(title: String, hint: String, lock: String, on_press: Callable
 		t.modulate.a = 0.5
 	elif hint != "":
 		v.add_child(small(hint, INK_SOFT))
+	for child in v.get_children():
+		if child is Label:
+			child.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			child.text_overrun_behavior=TextServer.OVERRUN_NO_TRIMMING
+	# The VBox is a child of Button, so its minimum does not propagate upwards.
+	# Measure wrapped multi-line hints after layout instead of clipping into the next card.
+	var fit := func() -> void:
+		if is_instance_valid(btn) and is_instance_valid(v):
+			var wanted := maxf(42.0, v.get_combined_minimum_size().y + 16.0)
+			if not is_equal_approx(btn.custom_minimum_size.y,wanted): btn.custom_minimum_size.y=wanted
+	v.minimum_size_changed.connect(fit)
+	btn.resized.connect(fit)
+	fit.call_deferred()
 	return btn
 
 

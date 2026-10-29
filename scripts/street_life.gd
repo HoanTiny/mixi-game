@@ -52,7 +52,7 @@ static func story_step(g) -> Dictionary:
 	var job: Dictionary = g.s.get("street",{}).get("job",{})
 	var stage := str(job.get("stage","inspect"))
 	var loc := "tiem_sau"
-	var texts := {"inspect":"Đo kiểm quạt của cô bán hoa quả","part":"Chọn linh kiện ở chợ hoặc của tiệm","repair":"Thay tụ trên bàn sửa của chú Sơn","test":"Lắp vỏ và chạy thử trước khi trả quạt","deliver":"Mang quạt ra chợ trả cô bán hoa quả"}
+	var texts := {"inspect":"Đo kiểm quạt của cô bán hoa quả","diagnose":"Đọc số đo và chọn bộ phận cần thay","part":"Chọn linh kiện ở chợ hoặc của tiệm","repair":"Thay tụ trên bàn sửa của chú Sơn","test":"Lắp vỏ và chạy thử trước khi trả quạt","deliver":"Mang quạt ra chợ trả cô bán hoa quả"}
 	if stage=="part" and int(g.s.street.parts.get("Tụ quạt",0))==0: loc="cho_cau_nho"
 	return {"kind":"repair","loc":loc,"text":texts.get(stage,texts.inspect),"hours":0.0}
 static func schedule(name: String, hour: float) -> String:
@@ -66,18 +66,25 @@ static func option(id: String, name: String, hours: float, cost := 0, hint := ""
 	return {"id":id,"name":name,"hours":hours,"cost":cost,"hint":hint,"reason":""}
 static func options(g, loc: String) -> Array:
 	migrate(g.s)
-	var out := []
+	if g.Day23.owns_job(g): return g.Day23.repair_options(g,loc)
+	var out: Array = g.Day23.repair_options(g,loc)
 	var st: Dictionary = g.s.street
 	var job: Dictionary = st.job
 	if loc == "tiem_sau":
 		if job.is_empty():
 			var kind: int = (g.day()-1) % 2 if int(st.xp) >= 2 else 0
 			out.append(option("accept", "Nhận: " + JOBS[kind].name,0.25,0,"Tiền công %s · hẹn 17:00 ngày mai" % g.fmt_money(JOBS[kind].pay)))
+			if g.s.flags.get("day23_reliable",false): out[-1].hint="Khách quen giới thiệu · tiền công %s (+20.000đ) · hẹn 17:00 ngày mai"%g.fmt_money(int(JOBS[kind].pay)+20000)
 			if int(st.accepted_day) == g.day(): out[-1].reason = "Đã nhận đơn hôm nay; mai có khách mới"
 			if g.quest_state("quat_trai_cay")=="active": out[-1].reason = "Trả quạt cho cô bán hoa quả trước khi nhận đơn khác"
+			if g.s.get("day23",{}).get("order","")=="offered" and g.day()<=3: out[-1].reason="Trả lời cô hàng nước trước khi nhận đơn thường"
 		else:
 			match str(job.stage):
 				"inspect": out.append(option("inspect","Rút điện · đo kiểm",0.25 if st.tool else 0.5,0,job.symptom))
+				"diagnose":
+					out.append(option("diagnose_cap","Tụ yếu: thay tụ đúng 1,5 µF",0.1,0,"Tụ đo 0,3 µF, thấp hơn nhiều so với nhãn; dây nguồn vẫn thông"))
+					out.append(option("diagnose_wire","Thử thay dây nguồn",0.1,0,"Đối chiếu kết quả thông mạch trước khi mua đồ"))
+					out.append(option("diagnose_motor","Thay cả động cơ",0.1,0,"Cần bằng chứng động cơ hỏng trước khi báo khách một khoản lớn"))
 				"part":
 					out.append(option("own_part","Dùng linh kiện đã mua",0.1,0,job.reading))
 					if int(st.parts.get(job.part,0)) < 1: out[-1].reason = "Cần mua " + str(job.part) + " ở chợ"
@@ -122,6 +129,7 @@ static func options(g, loc: String) -> Array:
 		elif o.id != "wait" and (loc=="tiem_sau" or o.id in ["shift","delivery"]) and float(g.s.fatigue)>=90: o.reason = "Quá mệt; nghỉ trước khi sửa"
 	return out
 static func act(g, loc: String, id: String) -> bool:
+	if id.begins_with("arc_") or g.Day23.owns_job(g): return g.Day23.act(g,loc,id)
 	var chosen := {}
 	for o in options(g,loc):
 		if o.id == id: chosen = o
@@ -138,11 +146,21 @@ static func act(g, loc: String, id: String) -> bool:
 			var kind: int = (g.day()-1)%2 if int(st.xp)>=2 else 0
 			st.job = JOBS[kind].duplicate(true)
 			if st.route == "Thợ sửa độc lập": st.job.pay = int(st.job.pay * 1.1)
+			if g.s.flags.get("day23_reliable",false): st.job.pay+=20000
 			st.job.merge({"kind":kind,"stage":"inspect","due":g.day()+1})
 			st.accepted_day = g.day()
 			Quest.notice(g,"Nhận việc · "+str(st.job.name),"Đo kiểm trước, rồi cân nhắc tiền linh kiện và giờ hẹn.")
 			if int(st.completed)==0: g.add_log("Chú Sơn: Cô Duyên dùng chiếc quạt này ở phòng trọ. Cháu làm cẩn thận, cô còn giới thiệu khách cho.","event")
-		"inspect": st.job.stage = "part"; g.add_log(st.job.reading)
+		"inspect":
+			st.job.stage = "diagnose" if st.job.get("quest_id","")=="quat_trai_cay" and g.s.flags.get("opening_fan_met",false) else "part"
+			g.add_log(st.job.reading)
+		"diagnose_cap":
+			st.job.stage="part"
+			st.job.erase("feedback")
+			g.add_log("Chú Sơn gật đầu: Tụ còn một phần năm trị số. Thay đúng tụ rồi thử lại, chưa cần thay cả động cơ.","event")
+		"diagnose_wire", "diagnose_motor":
+			st.job.feedback="Dây nguồn vẫn thông. Tụ chỉ còn 0,3 / 1,5 µF. Chưa có bằng chứng cần thay động cơ; đọc lại số đo nhé."
+			g.add_log(st.job.feedback,"warn")
 		"shop_part", "own_part", "credit_part":
 			if id=="own_part": st.parts[st.job.part] = int(st.parts[st.job.part])-1
 			if id=="credit_part": st.story_part_credit=int(st.job.price)+20000
@@ -195,8 +213,9 @@ static func status(g) -> String:
 	text += "\nDụng cụ: " + ("Đồng hồ đo riêng" if st.tool else "Mượn đồ nghề tiệm")
 	for part in st.parts: text += " · %s ×%d" % [part,st.parts[part]]
 	if not st.job.is_empty():
-		text += "\n%s · %s · hẹn ngày %d lúc %s" % [st.job.name,{"inspect":"Chờ đo","part":"Chờ linh kiện","repair":"Chờ sửa","test":"Chờ chạy thử","deliver":"Chờ trả"}[st.job.stage],st.job.due,g.hh(float(st.job.get("due_hour",17)))]
+		text += "\n%s · %s · hẹn ngày %d lúc %s" % [st.job.name,{"inspect":"Chờ đo","measure":"Đo từng bộ phận","diagnose":"Chọn chẩn đoán","quote":"Chờ báo giá","approval":"Chờ khách đồng ý","part":"Chờ linh kiện","check_part":"Kiểm tra linh kiện cũ","used_choice":"Chọn mẫu đúng nhãn","repair":"Chờ sửa","test":"Chờ chạy thử","deliver":"Chờ trả"}.get(st.job.stage,"Đang sửa"),st.job.due,g.hh(float(st.job.get("due_hour",17)))]
 		if st.job.stage != "inspect": text += "\n" + str(st.job.reading)
+		if st.job.has("feedback"): text += "\n"+str(st.job.feedback)
 	return text
 
 
@@ -214,6 +233,13 @@ static func bench_action(g, step: String, component: int, token: String) -> Stri
 			reason = offer.reason
 	if not allowed: return reason
 	var progress: Dictionary = job.get("bench",{"removed":false,"installed":false,"screws":0})
+	# Existing saves with a partly assembled repair already have an open case.
+	if step=="open":
+		job.cover_open=true
+		g._commit()
+		return "Đã rút điện và mở nắp khoang điện."
+	if not bool(job.get("cover_open",job.has("bench"))):
+		return "Rút điện và mở nắp khoang điện trước."
 	match step:
 		"remove":
 			if progress.removed: return "Đã tháo linh kiện hỏng"

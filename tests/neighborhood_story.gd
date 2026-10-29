@@ -41,6 +41,7 @@ func street(g, action: String, loc := "tiem_sau") -> void:
 
 func bench(g) -> void:
 	var token := str(g.s.street.accepted_day)+":"+str(int(g.s.street.job.kind))
+	g.Street.bench_action(g,"open",0,token)
 	check(g.Street.bench_action(g,"install",0,token)!="","cannot install before removal")
 	check(g.Street.bench_action(g,"remove",0,token)=="","remove component")
 	check(g.Street.bench_action(g,"install",1,token)!="","wrong part rejected")
@@ -53,6 +54,8 @@ func bench(g) -> void:
 func _initialize() -> void:
 	var g = fresh()
 	check(g.neighborhood_target().action=="pho_chao_son","day1 has workshop introduction")
+	# Late arrival retains the ordinary daily-order path; the early fan is covered separately.
+	g.s.used=5.0
 	g.do_action("pho_chao_son")
 	check(g.clock()>=8 and g.s.neighborhood.stage=="work","introduction waits until shop opens")
 	street(g,"accept")

@@ -16,31 +16,31 @@ const LOOKS := {
 		"skin": "d1a07a", "hair": "1b1714", "hair_style": "short", "shirt": "5b7f8f", "sleeve": "short",
 		"pants": "5e5446", "shoes": "3b3b3b", "hat": "none", "bag": true, "height": 1.72, "build": 1.02},
 	# Linh, 20 tuổi: áo đồng phục trường nghề xanh, quần jean, giày trắng, tóc cột đuôi ngựa.
-	"LINH": {"rb": "Female_Adult_12", "head": "Sports_Female_02", "scale": 0.95,
+	"LINH": {"cloth_tint": "57778a", "rb": "Female_Adult_12", "head": "Sports_Female_02", "scale": 0.95,
 		"skin": "e2b48f", "hair": "1b1714", "hair_style": "ponytail", "shirt": "4f8fb5", "sleeve": "short",
 		"pants": "3b5b82", "shoes": "f2f0ea", "footwear": "shoes", "hat": "none", "bag": true, "height": 1.58,
 		"build": 0.94, "female": true},
 	# Bà Tư, 70 tuổi: áo bà ba tím dài qua hông, quần đen, tóc bạc búi.
-	"BA_TU": {"rb": "Female_Adult_02", "head": "Business_Female_03", "scale": 0.92, "hair_tone": "grey",
+	"BA_TU": {"cloth_tint": "786179", "rb": "Female_Adult_02", "head": "Business_Female_03", "scale": 0.92, "hair_tone": "grey",
 		"skin": "c99a76", "hair": "d8d8d8", "hair_style": "bun", "shirt": "8a6f9a", "sleeve": "long",
 		"pants": "1f1f24", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.5, "build": 0.95,
 		"female": true, "tunic": true},
 	# Chị Hạnh: áo thun cam, tạp dề, tóc búi.
-	"HANH": {"rb": "Chef_Female_01", "head": "Female_Adult_03", "scale": 0.95, "cloth_profile": "cook",
+	"HANH": {"cloth_tint": "958267", "rb": "Chef_Female_01", "head": "Female_Adult_03", "scale": 0.95, "cloth_profile": "cook",
 		"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "c0603a", "sleeve": "short",
 		"pants": "2c2f3a", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.58, "build": 1.04,
 		"female": true, "apron": true},
 	# Chú Sáu: sơ mi xanh bạc màu dài tay, quần kaki, nón kết.
-	"SAU": {"rb": "Male_Adult_14", "head": "Business_Male_02", "scale": 0.95, "hair_tone": "grey",
+	"SAU": {"cloth_tint": "647565", "rb": "Male_Adult_14", "head": "Business_Male_02", "scale": 0.95, "hair_tone": "grey",
 		"skin": "b97d55", "hair": "9a9a9a", "hair_style": "short", "shirt": "525e5d", "sleeve": "long",
 		"pants": "6d5d4b", "shoes": "3b3b3b", "hat": "cap", "bag": false, "height": 1.64, "build": 1.08},
 	# Minh, tài xế giao hàng: áo khoác xanh, mũ bảo hiểm, giày.
-	"MINH": {"rb": "Male_Adult_10", "head": "Male_Adult_10", "scale": 0.97, "cloth_profile": "delivery", "helmet": "394d45",
+	"MINH": {"cloth_tint": "425d4d", "rb": "Male_Adult_10", "head": "Male_Adult_10", "scale": 0.97, "cloth_profile": "delivery", "helmet": "394d45",
 		"skin": "c98f63", "hair": "1b1714", "hair_style": "short", "shirt": "2f8a5a", "sleeve": "long",
 		"pants": "2c3e50", "shoes": "f5f5f5", "footwear": "shoes", "hat": "helmet", "bag": false, "height": 1.74,
 		"build": 1.04},
 	# Cô Duyên: áo sơ mi hoa, quần tây.
-	"DUYEN": {"rb": "Female_Adult_05", "head": "Female_Adult_03", "scale": 0.94,
+	"DUYEN": {"cloth_tint": "99746d", "rb": "Female_Adult_05", "head": "Medical_Female_01", "scale": 0.94,
 		"skin": "d8a27a", "hair": "2b211b", "hair_style": "bun", "shirt": "b5577a", "sleeve": "long",
 		"pants": "4a4a52", "shoes": "8b5a2b", "hat": "none", "bag": false, "height": 1.56, "build": 1.06,
 		"female": true},

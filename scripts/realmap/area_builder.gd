@@ -202,6 +202,8 @@ const GROUND_SHADER := """
 shader_type spatial;
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D normal_tex : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D concrete_tex : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D concrete_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform bool has_tex = false;
 uniform vec3 tint = vec3(1.0);
 uniform float meters = 4.0;
@@ -270,12 +272,18 @@ void fragment() {
 		float g = max(step(f.x, 0.08), step(f.y, 0.08));
 		col = mix(col, col * 1.3 + 0.04, g * 0.65 * vis);
 	} else if (COLOR.a > 0.15) {
-		vec2 p = w / 1.1;
+		// Worn concrete at human scale, with broad irregular patches rather than a giant checkerboard.
+		col = mix(col, texture(concrete_tex, w / 3.0).rgb * vec3(0.76,0.73,0.66), 0.85);
+		NORMAL_MAP = texture(concrete_normal,w / 3.0).rgb;
+		NORMAL_MAP_DEPTH = 0.45;
+		float patch = sin(w.x * 0.7 + sin(w.y * 0.42)) * sin(w.y * 0.55 + w.x * 0.12);
+		col *= 0.94 + 0.09 * patch;
+		vec2 p = w / vec2(3.4,2.6);
 		vec2 f = fract(p);
 		float vis = 1.0 - smoothstep(0.15, 0.5, max(fwidth(p.x), fwidth(p.y)));
 		col *= mix(1.0, 0.94 + 0.08 * hash(floor(p)), vis);
-		float g = max(step(f.x, 0.035), step(f.y, 0.035));
-		col = mix(col, col * 0.84, g * vis);
+		float g = max(step(f.x, 0.002), step(f.y, 0.003));
+		col = mix(col, col * 0.82, g * vis);
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.92;
@@ -483,6 +491,8 @@ static func ground_shader_material(albedo: Texture2D = null, normal: Texture2D =
 	var sh := Shader.new()
 	sh.code = GROUND_SHADER
 	m.shader = sh
+	m.set_shader_parameter("concrete_tex",load("res://assets/ph/textures/concrete_floor_worn_001/concrete_floor_worn_001_diff.jpg"))
+	m.set_shader_parameter("concrete_normal",load("res://assets/ph/textures/concrete_floor_worn_001/concrete_floor_worn_001_nor.jpg"))
 	m.set_shader_parameter("has_tex", albedo != null)
 	if albedo != null:
 		m.set_shader_parameter("albedo_tex", albedo)

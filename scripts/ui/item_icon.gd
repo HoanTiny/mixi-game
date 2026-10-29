@@ -32,6 +32,12 @@ func _draw() -> void:
 	var ink := Color(0.07, 0.06, 0.05)
 	var w := 3.0
 	match kind:
+		"note":
+			draw_line(Vector2(42,68),Vector2(42,24),tint,6,true)
+			draw_line(Vector2(42,24),Vector2(76,16),tint,6,true)
+			draw_line(Vector2(76,16),Vector2(76,60),tint,6,true)
+			draw_circle(Vector2(32,72),12,tint)
+			draw_circle(Vector2(66,64),12,tint)
 		"phone":
 			_rrect(Rect2(30, 10, 40, 80), Color("2a2d33"), ink, w)
 			draw_rect(Rect2(34, 18, 32, 60), Color("5b7c99"))
@@ -95,6 +101,14 @@ func _draw() -> void:
 				draw_rect(Rect2(30, 82, 40, 6), Color("3d5a80"))
 			elif kind == "tshirt":
 				draw_rect(Rect2(30, 84, 40, 4), Color("3d5a80"))
+		"pants":
+			var pts := PackedVector2Array([Vector2(30,14),Vector2(70,14),Vector2(76,90),Vector2(55,90),Vector2(50,46),Vector2(45,90),Vector2(24,90)])
+			draw_colored_polygon(pts,Color("526b7e"))
+			pts.append(pts[0]); draw_polyline(pts,ink,w)
+			draw_line(Vector2(30,23),Vector2(70,23),Color("a1a99d"),2)
+			draw_line(Vector2(50,24),Vector2(50,44),ink,2)
+			draw_line(Vector2(33,32),Vector2(40,40),Color("8495a1"),2)
+			draw_line(Vector2(67,32),Vector2(60,40),Color("8495a1"),2)
 		"bottle":
 			_rrect(Rect2(36, 30, 28, 60), Color("a8d8ea", 0.8), ink, w)
 			draw_rect(Rect2(42, 12, 16, 20), Color("a8d8ea", 0.8))

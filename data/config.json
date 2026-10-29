@@ -306,6 +306,7 @@
     "ghe_da": {"fatigue": 14, "mood": -8, "event": "ngu_ghe_da", "log": "Ngủ lại trên ghế đá ven hồ Gươm"}
   },
   "actions": [
+    {"id":"opening_mango","group":"optional","location":"xom_bo_me","name":"Chia hai quả xoài, kể bà nghe chuyện chiếc quạt","hours":0.25,"maxTimes":1,"require":{"flag.opening_mango":true},"rest":true,"effects":{"flag.opening_home_shared":true,"rep.BA_TU":3,"rep.LINH":2,"need.fed":10,"log":"Bà rửa hai quả xoài, Linh lấy ba cái bát. “Thế là có người biết anh sửa được rồi.” Chiếc túi đồ nghề được đặt cạnh cửa, để sáng mai mang đi."}},
     {"id": "boc_vac_toi", "group": "work", "location": "bai_boc_vac", "name": "Bốc vác ca tối: dỡ rau quả xuống chợ đầu mối", "hours": 4, "pay": 260000, "window": [18, 22], "minigame": "boc_vac", "note": "Xe hàng các tỉnh về từ chập tối, trả công theo ca", "dirty": {"clean": -20, "neat": -15}, "effects": {"fatigue": 26}},
     {"id": "keo_xe_tho", "group": "work", "location": "xe_tho", "name": "Kéo xe thồ giao hàng chợ Đồng Xuân", "hours": 4, "pay": 220000, "cost": 20000, "window": [6, 18], "minigame": "xe_tho", "note": "Thuê xe 20.000đ, trả công theo chuyến", "dirty": {"clean": -12, "neat": -10}, "effects": {"fatigue": 22}},
     {"id": "chay_ban_ta_hien", "group": "work", "location": "ben_can", "name": "Chạy bàn, rửa cốc quán bia Tạ Hiện ca tối", "hours": 4, "pay": 190000, "window": [17, 22], "minigame": "bia_ta_hien", "dirty": {"clean": -8, "neat": -8}, "effects": {"fatigue": 14}},

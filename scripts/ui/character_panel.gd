@@ -10,6 +10,9 @@ const GameLogic := preload("res://scripts/game_logic.gd")
 const TitleScreen := preload("res://scripts/ui/title_screen.gd")
 const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const Character := preload("res://scripts/world/character.gd")
+const AnCharacter := preload("res://scripts/world/an_character.gd")
+const Wardrobe := preload("res://scripts/wardrobe.gd")
+const Relationships := preload("res://scripts/systems/relationships.gd")
 const CREAM := Color("ece3d3")
 const GOLDEN := Color("e8b45a")
 const PANEL_BG := Color(0.1, 0.09, 0.08, 0.93)
@@ -34,6 +37,9 @@ var _slots := {}
 var _face: Control
 var _pd_label: Label
 var _bars := {}
+## Trạng thái đang có (scripts/systems/survival.gd) và bốn thuộc tính {id: {bar, label}} (scripts/systems/attributes.gd).
+var _conds: HFlowContainer
+var _attrs := {}
 var _traits: HFlowContainer
 var _rels: VBoxContainer
 var _view: SubViewport
@@ -41,6 +47,8 @@ var _turn: Node3D
 var _body: Node3D
 var _drag := false
 var _spin := 0.0
+var _portrait_camera: Camera3D
+var _portrait_zoom := 1.0
 
 
 func _ready() -> void:
@@ -113,6 +121,12 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if not visible or _turn == null:
 		return
+	# Keep the whole body in frame when the browser side panel is tall/narrow.
+	# Zoom is relative to this fit, rather than a fixed FOV that clips shoulders.
+	var aspect := maxf(0.1,float(_view.size.x)/maxf(1.0,float(_view.size.y)))
+	var fitted_height := maxf(2.2,0.95/aspect)
+	_portrait_camera.fov = clampf(rad_to_deg(2.0*atan(fitted_height/8.8))*_portrait_zoom,18.0,100.0)
+	for slot in _slots.values(): slot.panel.visible=aspect>0.42
 	if not _drag:
 		_spin = lerpf(_spin, 0.0, clampf(delta * 1.5, 0.0, 1.0))
 		_turn.rotation.y += _spin * delta
@@ -263,6 +277,24 @@ func _build_left(row: HBoxContainer) -> void:
 ## Đồ trong ngăn đang mở: [{id, name, kind, desc, count, used, action}].
 func _items(tab: String) -> Array:
 	var out := []
+	if tab=="clothes" and str(game.cfg.get("anModel","rigged"))=="rigged":
+		if game.s.get("inventory",{}).is_empty():
+			out.append({"id":"an_base","name":"Áo caro và jeans của An","kind":"shirt","count":1,
+				"used":str(game.wardrobe().worn.get("ao",""))=="" and str(game.wardrobe().worn.get("quan",""))=="",
+				"group":"Quần áo","desc":"Bộ đồ mang theo từ nhà.\nMua thêm đồ tại shop si-đa Hàng Đào; cắt và nhuộm tóc ở tiệm tóc."})
+		for id in game.s.get("inventory",{}):
+			var item: Dictionary=game.s.inventory[id]
+			var slot: String=str(item.slot)
+			var bag_slot := "ao" if slot=="shirt" else "quan"
+			var used: bool=str(game.s.equipped.get(slot,""))==id and str(game.wardrobe().worn.get(bag_slot,""))==""
+			out.append({"id":id,"name":item.name,"kind":"shirt" if slot=="shirt" else "pants","count":1,"used":used,"group":"Quần áo",
+				"desc":"Đồ đã sở hữu · Mặc không tốn tiền.\nMua thêm áo và jeans ở chợ; cắt, nhuộm tóc tại tiệm tóc."})
+		for id in game.wardrobe().owned:
+			var item: Dictionary=game.cloth(id)
+			if str(item.get("slot","")) not in ["ao","quan"]: continue
+			out.append({"id":id,"name":item.name,"kind":"shirt" if item.slot=="ao" else "pants","count":int(game.wardrobe().owned[id]),
+				"used":str(game.wardrobe().worn.get(item.slot,""))==id,"group":"Quần áo","desc":"Đồ từ cửa hàng si-đa · Màu vải hiển thị trên cùng nhân vật An."})
+		return out
 	var cfg_items: Dictionary = game.cfg.get("items", {})
 	match tab:
 		"tools", "clothes":
@@ -353,15 +385,22 @@ func _refresh_items() -> void:
 		_item_desc.text = {"scrap": "Chưa có đồ đồng nát. Lục thùng rác dọc vỉa hè (đứng gần, bấm E) để nhặt chai, lon, bìa giấy.",
 			"keep": "Chưa có gì. Đồ người ta nhờ mang và những món kỷ niệm sẽ nằm ở đây."}.get(_tab, "")
 		return
-	_item_title.text = "【%s】%s" % [chosen.group, chosen.name]
+	_item_title.text = "%s · %s" % [chosen.group, chosen.name]
 	_item_desc.text = str(chosen.desc)
 	if _tab == "clothes" and not chosen.used:
 		_item_btn.visible = true
-		_item_btn.text = "Mặc bộ này"
+		_item_btn.text = "Mặc món này"
 		for c in _item_btn.pressed.get_connections():
 			_item_btn.pressed.disconnect(c.callable)
 		var id := str(chosen.id)
-		_item_btn.pressed.connect(func() -> void: game.set_outfit(id))
+		_item_btn.pressed.connect(func() -> void:
+			if id=="an_base":
+				game.wardrobe().worn.erase("ao"); game.wardrobe().worn.erase("quan"); game._commit()
+			elif str(game.cfg.get("anModel","rigged"))=="rigged" and game.s.get("inventory",{}).has(id):
+				game.wardrobe().worn.erase("ao" if game.s.inventory[id].slot=="shirt" else "quan")
+				Wardrobe.equip(game,id)
+			elif str(game.cfg.get("anModel","rigged"))=="rigged": game.wear_item(id)
+			else: game.set_outfit(id))
 
 
 # ---------------------------------------------------------------- giữa: An 3D và các ô đang dùng
@@ -371,6 +410,13 @@ func _build_center(row: HBoxContainer) -> void:
 	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(c)
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var backdrop_mat := ShaderMaterial.new()
+	backdrop_mat.shader = preload("res://scripts/ui/portrait_backdrop.gdshader")
+	backdrop.material = backdrop_mat
+	c.add_child(backdrop)
 	var box := SubViewportContainer.new()
 	box.stretch = true
 	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -385,7 +431,7 @@ func _build_center(row: HBoxContainer) -> void:
 	_view.msaa_3d = Viewport.MSAA_4X
 	_view.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	box.add_child(_view)
-	var hint := UI.label("Kéo chuột để xoay", 13, Color(CREAM, 0.5))
+	var hint := UI.label("Kéo: xoay · Lăn: xem gần", 13, Color(CREAM, 0.7))
 	hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	hint.position.y -= 50
 	hint.position.x -= 55
@@ -422,21 +468,21 @@ func _build_model() -> void:
 	var e := Environment.new()
 	e.background_mode = Environment.BG_CLEAR_COLOR
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("e6e2dc")
-	e.ambient_light_energy = 0.5
+	e.ambient_light_color = Color("c8d2da")
+	e.ambient_light_energy = 0.35
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.environment = e
 	_view.add_child(env)
 	var key := DirectionalLight3D.new()
 	key.rotation_degrees = Vector3(-30, -35, 0)
 	key.light_color = Color("fff1e0")
-	key.light_energy = 1.0
+	key.light_energy = 0.55
 	key.shadow_enabled = true
 	_view.add_child(key)
 	var rim := DirectionalLight3D.new()
 	rim.rotation_degrees = Vector3(-15, 150, 0)
-	rim.light_color = Color("9fc3ff")
-	rim.light_energy = 0.6
+	rim.light_color = Color("c5d1df")
+	rim.light_energy = 0.28
 	_view.add_child(rim)
 	var floor_mesh := MeshInstance3D.new()
 	var disc := CylinderMesh.new()
@@ -451,6 +497,7 @@ func _build_model() -> void:
 	floor_mesh.material_override = fm
 	_view.add_child(floor_mesh)
 	var cam := Camera3D.new()
+	_portrait_camera = cam
 	cam.fov = 30
 	cam.position = Vector3(0, 1.0, 4.4)
 	_view.add_child(cam)
@@ -464,9 +511,19 @@ func _build_model() -> void:
 
 ## Dựng lại An trong khung xem theo bộ đang mặc.
 func _dress() -> void:
+	if str(game.cfg.get("anModel", "rigged")) == "rigged" and AnCharacter.available():
+		if not (_body is AnCharacter):
+			if is_instance_valid(_body):
+				_turn.remove_child(_body)
+				_body.queue_free()
+			_body = AnCharacter.new()
+			_turn.add_child(_body)
+			_body.setup(Color.WHITE, Color.WHITE, "An")
+		_body.apply_outfit(game)
+		return
 	var look := Character.an_look(game)
 	if _body != null:
-		if str(_body.get("look").get("rb", "")) == str(look.rb):
+		if not (_body is AnCharacter) and str(_body.get("look").get("rb", "")) == str(look.rb):
 			return
 		_body.queue_free()
 	_body = Character.make(look)
@@ -478,6 +535,8 @@ func _on_drag(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_drag = event.pressed
+	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		_portrait_zoom = clampf(_portrait_zoom + (-0.06 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 0.06),0.75,1.12)
 	elif event is InputEventMouseMotion and _drag:
 		_turn.rotation.y += event.relative.x * 0.012
 		_spin = event.relative.x * 0.4
@@ -496,6 +555,12 @@ func _refresh_slots() -> void:
 		if str(it.id) == game.outfit():
 			_slots.clothes.icon.set("kind", it.kind)
 			(_slots.clothes.panel as Control).tooltip_text = str(it.name)
+	if str(game.cfg.get("anModel","rigged"))=="rigged":
+		_slots.clothes.icon.set("kind","shirt")
+		var worn_names := PackedStringArray()
+		for item in _items("clothes"):
+			if item.used: worn_names.append(str(item.name))
+		(_slots.clothes.panel as Control).tooltip_text = "\n".join(worn_names)
 	_slots.home.icon.set("kind", "key")
 	var home_name := ""
 	if world != null and world.has_method("location_info"):
@@ -586,6 +651,30 @@ func _build_right(row: HBoxContainer) -> void:
 		var b := UI.bar(9)
 		col.add_child(b)
 		_bars[sp[0]] = {"bar": b, "label": lab, "title": sp[1]}
+	_conds = HFlowContainer.new()
+	_conds.add_theme_constant_override("h_separation", 8)
+	_conds.add_theme_constant_override("v_separation", 8)
+	v.add_child(_conds)
+	_heading(v, "Thuộc tính")
+	for at in game.Attributes.rows(game):
+		var r := HBoxContainer.new()
+		r.add_theme_constant_override("separation", 8)
+		r.tooltip_text = str(at.desc)
+		r.mouse_filter = Control.MOUSE_FILTER_PASS
+		v.add_child(r)
+		var ic := ItemIcon.new(str(at.icon), CREAM)
+		ic.custom_minimum_size = Vector2(34, 34)
+		r.add_child(ic)
+		var col := VBoxContainer.new()
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.add_theme_constant_override("separation", 1)
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		r.add_child(col)
+		var lab := UI.label("", 13, CREAM)
+		col.add_child(lab)
+		var b := UI.bar(9)
+		col.add_child(b)
+		_attrs[at.id] = {"bar": b, "label": lab}
 	_heading(v, "Đặc điểm tính cách", 290)
 	_traits = HFlowContainer.new()
 	_traits.add_theme_constant_override("h_separation", 8)
@@ -613,27 +702,20 @@ func _refresh_status() -> void:
 		var x: float = vals[k]
 		UI.set_bar(_bars[k].bar, x, 100.0, UI.level_color(x / 100.0))
 		(_bars[k].label as Label).text = "%s  %d/100" % [_bars[k].title, int(x)]
+	for c in _conds.get_children():
+		_conds.remove_child(c)
+		c.queue_free()
+	for t in game.Survival.active(game):
+		_conds.add_child(_chip(str(t.name) + ("  · còn %d giờ" % ceili(float(t.left)) if float(t.left) >= 0.0 else ""), str(t.tone), str(t.desc)))
+	for row in game.Attributes.rows(game):
+		var full: bool = int(row.next) == 0
+		UI.set_bar(_attrs[row.id].bar, 1.0 if full else float(row.xp), 1.0 if full else float(row.next), GOLDEN)
+		(_attrs[row.id].label as Label).text = "%s  cấp %d%s" % [row.name, int(row.lv), "  · tối đa" if full else "  · %d/%d XP" % [int(row.xp), int(row.next)]]
 	for c in _traits.get_children():
 		_traits.remove_child(c)
 		c.queue_free()
 	for t in game.traits():
-		var chip := PanelContainer.new()
-		var sb := StyleBoxFlat.new()
-		var col: Color = {"good": Color("2f8f4e"), "bad": Color("c56a1d"), "base": Color("2e6f9e")}.get(t.tone, Color("555555"))
-		sb.bg_color = col
-		sb.border_color = col.lightened(0.35)
-		sb.set_border_width_all(1)
-		sb.set_corner_radius_all(2)
-		sb.content_margin_left = 12
-		sb.content_margin_right = 12
-		sb.content_margin_top = 3
-		sb.content_margin_bottom = 3
-		chip.add_theme_stylebox_override("panel", sb)
-		chip.tooltip_text = str(t.desc)
-		chip.mouse_filter = Control.MOUSE_FILTER_PASS
-		var l := _hand(str(t.name), 20, Color.WHITE)
-		chip.add_child(l)
-		_traits.add_child(chip)
+		_traits.add_child(_chip(str(t.name), str(t.tone), str(t.desc)))
 	for c in _rels.get_children():
 		_rels.remove_child(c)
 		c.queue_free()
@@ -661,11 +743,39 @@ func _refresh_status() -> void:
 		col2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		col2.add_theme_constant_override("separation", 1)
 		r.add_child(col2)
-		var word := "Thân thiết" if val >= 70 else ("Quen" if val >= 45 else ("Xa cách" if val >= 25 else "Có hiềm khích"))
-		col2.add_child(UI.label("%s · %s %d" % [who, word, val], 13, CREAM))
+		# Bậc quan hệ theo data/systems/relationships.json (tuyến tình cảm có bậc riêng), kèm trạng thái như Cặp đôi.
+		var rc: Dictionary = Relationships.card(game, k)
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 6)
+		col2.add_child(line)
+		line.add_child(UI.label("%s · %s %d" % [who, rc.tier, val], 13, CREAM))
+		if str(rc.status) != "":
+			line.add_child(UI.label("♥ " + str(rc.status), 12, Color("e85d75")))
+		if str(rc.next) != "":
+			line.tooltip_text = "Bậc sau: " + str(rc.next)
 		var b := UI.bar(6)
 		UI.set_bar(b, val, 100.0, Color("4cc46a") if val >= 60 else (GOLDEN if val >= 35 else Color("e0604f")))
 		col2.add_child(b)
+
+
+## Thẻ chữ viết tay nền màu theo tone (good xanh lá, bad cam, base xanh dương), rê chuột hiện lời tả.
+func _chip(text: String, tone: String, desc: String) -> PanelContainer:
+	var chip := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	var col: Color = {"good": Color("2f8f4e"), "bad": Color("c56a1d"), "base": Color("2e6f9e")}.get(tone, Color("555555"))
+	sb.bg_color = col
+	sb.border_color = col.lightened(0.35)
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(2)
+	sb.content_margin_left = 12
+	sb.content_margin_right = 12
+	sb.content_margin_top = 3
+	sb.content_margin_bottom = 3
+	chip.add_theme_stylebox_override("panel", sb)
+	chip.tooltip_text = desc
+	chip.mouse_filter = Control.MOUSE_FILTER_PASS
+	chip.add_child(_hand(text, 20, Color.WHITE))
+	return chip
 
 
 func refresh() -> void:

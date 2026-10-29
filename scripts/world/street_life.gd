@@ -62,6 +62,9 @@ func setup(w) -> void:
 func _errand_now(id: String) -> Dictionary:
 	if not game.is_started() or game.is_over():
 		return {}
+	if id=="LINH":
+		var appointment: Dictionary=game.Day23.linh_errand(game)
+		if not appointment.is_empty(): return appointment
 	var hour: float = game.clock()
 	var wd: int = game.day() % 7
 	var rain: bool = game.s.today.get("rain", false)
@@ -132,8 +135,14 @@ func _update_npc(id: String, delta: float) -> void:
 		else:
 			_arrive(n, "returning")
 	elif not want.is_empty() and state in ["going", "there", "away"] and want != cur:
+		if state=="away":
+			node.global_position=_spot(cur)
+			node.visible=true
 		n["errand"] = want
-		_arrive(n, "going")
+		if node.global_position.distance_to(world.player.position)<SEE_RANGE:
+			_start_walk(n,_v2(node.global_position),_v2(_spot(want)),"going")
+		else:
+			_arrive(n, "going")
 	if str(n.state) in ["going", "returning"]:
 		_step(n, delta)
 	node.global_position.y = world.city.ground_y(_v2(node.global_position))

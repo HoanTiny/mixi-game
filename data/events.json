@@ -2670,4 +2670,112 @@
    }
   ]
  }
+,
+{
+ "id": "opening_fan",
+ "system": true,
+ "title": "Cô cần gió trước buổi chợ",
+ "who": "Cô bán hoa quả",
+ "text": "Cô đặt chiếc quạt lên bàn, lấy khăn lau mồ hôi. “Trưa sạp bí lắm. Quạt cứ ù, phải lấy tay đẩy mới quay. Cháu xem giúp cô được không?”\n\nChú Sơn kéo ghế cho An: “Đồ nghề ở đây. Cháu hỏi khách rồi tự quyết, chú ở bên cạnh.”",
+ "quote": "Một chiếc quạt chạy lại. Một người khách nhớ tên mình.",
+ "choices": [
+  {
+   "label": "Cháu nhận. Đo kiểm rồi trả cô trước 12 giờ.",
+   "hint": "120.000đ tiền công, tự lo linh kiện. Có thể mua ở chợ 30.000đ hoặc dùng đồ tiệm 50.000đ.",
+   "effects": {
+    "quest_start": {
+     "id": "quat_trai_cay",
+     "deadline_hour": 12
+    },
+    "promise": {
+     "id": "quat_truoc_trua",
+     "text": "Trả quạt cho cô bán hoa quả trước 12 giờ",
+     "to": "SAU",
+     "due": 1
+    }
+   }
+  },
+  {
+   "label": "Cho cháu tới 15 giờ, cháu muốn kiểm tra cho chắc.",
+   "hint": "Cùng tiền công; cô mượn tạm quạt bên cạnh trong buổi trưa.",
+   "effects": {
+    "quest_start": {
+     "id": "quat_trai_cay",
+     "deadline_hour": 15
+    },
+    "flag.quatRoRang": true
+   }
+  },
+  {
+   "label": "Hôm nay cháu chưa nhận được, để chú Sơn giúp cô.",
+   "hint": "Không mất uy tín vì chưa hứa. Chị Hạnh vẫn đang cần người phụ quán.",
+   "effects": {
+    "flag.opening_fan_declined": true,
+    "log": "Chú Sơn nhận lại quạt. Cô cảm ơn An đã nói sớm. Hôm nay có thể ghé quán Hạnh tìm một ca làm."
+   }
+  }
+ ]
+},
+{
+ "id": "opening_customer_returns",
+ "day": 2,
+ "mode": "full",
+ "loc": "cho_cau_nho",
+ "window": [
+  7,
+  18
+ ],
+ "hours": 0.15,
+ "when": {
+  "flag.opening_fan_met": true,
+  "quest_done": "quat_trai_cay"
+ },
+ "title": "Cô nhớ tên người sửa quạt",
+ "who": "Cô bán hoa quả",
+ "text": "Cái quạt đang quay bên sạp. Thấy An, cô gọi đúng tên: “An ơi, tối qua cô bật tới hết chợ, êm lắm!”\n\nCô chỉ sang hàng nước: “Chị ấy có cái ấm hỏng. Khi nào rảnh cháu ghé tiệm chú Sơn, cô nhờ chị mang qua. Đừng nhận nếu đang bận nhé.”",
+ "choices": [
+  {
+   "label": "Cháu cảm ơn cô. Có việc cháu sẽ báo giờ rõ ràng.",
+   "hint": "Một khách quen đầu tiên. Chiếc ấm đang chờ An trả lời ở tiệm Sơn hôm nay.",
+   "effects": {
+    "rep.SAU": 2,
+    "need.mood": 5,
+    "diary": "Người khách đầu tiên nhớ tên mình. Cái quạt vẫn chạy ở sạp hoa quả."
+   }
+  }
+ ]
+},
+{
+ "id": "day23_evening",
+ "system": true,
+ "title": "Một bàn nhỏ, hai cuốn sổ",
+ "who": "Linh",
+ "text": "{family_result}\n\n{work_result}\n\nLinh đặt ảnh phòng cạnh sổ tiền: Phòng gần cần năm triệu, nhưng bậc cửa cao quá. Chỗ dì Nga chật hơn, bà lại có người trò chuyện. Anh muốn ngày mai mình lo việc nào trước?",
+ "choices": [
+  {
+   "label": "Tới dì Nga hỏi ở tạm, giảm áp lực tiền cọc",
+   "hint": "Đánh dấu nhà dì Nga; chưa ký hay mất tiền",
+   "effects": {
+    "housing_visit": "di_nam",
+    "flag.day23_plan_family": true
+   }
+  },
+  {
+   "label": "Xem thêm phòng Ngọc Thụy, tính cả quãng đi làm",
+   "hint": "Đánh dấu phòng bên kia sông; có chuyến xe từ bến",
+   "effects": {
+    "housing_visit": "cau_tre",
+    "flag.day23_plan_room": true
+   }
+  },
+  {
+   "label": "Sáng nhận việc ở Sơn, chiều xem phòng gần",
+   "hint": "Nếu giữ hẹn với khách, đơn thường ở Sơn có thêm 20.000đ tiền công",
+   "effects": {
+    "housing_visit": "hem_dua",
+    "flag.day23_plan_work": true
+   }
+  }
+ ]
+}
 ]

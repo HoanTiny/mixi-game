@@ -18,6 +18,7 @@ const CityMap := preload("res://scripts/world/city_map.gd")
 const RealCity := preload("res://scripts/world/real_city.gd")
 const Landmarks := preload("res://scripts/world/landmarks.gd")
 const AnCharacter := preload("res://scripts/world/an_character.gd")
+const OpeningStreet := preload("res://scripts/world/opening_street.gd")
 const Geo := preload("res://scripts/realmap/geo.gd")
 const AreaBuilder := preload("res://scripts/realmap/area_builder.gd")
 const RainLayer := preload("res://scripts/world/rain_layer.gd")
@@ -165,6 +166,9 @@ var sun: DirectionalLight3D
 var env: Environment
 var player: Node3D
 var player_body: Node3D
+var _rest_origin := Transform3D.IDENTITY
+var _rest_stool: Node3D
+var _resting := false
 ## Xe máy của An (hiện khi đang có đơn giao hàng), An đang ngồi trên xe.
 var _ride_bike: Node3D
 var _riding := false
@@ -286,6 +290,10 @@ func _ready() -> void:
 		pilot_life = PilotLife.new()
 		add_child(pilot_life)
 		pilot_life.setup(self)
+	if real and city.street_upgrade:
+		var opening := OpeningStreet.new()
+		add_child(opening)
+		opening.setup(self)
 
 	hud = Hud.new()
 	hud.world = self
@@ -295,6 +303,10 @@ func _ready() -> void:
 	audio.world = self
 	audio.game = game
 	add_child(audio)
+	if real and city.street_upgrade:
+		var neighborhood_audio := preload("res://scripts/world/neighborhood_audio.gd").new()
+		add_child(neighborhood_audio)
+		neighborhood_audio.setup(self)
 	hud.dialogs.visibility_changed.connect(func() -> void:
 		if hud.dialogs.visible:
 			audio.play("dialog"))
@@ -429,7 +441,7 @@ func _build_environment() -> void:
 	sun.shadow_blur = 1.5
 	if real and (city.pilot_active or city.street_upgrade):
 		sun.shadow_blur = 3.0
-		sun.shadow_opacity = 0.68
+		sun.shadow_opacity = 0.60
 	sun.directional_shadow_max_distance = 70.0
 	if ScreenFit.light_shadows:
 		# Điện thoại, trình duyệt: bản đồ bóng nhỏ hơn, hai tầng bóng, tầng gần phủ xa hơn cho đỡ sọc khi nắng xiên.
@@ -1616,7 +1628,8 @@ func _build_real_traffic() -> void:
 	for spot in CROWD_SPOTS:
 		if city.locs.has(spot[0]):
 			# The authored diners and service clusters already give this shop activity.
-			var number := 1 if city.pilot_active and spot[0] == "com_hanh" else int(spot[1])
+			var number := 1 if (city.pilot_active or city.street_upgrade) and spot[0] in ["com_hanh","tiem_sau","xom_bo_me"] else int(spot[1])
+			if city.street_upgrade and spot[0]=="cho_cau_nho": number=8
 			hot.append([city.loc_door(spot[0]), number, spot[2]])
 	var stalls: Array = []
 	for t in _stall_tables:
@@ -1625,8 +1638,11 @@ func _build_real_traffic() -> void:
 			stalls.append([Vector2(t.global_position.x, t.global_position.z), Vector2(out.x, out.z).normalized()])
 	crowd = Crowd.new()
 	add_child(crowd)
+	var quiet_fronts: Array=[]
+	if city.street_upgrade:
+		for id in StreetPrototype.PRIMARY: quiet_fronts.append(city.loc_door(id))
 	crowd.build(area.dress, city.data.roads, area.dress.center, city.walkable, hot, stalls,
-		area.tree_spots() + area.dress.pole_spots + _lamp_spots + (PilotLife.reservation_points(city) if city.pilot_active or city.street_upgrade else []), 0.65 if ScreenFit.low_power else 1.0)
+		area.tree_spots() + area.dress.pole_spots + _lamp_spots + (PilotLife.reservation_points(city) if city.pilot_active or city.street_upgrade else []) + (OpeningStreet.reservation_points(city) if city.street_upgrade else []), 0.65 if ScreenFit.low_power else 1.0, quiet_fronts)
 	small.shuffle()
 	for k in mini(small.size(), 22):
 		var pth: Dictionary = small[k].duplicate()
@@ -2195,8 +2211,9 @@ func _speed() -> float:
 			v *= SPRINT
 	if _wading():
 		v *= RainLayer.WADE_SPEED
-	if game.has_needs() and game.phong_do() < float(game.cfg.needs.slowBelow):
-		v *= 0.7
+	# Đói lả, trầm cảm, Phong độ thấp thì chậm (lấy mức chậm nhất); Nhanh nhẹn chỉ cộng khi đi bộ (game_logic.move_mult).
+	if game.has_needs():
+		v *= minf(1.0, game.move_mult()) if _riding else game.move_mult()
 	# Đang khiêng đồ của việc nhờ (xe đạp, cơm suất, con mèo) thì đi chậm hơn một chút.
 	for id in game.quests_active():
 		var step: Dictionary = game.quest_step(id)
@@ -2306,14 +2323,7 @@ func _update_ride_light() -> void:
 func update_outfit() -> void:
 	# Mô hình An gắn xương: tô màu tóc (tiệm tóc), áo, quần theo món đang mặc trong tủ đồ.
 	if player_body != null and player_body.has_method("set_colors"):
-		var ap: Dictionary = game.s.get("appearance", AnCharacter.DEFAULT_COLORS)
-		var colors := {"hair": str(ap.get("hair", "28231e")), "shirt": str(ap.get("shirt", "969084")), "pants": str(ap.get("pants", "657b8c"))}
-		for slot in [["ao", "shirt"], ["quan", "pants"]]:
-			var id: String = str(game.wardrobe().worn.get(slot[0], ""))
-			if id != "":
-				colors[slot[1]] = str(game.cloth(id).get("color", colors[slot[1]]))
-		player_body.set_colors(colors)
-		player_body.set_hair_style(str(game.s.get("hair_style", "natural")))
+		player_body.apply_outfit(game)
 	else:
 		dress_player()
 	if player_body == null or not player_body.has_method("wear"):
@@ -2564,6 +2574,28 @@ func set_player_inside(inside: bool) -> void:
 	if inside:
 		_target = null
 		_target_loc = ""
+
+func begin_rest_pose(loc: String) -> void:
+	if _resting or _riding: return
+	_resting=true
+	_rest_origin=player.transform
+	_target=null
+	_target_loc=""
+	_path.clear()
+	player.position=loc_point(loc,-1.1,0.6)
+	player.rotation.y=CityMap.rot_y(city.locs[loc].normal)
+	player.visible=true
+	_rest_stool=StreetPrototype.scanned(self,"metal_stool_01",player.position,0.46)
+	if player_body.has_method("rest"): player_body.rest(true)
+	else: player_body.sit(true,0.46)
+
+func end_rest_pose() -> void:
+	if not _resting: return
+	if player_body.has_method("rest"): player_body.rest(false)
+	else: player_body.sit(false,0.46)
+	player.transform=_rest_origin
+	if is_instance_valid(_rest_stool): _rest_stool.queue_free()
+	_resting=false
 
 
 func _handle_click(screen_pos: Vector2) -> void:
@@ -2841,9 +2873,9 @@ func _update_lighting(hour: float) -> void:
 		# with local shop lamps providing the warm accents after sunset.
 		sun.rotation_degrees = Vector3(-elevation, 28.0 + t * 45.0, 0)
 		sun.light_color = c.lerp(Color("d5d7d9"), 0.32 * (1.0 - nf))
-		sun.light_energy = lerpf(0.38, 0.14, nf) * (0.42 if rain else 1.0)
-		env.ambient_light_color = Color("c2c4ce").lerp(Color("929ead"), nf)
-		env.ambient_light_energy = lerpf(0.66 if rain else 0.62, 0.42, nf)
+		sun.light_energy = lerpf(0.48, 0.14, nf) * (0.42 if rain else 1.0)
+		env.ambient_light_color = Color("c6ced5").lerp(Color("929ead"), nf)
+		env.ambient_light_energy = lerpf(0.60 if rain else 0.52, 0.42, nf)
 	RenderingServer.global_shader_parameter_set("night", nf)
 	# Quầng sáng (glow) chỉ bật lúc tối: đèn lồng, chữ neon, cửa sổ lóa nhẹ. Điện thoại tắt cho nhẹ.
 	env.glow_enabled = nf > 0.05 and not ScreenFit.low_power
@@ -3152,13 +3184,23 @@ func _ride(bike: Node3D, rng: RandomNumberGenerator, back_chance := 0.25) -> voi
 		bike.add_child(who)
 
 
+var _floating_note: Label3D
+var _floating_tween: Tween
+
 func _float_text(text: String, color: Color) -> void:
-	var l := _label3d(text, player.position + Vector3(0, 2.6, 0), 40)
+	if is_instance_valid(_floating_tween): _floating_tween.kill()
+	if is_instance_valid(_floating_note): _floating_note.queue_free()
+	var l := _label3d(text, player.position + Vector3(0, 2.1, 0), 28 if text.length()>18 else 36)
+	_floating_note=l
+	l.width=560.0
+	l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	l.pixel_size=0.005
 	l.modulate = color
 	add_child(l)
 	var tw := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(l, "position", l.position + Vector3(0, 1.4, 0), 1.6)
+	_floating_tween=tw
 	tw.tween_property(l, "modulate:a", 0.0, 1.6).set_delay(0.4)
 	tw.chain().tween_callback(l.queue_free)
 
@@ -3367,9 +3409,9 @@ func _refresh_quest_marks() -> void:
 	while _quest_marks.size() < spots.size():
 		var m := MeshInstance3D.new()
 		var cm := CylinderMesh.new()
-		cm.top_radius = 0.38
+		cm.top_radius = 0.19
 		cm.bottom_radius = 0.0
-		cm.height = 0.75
+		cm.height = 0.4
 		cm.radial_segments = 4
 		m.mesh = cm
 		var mat := StandardMaterial3D.new()

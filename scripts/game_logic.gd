@@ -40,9 +40,22 @@ var s: Dictionary = {}
 var notes: Array = []
 ## Đơn sửa đồ ở tiệm chú Sơn và bàn sửa 3D (scripts/street_life.gd, scripts/world/repair_bench.gd).
 const Street := preload("res://scripts/street_life.gd")
+const Day23 := preload("res://scripts/day23.gd")
 const Neighborhood := preload("res://scripts/neighborhood_flow.gd")
 ## Tiệm tóc: kiểu tóc, màu nhuộm cho mô hình An (scripts/wardrobe.gd, HAIR).
 const Wardrobe := preload("res://scripts/wardrobe.gd")
+## Sinh tồn đa tầng (trạng thái theo ngưỡng Độ no, Vệ sinh, Tâm trạng), bốn thuộc tính và đồng hồ 24 giờ
+## (scripts/systems/, số liệu ở data/systems/survival.json, attributes.json).
+const Survival := preload("res://scripts/systems/survival.gd")
+const Attributes := preload("res://scripts/systems/attributes.gd")
+const GameClock := preload("res://scripts/systems/game_clock.gd")
+## Tay nghề, bằng cấp (data/systems/careers.json) và tầng luật của trò chơi nhỏ (data/systems/minigames.json).
+const Careers := preload("res://scripts/systems/careers.gd")
+const Relationships := preload("res://scripts/systems/relationships.gd")
+const Commerce := preload("res://scripts/systems/commerce.gd")
+const MiniGames := preload("res://scripts/minigames/minigames.gd")
+## Kết quả trò chơi nhỏ vừa tính xong (MiniGames.on_action) để giao diện báo; không lưu vào bản lưu.
+var last_minigame: Dictionary = {}
 ## Danh mục quần áo bóc túi mù (data/clothes.json): rarities, slots, items.
 var clothes: Dictionary = {}
 var _event_data: Dictionary = {}
@@ -97,6 +110,13 @@ func load_data(dir := "res://data") -> void:
 	_merge_pack(dir, "_pho.json")
 	if FileAccess.file_exists(dir + "/clothes.json"):
 		clothes = _read_json(dir + "/clothes.json")
+	for sys in ["survival", "attributes", "careers", "relationships", "commerce"]:
+		if FileAccess.file_exists(dir + "/systems/" + sys + ".json"):
+			cfg[sys] = _read_json(dir + "/systems/" + sys + ".json")
+	if FileAccess.file_exists(dir + "/systems/minigames.json"):
+		cfg["minigame_catalog"] = _read_json(dir + "/systems/minigames.json")
+		MiniGames.register(self)
+	Commerce.register(self)
 
 
 func _merge_pack(dir: String, suffix: String) -> void:
@@ -442,12 +462,15 @@ func set_difficulty(diff: String) -> void:
 
 func add_fatigue(d: float) -> void:
 	if d > 0.0:
-		d *= float(_diff().get("fatigueRate", 1.0))
+		# Trạng thái tốt (Cặp đôi…) làm mệt chậm hơn: fatigue.rate trong mods của survival.json.
+		d *= float(_diff().get("fatigueRate", 1.0)) * maxf(0.0, 1.0 + mod("fatigue.rate"))
 	s["fatigue"] = clampf(float(s.fatigue) + d, 0.0, float(cfg.fatigue.max))
 
 
 func add_rep(k: String, d: float) -> void:
 	s.rep[k] = clampi(int(s.rep.get(k, 50)) + int(d), 0, 100)
+	if d > 0.0:
+		Relationships.touch(self, k)
 
 
 func _find(list: Array, id: String) -> Variant:
@@ -616,7 +639,8 @@ func apply_effects(eff: Dictionary) -> void:
 					if not s.has("scores"):
 						s["scores"] = {}
 					s.scores[key.substr(6)] = int(s.scores.get(key.substr(6), 0)) + int(v)
-				else:
+				elif not (Survival.effect(self, key, v) or Attributes.effect(self, key, v) or Careers.effect(self, key, v)
+						or Relationships.effect(self, key, v) or Commerce.effect(self, key, v)):
 					push_warning("Hiệu ứng không rõ: " + str(key))
 
 
@@ -1035,7 +1059,20 @@ func check(req: Dictionary) -> String:
 			if away != bool(v):
 				fail = "-"
 		else:
-			push_warning("Điều kiện không rõ: " + str(key))
+			# Trạng thái (has_cond, no_cond), thuộc tính (stat.X), tay nghề, bằng cấp (prof.X, cert) do scripts/systems/ tự xét.
+			var r = Survival.check(self, key, v)
+			if r == null:
+				r = Attributes.check(self, key, v)
+			if r == null:
+				r = Careers.check(self, key, v)
+			if r == null:
+				r = Relationships.check(self, key, v)
+			if r == null:
+				r = Commerce.check(self, key, v)
+			if r == null:
+				push_warning("Điều kiện không rõ: " + str(key))
+			else:
+				fail = str(r)
 		if fail != "":
 			return fail
 	return ""
@@ -1125,6 +1162,10 @@ func action_status(a: Dictionary) -> Dictionary:
 	var reason := check(a.get("require", {}))
 	if reason != "":
 		return {"ok": false, "reason": reason}
+	# Đói lả không bê vác, bốc mùi không phục vụ khách, trầm cảm không đi làm (scripts/systems/survival.gd).
+	reason = Survival.block(self, a)
+	if reason != "":
+		return {"ok": false, "reason": reason}
 	if today_count(a.id) >= int(a.get("perDay", 1)):
 		return {"ok": false, "reason": "Hôm nay đã làm rồi"}
 	if action_money(a) > int(s.cash):
@@ -1164,6 +1205,8 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	var pay := int(a.get("pay", 0))
 	if a.has("rainPay") and s.today.get("rain", false):
 		pay = int(a.rainPay)
+	# Trò chơi trong data/systems/minigames.json: kết quả thô của cảnh {score, fails} đổi thành {ratio, bonus, win}.
+	result = MiniGames.normalize(self, a, result)
 	if not result.is_empty():
 		pay = round_k(float(pay) * float(result.get("ratio", 1.0))) + int(result.get("bonus", 0))
 		if not bool(result.get("auto", false)):
@@ -1184,7 +1227,10 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 		earn(pay, label)
 	else:
 		add_log(label)
-	apply_effects(a.get("effects", {}))
+	apply_effects(Survival.action_effects(self, a))
+	Survival.on_action(self, a, float(a.hours))
+	Attributes.on_action(self, a, result)
+	MiniGames.on_action(self, a, result)
 	if a.group == "work" and finish > float(cfg.lateHour) + 0.001:
 		add_fatigue(float(cfg.lateFatigue))
 		add_log("Làm tới cuối tối: Mệt +%d" % int(cfg.lateFatigue), "warn")
@@ -1332,13 +1378,13 @@ func elapse(hours: float, working := false) -> void:
 	if not is_started() or is_over() or hours <= 0.0:
 		return
 	s["used"] = minf(float(s.used) + hours, day_end() - float(cfg.dayStart))
-	if working and has_needs():
-		need_adj("clean", -hours * 4.0)
+	if working:
+		Survival.activity(self, ["workshop"], hours)
 
 
-## Tên nhu cầu của nhánh thoi-gian-troi (satiety, hygiene, mood) đổi sang nhu cầu của bản này.
+## Tên nhu cầu của nhánh thoi-gian-troi (satiety, hygiene, mood) đổi sang nhu cầu của bản này (survival.json aliases).
 func adjust_need(key: String, amount: float) -> void:
-	need_adj({"satiety": "fed", "hygiene": "clean"}.get(key, key), amount)
+	need_adj(key, amount)
 
 
 func is_out_of_time() -> bool:
@@ -1479,6 +1525,8 @@ func fill(text: String) -> String:
 		"sleep_out": str(int(cfg.fatigue.sleepOutside)),
 		"npc": str(_event_data.get("npc", "")),
 		"line": str(_event_data.get("line", "")),
+		"family_result": str(_event_data.get("family_result","")),
+		"work_result": str(_event_data.get("work_result","")),
 		"chat_rep": str(int(cfg.get("chatRep", 2))),
 		"cash": fmt_money(int(s.get("cash", 0))),
 		"cost_hem_dua": fmt_money(housing_cost("hem_dua")) if is_started() else "",
@@ -1645,6 +1693,7 @@ func night_preview() -> Dictionary:
 func finish_day() -> void:
 	if not is_started() or is_over() or not s.queue.is_empty():
 		return
+	Day23.tick(self,true)
 	var tonight := []
 	if not delivery_active().is_empty():
 		add_log("Hết ngày, đơn giao hàng đang chạy bị hủy", "warn")
@@ -2221,9 +2270,14 @@ func traits() -> Array:
 	if count("com_voi_ba") + count("dua_ba_di_cho") >= 3:
 		out.append({"name": "Thương nhà", "tone": "good", "desc": "Bận mấy cũng về ăn cơm với bà, đưa bà đi chợ."})
 	var rep_sum := 0
+	var rep_n := 0
 	for k in s.rep:
+		# Tuyến tình cảm (Hân) không tính vào chuyện được lòng xóm.
+		if Relationships.npc_def(self, k).get("romance", false):
+			continue
 		rep_sum += int(s.rep[k])
-	if s.rep.size() > 0 and rep_sum / s.rep.size() >= 60:
+		rep_n += 1
+	if rep_n > 0 and rep_sum / rep_n >= 60:
 		out.append({"name": "Được lòng xóm", "tone": "good", "desc": "Hàng xóm, người quen trung bình thân từ 60 trở lên."})
 	if float(s.fatigue) >= float(cfg.fatigue.warn) or int(s.get("warn_days", 0)) >= 3:
 		out.append({"name": "Cố quá sức", "tone": "bad", "desc": "Làm tới kiệt sức. Mệt cao thì đi chậm, dễ hỏng việc."})
@@ -2361,12 +2415,22 @@ func slice_report() -> Dictionary:
 func _commit() -> void:
 	migrate_save()
 	_tick_needs()
+	Survival.update(self)
+	Commerce.tick(self)
+	Relationships.tick(self)
 	_check_quests()
+	Day23.tick(self)
 	changed.emit()
 
 
 func migrate_save() -> void:
 	Neighborhood.migrate(self)
+	Day23.migrate(self)
+	Survival.migrate(self)
+	Attributes.migrate(self)
+	Careers.migrate(self)
+	Relationships.migrate(self)
+	Commerce.migrate(self)
 
 
 func neighborhood_target() -> Dictionary:
@@ -2381,6 +2445,9 @@ func delivery_lock() -> String:
 		return "-"
 	if s.flags.get("phoneBroken", false):
 		return "Điện thoại đang hỏng"
+	var blocked := Survival.block_work(self)
+	if blocked != "":
+		return blocked
 	if hours_left() < 0.5:
 		return "Sắp hết ngày"
 	return ""
@@ -2450,6 +2517,7 @@ func delivery_drop() -> Dictionary:
 	s.counts["giao_hang"] = count("giao_hang") + 1
 	s.today["giao_hang"] = today_count("giao_hang") + 1
 	s.erase("delivery")
+	Attributes.notify(self, "delivery")
 	_commit()
 	return {"pay": pay, "tip": tip, "late": late}
 
@@ -2484,7 +2552,8 @@ func talk(npc: String) -> void:
 	s.today["talk_" + npc] = 1
 	# Nói chuyện với người quen (mạch chuyện hay tán gẫu) thì vui lên.
 	if has_needs():
-		need_adj("mood", float(cfg.needs.get("moodTalk", 0)))
+		need_adj("mood", float(cfg.needs.get("moodTalk", 0)) * maxf(0.0, 1.0 + mod("talk_mood")))
+	Attributes.notify(self, "talk")
 	if not s.has("talks_done"):
 		s["talks_done"] = []
 	var who := rep_name(npc)
@@ -2499,7 +2568,8 @@ func talk(npc: String) -> void:
 	for c in talks[npc].get("chat", []):
 		if check(c.get("when", {})) == "":
 			lines.append(c.text)
-	add_rep(npc, float(cfg.get("chatRep", 2)))
+	# Người bốc mùi thì người ta ngại, tán gẫu không thân thêm (survival.json, talk_rep).
+	add_rep(npc, float(cfg.get("chatRep", 2)) * maxf(0.0, 1.0 + mod("talk_rep")))
 	s.queue.append({"id": "talk_chat", "data": {"npc": who, "line": lines.pick_random() if not lines.is_empty() else "..."}})
 	add_log("Tán gẫu với " + who)
 	_commit()
@@ -2513,17 +2583,21 @@ func has_needs() -> bool:
 	return s.has("needs")
 
 
+## k: khóa nhu cầu (fed, clean, neat, mood) hay tên theo tài liệu thiết kế (hunger, hygiene).
 func need(k: String) -> float:
+	k = Survival.key(self, k)
 	return float(s.needs.get(k, cfg.needs.start.get(k, 100.0))) if has_needs() else 100.0
 
 
 func need_adj(k: String, d: float) -> void:
+	k = Survival.key(self, k)
 	if has_needs():
 		# Bản lưu cũ chưa có chỉ số mới (tâm trạng): bắt đầu từ mức đầu ván.
 		s.needs[k] = clampf(float(s.needs.get(k, cfg.needs.start.get(k, 100.0))) + d, 0.0, 100.0)
 
 
-## Đói, bẩn dần theo giờ đã trôi; nhịn tới 0 thì Mệt tăng nhanh.
+## Đói, bẩn dần theo giờ đã trôi; nhịn tới 0 thì Mệt tăng nhanh. Trạng thái nhân tốc độ tụt (rate.X: buff dưỡng sinh…);
+## việc đang làm hao thêm ở Survival.on_action.
 func _tick_needs() -> void:
 	if not has_needs() or not is_started():
 		return
@@ -2533,7 +2607,10 @@ func _tick_needs() -> void:
 	s["needs_t"] = clock()
 	var starving := need("fed") <= 0.0
 	for k in cfg.needs.perHour:
-		need_adj(k, float(cfg.needs.perHour[k]) * dt * float(_diff().get("needsRate", 1.0)))
+		need_adj(k, float(cfg.needs.perHour[k]) * dt * float(_diff().get("needsRate", 1.0)) * Survival.rate(self, k))
+		# Hồi đều mỗi giờ từ trạng thái tốt (regen.mood của Cặp đôi).
+		if mod("regen." + k) != 0.0:
+			need_adj(k, mod("regen." + k) * dt)
 	if starving or need("fed") <= 0.0:
 		add_fatigue(float(cfg.needs.starveFatiguePerHour) * dt)
 
@@ -2546,6 +2623,21 @@ func phong_do() -> float:
 	var rested := 100.0 - float(s.fatigue)
 	return need("fed") * float(w.fed) + need("clean") * float(w.clean) + need("neat") * float(w.neat) + rested * float(w.rested) \
 		+ need("mood") * float(w.get("mood", 0.0))
+
+
+## Tổng một hiệu ứng bị động từ trạng thái (survival.gd) và thuộc tính (attributes.gd): "move", "xp", "mg.time",
+## "activity.heavy", "fatigue.heavy", "talk_rep", "talk_mood", "scrap"…
+func mod(key: String) -> float:
+	return Survival.mod(self, key) + Attributes.mod(self, key)
+
+
+## Hệ số tốc độ đi (world.gd): lấy mức chậm nhất giữa các trạng thái và Phong độ thấp (không cộng dồn), nhân phần
+## Nhanh nhẹn cộng thêm.
+func move_mult() -> float:
+	var slow := Survival.move_factor(self)
+	if has_needs() and phong_do() < float(cfg.needs.slowBelow):
+		slow = minf(slow, 0.7)
+	return slow * (1.0 + Attributes.mod(self, "move"))
 
 
 ## Hệ số tiền công theo phong độ: đủ thì 100%, kém thì 70%, tệ thì 50%.
@@ -2858,6 +2950,9 @@ func _quest_finish(id: String, ok: bool) -> void:
 		if ok:
 			s.street.xp=int(s.street.xp)+1
 			s.street.completed=int(s.street.completed)+1
+			if s.flags.get("opening_fan_met",false):
+				s.flags.opening_mango=true
+				need_adj("mood",5)
 		Street.end_story(self)
 	s.queue.append({"id": ("qd:" if ok else "qf:") + id, "data": {}})
 	add_log(("Xong việc nhờ: " if ok else "Hỏng việc nhờ: ") + str(q.title), "plus" if ok else "warn")
@@ -2974,6 +3069,7 @@ func scavenge(bin_id: String, x := INF, z := INF) -> Dictionary:
 		need_adj(k, float(c.dirty[k]))
 	add_fatigue(float(c.fatigue))
 	add_log("Lục thùng rác: " + (", ".join(parts) if not parts.is_empty() else "không có gì"))
+	Attributes.notify(self, "scavenge")
 	var found := _quest_on_scavenge(x, z)
 	if found != "":
 		got["_quest"] = found
@@ -2987,6 +3083,9 @@ func scrap_value() -> int:
 		total += int(s.inv[k]) * int(cfg.scrap[k].price)
 	if s.flags.get("veChaiQuen", false):
 		total = int(round(total * float(cfg.scrap.get("friendMult", 1.0)) / 1000.0)) * 1000
+	# Nhạy bén nhìn ra món được giá (attributes.json, perLevel.per.scrap).
+	if mod("scrap") > 0.0:
+		total = int(round(total * (1.0 + mod("scrap")) / 1000.0)) * 1000
 	return total
 
 

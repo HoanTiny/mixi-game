@@ -39,13 +39,21 @@ static func earned(g, amount: int) -> void:
 static func action_done(g, action: Dictionary) -> void:
 	if not g.s.has("neighborhood"): return
 	var id := str(action.id)
-	if id=="pho_chao_son" and g.s.neighborhood.stage=="intro": g.s.neighborhood.stage="work"
+	if id=="pho_chao_son" and g.s.neighborhood.stage=="intro":
+		g.s.neighborhood.stage="work"
+		# Introduce the existing fan quest in person on the first morning.
+		# Late arrivals and older saves keep the original day-two encounter.
+		if g.is_full() and g.day()==1 and g.clock()<=10.5 and g.quest_state("quat_trai_cay")=="":
+			g.s.flags.opening_fan_met=true
+			if not g.s.scenes_done.has("ngay2"): g.s.scenes_done.append("ngay2")
+			g.s.queue.append({"id":"opening_fan","data":{}})
 	if g.s.neighborhood.stage=="meal" and float(action.get("effects",{}).get("need.fed",0))>0:
 		g.s.neighborhood.stage="home"
 	if id=="pho_ban_thu_chi":
 		g.s.neighborhood.stage="done"
 		g.s.flags.neighborhood_debrief=true
 	if id=="anh_cho_ba": g.housing().erase("visit_return")
+	if id=="opening_mango": g.s.neighborhood.stage="done"
 
 static func plan_visit(g, place: String) -> void:
 	if not VISITS.has(place): return
@@ -74,8 +82,12 @@ static func target(g) -> Dictionary:
 	if not g.s.has("neighborhood") or g.chapter()!=1 or g.day()>7: return {}
 	match str(g.s.neighborhood.stage):
 		"intro":
+			if g.is_full() and g.day()==1 and g.clock()<=10.5:
+				return _action_target(g,g.get_action("pho_chao_son"),"Có người cần một người thợ","Cô bán hoa quả đang mang chiếc quạt hỏng tới tiệm Sơn. Ghé nghe cô cần gì",true)
 			return _action_target(g,g.get_action("pho_chao_son"),"Tìm việc quanh xóm","Chú Sơn có việc đầu tiên. Bạn cũng có thể chọn ca phụ quán hoặc bốc vác",true)
 		"work":
+			if g.s.flags.get("opening_fan_declined",false) or g.quest_state("quat_trai_cay")=="failed":
+				return _action_target(g,g.get_action("ca_phu_quan"),"Một cách kiếm sống khác","Chị Hạnh đang cần người phụ quán; vẫn có thể bắt đầu lại hôm nay",true)
 			if float(g.s.fatigue)>=90:
 				return _action_target(g,g.get_action("nghi"),"Nghỉ trước khi nhận việc","Quá mệt để sửa an toàn; nghỉ ở nhà rồi chọn việc tiếp",true)
 			if int(g.s.street.get("accepted_day",0))==g.day() and g.s.street.job.is_empty():
@@ -94,6 +106,8 @@ static func target(g) -> Dictionary:
 				a=g.get_action("com_voi_ba")
 			return _action_target(g,a,"Ăn một bữa sau khi làm","Gợi ý sinh hoạt; có thể về ăn cùng bà miễn phí",true)
 		"home":
+			if g.s.flags.get("opening_mango",false) and not g.count("opening_mango"):
+				return _action_target(g,g.get_action("opening_mango"),"Hai quả xoài mang về","Cô bán hàng gửi bà phần quà. Về kể chuyện chiếc quạt đầu tiên",true)
 			return _action_target(g,g.get_action("pho_ban_thu_chi"),"Về nhà bàn khoản chuyển trọ","Ghi khoản đã kiếm, tiền đã chi và việc ngày mai cùng gia đình",true)
 	return {}
 

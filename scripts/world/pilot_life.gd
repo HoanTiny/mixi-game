@@ -1,6 +1,6 @@
 extends Node3D
 ## Six unnamed residents for the authored street slice. These use the shipped
-## Rocketbox sit/idle/talk clips; there are no invented eating/repair/laundry clips.
+## Rocketbox sit/idle/talk clips plus procedural hand activities and held props.
 ## Keep their anchors in sync with StreetPrototype furniture, behind the frontage.
 ## World creates this only when city.pilot_active, before/after crowd respectively:
 ##   Crowd.build(..., blocked + PilotLife.reservation_points(city))
@@ -13,6 +13,14 @@ const ANIMATION_RANGE := 12.0
 const UPDATE_INTERVAL := 0.25
 const FLOOR_Y := 0.15
 const LOCATIONS := ["com_hanh", "tiem_sau", "xom_bo_me"]
+const RESIDENTS := [
+	{"rb":"Male_Adult_07","head":"Male_Adult_10","scale":.96,"build":1.08,"cloth_tint":"697c84"},
+	{"rb":"Male_Adult_14","head":"Business_Male_02","scale":.93,"build":1.06,"hair_tone":"grey","hat":"cap","cloth_tint":"6c795e"},
+	{"rb":"Female_Adult_12","head":"Sports_Female_02","scale":.94,"build":.94,"female":true,"cloth_tint":"6c8297"},
+	{"rb":"Female_Adult_05","head":"Medical_Female_01","scale":.96,"build":1.03,"female":true,"cloth_tint":"a07b68"},
+	{"rb":"Male_Adult_02","head":"Business_Male_02","scale":1.01,"build":.95,"cloth_tint":"8b8266"},
+	{"rb":"Female_Adult_02","head":"Business_Female_03","scale":.90,"build":1.08,"female":true,"hair_tone":"grey","cloth_tint":"88778d"}
+]
 
 var world
 var _actors: Array = []
@@ -103,9 +111,11 @@ func setup(w) -> void:
 	_actors.clear()
 	_elapsed = 0.0
 	_until_update = 0.0
+	var resident_index := 0
 	for anchor in _anchors(world.city):
 		# Duplicate the style before toggling talker: CROWD is shared with other rigs.
-		var look: Dictionary = Character.CROWD[int(anchor.look)].duplicate(true)
+		var look: Dictionary = RESIDENTS[resident_index%RESIDENTS.size()].duplicate(true)
+		resident_index+=1
 		if not Human.exists(str(look.rb)):
 			push_warning("Pilot ambient person missing: " + str(look.rb))
 			continue
@@ -161,6 +171,11 @@ func _refresh() -> void:
 		var talking := (phase < 5.0 if int(entry.turn) == 0 else phase >= 7.0 and phase < 12.0)
 		var old_pose: String = actor._state
 		actor.look["talker"] = talking and not bool(entry.seated)
+		var task := "eat" if entry.seated else ("repair" if entry.id=="bench_helper" else ("box" if entry.id=="repair_customer" else ""))
+		if entry.id=="courtyard_resident_0" and (hour<10.0 or (hour>=16.0 and hour<18.0)): task="sweep"
+		actor.global_rotation.y=CityMap.rot_y(world.city.locs[entry.location].normal)+(-PI/2 if task=="sweep" else float(entry.yaw))
+		if task!="": actor.look["talker"]=false
+		actor.perform_activity(task if scheduled and near else "")
 		actor.animate(0.0, 0.0)
 		if old_pose != actor._state:
 			actor._ap.advance(0.0)

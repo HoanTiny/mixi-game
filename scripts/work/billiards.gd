@@ -28,22 +28,35 @@ var _aim_now := Vector2.ZERO
 var _msg := ""
 var _moving := false
 var _font: Font
+var _view: SubViewport
+var _scene: Node3D
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_font = get_theme_default_font()
+	_view = SubViewport.new()
+	_view.own_world_3d = true
+	_view.msaa_3d = Viewport.MSAA_2X
+	_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(_view)
+	_scene = preload("res://scripts/work/billiards_view.gd").new()
+	_view.add_child(_scene)
 	_shots_left = int(cfg.get("shots", 10))
 	resized.connect(_layout)
 	_layout()
 	_rack()
+	_layout()
 
 
 func _layout() -> void:
 	var w := minf(size.x - 80.0, (size.y - 170.0) * 2.0)
 	var h := w / 2.0
 	_table = Rect2((size.x - w) / 2.0, 80.0 + (size.y - 170.0 - h) / 2.0, w, h)
+	if is_instance_valid(_view) and not _balls.is_empty():
+		_view.size = Vector2i(size)
+		_scene.layout(size, _table, _balls, R, POCKET_R)
 	queue_redraw()
 
 
@@ -92,8 +105,8 @@ func _gui_input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
-			_aim_from = event.position
-			_aim_now = event.position
+			_aim_from = _scene.input_point(event.position)
+			_aim_now = _aim_from
 		elif _aim_from != null:
 			var pull: Vector2 = (_aim_from as Vector2) - _aim_now
 			_aim_from = null
@@ -101,7 +114,7 @@ func _gui_input(event: InputEvent) -> void:
 				_shoot(pull.normalized(), clampf(pull.length() / 220.0, 0.05, 1.0))
 		accept_event()
 	elif event is InputEventMouseMotion and _aim_from != null:
-		_aim_now = event.position
+		_aim_now = _scene.input_point(event.position)
 		queue_redraw()
 		accept_event()
 
@@ -117,6 +130,9 @@ func _shoot(dir: Vector2, power: float) -> void:
 
 
 func _process(delta: float) -> void:
+	if is_instance_valid(_scene) and not _balls.is_empty():
+		var pull := (_aim_from as Vector2)-_aim_now if _aim_from != null else Vector2.ZERO
+		_scene.sync(_table,_balls,pull,_state=="play" and not _moving and _aim_from!=null,delta)
 	if _state != "play" or not _moving:
 		return
 	var steps := 6
@@ -270,22 +286,9 @@ func _skip_rect() -> Rect2:
 # ---------------------------------------------------------------- vẽ
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.05, 0.05, 0.06, 0.94))
-	var rail := _table.grow(26.0)
-	draw_style_box(_box(Color("5a3218"), 14), rail)
-	draw_rect(_table, Color("2f6a4a"))
-	for i in 3:
-		draw_circle(_to_px(Vector2(0.25, 0.5)), 2.0, Color(1, 1, 1, 0.25))
-	draw_line(_to_px(Vector2(0.25, 0.0)), _to_px(Vector2(0.25, 1.0)), Color(1, 1, 1, 0.12), 1.0)
-	for pk in _pockets():
-		draw_circle(pk, POCKET_R, Color("0e0e0e"))
-	for b in _balls:
-		if b.in:
-			continue
-		var p := _to_px(b.p)
-		draw_circle(p + Vector2(2, 3), R, Color(0, 0, 0, 0.35))
-		draw_circle(p, R, b.c)
-		draw_circle(p - Vector2(3.5, 3.5), R * 0.32, Color(1, 1, 1, 0.55))
+	if is_instance_valid(_view):
+		draw_texture_rect(_view.get_texture(),Rect2(Vector2.ZERO,size),false)
+	draw_style_box(_box(Color(0.055,0.075,0.07,0.94),4),Rect2(20,12,size.x-40,66))
 	# Ngắm: gậy lùi sau bi cái, đường ngắm chấm phía trước.
 	if _state == "play" and not _moving and _aim_from != null:
 		var cp := _to_px(_cue().p)
@@ -295,21 +298,27 @@ func _draw() -> void:
 			var power := clampf(pull.length() / 220.0, 0.05, 1.0)
 			# Dự báo: bi ma ở chỗ bi cái chạm bi đầu tiên trên đường ngắm, vạch hướng bi màu sẽ chạy.
 			var hit := _first_hit(cp, dir)
-			var reach: float = hit[0] if hit[1] != null else 1600.0
+			var walls := _table.grow(-R)
+			var wall_distance := INF
+			if absf(dir.x)>0.0001: wall_distance=minf(wall_distance,((walls.end.x if dir.x>0 else walls.position.x)-cp.x)/dir.x)
+			if absf(dir.y)>0.0001: wall_distance=minf(wall_distance,((walls.end.y if dir.y>0 else walls.position.y)-cp.y)/dir.y)
+			if hit[1]!=null and float(hit[0])>wall_distance: hit=[0.0,null]
+			var reach: float = hit[0] if hit[1] != null else wall_distance
 			var k := 0
 			while R + 14.0 + k * 22.0 < reach - R and k < 60:
-				draw_circle(cp + dir * (R + 14.0 + k * 22.0), 2.2, Color(1, 1, 1, maxf(0.15, 0.55 - k * 0.02)))
+				draw_circle(_scene.display(cp + dir * (R + 14.0 + k * 22.0)), 2.2, Color(1, 1, 1, maxf(0.15, 0.55 - k * 0.02)))
 				k += 1
 			if hit[1] != null:
 				var ghost: Vector2 = cp + dir * float(hit[0])
-				draw_arc(ghost, R, 0, TAU, 20, Color(1, 1, 1, 0.75), 1.5)
+				draw_arc(_scene.display(ghost), R, 0, TAU, 20, Color(1, 1, 1, 0.75), 1.5)
 				var bp := _to_px(hit[1].p)
 				var go := (bp - ghost).normalized()
-				draw_line(bp, bp + go * 90.0, Color(hit[1].c, 0.9), 2.0, true)
-			var back := cp - dir * (R + 6.0 + power * 60.0)
-			draw_line(back, back - dir * 300.0, Color("c9a46a"), 6.0, true)
-			draw_line(back, back - dir * 18.0, Color("f4f1e8"), 6.0, true)
+				draw_line(_scene.display(bp), _scene.display(bp + go * 90.0), Color(hit[1].c, 0.9), 2.0, true)
 			_text(Vector2(size.x / 2.0, _table.end.y + 56.0), "Lực %d%%" % int(power * 100.0), 16, Color("f4e3b0"))
+			var power_bar := Rect2(size.x/2-100,_table.end.y+64,200,6)
+			draw_rect(power_bar,Color("25322d"))
+			power_bar.size.x *= power
+			draw_rect(power_bar,Color("b8a46d"))
 	var head := "%s · còn %d cơ · vào %d bi" % [title, _shots_left, _potted]
 	if int(cfg.get("target", 0)) > 0:
 		head += " / cần %d" % int(cfg.target)

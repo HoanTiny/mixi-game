@@ -99,12 +99,15 @@ var _kid_prev: Array[Vector2] = []
 ## hot: chỗ đông người [chỗ, số người, bán kính]; stalls: sạp chợ [giữa sạp, hướng ra phía người mua]; blocked: gốc cây,
 ## cột đèn; amount: nhân số người đi bộ, nhóm nói chuyện, người ở chỗ đông (điện thoại bớt).
 func build(dress, roads: Array, center: Vector2, walkable: Callable, hot: Array = [], stalls: Array = [], blocked: Array = [],
-		amount := 1.0) -> void:
+		amount := 1.0, quiet_fronts: Array = []) -> void:
 	_rng.seed = 4711
 	_index_roads(roads, center)
 	for p in blocked:
 		_take(p)
 	var ok := func(p: Vector2, r: float) -> bool: return walkable.call(p) and _free(p, r) and not _on_road(p)
+	# Authored conversations need a clear entrance; passers-by still use the sidewalk.
+	var static_ok := func(p: Vector2, r: float) -> bool:
+		return ok.call(p,r) and not quiet_fronts.any(func(q: Vector2) -> bool: return p.distance_to(q)<3.5)
 	# Sạp chợ: người bán đứng sau sạp nhìn ra (sát mặt tiền, khỏi xét đi được), hai ba người mua đứng trước sạp (trước
 	# sạp là chỗ đi bộ dù có đường vẽ chồng ở đó, khỏi xét lòng đường).
 	var crowded: Array = []
@@ -137,7 +140,7 @@ func build(dress, roads: Array, center: Vector2, walkable: Callable, hot: Array 
 	for it in dress.shops:
 		var p: Vector2 = it[0]
 		var n: Vector2 = it[1]
-		if _rng.randf() >= SHOP_SHARE * _near(p, center) or not ok.call(p, 0.7):
+		if _rng.randf() >= SHOP_SHARE * _near(p, center) or not static_ok.call(p, 0.7):
 			continue
 		_take(p)
 		shop.append([p, n.rotated(_rng.randf_range(-0.6, 0.6)), 0.0])
@@ -145,11 +148,11 @@ func build(dress, roads: Array, center: Vector2, walkable: Callable, hot: Array 
 		if _rng.randf() < BUYER_SHARE:
 			for k in _rng.randi_range(1, 2):
 				var q := p + n * _rng.randf_range(0.9, 1.3) + n.orthogonal() * _rng.randf_range(-0.7, 0.7)
-				if ok.call(q, 0.6):
+				if static_ok.call(q, 0.6):
 					_take(q)
 					shop.append([q, (p - q).normalized().rotated(_rng.randf_range(-0.4, 0.4)), 0.0])
 					counts.buyers += 1
-	shop.append_array(_chat_groups(roads, center, ok, roundi(CHAT_GROUPS * amount)))
+	shop.append_array(_chat_groups(roads, center, static_ok, roundi(CHAT_GROUPS * amount)))
 	for h in hot:
 		var c: Vector2 = h[0]
 		var want := roundi(float(h[1]) * amount)
@@ -158,7 +161,7 @@ func build(dress, roads: Array, center: Vector2, walkable: Callable, hot: Array 
 		while got < want and tries < want * 12:
 			tries += 1
 			var q := c + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(2.0, float(h[2]))
-			if not ok.call(q, 0.6):
+			if not static_ok.call(q, 0.6):
 				continue
 			_take(q)
 			crowded.append([q, (c - q).normalized().rotated(_rng.randf_range(-1.3, 1.3)), 0.0])

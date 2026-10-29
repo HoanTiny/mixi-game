@@ -508,5 +508,83 @@
     "text": "\"Làm điện thì phải sống lâu mới làm được lâu. Em nhớ đấy.\""
    }
   ]
+ },
+ "HAN": {
+  "story": [
+   {
+    "id": "han_chao",
+    "when": {},
+    "title": "Xe hoa đầu ngõ",
+    "text": "Chiếc xe đạp Phượng Hoàng chở hai sọt hoa dựng sát gốc bàng: cúc họa mi, sen trắng, mấy bó hồng nhung. Cô gái đứng bên xe đang cắt chéo cuống hoa bằng con dao nhỏ, tay thoăn thoắt. \"Anh mua hoa cúng hay hoa cắm? Hoa cúng thì em lấy cành thẳng, hoa cắm thì lấy cành có dáng.\" Tấm bìa cát-tông treo ghi nắn nót: Hoa Hân - Mê Linh.",
+    "choices": [
+     {
+      "label": "Hỏi hoa nào để được lâu nhất",
+      "hint": "Hân +3",
+      "effects": {
+       "rep.HAN": 3,
+       "log": "Hân bảo cúc họa mi để được cả tuần nếu ngày nào cũng cắt đầu cuống. \"Mà hết mùa rồi anh ạ, mua nhanh kẻo hết.\""
+      }
+     },
+     {
+      "label": "Khen cái xe đạp cũ đẹp",
+      "hint": "Hân +2",
+      "effects": {
+       "rep.HAN": 2,
+       "log": "\"Xe của bố em đấy. Phanh không ăn đâu, anh đừng mượn.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "han_me_linh",
+    "when": {
+     "rep.HAN": 45
+    },
+    "title": "Hoa từ Mê Linh",
+    "text": "Hân kể bốn giờ sáng chị đã ở chợ Quảng An, có hôm bố chị chở hoa từ Mê Linh xuống tận nơi. Hoa ế thì chiều chị bán rẻ cho mấy cô lễ chùa Bà Đá. \"Bán hoa sướng nhất là được nhìn người ta cầm bó hoa đi về. Khổ nhất là trời mưa.\"",
+    "choices": [
+     {
+      "label": "Hỏi chuyện chị định thuê sạp",
+      "hint": "Hân +3 · Nhạy bén thêm kinh nghiệm",
+      "effects": {
+       "rep.HAN": 3,
+       "xp.per": 3,
+       "log": "Hân muốn thuê một sạp ở chợ hoa, đang để dành mỗi ngày năm mươi nghìn."
+      }
+     },
+     {
+      "label": "Kể chuyện An sửa quạt ở tiệm chú Sơn",
+      "hint": "Hân +2",
+      "effects": {
+       "rep.HAN": 2,
+       "log": "Hân cười: \"Thế hôm nào cái đèn xe em hỏng thì em biết tìm ai.\""
+      }
+     }
+    ]
+   }
+  ],
+  "chat": [
+   {
+    "text": "\"Hoa sen phải mua lúc còn búp, về nhà mới nở. Mua nở sẵn là mất phần đẹp nhất.\""
+   },
+   {
+    "text": "\"Sáng nay khách Tây mua cả sọt cúc, em chưa kịp hỏi họ cắm ở đâu.\""
+   },
+   {
+    "text": "\"Trời này hoa héo nhanh lắm, em phải phun nước liên tục.\""
+   },
+   {
+    "text": "\"Anh có biết bà cụ đầu ngõ không? Ngày rằm nào bà cũng mua của em một bó hồng.\"",
+    "when": {
+     "rep.HAN": 40
+    }
+   },
+   {
+    "text": "\"Anh đến muộn thế, em để phần anh mấy cành đẹp rồi đây này.\"",
+    "when": {
+     "rep.HAN": 70
+    }
+   }
+  ]
  }
 }

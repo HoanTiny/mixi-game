@@ -11,6 +11,7 @@ extends Control
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const Character := preload("res://scripts/world/character.gd")
+const AnCharacter := preload("res://scripts/world/an_character.gd")
 const WP := preload("res://scripts/work/work_props.gd")
 
 signal finished(result: Dictionary)
@@ -769,7 +770,12 @@ func _repair_act(s: Dictionary) -> void:
 func _build_player() -> void:
 	_player = Node3D.new()
 	_world.add_child(_player)
-	_body = Character.make(Character.an_look(GameState.game))
+	if str(GameState.game.cfg.get("anModel","rigged"))=="rigged" and AnCharacter.available():
+		_body=AnCharacter.new()
+		_body.setup(Color.WHITE,Color.WHITE,"An")
+		_body.apply_outfit(GameState.game)
+	else:
+		_body = Character.make(Character.an_look(GameState.game))
 	_player.add_child(_body)
 	_stack = Node3D.new()
 	_stack.position = Vector3(0, 1.0, 0.45)
@@ -825,6 +831,7 @@ func _nearest_spot() -> Dictionary:
 func _act(s: Dictionary) -> void:
 	if _state != "play" or _cool > 0.0 or s.is_empty():
 		return
+	var carried_before: int=_carry.size()
 	match _mode:
 		"serve":
 			_serve_act(s)
@@ -833,6 +840,7 @@ func _act(s: Dictionary) -> void:
 		_:
 			_carry_act(s)
 	_refresh_carry()
+	if _carry.size()<carried_before and _body.has_method("place"): _body.place()
 
 
 ## Đồ trên tay: chồng hộp trước bụng, đổi theo món đang cầm.

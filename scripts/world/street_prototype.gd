@@ -166,7 +166,8 @@ static func build(world, parent: Node3D, id: String, width: float, depth: float,
 			bike.rotation.y = 0.65
 			scanned(parent, "metal_office_desk", Vector3(width * 0.24, 0.15, -1.65), 0.78)
 			scanned(parent, "bench_vice_01", Vector3(width * 0.24 - 0.4, 0.93, -1.4), 0.22, 0.35)
-			placed(parent, WorkProps.fan(), Vector3(width * 0.24 + 0.35, 0.93, -1.65), -0.22)
+			if not world.real or not world.city.street_upgrade:
+				placed(parent, WorkProps.fan(), Vector3(width * 0.24 + 0.35, 0.93, -1.65))
 			scanned(parent, "metal_tool_chest", Vector3(width * 0.41, 0.15, -1.85), 0.55)
 			placed(parent, WorkProps.spool(), Vector3(width * 0.39, 0.15, -2.7), 0.3)
 			scanned(parent, "portable_generator", Vector3(-width * 0.38, 0.15, -1.85), 0.48, 0.25)
@@ -198,5 +199,6 @@ static func build(world, parent: Node3D, id: String, width: float, depth: float,
 			for i in 5:
 				laundry(parent, Vector3(-2.3 + i * 1.05, 2.58, -depth + 0.9), i)
 	kit["owns_dressing"] = true
+	preload("res://scripts/architecture/lived_in_interiors.gd").build(kit.ground,id,width,depth)
 	kit["identity"] = kinds[id]
 	return kit

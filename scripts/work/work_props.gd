@@ -142,14 +142,11 @@ static func pipes() -> Node3D:
 
 ## Quạt bàn: đế tròn, thân, lồng quạt xanh.
 static func fan() -> Node3D:
-	var n := Node3D.new()
-	var body := plain(Color("dfe4ea"), 0.5)
-	cyl(n, 0.16, 0.05, body, Vector3(0, 0.025, 0))
-	cyl(n, 0.025, 0.35, body, Vector3(0, 0.22, 0))
-	cyl(n, 0.07, 0.12, body, Vector3(0, 0.42, -0.04), Vector3.BACK)
-	var cage := cyl(n, 0.2, 0.06, plain(Color("5aa0c8"), 0.4, 0.2), Vector3(0, 0.42, 0.06), Vector3.BACK)
-	cage.transparency = 0.2
-	return n
+	return preload("res://scripts/work/repair_models.gd").fan()
+
+
+static func kettle() -> Node3D:
+	return preload("res://scripts/work/repair_models.gd").kettle()
 
 
 static func rice_cooker() -> Node3D:

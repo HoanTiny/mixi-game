@@ -1,5 +1,7 @@
 extends Window
 const UI := preload("res://scripts/ui/ui_kit.gd")
+const WP := preload("res://scripts/work/work_props.gd")
+const Models := preload("res://scripts/work/repair_models.gd")
 const SOCKET := Vector3(0.4,0.75,0.25)
 const BIN := Vector3(2.15,0.75,0.65)
 const SOURCE := Vector3(-2.0,0.75,0.55)
@@ -25,10 +27,23 @@ var drag_origin := Vector3.ZERO
 var feedback := ""
 var orbit_yaw := 0.0
 var orbit_pitch := 0.92
+var step_labels: Array[Label] = []
+var socket_ring: MeshInstance3D
+var meter_readout: Label3D
+var cover: Node3D
+var cover_button: Button
+var activity: Node3D
+var activity_panel: VBoxContainer
+var _testing := false
+var finished := false
+var _cover_target := Vector3.ZERO
+var _cover_angle := 0.0
+var _foley: AudioStreamPlayer
+var _hum: AudioStreamPlayer
 func _ready() -> void:
 	title = "Bàn sửa của An"
-	size = Vector2i(1040,690)
-	min_size = size
+	size = Vector2i(1040,660)
+	min_size = Vector2i(760,540)
 	transient = true
 	exclusive = true
 	theme = UI.make_theme()
@@ -37,31 +52,57 @@ func _ready() -> void:
 	token = str(game.s.street.accepted_day)+":"+str(kind)
 	var panel := PanelContainer.new()
 	# Nền tối cho chữ sáng của bàn sửa (giao diện chung của game là nền sáng).
-	panel.add_theme_stylebox_override("panel", UI.box(Color(0.09, 0.1, 0.12, 0.98), Color(1, 1, 1, 0.12), 6, 14))
+	panel.add_theme_stylebox_override("panel", UI.box(Color("1b2422"), Color("72664e"), 3, 14))
 	add_child(panel)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation",10)
 	panel.add_child(column)
 	column.add_child(UI.label("BÀN SỬA  ·  " + str(game.s.street.job.name),22,UI.GOLD))
-	details = UI.wrap(str(game.s.street.job.reading),15,UI.HUD_TEXT,980)
+	var steps := HBoxContainer.new()
+	steps.add_theme_constant_override("separation",24)
+	column.add_child(steps)
+	for text in ["01  MỞ NẮP", "02  THAY LINH KIỆN", "03  SIẾT & THỬ"]:
+		var label := UI.label(text,14,UI.HUD_SOFT)
+		steps.add_child(label); step_labels.append(label)
+	details = UI.wrap(str(game.s.street.job.reading),15,UI.HUD_TEXT,720)
 	column.add_child(details)
+	var workspace := HBoxContainer.new()
+	workspace.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	column.add_child(workspace)
 	surface = SubViewportContainer.new()
-	surface.custom_minimum_size = Vector2(980,430)
+	surface.custom_minimum_size = Vector2(510,300)
+	surface.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	surface.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	surface.stretch = true
 	surface.mouse_filter = Control.MOUSE_FILTER_STOP
-	column.add_child(surface)
+	workspace.add_child(surface)
 	viewport = SubViewport.new()
 	viewport.size = Vector2i(980,430)
 	viewport.own_world_3d = true
+	viewport.msaa_3d = Viewport.MSAA_2X
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	surface.add_child(viewport)
 	surface.gui_input.connect(_surface_input)
-	hint = UI.wrap("",16,UI.GOLD,980)
+	activity_panel=VBoxContainer.new(); activity_panel.custom_minimum_size.x=210
+	workspace.add_child(activity_panel)
+	activity_panel.add_child(UI.label("AN · TẠI BÀN SỬA",14,UI.GOLD))
+	var activity_surface := SubViewportContainer.new()
+	activity_surface.stretch=true; activity_surface.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	activity_surface.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	activity_panel.add_child(activity_surface)
+	var activity_view := SubViewport.new(); activity_view.size=Vector2i(210,300)
+	activity_view.own_world_3d=true; activity_view.msaa_3d=Viewport.MSAA_2X
+	activity_surface.add_child(activity_view)
+	activity=preload("res://scripts/work/repair_activity.gd").new()
+	activity.game=game; activity.kind=kind; activity_view.add_child(activity)
+	activity_panel.add_child(UI.wrap("Rút điện → mở nắp → thay đúng linh kiện → đóng nắp chạy thử.",13,UI.HUD_SOFT,210))
+	hint = UI.wrap("",16,UI.GOLD,720)
 	column.add_child(hint)
 	var buttons := HBoxContainer.new()
 	column.add_child(buttons)
+	cover_button=Button.new(); cover_button.text="Rút điện & mở nắp"
+	cover_button.pressed.connect(_open_cover); buttons.add_child(cover_button)
 	test_button = Button.new()
 	test_button.text = "Lắp vỏ & chạy thử · 15 phút"
 	test_button.pressed.connect(_test)
@@ -72,13 +113,17 @@ func _ready() -> void:
 	buttons.add_child(close)
 	column.add_child(UI.label("Chuột trái: kéo / siết vít · Chuột phải: xoay góc nhìn · Lăn chuột: phóng · Esc: rời bàn",13,UI.HUD_SOFT))
 	_build_scene()
+	_foley=AudioStreamPlayer.new(); add_child(_foley); _foley.volume_db=-19
+	_foley.stream=load("res://assets/sounds/neighborhood/screw.wav")
+	_hum=AudioStreamPlayer.new(); add_child(_hum); _hum.volume_db=-28
+	_hum.stream=preload("res://scripts/world/audio.gd")._load("res://assets/sounds/neighborhood/fan.wav",true)
 	game.changed.connect(refresh)
 	refresh()
 	popup_centered()
 func material(color: String, metal := 0.0) -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(color)
-	mat.roughness = 0.74
+	mat.roughness = lerpf(0.82,0.36,metal)
 	mat.metallic = metal
 	return mat
 func box(parent: Node, pos: Vector3, dimensions: Vector3, color: String) -> MeshInstance3D:
@@ -106,9 +151,9 @@ func label3(text: String, pos: Vector3) -> void:
 	var label := Label3D.new()
 	label.text = text
 	label.position = pos
-	label.font_size = 20
-	label.outline_size = 4
-	label.pixel_size = 0.006
+	label.font_size = 22
+	label.outline_size = 2
+	label.pixel_size = 0.0045
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.modulate = Color("e5d7ad")
 	viewport.add_child(label)
@@ -117,17 +162,22 @@ func part(part_kind: int, pos: Vector3, worn := false) -> Node3D:
 	viewport.add_child(root)
 	root.position = pos
 	if part_kind==0:
-		box(root,Vector3(0,0.13,0),Vector3(0.43,0.26,0.23),"77634e" if worn else "2b4146")
+		Models.casing(root,Vector3(0,0.13,0),Vector3(0.43,0.26,0.23),Models.mat("77634e" if worn else "2b4146"))
 		for x in [-0.13,0.13]: box(root,Vector3(x,0.08,0.2),Vector3(0.025,0.025,0.24),"ba9b60")
+		box(root,Vector3(0,0.265,0),Vector3(0.32,0.008,0.17),"a1977c" if worn else "d1d1bc")
+		for z in [-0.045,0.0,0.045]: box(root,Vector3(-0.025,0.271,z),Vector3(0.20,0.003,0.008),"4c5750")
 	else:
 		var fuse := cylinder(root,Vector3(0,0.1,0),0.07,0.4,"796654" if worn else "c2b598")
 		fuse.rotation.z = PI/2
 		box(root,Vector3(0,0.1,0),Vector3(0.7,0.025,0.025),"a38b60")
+		for x in [-0.17,0.17]:
+			var cap := cylinder(root,Vector3(x,0.1,0),0.075,0.06,"909d9c")
+			cap.rotation.z=PI/2
 	return root
 func _build_scene() -> void:
 	camera = Camera3D.new()
 	viewport.add_child(camera)
-	camera.position = Vector3(0,5.7,4.0)
+	camera.position = Vector3(0.45,5.0,4.4)
 	camera.look_at(Vector3(0,0.5,0))
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	camera.keep_aspect = Camera3D.KEEP_WIDTH
@@ -135,63 +185,79 @@ func _build_scene() -> void:
 	var light := DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-55,-25,0)
 	light.shadow_enabled = true
+	light.light_color = Color("e5e9e5")
+	light.light_energy = 0.62
 	viewport.add_child(light)
 	var environment := WorldEnvironment.new()
 	environment.environment = Environment.new()
 	environment.environment.background_mode = Environment.BG_COLOR
 	environment.environment.background_color = Color("272c28")
 	environment.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.environment.ambient_light_color = Color("dfd6b9")
-	environment.environment.ambient_light_energy = 0.4
+	environment.environment.ambient_light_color = Color("c0ccd1")
+	environment.environment.ambient_light_energy = 0.32
+	environment.environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	viewport.add_child(environment)
 	var table := box(viewport,Vector3(0,0.45,0),Vector3(6,0.2,3.2),"67513a")
-	var wood := ShaderMaterial.new()
-	wood.shader = preload("res://scripts/world/bench_surface.gdshader")
-	table.material_override = wood
-	for i in range(15): box(viewport,Vector3(-2.8+i*0.4,0.553,0),Vector3(0.008,0.003,3.12),"45392e")
+	var timber := preload("res://scripts/work/higgsfield_materials.gd").surface("repair_wood", 0.31).duplicate()
+	timber.uv1_triplanar = true
+	table.material_override = timber
 	box(viewport,Vector3(0.35,0.57,0),Vector3(2.5,0.06,2.4),"33433e")
 	box(viewport,BIN-Vector3(0,0.16,0),Vector3(1.05,0.06,0.8),"766958")
 	for x in [-0.52,0.52]: box(viewport,BIN+Vector3(x,-0.08,0),Vector3(0.04,0.18,0.8),"90816b")
 	box(viewport,SOURCE-Vector3(0,0.16,0),Vector3(1.2,0.06,0.8),"414b44")
-	box(viewport,SOCKET-Vector3(0,0.1,0),Vector3(0.85,0.09,0.58),"b99c5c")
+	box(viewport,SOCKET-Vector3(0,0.1,0),Vector3(0.85,0.09,0.58),"506957")
+	for x in [-0.32,0.32]:
+		box(viewport,SOCKET+Vector3(x,-0.046,0),Vector3(0.10,0.012,0.35),"9a8954")
 	if kind==0:
-		cylinder(viewport,Vector3(0.35,0.73,-0.65),0.53,0.26,"73766d")
-		rotor = Node3D.new()
-		viewport.add_child(rotor)
-		rotor.position = Vector3(0.35,0.9,-0.65)
-		for angle in [0.0,TAU/3,TAU*2/3]:
-			var blade := box(rotor,Vector3(sin(angle)*0.24,0,cos(angle)*0.24),Vector3(0.18,0.035,0.45),"a3a896")
-			blade.rotation.y = angle
-		cylinder(rotor,Vector3.ZERO,0.1,0.07,"454e47")
+		var fan := Models.fan(); viewport.add_child(fan)
+		fan.position=Vector3(.35,.60,-.85); fan.scale=Vector3.ONE*1.6
+		rotor=fan.get_node("Rotor")
 	else:
 		cylinder(viewport,Vector3(0.35,0.7,-0.55),0.65,0.15,"b7b6a6")
 		cylinder(viewport,Vector3(0.35,0.8,-0.55),0.48,0.08,"52584e")
 		box(viewport,Vector3(1.05,0.73,-0.55),Vector3(0.15,0.13,0.5),"2a342e")
 	# Leads between appliance and the replacement socket.
-	for x in [0.22,0.57]: box(viewport,Vector3(x,0.7,-0.1),Vector3(0.025,0.025,0.6),"a15b43")
 	# Meter and hand tools on the back edge of the work surface.
-	box(viewport,Vector3(2.15,0.65,-0.9),Vector3(0.5,0.16,0.7),"826b42")
-	box(viewport,Vector3(2.15,0.74,-1.06),Vector3(0.36,0.025,0.23),"829782")
-	cylinder(viewport,Vector3(2.15,0.76,-0.76),0.11,0.04,"282e29")
-	var driver := cylinder(viewport,Vector3(1.55,0.66,-0.85),0.065,0.44,"965b3e")
-	driver.rotation.x=PI/2
-	box(viewport,Vector3(1.55,0.66,-0.45),Vector3(0.025,0.025,0.42),"b1afa0")
+	Models.meter(viewport,Vector3(2.15,.65,-.9))
+	meter_readout = Label3D.new()
+	meter_readout.position=Vector3(2.15,0.765,-1.05)
+	meter_readout.rotation.x=-PI/2
+	meter_readout.font_size=32; meter_readout.pixel_size=0.0018
+	meter_readout.outline_size=0; meter_readout.modulate=Color("22362d")
+	viewport.add_child(meter_readout)
+	var driver := Models.screwdriver(viewport)
+	driver.position=Vector3(1.55,.64,-.4); driver.rotation.x=-PI/2; driver.scale=Vector3.ONE*2.8
+	# Insulated meter leads curve around the appliance instead of crossing sockets.
+	for side in [-1.0,1.0]:
+		var points := [Vector3(2.15+side*.11,.76,-.66),Vector3(2.6+side*.06,.59,-.40),Vector3(2.7+side*.06,.59,-.05),Vector3(1.65+side*.06,.59,.05)]
+		for i in 3: Models.rod(viewport,points[i],points[i+1],.011,Models.mat("9c4935" if side>0 else "242c29"))
+		Models.rod(viewport,points[3],points[3]+Vector3(-.18,0,0),.021,Models.mat("9c4935" if side>0 else "242c29"))
+		Models.rod(viewport,points[3]+Vector3(-.18,0,0),points[3]+Vector3(-.28,0,0),.006,Models.mat("adb6af",.8))
 	old_part = part(kind,SOCKET,true)
 	new_part = part(kind,SOURCE)
 	sample_part = part(1-kind,SAMPLE)
 	for point in SCREWS:
-		var screw := cylinder(viewport,point,0.095,0.08,"b3b5a9")
-		box(screw,Vector3(0,0.045,0),Vector3(0.12,0.012,0.025),"3b433b")
+		var screw := cylinder(viewport,point,0.065,0.05,"87928e")
+		box(screw,Vector3(0,0.027,0),Vector3(0.085,0.008,0.018),"3b433b")
+		box(screw,Vector3(0,0.028,0),Vector3(0.018,0.008,0.085),"3b433b")
 		screw_nodes.append(screw)
 	label3("LINH KIỆN MỚI",SOURCE+Vector3(0,0,-0.45))
 	label3("MẪU ĐỐI CHIẾU",SAMPLE+Vector3(0,0,-0.32))
 	label3("KHAY ĐỒ HỎNG",BIN+Vector3(0,0,-0.55))
 	label3("Ổ LẮP",SOCKET+Vector3(0,0,0.75))
+	preload("res://scripts/work/repair_set.gd").build(self)
+	cover=Node3D.new(); viewport.add_child(cover); cover.position=SOCKET+Vector3(0,.30,0)
+	Models.casing(cover,Vector3.ZERO,Vector3(.84,.10,.62),Models.enamel() if kind==0 else Models.mat("3a403b"))
+	for i in 6: Models.box(cover,Vector3(-.24+i*.095,.052,0),Vector3(.045,.005,.25),Models.mat("28352e"))
+	var ring_root := Node3D.new()
+	viewport.add_child(ring_root)
+	socket_ring = preload("res://scripts/work/repair_set.gd").loop(ring_root,SOCKET-Vector3(0,0.05,0),0.43,"c8b47e",0.012)
 func progress() -> Dictionary:
 	return game.s.street.job.get("bench",{"removed":false,"installed":false,"screws":0})
 func refresh() -> void:
 	var job: Dictionary = game.s.street.job
 	if job.is_empty() or token != str(game.s.street.accepted_day)+":"+str(int(job.kind)):
+		if _testing or finished: return
 		queue_free()
 		return
 	var state := progress()
@@ -201,15 +267,34 @@ func refresh() -> void:
 		new_part.position = SOCKET if state.installed else SOURCE
 		sample_part.position = SAMPLE
 	for i in 2:
-		screw_nodes[i].material_override = material("789c6c" if int(state.screws)&(1<<i) else "b3b5a9")
+		screw_nodes[i].material_override = material("789c6c" if int(state.screws)&(1<<i) else "87928e",0.65)
+		screw_nodes[i].rotation.y = PI/4 if int(state.screws)&(1<<i) else 0.0
 	test_button.disabled = job.stage != "test"
+	var opened := bool(job.get("cover_open",job.has("bench")))
+	var current_step := 2 if state.installed else (1 if opened else 0)
+	for i in step_labels.size():
+		step_labels[i].modulate = Color("d4bf89") if i==current_step else (Color("91aa91") if i<current_step else Color("737e78"))
+	socket_ring.visible = opened and state.removed and not state.installed
+	cover_button.disabled=opened or str(job.stage)!="repair"
+	_cover_target=Vector3(-.85,.65,-.63) if opened and str(job.stage)!="deliver" else SOCKET+Vector3(0,.30,0)
+	_cover_angle=-.28 if opened else 0.0
+	activity.set_phase("screw" if state.installed else ("replace" if opened else "inspect"))
+	meter_readout.text = ("1.5 µF" if kind==0 else "0.2 Ω") if job.stage=="deliver" else ("0.3 µF" if kind==0 else "OL")
 	var instruction := "1 / 3 · Kéo linh kiện hỏng từ ổ lắp sang khay bên phải."
+	if not opened: instruction="Rút điện và mở nắp khoang điện trước khi chạm vào linh kiện."
 	if state.removed: instruction = "2 / 3 · Kéo linh kiện mới bên trái vào ổ lắp màu vàng."
 	if state.installed: instruction = "3 / 3 · Bấm hai vít bạc cạnh ổ lắp để siết chặt."
 	if job.stage=="test": instruction = "Đã lắp xong · Chạy thử trước khi trả khách."
 	if job.stage=="deliver": instruction = "Chạy thử đạt · Rời bàn để trả món và nhận tiền công."
 	hint.text = instruction + ("\n"+feedback if not feedback.is_empty() else "")
-	details.text = str(job.reading) + "\n" + "Giờ %s · Sửa 45 phút, Mệt +8 khi lắp xong · Linh kiện đã lấy cho đơn" % game.hh(game.clock())
+	var minutes := 45
+	for offer in game.Street.options(game,"tiem_sau"):
+		if offer.id==("fix_cap" if kind==0 else "fix_fuse"): minutes=roundi(float(offer.hours)*60.0)
+	details.text = str(job.reading) + "\n" + "Giờ %s · Sửa %d phút, Mệt +8 khi lắp xong · Linh kiện đã lấy cho đơn" % [game.hh(game.clock()),minutes]
+func _open_cover() -> void:
+	feedback=game.Street.bench_action(game,"open",kind,token)
+	_foley.play()
+	refresh()
 func _surface_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_RIGHT and dragging==null:
 		orbit_yaw -= event.relative.x*0.006
@@ -236,12 +321,16 @@ func near_screen(pos: Vector2, point: Vector3, radius := 28.0) -> bool:
 	var local := pos * Vector2(viewport.size) / surface.size
 	return local.distance_to(camera.unproject_position(point)) < radius
 func pointer_down(pos: Vector2) -> void:
-	if game.s.street.job.stage != "repair": return
+	if finished or game.s.street.job.get("stage","") != "repair": return
+	if not bool(game.s.street.job.get("cover_open",game.s.street.job.has("bench"))):
+		if near_screen(pos,cover.position,55): _open_cover()
+		return
 	feedback = ""
 	var state := progress()
 	for i in 2:
 		if near_screen(pos,SCREWS[i],20):
 			feedback = game.Street.bench_action(game,"screw",i,token)
+			if feedback.is_empty(): _foley.play()
 			refresh()
 			return
 	if not state.removed and near_screen(pos,old_part.position+Vector3(0,0.12,0)):
@@ -270,13 +359,25 @@ func pointer_up(pos: Vector2) -> void:
 	else: feedback = "Chưa đúng vùng thả; linh kiện được trả về chỗ cũ."
 	refresh()
 func _test() -> void:
+	if finished or _testing: return
+	_testing=true
 	if game.Street.act(game,"tiem_sau","test"):
-		feedback = "Kiểm tra chạy và cách điện đạt."
+		finished=true
+		if kind==0: _hum.play()
+		_cover_target=SOCKET+Vector3(0,.30,0); _cover_angle=0.0
+		activity.set_phase("test")
+		hint.text="Đã đóng nắp · Máy chạy ổn định. Rời bàn để mang trả khách."
+		test_button.disabled=true; cover_button.disabled=true; socket_ring.visible=false
+		meter_readout.text="1.5 µF" if kind==0 else "0.2 Ω"
 	else: feedback = "Không đủ giờ hoặc sức để chạy thử; quay lại sau."
-	refresh()
+	_testing=false
+	if not finished: refresh()
 func _process(delta: float) -> void:
-	if rotor!=null and not game.s.street.job.is_empty() and game.s.street.job.stage=="deliver":
-		rotor.rotate_y(delta*7)
+	activity_panel.visible=size.x>=1000
+	cover.position=cover.position.lerp(_cover_target,1.0-exp(-delta*8))
+	cover.rotation.y=lerp_angle(cover.rotation.y,_cover_angle,1.0-exp(-delta*8))
+	if rotor!=null and (finished or game.s.street.job.get("stage","")=="deliver"):
+		rotor.rotate_z(delta*12)
 func _input(event: InputEvent) -> void:
 	# Release outside the viewport cancels the drag instead of leaving a floating part.
 	if event is InputEventMouseButton and not event.pressed and dragging!=null:
