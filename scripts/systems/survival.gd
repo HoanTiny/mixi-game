@@ -106,6 +106,64 @@ static func rate(g, k: String) -> float:
 	return maxf(0.0, 1.0 + mod(g, "rate." + k))
 
 
+## Signed points/hour. Stamina is stored as inverse fatigue, not a second meter.
+static func decay_rates(g) -> Dictionary:
+	var out: Dictionary = g.cfg.get("needs", {}).get("perHour", {}).duplicate()
+	out.merge(data(g).get("decayPerHour", {}), true)
+	return out
+
+
+static func mood_decay_multiplier(g) -> float:
+	var c: Dictionary = data(g).get("neglect", {})
+	var threshold := float(c.get("below", 30.0))
+	return float(c.get("moodMultiplier", 2.0)) if hunger(g) < threshold or hygiene(g) < threshold else 1.0
+
+
+## Integrate crossings at 30 and 0 exactly; a long work shift must not apply the
+## final hunger penalty retroactively to its healthy first hours. Timed buffs
+## expire at their real timestamp even when an action advances several hours.
+static func advance(g, hours: float) -> void:
+	if hours <= 0.0 or not g.has_needs(): return
+	var rates := decay_rates(g)
+	var left := hours
+	var at: float = g.now_abs() - hours
+	var threshold := float(data(g).get("neglect", {}).get("below", 30.0))
+	var difficulty := float(g._diff().get("needsRate", 1.0))
+	while left > 0.0000001:
+		var step := left
+		var active_rates := {}
+		for k in rates:
+			var modifier := 0.0
+			for id in conds(g):
+				var until := float(conds(g)[id].get("until", -1.0))
+				if until >= 0.0 and until <= at + 0.0000001: continue
+				if until > at: step = minf(step, until - at)
+				modifier += float(def(g, id).get("mods", {}).get("rate." + str(k), 0.0))
+			active_rates[k] = float(rates[k]) * difficulty * maxf(0.0, 1.0 + modifier)
+		for k in ["fed", "clean"]:
+			var v: float = g.need(k)
+			var r := float(active_rates.get(k, 0.0))
+			if r >= 0.0: continue
+			for boundary in [threshold, 0.0]:
+				if v > boundary + 0.0000001:
+					step = minf(step, (v - boundary) / -r)
+		# At exactly the boundary a falling meter is below it for the entire
+		# following positive interval; equality with a stationary meter is not.
+		var neglected := false
+		for k in ["fed", "clean"]:
+			var v: float = g.need(k)
+			neglected = neglected or v < threshold or (absf(v - threshold) < 0.0000001 and float(active_rates.get(k, 0.0)) < 0.0)
+		var mood_mult := float(data(g).get("neglect", {}).get("moodMultiplier", 2.0)) if neglected else 1.0
+		var starved: bool = g.need("fed") <= 0.0000001
+		for k in active_rates:
+			var delta := float(active_rates[k]) * step
+			if k == "stamina": g.add_fatigue(-delta)
+			else: g.need_adj(str(k), delta * (mood_mult if k == "mood" and delta < 0.0 else 1.0))
+		if starved: g.add_fatigue(float(g.cfg.needs.get("starveFatiguePerHour", 3.0)) * step)
+		at += step
+		left -= step
+
+
 ## Hệ số tốc độ đi do trạng thái: lấy mức chậm nhất, không cộng dồn (đói lả và trầm cảm cùng lúc vẫn chỉ chậm 30%).
 static func move_factor(g) -> float:
 	var f := 1.0

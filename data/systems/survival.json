@@ -1,84 +1,206 @@
 {
   "_ghi_chu": "Sinh tồn đa tầng (scripts/systems/survival.gd). Ba chỉ số chính dùng lại khóa nhu cầu cũ để save và nội dung cũ còn chạy: Độ no = fed, Vệ sinh = clean, Tâm trạng = mood (aliases). Trạng thái có need/below tự bật khi chỉ số tụt dưới ngưỡng và tự tắt khi hồi lên tới release; có hours là trạng thái có hạn (buff, ốm). mods: move (tốc độ, lấy mức chậm nhất), rate.<nhu cầu> (nhân tốc độ tụt theo giờ), talk_rep, talk_mood (nhân phần được khi nói chuyện). blocks: tag của việc bị chặn, hoặc tên nhóm (work). activity: phần tụt thêm mỗi giờ khi làm việc có tag đó (rain chỉ tính cho việc ngoài trời hôm mưa).",
-  "aliases": {"hunger": "fed", "satiety": "fed", "hygiene": "clean"},
+  "aliases": {
+    "hunger": "fed",
+    "satiety": "fed",
+    "hygiene": "clean"
+  },
   "conditions": {
     "suy_nhuoc": {
-      "name": "Suy nhược", "tone": "bad", "icon": "bowl",
-      "need": "fed", "below": 20, "release": 25,
-      "mods": {"move": -0.3},
-      "blocks": ["heavy"],
+      "name": "Suy nhược",
+      "tone": "bad",
+      "icon": "bowl",
+      "need": "fed",
+      "below": 20,
+      "release": 25,
+      "mods": {
+        "move": -0.3
+      },
+      "blocks": [
+        "heavy"
+      ],
       "reason": "Đói lả, không bê vác nổi. Ăn gì đó đã",
       "desc": "Độ no dưới 20: đi chậm 30%, không nhận được việc nặng (bốc vác, ca kho, công trình)."
     },
     "hoi": {
-      "name": "Người bốc mùi", "tone": "bad", "icon": "drop",
-      "need": "clean", "below": 30, "release": 35,
-      "mods": {"talk_rep": -1.0, "talk_mood": -0.5},
-      "blocks": ["service"],
+      "name": "Người bốc mùi",
+      "tone": "bad",
+      "icon": "drop",
+      "need": "clean",
+      "below": 30,
+      "release": 35,
+      "mods": {
+        "talk_rep": -1.0,
+        "talk_mood": -0.5
+      },
+      "blocks": [
+        "service"
+      ],
       "reason": "Người bốc mùi, chỗ phục vụ khách không nhận. Tắm đã",
       "desc": "Vệ sinh dưới 30: người quen né, tán gẫu không thân thêm; không nhận việc phục vụ khách (quán, shop, xe ôm, tờ rơi)."
     },
     "tram_cam": {
-      "name": "Trầm cảm", "tone": "bad", "icon": "heart",
-      "need": "mood", "below": 1, "release": 30,
-      "mods": {"move": -0.15, "rate.fed": 0.5},
-      "blocks": ["work"],
+      "name": "Trầm cảm",
+      "tone": "bad",
+      "icon": "heart",
+      "need": "mood",
+      "below": 1,
+      "release": 30,
+      "mods": {
+        "move": -0.15,
+        "rate.fed": 0.5
+      },
+      "blocks": [
+        "work"
+      ],
       "reason": "Tâm trạng chạm đáy, không gượng dậy đi làm nổi. Nghỉ, ăn, ngủ hay nói chuyện với ai đó đã",
       "desc": "Tâm trạng chạm đáy: không nhận được việc kiếm tiền nào, chỉ nghỉ, ăn, ngủ, nói chuyện. Hết khi Tâm trạng hồi lên 30."
     },
     "treo_lung": {
-      "name": "Trẹo lưng", "tone": "bad", "icon": "person",
+      "name": "Trẹo lưng",
+      "tone": "bad",
+      "icon": "person",
       "hours": 36,
-      "mods": {"move": -0.15},
-      "blocks": ["heavy"],
+      "mods": {
+        "move": -0.15
+      },
+      "blocks": [
+        "heavy"
+      ],
       "reason": "Đang trẹo lưng, chưa bê vác được",
       "desc": "Chấn thương khi làm nặng: đi chậm, không nhận việc nặng trong 36 giờ."
     },
     "dap_ngon": {
-      "name": "Dập ngón tay", "tone": "bad", "icon": "person",
+      "name": "Dập ngón tay",
+      "tone": "bad",
+      "icon": "person",
       "hours": 24,
-      "mods": {"mg.time": -0.15, "rate.mood": 0.3},
+      "mods": {
+        "mg.time": -0.15,
+        "rate.mood": 0.3
+      },
       "desc": "Ngón tay băng bó: thao tác chậm (bớt giờ trong ca có chỉ tiêu), dễ cáu hơn trong 24 giờ."
     },
     "khi_huyet": {
-      "name": "Khí huyết lưu thông", "tone": "good", "icon": "heart",
+      "name": "Khí huyết lưu thông",
+      "tone": "good",
+      "icon": "heart",
       "hours": 6,
-      "mods": {"rate.mood": -0.5},
+      "mods": {
+        "rate.mood": -0.5
+      },
       "desc": "Sau buổi dưỡng sinh: Tâm trạng tụt chậm một nửa trong 6 giờ."
     }
   },
   "actionConds": {
-    "duong_sinh": {"khi_huyet": 6}
+    "duong_sinh": {
+      "khi_huyet": 6
+    }
   },
   "activity": {
-    "heavy": {"fed": -2.0},
-    "rain": {"clean": -3.0, "neat": -2.0},
-    "workshop": {"clean": -4.0}
+    "heavy": {
+      "fed": -2.0
+    },
+    "rain": {
+      "clean": -3.0,
+      "neat": -2.0
+    },
+    "workshop": {
+      "clean": -4.0
+    }
   },
   "actionTags": {
-    "boc_vac_toi": ["heavy", "outdoor"],
-    "keo_xe_tho": ["heavy", "outdoor"],
-    "ca_kho": ["heavy"],
-    "ca_chieu_kho": ["heavy"],
-    "ca_chieu_kho_sau": ["heavy"],
-    "ben_can_b": ["heavy", "outdoor"],
-    "ben_can_c": ["heavy", "outdoor"],
-    "dien_cho": ["heavy", "outdoor"],
-    "bao_tri_ben_can": ["heavy", "outdoor"],
-    "chay_ban_ta_hien": ["service"],
-    "ca_phu_quan": ["service"],
-    "giao_com": ["service", "outdoor"],
-    "lam_shop_vy": ["service"],
-    "lam_bia": ["service"],
-    "xe_om": ["service", "outdoor"],
-    "phat_to_roi": ["service", "outdoor"],
-    "thu_dong_nat": ["outdoor"],
-    "app_tho": ["outdoor"],
-    "app_tho_cuoi_tuan": ["outdoor"],
-    "sua_may_bom": ["outdoor"],
-    "don_mua_het": ["outdoor"],
-    "don_mua": ["outdoor"],
-    "don_mua_sau": ["outdoor"],
-    "sua_quat_truong": ["outdoor"]
+    "boc_vac_toi": [
+      "heavy",
+      "outdoor"
+    ],
+    "keo_xe_tho": [
+      "heavy",
+      "outdoor"
+    ],
+    "ca_kho": [
+      "heavy"
+    ],
+    "ca_chieu_kho": [
+      "heavy"
+    ],
+    "ca_chieu_kho_sau": [
+      "heavy"
+    ],
+    "ben_can_b": [
+      "heavy",
+      "outdoor"
+    ],
+    "ben_can_c": [
+      "heavy",
+      "outdoor"
+    ],
+    "dien_cho": [
+      "heavy",
+      "outdoor"
+    ],
+    "bao_tri_ben_can": [
+      "heavy",
+      "outdoor"
+    ],
+    "chay_ban_ta_hien": [
+      "service"
+    ],
+    "ca_phu_quan": [
+      "service"
+    ],
+    "giao_com": [
+      "service",
+      "outdoor"
+    ],
+    "lam_shop_vy": [
+      "service"
+    ],
+    "lam_bia": [
+      "service"
+    ],
+    "xe_om": [
+      "service",
+      "outdoor"
+    ],
+    "phat_to_roi": [
+      "service",
+      "outdoor"
+    ],
+    "thu_dong_nat": [
+      "outdoor"
+    ],
+    "app_tho": [
+      "outdoor"
+    ],
+    "app_tho_cuoi_tuan": [
+      "outdoor"
+    ],
+    "sua_may_bom": [
+      "outdoor"
+    ],
+    "don_mua_het": [
+      "outdoor"
+    ],
+    "don_mua": [
+      "outdoor"
+    ],
+    "don_mua_sau": [
+      "outdoor"
+    ],
+    "sua_quat_truong": [
+      "outdoor"
+    ]
+  },
+  "decayPerHour": {
+    "stamina": -0.75,
+    "fed": -6,
+    "clean": -2,
+    "mood": -1.2
+  },
+  "neglect": {
+    "below": 30,
+    "moodMultiplier": 2,
+    "note": "Hungry OR dirty doubles mood loss; both together still2x. Existing tram_cam condition starts at mood bottom, not a clinical diagnosis."
   }
 }

@@ -329,12 +329,12 @@ func location_blockers(loc_id: String) -> Array[Rect2]:
 	if not has_courtyard(loc_id):
 		return [Rect2(-w / 2.0, -d, w, d)]
 	if pilot_active:
-		return pilot_home_blockers
+		return pilot_home_blockers + [Rect2(-3.9,-5.95,2.45,1.7)]
 	var front_depth := minf(4.0, d * 0.5)
 	var wing := (w - 3.0) / 2.0
 	var court := minf(7.0, w - 1.4)
 	var rear_wing := (w - court) / 2.0
-	return [Rect2(-w / 2.0, -front_depth, wing, front_depth),
+	return [Rect2(-3.9,-5.95,2.45,1.7), Rect2(-w / 2.0, -front_depth, wing, front_depth),
 		Rect2(1.5, -front_depth, wing, front_depth),
 		Rect2(-w / 2.0, -d + 0.3, rear_wing, d - front_depth - 0.3),
 		Rect2(court / 2.0, -d + 0.3, rear_wing, d - front_depth - 0.3),

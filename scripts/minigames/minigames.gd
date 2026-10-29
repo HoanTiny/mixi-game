@@ -10,6 +10,7 @@ extends RefCounted
 const Survival := preload("res://scripts/systems/survival.gd")
 const Attributes := preload("res://scripts/systems/attributes.gd")
 const Careers := preload("res://scripts/systems/careers.gd")
+const Economy := preload("res://scripts/systems/economy.gd")
 const NEED_NAMES := {"fed": "Độ no", "clean": "Vệ sinh", "mood": "Tâm trạng", "neat": "Quần áo"}
 
 
@@ -86,7 +87,14 @@ static func view_cfg(g, id: String) -> Dictionary:
 			p[k] = float(p[k]) * scale(g, d.scaling[k], str(d.get("prof", "")))
 	p["view"] = str(d.get("view", ""))
 	p["type"] = str(d.get("type", ""))
+	p["allowAuto"] = bool(d.get("allowAuto", true))
 	p["info"] = info(g, id)
+	if bool(d.get("requiresSession", false)):
+		p["gradePreview"] = {}
+		var action: Dictionary = g.get_action(str(d.get("action", {}).get("id", id)))
+		var base_pay := Economy.base_pay(g, action, int(d.get("pay", 0)))
+		for o in d.get("outcomes", []):
+			p.gradePreview[str(o.get("label", ""))] = {"pay": g.fmt_money(g.round_k(base_pay * float(o.get("payRatio", 0)))), "effects": o.get("effects", {}).duplicate()}
 	return p
 
 
@@ -106,19 +114,25 @@ static func normalize(g, a: Dictionary, raw: Dictionary) -> Dictionary:
 	var r := raw.duplicate()
 	if not r.has("score"):
 		r["score"] = float(r.get("ratio", 1.0))
+	# Session-backed jobs calculate every reward from bounded performance, never client ratio/bonus.
+	if bool(d.get("requiresSession", false)):
+		r["score"] = clampf(float(r.score), 0.0, 1.0)
+		r["fails"] = clampi(int(r.get("fails", 0)), 0, 1000)
+		r.erase("ratio")
+		r.erase("bonus")
 	var o := outcome(d, float(r.score))
 	r["win"] = bool(o.get("win", false))
 	r["label"] = str(o.get("label", ""))
-	if raw.has("ratio"):
+	if raw.has("ratio") and not bool(d.get("requiresSession", false)):
 		return r
-	var ratio := clampf(float(r.score), 0.0, 1.25)
+	var ratio := float(o.get("payRatio", clampf(float(r.score), 0.0, 1.25)))
 	if r.win:
 		ratio = maxf(ratio, float(d.get("minRatio", 0.0)))
 	r["ratio"] = ratio
 	# Tay nghề cao thì được trả thêm (careers.json perLevel.pay).
 	r["bonus"] = 0
 	if d.has("prof") and int(a.get("pay", 0)) > 0:
-		r["bonus"] = g.round_k(float(a.pay) * ratio * Careers.mod(g, str(d.prof), "pay"))
+		r["bonus"] = g.round_k(float(Economy.base_pay(g, a, int(a.pay))) * ratio * Careers.mod(g, str(d.prof), "pay"))
 	return r
 
 
@@ -142,6 +156,7 @@ static func on_action(g, a: Dictionary, result: Dictionary) -> void:
 		parts.append(gains)
 	g.add_log("%s: %s" % [a.name, " · ".join(parts)], "event" if o.get("win", false) else "warn")
 	g.last_minigame = {"id": id, "win": bool(o.get("win", false)), "text": " · ".join(parts),
+		"grade": str(o.get("label", "")), "score": score,
 		"injury": str(Survival.def(g, str(hurt.get("cond", ""))).get("name", "")) if not hurt.is_empty() else ""}
 
 
@@ -217,15 +232,20 @@ static func info(g, id: String) -> Array:
 	var d := def(g, id)
 	var a: Dictionary = g.get_action(str(d.get("action", {}).get("id", id)))
 	var out := []
+	var base_pay := Economy.base_pay(g, a, int(d.get("pay", 0)))
 	var head := "Mất %s" % _hours_text(float(d.get("hours", 1.0)))
 	if int(d.get("cost", 0)) > 0:
 		head += " · phí %s" % g.fmt_money(int(d.cost))
 	if int(d.get("pay", 0)) > 0:
 		var extra: float = Careers.mod(g, str(d.get("prof", "")), "pay") if d.has("prof") else 0.0
-		head += " · tiền công tới %s%s" % [g.fmt_money(int(d.pay)), " (tay nghề +%d%%)" % int(extra * 100.0) if extra > 0.0 else ""]
+		var top_ratio := 1.0
+		for o in d.get("outcomes", []): top_ratio = maxf(top_ratio, float(o.get("payRatio",1.0)))
+		head += " · tiền công %s %s%s" % ["tới" if bool(d.get("requiresSession", false)) else "chuẩn",g.fmt_money(g.round_k(base_pay * top_ratio)), " (tay nghề +%d%%)" % int(extra * 100.0) if extra > 0.0 else ""]
 	out.append(head)
 	for o in d.get("outcomes", []):
 		var line := "%s%s: %s" % [str(o.get("label", "")), " (%s)" % o.when if o.has("when") else "", reward_text(g, o)]
+		if o.has("payRatio"):
+			line = "%s · %s" % [g.fmt_money(g.round_k(base_pay * float(o.payRatio))), line]
 		if d.has("prof") and int(o.get("prof", 0)) > 0:
 			line += " · tay nghề %s +%d" % [Careers.prof_name(g, str(d.prof)).to_lower(), int(o.prof)]
 		out.append(line)

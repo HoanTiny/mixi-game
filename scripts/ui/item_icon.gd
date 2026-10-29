@@ -32,6 +32,25 @@ func _draw() -> void:
 	var ink := Color(0.07, 0.06, 0.05)
 	var w := 3.0
 	match kind:
+		"lock":
+			draw_arc(Vector2(50,38),22,PI,TAU,20,tint,8,true)
+			_rrect(Rect2(20,36,60,48),Color("414437"),tint,5)
+			draw_circle(Vector2(50,56),6,tint)
+			draw_line(Vector2(50,57),Vector2(50,70),tint,5,true)
+		"backpack":
+			draw_arc(Vector2(50,26),12,PI,TAU,18,tint,5,true)
+			_rrect(Rect2(23,26,54,60),Color("46564a"),tint,4)
+			_rrect(Rect2(31,53,38,25),Color("354039"),tint,3)
+			draw_line(Vector2(23,38),Vector2(17,72),tint,4,true)
+			draw_line(Vector2(77,38),Vector2(83,72),tint,4,true)
+		"bread":
+			_rrect(Rect2(12,31,76,37),Color("c99148"),Color("6f4e2b"),3)
+			for x in [30,48,66]: draw_line(Vector2(x,39),Vector2(x-7,56),Color("efd3a0"),5,true)
+		"medicine":
+			_rrect(Rect2(24,24,52,62),Color("e1dfcc"),ink,3)
+			draw_rect(Rect2(31,15,38,13),Color("4c7672"))
+			draw_rect(Rect2(44,39,12,31),Color("77958a"))
+			draw_rect(Rect2(35,48,30,12),Color("77958a"))
 		"note":
 			draw_line(Vector2(42,68),Vector2(42,24),tint,6,true)
 			draw_line(Vector2(42,24),Vector2(76,16),tint,6,true)

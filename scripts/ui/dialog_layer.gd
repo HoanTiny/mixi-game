@@ -432,7 +432,9 @@ func _event() -> void:
 func _night() -> void:
 	var n: Dictionary = game.night_preview()
 	var lines := [
-		"Sinh hoạt cả nhà: −%s" % GameLogic.fmt_money(n.living),
+		"Tiền trọ đêm nay: −%s" % GameLogic.fmt_money(int(n.get("rent", 0))),
+		"Góp sinh hoạt gia đình: −%s" % GameLogic.fmt_money(int(n.get("upkeep", n.living))),
+		"Tổng sinh hoạt và tiền trọ còn nợ: −%s" % GameLogic.fmt_money(n.living),
 		"Ngủ và %s giờ còn trống: Mệt −%d" % [GameLogic.num(n.free_hours), int(n.recover)],
 	]
 	if int(n.due_pay) > 0:

@@ -11,3 +11,5 @@ No external recordings, voice cloning, speech or music. 22.05 kHz mono PCM.
 
 World emitters fade outside opening hours and have bounded audible distances.
 The HUD music-note button mutes/unmutes the Master bus, including these effects.
+
+`bath.wav`: tiếng xối nước tổng hợp, sinh bằng `tools/gen_bath_sound.py` (seed cố định), phát một lần khi tắm.

@@ -174,6 +174,9 @@ func _refresh() -> void:
 		var task := "eat" if entry.seated else ("repair" if entry.id=="bench_helper" else ("box" if entry.id=="repair_customer" else ""))
 		if entry.id=="courtyard_resident_0" and (hour<10.0 or (hour>=16.0 and hour<18.0)): task="sweep"
 		actor.global_rotation.y=CityMap.rot_y(world.city.locs[entry.location].normal)+(-PI/2 if task=="sweep" else float(entry.yaw))
+		if entry.location == "xom_bo_me" and world.camera != null and task == "":
+			var face: Vector3 = world.camera.global_position-actor.global_position
+			actor.global_rotation.y = atan2(face.x,face.z)+(0.4 if int(entry.turn)==0 else -0.4)
 		if task!="": actor.look["talker"]=false
 		actor.perform_activity(task if scheduled and near else "")
 		actor.animate(0.0, 0.0)

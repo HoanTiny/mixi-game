@@ -34,6 +34,7 @@ const StreetKit := preload("res://scripts/architecture/street_kit.gd")
 const PilotLife := preload("res://scripts/world/pilot_life.gd")
 const PilotGround := preload("res://scripts/world/pilot_ground.gd")
 const PilotDetails := preload("res://scripts/world/pilot_details.gd")
+const MapManager := preload("res://scripts/systems/map_manager.gd")
 const NeighborhoodTravel := preload("res://scripts/neighborhood_travel.gd")
 
 ## Xóm trọ của An ở chương 1: nơi xuất phát mỗi sáng và nơi đi ngủ mỗi tối. Chương 2 "home" là chỗ ở đã chốt
@@ -251,23 +252,24 @@ func _ready() -> void:
 	add_child(player)
 	# Vòng vàng dưới chân để luôn nhận ra An giữa đám đông.
 	var marker := MeshInstance3D.new()
-	var disc := CylinderMesh.new()
-	disc.top_radius = 0.55
-	disc.bottom_radius = 0.55
-	disc.height = 0.02
+	var disc := PlaneMesh.new()
+	disc.size = Vector2(1.22,1.22)
 	marker.mesh = disc
-	var marker_mat := _mat(Color(0.95, 0.76, 0.3, 0.55))
-	marker_mat.emission_enabled = true
-	marker_mat.emission = Color("f2c14e")
-	marker_mat.emission_energy_multiplier = 0.16 if real and (city.pilot_active or city.street_upgrade) else 0.5
-	if real and (city.pilot_active or city.street_upgrade):
-		marker_mat.albedo_color = Color(0.68, 0.56, 0.31, 0.19)
+	var marker_mat := ShaderMaterial.new()
+	marker_mat.shader = preload("res://shaders/interaction_ring.gdshader")
+	marker_mat.set_shader_parameter("active",0.1)
+	marker_mat.set_shader_parameter("tint",Color("c7b382"))
 	marker.material_override = marker_mat
 	marker.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	marker.position = Vector3(0, 0.18, 0)
 	player.add_child(marker)
 	home = game.home_loc() if game.is_started() and LOCATIONS.has(game.home_loc()) else HOME
 	player.position = loc_point(home, -1.5, 0.8)
+	if zones_enabled() and game.is_started():
+		MapManager.migrate(game)
+		game.s["zone_navigation"] = true
+		var arrival: String = str(MapManager.definitions(game).get(MapManager.current(game), {}).get("arrival", home))
+		if LOCATIONS.has(arrival): player.position = door_of(arrival)
 	# Về từ màn khác thì hiện ra ở chỗ đó.
 	var gs := get_node("/root/GameState")
 	if gs.spawn_at != "" and LOCATIONS.has(gs.spawn_at):
@@ -727,25 +729,28 @@ func _build_location(id: String, loc: Dictionary) -> void:
 
 	# Vòng sáng trước cửa: điểm tương tác.
 	var ring := MeshInstance3D.new()
-	var torus := TorusMesh.new()
-	torus.inner_radius = 0.55
-	torus.outer_radius = 0.72
-	if real and (city.pilot_active or city.street_upgrade):
-		torus.inner_radius = 0.59
-		torus.outer_radius = 0.64
-	ring.mesh = torus
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color("f2c14e")
-	mat.emission_enabled = true
-	mat.emission = Color("f2c14e")
-	mat.emission_energy_multiplier = 0.6
-	if real and (city.pilot_active or city.street_upgrade):
-		mat.albedo_color = Color("a99a6c")
-		mat.emission_energy_multiplier = 0.12
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(1.5,1.5)
+	ring.mesh = plane
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://shaders/interaction_ring.gdshader")
 	ring.material_override = mat
-	ring.position = Vector3(0, 0.2, city.door_out)
-	ring.scale = Vector3(1, 0.3, 1)
+	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ring.position = Vector3(0,0.19,city.door_out)
 	holder.add_child(ring)
+	var arrow := MeshInstance3D.new()
+	arrow.name = "InteractionArrow"
+	var cone := CylinderMesh.new()
+	cone.top_radius = 0.13
+	cone.bottom_radius = 0.0
+	cone.height = 0.24
+	cone.radial_segments = 4
+	arrow.mesh = cone
+	arrow.material_override = _mat(Color("dfc982"))
+	arrow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	arrow.position = Vector3(0.82,0.55,0)
+	arrow.visible = false
+	ring.add_child(arrow)
 	door_rings[id] = ring
 
 	var slot := 0
@@ -1723,6 +1728,11 @@ func interact() -> void:
 		hud.quick_first()
 		return
 	var near := nearest_location()
+	if zones_enabled() and near != "" and game.is_started() and not hud.blocking():
+		var zone := MapManager.zone_for_location(game, near)
+		if zone != "" and zone != MapManager.current(game):
+			game.s["zone"] = zone
+			game._commit()
 	if near != "":
 		hud.open_location(near)
 
@@ -1815,13 +1825,23 @@ func _process(delta: float) -> void:
 	_update_cutaway(delta)
 
 	var near := nearest_location()
+	# Walking already accrues its own time/fatigue. Entering a district updates
+	# context immediately, without charging a second fast-travel trip or requiring E.
+	if zones_enabled() and near != "" and game.is_started() and not hud.blocking():
+		var zone := MapManager.zone_for_location(game, near)
+		if zone != "" and zone != MapManager.current(game):
+			game.s["zone"] = zone
+			game._commit()
 	var bin := nearest_bin()
 	var vend := nearest_vendor()
 	hud.set_prompt("bin:" + bin if bin != "" else ("vendor:" + vend if vend != "" else near))
 	for id in door_rings:
 		var ring: MeshInstance3D = door_rings[id]
-		var pulse := 1.0 + (0.12 * sin(Time.get_ticks_msec() / 180.0) if id == near else 0.0)
-		ring.scale = Vector3(pulse, 0.3, pulse)
+		(ring.material_override as ShaderMaterial).set_shader_parameter("active",1.0 if id == near else 0.0)
+		var arrow: Node3D = ring.get_node("InteractionArrow")
+		arrow.visible = id == near
+		arrow.position.y = 0.5 + 0.07*sin(Time.get_ticks_msec()*0.0025)
+
 	if hud.location_open() != "" and door_of(hud.location_open()).distance_to(player.position) > INTERACT_RANGE + 1.5:
 		hud.close_location()
 
@@ -2414,6 +2434,50 @@ func _migrate_neighborhood() -> void:
 		game._commit.call_deferred()
 
 
+func zones_enabled() -> bool:
+	return real and city.id == "hn_pho_co" and not MapManager.definitions(game).is_empty()
+
+
+func zone_options() -> Array:
+	if not zones_enabled(): return []
+	var out: Array = []
+	for id in MapManager.definitions(game):
+		var d: Dictionary = MapManager.definitions(game)[id].duplicate()
+		d["id"] = id
+		d["minutes"] = MapManager.minutes(game, id)
+		d["reason"] = MapManager.travel_reason(game, id, _walk_meters * float(game.cfg.walkHoursPerMeter))
+		out.append(d)
+	return out
+
+
+func change_zone(destination: String) -> bool:
+	if not zones_enabled() or hud.blocking() or title_open(): return false
+	var d: Dictionary = MapManager.definitions(game).get(destination, {})
+	var location := str(d.get("arrival", ""))
+	if not LOCATIONS.has(location): return false
+	var arrival: Vector2 = city.loc_door(location)
+	if not city.walkable(arrival): return false
+	if not MapManager.travel(game, destination, false, _walk_meters * float(game.cfg.walkHoursPerMeter)): return false
+	_walk_meters = 0.0
+	_run_meters = 0.0
+	_idle_t = 0.0
+	_target = null
+	_target_loc = ""
+	_pending_click = null
+	_path.clear()
+	_path_i = 0
+	_travel_pace.reset()
+	_pan = Vector3.ZERO
+	player.position = Vector3(arrival.x, city.ground_y(arrival), arrival.y)
+	camera.position = player.position + cam_offset()
+	camera.look_at(player.position + Vector3.UP, Vector3.UP)
+	_make_trail()
+	hud.close_location()
+	game._commit()
+	hud.set_prompt(location)
+	return true
+
+
 func travel_options(location_id: String) -> Array:
 	if not real or not NeighborhoodTravel.enabled(city) or not LOCATIONS.has(location_id):
 		return []
@@ -2459,6 +2523,9 @@ func travel_to(destination: String) -> bool:
 	camera.look_at(player.position + Vector3.UP, Vector3.UP)
 	_make_trail()
 	hud.close_location()
+	if zones_enabled():
+		var arrived_zone := MapManager.zone_for_location(game, destination)
+		if arrived_zone != "": game.s["zone"] = arrived_zone
 	game._commit()
 	hud.open_location(destination)
 	return true
@@ -2707,6 +2774,10 @@ func _on_changed() -> void:
 			_target_loc = ""
 			_walk_meters = 0.0
 		_last_day = game.day()
+		if zones_enabled():
+			game.s["zone_navigation"] = true
+			var wake_zone := MapManager.zone_for_location(game, nearest_location())
+			if wake_zone != "": game.s["zone"] = wake_zone
 	_update_lighting(game.clock())
 
 

@@ -52,7 +52,7 @@ func logic() -> void:
 	check(float(c3.sweep)<float(c1.sweep) and c3.view=="ring_toss","agility slows the aiming sweep")
 	check(float(MiniGames.view_cfg(g,"be_gach").seconds)>80.0,"agility adds shift time")
 	var info: String="\n".join(MiniGames.view_cfg(g,"be_gach").info)
-	check("240.000đ" in info and "Rủi ro chấn thương" in info and "tay nghề bốc vác" in info,"intro lists pay, rewards and risk")
+	check("110.000đ" in info and "Rủi ro chấn thương" in info and "tay nghề bốc vác" in info,"intro lists pay, rewards and risk")
 	check(MiniGames.view_cfg(g,"bricks").get("kind","bricks")=="bricks" and MiniGames.view_cfg(g,"bricks").has("seconds"),"catalogue-less games keep their old config")
 	check(Registry.make({"view":"ring_toss"}).get_script()==RingToss and Registry.make({"kind":"bricks"}).get_script().resource_path.ends_with("work_site.gd"),"registry picks views")
 
@@ -86,24 +86,24 @@ func logic() -> void:
 	# Bê gạch: tiền công theo phần chỉ tiêu, EXP nghề, EXP Thể chất, tụt mạnh Vệ sinh và Độ no.
 	g=fresh(); var cash: int=g.s.cash; var clean: float=g.need("clean"); var fed: float=g.need("fed")
 	g.do_action("be_gach",{"score":1.0,"delivered":8,"target":8,"fails":0})
-	check(g.s.cash==cash+240000,"full shift pays in full")
+	check(g.s.cash==cash+110000,"full shift pays capped chapter-one wage")
 	check(Careers.xp(g,"boc_vac")>=25.0 and Attributes.xp(g,"str")>0.0,"shift trains the trade and strength")
 	check(clean-g.need("clean")>=35.0 and fed-g.need("fed")>=20.0,"shift drains hygiene and hunger hard")
 	g=fresh(); cash=g.s.cash
 	g.do_action("be_gach",{"score":0.5,"fails":2})
-	check(g.s.cash==cash+120000 and str(g.last_minigame.text).begins_with("Xong ca"),"half quota pays half")
+	check(g.s.cash==cash+60000 and str(g.last_minigame.text).begins_with("Xong ca"),"half quota pays half of capped base rounded to 10k")
 	g=fresh(); cash=g.s.cash
 	g.do_action("be_gach",{"score":0.25,"fails":4})
-	check(g.s.cash==cash+60000 and not bool(g.last_minigame.win),"missing quota is a loss with partial pay")
+	check(g.s.cash==cash+30000 and not bool(g.last_minigame.win),"missing quota is a loss with partial pay")
 	g=fresh(); cash=g.s.cash; g.s.prof={"boc_vac":{"lv":3,"xp":0.0}}
 	g.do_action("be_gach",{"score":1.0,"fails":0})
-	check(g.s.cash==cash+240000+g.round_k(24000.0),"trade level 3 adds 10%% pay (got %d)" % (g.s.cash-cash))
+	check(g.s.cash==cash+110000+g.round_k(11000.0),"trade level 3 adds 10%% pay (got %d)" % (g.s.cash-cash))
 	g=fresh(); cash=g.s.cash
 	g.do_action("be_gach",{"ratio":1.0,"bonus":0,"auto":true})
-	check(g.s.cash==cash+240000,"quick repeat keeps the stored pay")
+	check(g.s.cash==cash+110000,"quick repeat keeps the stored pay")
 	g=fresh(); cash=g.s.cash
 	g.do_action("ca_kho",{"ratio":1.0,"bonus":0})
-	check(g.last_minigame.is_empty() and g.s.cash==cash+300000,"old minigames are untouched")
+	check(g.last_minigame.is_empty() and g.s.cash==cash+200000,"old minigame settlement obeys current economy base wage")
 
 	# Chấn thương: xác suất theo lần hỏng, Mệt, Thể chất; trúng thì bật trạng thái, trả viện phí, chặn việc nặng.
 	g=fresh()
@@ -130,7 +130,7 @@ func logic() -> void:
 	# Mô phỏng không có kết quả: tính như đủ chỉ tiêu.
 	g=fresh(); cash=g.s.cash
 	g.do_action("be_gach")
-	check(g.s.cash==cash+240000 and Careers.xp(g,"boc_vac")>=25.0,"simulated shift counts as full quota")
+	check(g.s.cash==cash+110000 and Careers.xp(g,"boc_vac")>=25.0,"simulated shift counts as full quota")
 
 	# Lưu, nạp.
 	var copy=Logic.new(); copy.load_data(); copy.s=JSON.parse_string(JSON.stringify(g.s)); copy.migrate_save()

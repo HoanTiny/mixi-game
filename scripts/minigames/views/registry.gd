@@ -5,6 +5,7 @@ extends RefCounted
 
 const WorkSite := preload("res://scripts/work/work_site.gd")
 const VIEWS := {
+	"beer_service": preload("res://scripts/minigames/views/beer_service_view.gd"),
 	"ring_toss": preload("res://scripts/minigames/views/ring_toss_view.gd"),
 	"brick_balance": preload("res://scripts/minigames/views/brick_balance_view.gd"),
 	"billiards": preload("res://scripts/work/billiards.gd"),

@@ -2,6 +2,7 @@ extends RefCounted
 ## Đơn sửa đồ ở tiệm chú Sơn (nhận đơn → đo kiểm → linh kiện → bàn sửa 3D → chạy thử → trả khách) và quầy linh kiện ở
 ## chợ Long Biên. Mỗi lệnh kiểm tra lại điều kiện trước khi tiêu tiền, tiêu giờ (gộp từ nhánh thoi-gian-troi).
 const Quest := preload("res://scripts/quest_guide.gd")
+const Economy := preload("res://scripts/systems/economy.gd")
 const HOURS := {"tiem_sau":[8,18],"cho_cau_nho":[7,19],"com_hanh":[10,20],"ben_xe_6":[7,18],"ben_can":[8,18],"tiem_toc":[8,19],"xom_bo_me":[6,22]}
 const JOBS := [
 	{"name":"Quạt của cô Duyên","symptom":"Quạt ù, cánh quay chậm. Rút điện trước khi mở vỏ.","part":"Tụ quạt","reading":"Tụ chỉ còn 0,3 µF; định mức 1,5 µF. Dây nguồn vẫn thông mạch.","fix":"Thay tụ đúng điện dung","price":30000,"pay":230000},
@@ -64,6 +65,14 @@ static func schedule(name: String, hour: float) -> String:
 	return ""
 static func option(id: String, name: String, hours: float, cost := 0, hint := "") -> Dictionary:
 	return {"id":id,"name":name,"hours":hours,"cost":cost,"hint":hint,"reason":""}
+
+## Shared by offer text and acceptance, including independent-trade/loyalty
+## bonuses. Accepted orders keep this quote even if balance config changes.
+static func repair_quote(g, kind: int) -> int:
+	var pay := Economy.repair_base_pay(g,kind,int(JOBS[kind].pay))
+	if str(g.s.street.get("route","")) == "Thợ sửa độc lập": pay = int(round(float(pay)*1.1))
+	if g.s.flags.get("day23_reliable",false): pay += 20000
+	return pay
 static func options(g, loc: String) -> Array:
 	migrate(g.s)
 	if g.Day23.owns_job(g): return g.Day23.repair_options(g,loc)
@@ -73,8 +82,9 @@ static func options(g, loc: String) -> Array:
 	if loc == "tiem_sau":
 		if job.is_empty():
 			var kind: int = (g.day()-1) % 2 if int(st.xp) >= 2 else 0
-			out.append(option("accept", "Nhận: " + JOBS[kind].name,0.25,0,"Tiền công %s · hẹn 17:00 ngày mai" % g.fmt_money(JOBS[kind].pay)))
-			if g.s.flags.get("day23_reliable",false): out[-1].hint="Khách quen giới thiệu · tiền công %s (+20.000đ) · hẹn 17:00 ngày mai"%g.fmt_money(int(JOBS[kind].pay)+20000)
+			var quote := repair_quote(g,kind)
+			out.append(option("accept", "Nhận: " + JOBS[kind].name,0.25,0,"Tiền công %s · hẹn 17:00 ngày mai" % g.fmt_money(quote)))
+			if g.s.flags.get("day23_reliable",false): out[-1].hint="Khách quen giới thiệu · tiền công %s (đã gồm +20.000đ) · hẹn 17:00 ngày mai"%g.fmt_money(quote)
 			if int(st.accepted_day) == g.day(): out[-1].reason = "Đã nhận đơn hôm nay; mai có khách mới"
 			if g.quest_state("quat_trai_cay")=="active": out[-1].reason = "Trả quạt cho cô bán hoa quả trước khi nhận đơn khác"
 			if g.s.get("day23",{}).get("order","")=="offered" and g.day()<=3: out[-1].reason="Trả lời cô hàng nước trước khi nhận đơn thường"
@@ -145,8 +155,7 @@ static func act(g, loc: String, id: String) -> bool:
 			if g.s.has("neighborhood") and g.s.neighborhood.stage=="intro": g.s.neighborhood.stage="work"
 			var kind: int = (g.day()-1)%2 if int(st.xp)>=2 else 0
 			st.job = JOBS[kind].duplicate(true)
-			if st.route == "Thợ sửa độc lập": st.job.pay = int(st.job.pay * 1.1)
-			if g.s.flags.get("day23_reliable",false): st.job.pay+=20000
+			st.job.pay = repair_quote(g,kind)
 			st.job.merge({"kind":kind,"stage":"inspect","due":g.day()+1})
 			st.accepted_day = g.day()
 			Quest.notice(g,"Nhận việc · "+str(st.job.name),"Đo kiểm trước, rồi cân nhắc tiền linh kiện và giờ hẹn.")

@@ -89,7 +89,8 @@ func _init() -> void:
 	g=fresh(); add_test_actions(g); clock(g,8.0); g.s.attr.str.lv=3
 	g.do_action("t_heavy")
 	check(is_equal_approx(fed_plain-g.need("fed"),4.0*0.8),"strength 3 cuts heavy drain by 20%")
-	check(is_equal_approx(g.s.fatigue,fat_plain*0.9),"strength 3 cuts heavy fatigue by 10%")
+	var passive := -float(Survival.decay_rates(g).get("stamina",0.0))*2.0
+	check(is_equal_approx(g.s.fatigue,passive+(fat_plain-passive)*0.9),"strength 3 cuts heavy action fatigue by 10%, not passive time decay")
 
 	# Hôm mưa, việc ngoài trời làm bẩn thêm.
 	g=fresh(); add_test_actions(g); clock(g,8.0)

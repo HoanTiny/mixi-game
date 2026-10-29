@@ -212,6 +212,83 @@
           }
         ]
       }
+    },
+    "bia_service": {
+      "type": "labor",
+      "view": "beer_service",
+      "requiresSession": true,
+      "allowAuto": false,
+      "action": {
+        "id": "bia_service",
+        "location": "ben_can",
+        "name": "Chạy bàn quán bia",
+        "window": [
+          16,
+          24
+        ],
+        "perDay": 1,
+        "note": "Canh nhịp dọn cốc; chất lượng ca quyết định tiền công và sức lực."
+      },
+      "hours": 4,
+      "cost": 0,
+      "pay": 112000,
+      "tags": [
+        "service"
+      ],
+      "params": {
+        "seconds": 30,
+        "target": 12,
+        "beatSeconds": 2.0,
+        "windowStart": 0.4,
+        "windowEnd": 0.7,
+        "missPenalty": 0.035
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.9,
+          "win": true,
+          "label": "Perfect",
+          "payRatio": 1.25,
+          "effects": {
+            "fatigue": 12,
+            "need.clean": -8,
+            "need.mood": 3
+          },
+          "xp": {
+            "agi": 6
+          },
+          "when": "từ 90% sau khi trừ lỗi"
+        },
+        {
+          "atLeast": 0.6,
+          "win": true,
+          "label": "Good",
+          "payRatio": 1.0,
+          "effects": {
+            "fatigue": 16,
+            "need.clean": -14
+          },
+          "xp": {
+            "agi": 4
+          },
+          "when": "từ 60% đến dưới 90%"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Fail",
+          "payRatio": 0.2857142857,
+          "effects": {
+            "fatigue": 22,
+            "need.clean": -22,
+            "need.mood": -4
+          },
+          "xp": {
+            "agi": 1
+          },
+          "when": "dưới 60%"
+        }
+      ]
     }
   }
 }

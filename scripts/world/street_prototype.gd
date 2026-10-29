@@ -193,7 +193,35 @@ static func build(world, parent: Node3D, id: String, width: float, depth: float,
 			scanned(parent, "plastic_crate_01", Vector3(-yard_x, 0.15, yard_z + 1.1), 0.3, 0.08)
 			scanned(parent, "potted_plant_04", Vector3(yard_x, 0.15, -depth + 0.6), 0.75)
 			scanned(parent, "plastic_monobloc_chair_01", Vector3(yard_x, 0.15, -4.35), 0.82, -0.18)
-			scanned(parent, "wooden_ladder", Vector3(-yard_x - 0.35, 0.15, -4.55), 1.95, 0.1)
+			scanned(parent, "wooden_ladder", Vector3(yard_x + 0.3, 0.15, -6.8), 1.95, 0.1)
+			# Two worn bikes hug the rear left wall; the central 3 m lane stays open.
+			for i in 2:
+				var bike := item(parent,Props.motorbike("xe_so"),Vector3(-2.7,0.15,-4.7-i*0.9),Color("626f66") if i==0 else Color("66564b"))
+				bike.name = "HomeParkedBike%d" % i
+				bike.rotation.y = PI/2
+				bike.rotation.z = -0.06
+			var bulb := preload("res://scripts/world/hanging_bulb.gd").new()
+			bulb.name = "HomeHangingBulb"
+			bulb.game = world.game
+			bulb.position = Vector3(0.8,3.25,-3.8)
+			parent.add_child(bulb)
+			WorkProps.cyl(bulb,0.009,0.65,WorkProps.plain(Color("393b34")),Vector3(0,-0.325,0))
+			WorkProps.cyl(bulb,0.055,0.09,metal,Vector3(0,-0.68,0))
+			var globe := MeshInstance3D.new()
+			var glass := SphereMesh.new()
+			glass.radius=0.09; glass.height=0.16
+			globe.mesh=glass
+			globe.position.y=-0.79
+			var warm := WorkProps.plain(Color("ffe1a2"))
+			warm.emission_enabled=true; warm.emission=Color("ffc578")
+			warm.emission_energy_multiplier=1.3
+			globe.material_override=warm
+			bulb.add_child(globe)
+			var bulb_light := OmniLight3D.new()
+			bulb_light.position=globe.position
+			bulb_light.omni_range=5.0; bulb_light.light_color=Color("ffd1a0")
+			bulb_light.shadow_enabled=false
+			bulb.add_child(bulb_light); bulb.lamp=bulb_light
 			world._block(Vector3(5.6, 0.025, 0.025), Vector3(0, 2.6, -depth + 0.9), Color("494a40"), parent)
 			for i in 5:
 				laundry(parent, Vector3(-2.3 + i * 1.05, 2.58, -depth + 0.9), i)

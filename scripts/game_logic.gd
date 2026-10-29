@@ -52,8 +52,15 @@ const GameClock := preload("res://scripts/systems/game_clock.gd")
 ## Tay nghề, bằng cấp (data/systems/careers.json) và tầng luật của trò chơi nhỏ (data/systems/minigames.json).
 const Careers := preload("res://scripts/systems/careers.gd")
 const MiniGames := preload("res://scripts/minigames/minigames.gd")
+const MapManager := preload("res://scripts/systems/map_manager.gd")
+const Relationships := preload("res://scripts/systems/relationships.gd")
+const Economy := preload("res://scripts/systems/economy.gd")
+const Inventory := preload("res://scripts/systems/inventory.gd")
 ## Kết quả trò chơi nhỏ vừa tính xong (MiniGames.on_action) để giao diện báo; không lưu vào bản lưu.
 var last_minigame: Dictionary = {}
+## Phiên chơi chỉ tồn tại trong bộ nhớ: callback cũ không thể trả công hai lần.
+var _minigame_sessions: Dictionary = {}
+var _minigame_serial := 0
 ## Danh mục quần áo bóc túi mù (data/clothes.json): rarities, slots, items.
 var clothes: Dictionary = {}
 var _event_data: Dictionary = {}
@@ -108,12 +115,17 @@ func load_data(dir := "res://data") -> void:
 	_merge_pack(dir, "_pho.json")
 	if FileAccess.file_exists(dir + "/clothes.json"):
 		clothes = _read_json(dir + "/clothes.json")
-	for sys in ["survival", "attributes", "careers"]:
+	for sys in ["survival", "attributes", "careers", "zones", "relationships", "economy"]:
 		if FileAccess.file_exists(dir + "/systems/" + sys + ".json"):
 			cfg[sys] = _read_json(dir + "/systems/" + sys + ".json")
 	if FileAccess.file_exists(dir + "/systems/minigames.json"):
 		cfg["minigame_catalog"] = _read_json(dir + "/systems/minigames.json")
 		MiniGames.register(self)
+	Relationships.register(self)
+	Economy.configure(self)
+	if FileAccess.file_exists(dir + "/systems/inventory.json"):
+		cfg["consumables"] = _read_json(dir + "/systems/inventory.json")
+		Inventory.register(self)
 
 
 func _merge_pack(dir: String, suffix: String) -> void:
@@ -152,6 +164,7 @@ static func _read_json(path: String) -> Variant:
 ## mode "full": chơi đủ 30 ngày từ ngày 1 (cfg.full). "A", "B", "C": lát cắt ngày 18–22
 ## với trạng thái dựng sẵn của tuyến đó (cfg.presets). diff: độ khó (cfg.difficulty: "de" dễ thở, "thuong" đúng đời).
 func new_game(mode: String, diff := "thuong") -> void:
+	_minigame_sessions.clear()
 	var full := mode == "full"
 	var p: Dictionary = cfg.full if full else cfg.presets[mode]
 	_event_data = {}
@@ -174,6 +187,7 @@ func new_game(mode: String, diff := "thuong") -> void:
 	if cfg.has("needs"):
 		s["needs"] = cfg.needs.start.duplicate()
 		s["needs_t"] = float(cfg.dayStart)
+	Economy.initialize(self)
 	s["difficulty"] = diff if cfg.get("difficulty", {}).has(diff) else "thuong"
 	if full:
 		s["cash"] = int(s.cash) + int(_diff().get("cashBonus", 0))
@@ -191,6 +205,7 @@ func new_game(mode: String, diff := "thuong") -> void:
 
 
 func reset() -> void:
+	_minigame_sessions.clear()
 	s = {}
 	_event_data = {}
 	changed.emit()
@@ -396,7 +411,9 @@ func projected_cash(target: int) -> int:
 			continue
 		total += int(r.amount)
 	total -= payable_sum(target - 1)
-	total -= living_cost() * maxi(0, target - day())
+	var nightly := living_cost() + (int(Economy.data(self).get("nightlyRent", 60000)) if Economy.active(self) else 0)
+	total -= nightly * maxi(0, target - day())
+	total -= int(s.get("economy", {}).get("rentArrears", 0))
 	return total
 
 
@@ -882,10 +899,11 @@ func _take_housing(k: String, owed: bool) -> void:
 	var h := housing()
 	var cost := housing_cost(k)
 	var name := str(cfg.housing[k].name)
-	if owed and int(s.cash) < cost:
+	if not owed and Economy.housing_available(self,k) < cost: return
+	if owed and Economy.housing_available(self,k) < cost:
 		_add_payable({"id": "gop_di_nam", "to": "", "label": "Góp tiền ở nhờ nhà dì Nga", "amount": cost, "due": 33})
 	else:
-		spend(cost, "Vào ở: " + name)
+		Economy.pay_housing(self,k,cost,"Vào ở: " + name)
 	h["state"] = "signed"
 	h["place"] = k
 	h["paid"] = int(cfg.housing[k].cost)
@@ -896,7 +914,9 @@ func _take_housing(k: String, owed: bool) -> void:
 func _reserve_housing(k: String) -> void:
 	var h := housing()
 	var dep := int(cfg.housing[k].get("deposit", 0))
-	spend(dep, "Đặt cọc giữ chỗ: " + str(cfg.housing[k].name))
+	if Economy.housing_available(self,k) < dep or h.state == "signed": return
+	if h.state == "reserved": return
+	Economy.pay_housing(self,k,dep,"Đặt cọc giữ chỗ: " + str(cfg.housing[k].name))
 	h["state"] = "reserved"
 	h["place"] = k
 	h["paid"] = dep
@@ -957,7 +977,7 @@ func check(req: Dictionary) -> String:
 			if s.get("mode", "slice") != v:
 				fail = "-"
 		elif key == "afford_housing":
-			if int(s.cash) < housing_cost(v):
+			if Economy.housing_available(self,str(v)) < housing_cost(v):
 				fail = "Cần %s tiền mặt (đang có %s)" % [fmt_money(housing_cost(v)), fmt_money(int(s.cash))]
 		elif key == "housing_state":
 			var hs: String = housing().state
@@ -1089,6 +1109,8 @@ func action_money(a: Dictionary) -> int:
 
 
 func is_hidden(a: Dictionary) -> bool:
+	if a.is_empty() or Relationships.hidden(self, a):
+		return true
 	if str(a.id)=="pho_chao_son" and s.get("neighborhood",{}).get("stage","done")!="intro": return true
 	if str(a.id)=="pho_ban_thu_chi" and s.get("neighborhood",{}).get("stage","done") not in ["meal","home"]: return true
 	if str(a.id)=="sua_do_le" and (quest_state("quat_trai_cay")=="active" or not s.get("street",{}).get("job",{}).is_empty()): return true
@@ -1146,9 +1168,17 @@ func actions_at(location: String) -> Array:
 
 ## {"ok": bool, "reason": String, "start": giờ bắt đầu nếu làm được}
 func action_status(a: Dictionary) -> Dictionary:
-	if is_over() or not s.queue.is_empty():
+	if not is_started() or a.is_empty() or is_over() or not s.queue.is_empty():
 		return {"ok": false, "reason": ""}
-	var reason := check(a.get("require", {}))
+	var zone_reason := MapManager.action_block(self, a)
+	if zone_reason != "":
+		return {"ok": false, "reason": zone_reason}
+	var relation_reason := Relationships.block(self, a)
+	if relation_reason != "":
+		return {"ok": false, "reason": relation_reason}
+	var economy_reason := Economy.action_block(self, a)
+	if economy_reason != "": return {"ok":false,"reason":economy_reason}
+	var reason := choice_lock(a)
 	if reason != "":
 		return {"ok": false, "reason": reason}
 	# Đói lả không bê vác, bốc mùi không phục vụ khách, trầm cảm không đi làm (scripts/systems/survival.gd).
@@ -1176,24 +1206,65 @@ func action_status(a: Dictionary) -> Dictionary:
 	return {"ok": true, "reason": "", "start": start}
 
 
+## Mở một phiên trước khi dựng modal. Không trừ giờ hoặc trả thưởng ở bước này.
+func start_minigame(id: String) -> String:
+	if not is_started():
+		return ""
+	var a := get_action(id)
+	if a.is_empty() or is_hidden(a) or not a.has("minigame") or not action_status(a).ok:
+		return ""
+	# Chỉ một modal được quyền hoàn tất; mở modal mới vô hiệu callback cũ.
+	_minigame_sessions.clear()
+	_minigame_serial += 1
+	var token := "%d:%d:%s" % [day(), _minigame_serial, id]
+	_minigame_sessions[token] = {"action": id, "day": day(), "clock": clock(), "zone": str(s.get("zone", ""))}
+	return token
+
+
+func cancel_minigame(token: String) -> void:
+	_minigame_sessions.erase(token)
+
+
+func _accept_minigame_result(a: Dictionary, result: Dictionary) -> bool:
+	var required := bool(MiniGames.def(self, str(a.get("minigame", ""))).get("requiresSession", false))
+	var token := str(result.get("session", ""))
+	if token == "":
+		return not required
+	var session: Dictionary = _minigame_sessions.get(token, {})
+	if session.is_empty():
+		return false
+	if str(session.action) != str(a.id) or int(session.day) != day() or absf(float(session.clock) - clock()) > 0.001 or str(session.zone) != str(s.get("zone", "")):
+		_minigame_sessions.erase(token)
+		return false
+	if required and (not bool(result.get("completed", false)) or result.get("auto", false) or not result.has("score") or not is_finite(float(result.get("score", NAN)))):
+		return false
+	_minigame_sessions.erase(token)
+	return true
+
+
 ## result: kết quả trò chơi nhỏ khi tự làm {"ratio": 0..1 phần chỉ tiêu, "bonus": tiền thưởng, "auto": làm tự động}.
 ## Không truyền thì tính đủ công (mô phỏng, bảng cân bằng).
 func do_action(id: String, result: Dictionary = {}) -> void:
 	var a := get_action(id)
-	if a.is_empty() or is_hidden(a):
+	if a.is_empty() or is_hidden(a) or bool(a.get("uiOnly", false)):
 		return
 	var st := action_status(a)
 	if not st.ok:
 		return
+	if not _accept_minigame_result(a, result):
+		return
 	var start: float = st.start
 	var finish := start + float(a.hours)
 	s["used"] = finish - float(cfg.dayStart)
+	# Nhu cầu phải giảm trong thời gian làm/chờ trước khi ăn, tắm hay nhận phần hồi phục.
+	_tick_needs()
 	if a.has("cost"):
 		spend(int(a.cost), str(a.name))
 	var label := "%s %s" % [hh(start), a.name]
 	var pay := int(a.get("pay", 0))
 	if a.has("rainPay") and s.today.get("rain", false):
 		pay = int(a.rainPay)
+	pay = Economy.base_pay(self, a, pay)
 	# Trò chơi trong data/systems/minigames.json: kết quả thô của cảnh {score, fails} đổi thành {ratio, bonus, win}.
 	result = MiniGames.normalize(self, a, result)
 	if not result.is_empty():
@@ -1220,6 +1291,11 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	Survival.on_action(self, a, float(a.hours))
 	Attributes.on_action(self, a, result)
 	MiniGames.on_action(self, a, result)
+	if not last_minigame.is_empty() and str(last_minigame.get("id", "")) == str(a.get("minigame", "")):
+		last_minigame["pay"] = pay
+		if a.group == "work":
+			last_minigame["text"] = str(last_minigame.text) + " · Thực nhận " + fmt_money(pay)
+	Relationships.on_action(self, a)
 	if a.group == "work" and finish > float(cfg.lateHour) + 0.001:
 		add_fatigue(float(cfg.lateFatigue))
 		add_log("Làm tới cuối tối: Mệt +%d" % int(cfg.lateFatigue), "warn")
@@ -1459,7 +1535,12 @@ func _merge_variants(base: Dictionary) -> Dictionary:
 
 
 func choice_lock(c: Dictionary) -> String:
-	return check(c.get("require", {}))
+	var req: Dictionary = c.get("require", {}).duplicate(true)
+	var place := str(c.get("effects",{}).get("housing_reserve",""))
+	if place != "" and req.has("cash_min"):
+		if Economy.housing_available(self,place) < int(req.cash_min): return "Chưa đủ quỹ cọc và tiền mặt"
+		req.erase("cash_min")
+	return check(req)
 
 
 func resolve_choice(i: int) -> void:
@@ -1540,7 +1621,7 @@ func living_cost() -> int:
 			var cn: Dictionary = cfg.get("chapter%d" % chapter(), {})
 			var ma_here: bool = s.flags.get("maVe", false) and not s.flags.get("maDaDi", false)
 			return int(cn.get("livingCostPerDay" if ma_here else "livingCostAlone", cfg.livingCostPerDay))
-	return int(cfg.livingCostPerDay)
+	return Economy.living_cost(self, int(cfg.livingCostPerDay))
 
 
 ## Tiền nhà còn phải đóng: chương 2 tối ngày 60 (tiền nhà tháng sau, hay phần còn lại của phòng đã đặt cọc), chương 3
@@ -1672,7 +1753,8 @@ func night_preview() -> Dictionary:
 		if r.status == "pending" and int(r.due) == day():
 			due_recv.append(r.label)
 	return {
-		"living": living_cost(), "free_hours": hours_left(),
+		"living": living_cost() + Economy.rent_due(self) + int(s.get("economy", {}).get("rentArrears", 0)), "free_hours": hours_left(),
+		"rent": Economy.rent_due(self), "upkeep": living_cost(),
 		"recover": -(float(cfg.fatigue.sleep) + hours_left() * float(cfg.fatigue.freeHour)),
 		"due_pay": due_pay, "due_recv": due_recv,
 		"slice_end": day() >= last_day(),
@@ -1694,7 +1776,8 @@ func finish_day() -> void:
 		s["needs_t"] = float(cfg.dayStart)
 		if style() > 0:
 			need_adj("mood", minf(8.0, float(style()) * 0.5))
-	spend(living_cost(), "Sinh hoạt cả nhà")
+	Economy.nightly(self)
+	spend(living_cost(), Economy.living_label(self))
 
 	# Mệt: đếm ngày ở mức cảnh báo và những lần bỏ qua cơ hội nghỉ, rồi hồi qua đêm.
 	# Mệt cuối ngày dùng cho kết E6; sáng ngày 30 kết thúc ngay nên giữ số của tối ngày 29.
@@ -1777,6 +1860,11 @@ func finish_day() -> void:
 	s["day"] = day() + 1
 	s["queue"] = tonight
 	_morning()
+	# Lưu khu thức dậy trước changed/autosave, không phụ thuộc thứ tự callback World.
+	var wake_location := str(s.get("wake_at", home_loc()))
+	var wake_zone := MapManager.zone_for_location(self, wake_location)
+	if wake_zone != "": s["zone"] = wake_zone
+	_minigame_sessions.clear()
 	_commit()
 
 
@@ -2411,6 +2499,10 @@ func migrate_save() -> void:
 	Survival.migrate(self)
 	Attributes.migrate(self)
 	Careers.migrate(self)
+	MapManager.migrate(self)
+	Relationships.migrate(self)
+	Inventory.migrate(self)
+	Economy.migrate(self)
 
 
 func neighborhood_target() -> Dictionary:
@@ -2585,11 +2677,7 @@ func _tick_needs() -> void:
 	if dt <= 0.0:
 		return
 	s["needs_t"] = clock()
-	var starving := need("fed") <= 0.0
-	for k in cfg.needs.perHour:
-		need_adj(k, float(cfg.needs.perHour[k]) * dt * float(_diff().get("needsRate", 1.0)) * Survival.rate(self, k))
-	if starving or need("fed") <= 0.0:
-		add_fatigue(float(cfg.needs.starveFatiguePerHour) * dt)
+	Survival.advance(self, dt)
 
 
 ## Phong độ 0..100 gộp từ no bụng, vệ sinh, quần áo và độ tỉnh táo (100 − Mệt), kiểu "Cool" của Nobody.
@@ -2661,6 +2749,14 @@ func item_count(k: String) -> int:
 	if _is_scrap(k):
 		return int(s.get("inv", {}).get(k, 0))
 	return int(s.get("qitems", {}).get(k, 0))
+
+
+func use_item(id: String) -> bool:
+	return Inventory.use(self,id)
+
+
+func buy_item(id: String, count := 1) -> bool:
+	return Inventory.buy(self,id,count)
 
 
 func item_name(k: String) -> String:

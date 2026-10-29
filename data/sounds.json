@@ -184,6 +184,14 @@
   "done": {
    "path": "res://assets/sounds/done.wav",
    "volume_db": -8
+  },
+  "meal": {
+   "path": "res://assets/sounds/neighborhood/dishes.wav",
+   "volume_db": -13
+  },
+  "bath": {
+   "path": "res://assets/sounds/neighborhood/bath.wav",
+   "volume_db": -15
   }
  }
 }

@@ -223,7 +223,7 @@ static func effects_text(game, a: Dictionary) -> String:
 
 static func pay_text(game, a: Dictionary) -> Array:
 	if a.has("pay"):
-		return ["+" + GameLogic.fmt_k(int(a.pay)), GOOD]
+		return ["+" + GameLogic.fmt_k(game.Economy.base_pay(game, a, int(a.pay))), GOOD]
 	var cost: int = game.action_money(a)
 	if cost > 0:
 		return ["−" + GameLogic.fmt_k(cost), STAMP]

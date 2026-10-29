@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "npcs": {
+    "BA_TU": {"name": "Bà Thoa", "trust": 55},
+    "LINH": {"name": "Linh", "trust": 50},
+    "DUYEN": {"name": "Cô Duyên", "trust": 45}
+  },
+  "meal": {"action": "com_voi_ba", "trustGain": 3, "maxPerDay": 1},
+  "lunch": {"affection": 75, "trust": 70, "meals": 7, "fed": 55, "hours": 0.25, "item": "com_hop_cua_ba"},
+  "_note": "Affection mirrors existing s.rep so old story checks remain valid. Trust and distinct shared meal days persist separately. A prepared lunch is dated, cannot stack, and expires the next morning."
+}

@@ -1,0 +1,89 @@
+{
+  "default": "phuc_tan",
+  "staminaCost": 5,
+  "travelMinutes": {
+    "phuc_tan": {
+      "ta_hien": 20,
+      "cho_dau_moi": 25
+    },
+    "ta_hien": {
+      "phuc_tan": 20,
+      "cho_dau_moi": 30
+    },
+    "cho_dau_moi": {
+      "phuc_tan": 25,
+      "ta_hien": 30
+    }
+  },
+  "zones": {
+    "phuc_tan": {
+      "name": "Hẻm trọ Phúc Tân",
+      "description": "Bữa cơm gia đình, sửa đồ, nghỉ ngơi và những người hàng xóm.",
+      "arrival": "xom_bo_me",
+      "locations": [
+        "xom_bo_me",
+        "tiem_sau",
+        "com_hanh",
+        "nha_tro_giuong",
+        "nha_di_nam",
+        "hem_dua",
+        "cau_tre",
+        "cam_do",
+        "shop_ao",
+        "tiem_toc"
+      ],
+      "npcs": [
+        "BA_TU",
+        "DUYEN",
+        "LINH",
+        "SAU",
+        "HANH"
+      ],
+      "quick": [
+        "nho_ba_com_hop",
+        "mua_tap_hoa",
+        "com_voi_ba",
+        "tam",
+        "nghi"
+      ]
+    },
+    "ta_hien": {
+      "name": "Khu Phố Cổ / Tạ Hiện",
+      "description": "Ca phục vụ quán bia, rửa cốc và những cuộc gặp buổi tối.",
+      "arrival": "ben_can",
+      "locations": [
+        "ben_can",
+        "bi_a",
+        "ho_guom",
+        "quan_net",
+        "ve_so"
+      ],
+      "npcs": [
+        "PHUC",
+        "TRAM",
+        "DUNG"
+      ],
+      "quick": [
+        "bia_service",
+        "rua_coc"
+      ]
+    },
+    "cho_dau_moi": {
+      "name": "Khu Công Trường / Chợ Đầu Mối",
+      "description": "Bốc hàng, bê gạch và kéo xe thồ. Việc nặng cần ăn đủ và giữ sức.",
+      "arrival": "bai_boc_vac",
+      "locations": [
+        "bai_boc_vac",
+        "cho_cau_nho",
+        "xe_tho",
+        "ben_xe_6"
+      ],
+      "npcs": [],
+      "quick": [
+        "be_gach",
+        "boc_vac",
+        "keo_xe"
+      ]
+    }
+  }
+}

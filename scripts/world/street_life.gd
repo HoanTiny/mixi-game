@@ -146,9 +146,33 @@ func _update_npc(id: String, delta: float) -> void:
 	if str(n.state) in ["going", "returning"]:
 		_step(n, delta)
 	node.global_position.y = world.city.ground_y(_v2(node.global_position))
+	var actor: Node3D = node.get_child(0)
+	var at_home: bool = str(n.state) == "home" and str(n.home) == "xom_bo_me"
+	if at_home and world.camera != null:
+		var face: Vector3 = world.camera.global_position-node.global_position
+		node.global_rotation.y = atan2(face.x,face.z) + 0.38
+	if id == "BA_TU" and actor.has_method("sit"):
+		# Change pose only at the schedule boundary; calling sit(false) every
+		# frame would reset the walk clip to idle after _step has advanced it.
+		if bool(n.get("home_seated",false)) != at_home:
+			actor.sit(at_home,0.48)
+			n["home_seated"] = at_home
+		if at_home and not n.has("chair"):
+			var chair = preload("res://scripts/world/street_prototype.gd").scanned(world,"plastic_monobloc_chair_01",n.home_pos,0.78)
+			chair.name = "GrandmaChair"
+			n["chair"] = chair
+		if n.has("chair"):
+			n.chair.visible = at_home
+			if at_home:
+				n.chair.global_position = node.global_position
+				n.chair.global_rotation.y = node.global_rotation.y
+
 
 
 func _start_walk(n: Dictionary, a: Vector2, b: Vector2, state: String) -> void:
+	var actor: Node3D = n.node.get_child(0)
+	if actor.has_method("sit"): actor.sit(false)
+	n["home_seated"] = false
 	n["state"] = state
 	n["path"] = world.city.path(a, b)
 	n["i"] = 0

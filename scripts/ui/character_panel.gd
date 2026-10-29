@@ -311,8 +311,10 @@ func _items(tab: String) -> Array:
 					"group": "Đồng nát", "desc": "%d cái · khoảng %s. Bán ở sạp đồng nát của cô Thắm, chợ Long Biên." % [n, GameLogic.fmt_money(n * price)]})
 		"keep":
 			for k in game.s.get("qitems", {}):
+				var consumable: Dictionary=game.Inventory.definition(game,str(k))
 				out.append({"id": k, "name": game.item_name(k), "kind": ItemIcon.kind_for(k), "count": int(game.s.qitems[k]),
-					"group": "Đồ việc nhờ", "desc": "Đang mang giúp người ta. Xem bước tiếp theo ở bảng mục tiêu."})
+					"group": "Đồ dùng" if not consumable.is_empty() else "Đồ việc nhờ", "desc": game.Inventory.effects_text(consumable)+". Mở Balo (B) để sử dụng." if not consumable.is_empty() else "Đang mang giúp người ta. Xem bước tiếp theo ở bảng mục tiêu."})
+				if not consumable.is_empty(): out[-1].kind=str(consumable.get("kind","box"))
 			for ks in game.keepsakes():
 				out.append({"id": ks.id, "name": ks.name, "kind": ItemIcon.kind_for(str(ks.id)), "count": 1, "group": "Kỷ vật",
 					"desc": str(ks.text).substr(0, 1).to_upper() + str(ks.text).substr(1)})
