@@ -121,10 +121,8 @@ chơi liên tục hay bản web; có vsync/cache. Draw calls tăng từ khoảng
 khi thêm nhà và người; cần kiểm thêm khi nhân rộng toàn map. Không dùng thời gian
 load giữa các lượt để kết luận nhanh hơn vì cache đã ấm.
 
-Test cũ `tests/daily_life.gd` hiện không tương thích dữ liệu game: dùng ID
-`com_phan`/`tam` không còn trong config hiện tại (`an_com`/`tam_rua`). Chạy test này
-báo lỗi ngay cả khi không tải world. Đợt kiến trúc không sửa game_logic, config hoặc
-file test cũ đó; không tính nó là một kiểm tra đạt.
+`tests/daily_life.gd` đã viết lại theo dữ liệu hiện tại (`an_com`, `tam_rua`, `s.needs`,
+chuyển khu tới ca kho); các ý kiểm tra cũ giữ nguyên.
 
 ## Phần còn lại
 
