@@ -44,7 +44,10 @@ func _initialize() -> void:
 		if use_market:
 			act(g,"part_0","cho_cau_nho")
 			act(g,"own_part")
-		else: act(g,"shop_part")
+		else:
+			# Ngày 1 chỉ còn dưới 50.000đ nên linh kiện tiệm bị khóa; chú Sơn ứng trước rồi trừ vào công.
+			check(not g.Street.act(g,"tiem_sau","shop_part") and g.s.cash==before,"shop part blocked while short of cash")
+			act(g,"credit_part")
 		var token := str(g.s.street.accepted_day)+":0"
 		g.Street.bench_action(g,"open",0,token)
 		check(g.Street.bench_action(g,"remove",0,token)=="","remove actual part")
