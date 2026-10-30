@@ -1014,6 +1014,10 @@ func check(req: Dictionary) -> String:
 		elif key == "quest_done":
 			if quest_state(str(v)) != "done":
 				fail = "-"
+		elif key == "quest_active":
+			if quest_state(str(v)) != "active": fail = "Chưa nhận việc này"
+		elif key == "quest_step":
+			if quest_state(str(v.id)) != "active" or int(s.quests.get(str(v.id), {}).get("step", -1)) != int(v.step): fail = "Không ở bước này"
 		elif key == "quest_failed":
 			if quest_state(str(v)) != "failed":
 				fail = "-"
@@ -1216,6 +1220,10 @@ func action_status(a: Dictionary) -> Dictionary:
 		return {"ok": false, "reason": "Quá mệt, cần nghỉ trước"}
 	var start := clock()
 	var limit := day_end()
+	if a.has("quest_contract"):
+		var contract: Dictionary = s.quests.get(str(a.quest_contract), {})
+		if str(contract.get("state", "")) != "active": return {"ok":false,"reason":"Chưa nhận hợp đồng"}
+		limit = minf(limit,float(contract.deadline)-float(day())*24.0)
 	if a.has("window"):
 		start = maxf(start, float(a.window[0]))
 		limit = minf(float(a.window[1]), limit)
@@ -1274,8 +1282,10 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	var st := action_status(a)
 	if not st.ok:
 		return
+	if a.has("quest_contract") and (result.is_empty() or bool(result.get("auto", false))): return
 	if not _accept_minigame_result(a, result):
 		return
+	var accepted_pay_mult := pay_mult()
 	var start: float = st.start
 	var finish := start + float(a.hours)
 	s["used"] = finish - float(cfg.dayStart)
@@ -1299,9 +1309,11 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	if pay > 0 and Hardship.pay_mult(self, id) > 1.0:
 		pay = round_k(float(pay) * Hardship.pay_mult(self, id))
 		add_log("Việc thưởng nóng hôm nay: lương ×%d" % int(Hardship.pay_mult(self, id)), "event")
-	if a.group == "work" and pay > 0 and pay_mult() < 1.0:
-		pay = round_k(float(pay) * pay_mult())
-		add_log("Phong độ kém, chỉ được %d%% tiền công" % int(pay_mult() * 100.0), "warn")
+	if a.group == "work" and pay > 0 and accepted_pay_mult < 1.0:
+		pay = round_k(float(pay) * accepted_pay_mult)
+		add_log("Phong độ khi nhận ca: %d%% tiền công" % int(accepted_pay_mult * 100.0), "warn")
+	# Authored contract wages are settled by its final handover, never by the practice round.
+	if a.has("quest_contract"): pay = 0
 	for k in a.get("dirty", {}):
 		need_adj(k, float(a.dirty[k]))
 	if has_needs():
@@ -1627,6 +1639,8 @@ func fill(text: String) -> String:
 		"work_result": str(_event_data.get("work_result","")),
 		"chat_rep": str(int(cfg.get("chatRep", 2))),
 		"cash": fmt_money(int(s.get("cash", 0))),
+		"housing_fund": fmt_money(Economy.fund(self)),
+		"night_rent": fmt_money(int(Economy.data(self).get("nightlyRent",60000))),
 		"cost_hem_dua": fmt_money(housing_cost("hem_dua")) if is_started() else "",
 		"cost_cau_tre": fmt_money(housing_cost("cau_tre")) if is_started() else "",
 		"rent": fmt_money(_rent_due()),
@@ -2535,6 +2549,9 @@ func _commit() -> void:
 
 
 func migrate_save() -> void:
+	if is_started():
+		s["schemaVersion"] = 2
+		s["worldLayoutVersion"] = int(story.get("layoutVersion", 1))
 	Neighborhood.migrate(self)
 	Day23.migrate(self)
 	Survival.migrate(self)
@@ -2909,7 +2926,8 @@ func quest_step_lock(id: String) -> String:
 	var step := quest_step(id)
 	if step.get("kind", "") != "visit":
 		return "-"
-	if now_abs()+float(step.get("hours",0.0))+quest_step_wait(id)>float(s.quests[id].get("deadline",INF))+0.001:
+	var deadline := minf(float(s.quests[id].get("deadline",INF)),float(s.quests[id].get("step_deadline",INF)))
+	if now_abs()+float(step.get("hours",0.0))+quest_step_wait(id)>deadline+0.001:
 		return "Không kịp trước giờ hẹn"
 	# Tới sớm thì ngồi chờ tới giờ như cảnh chính; quá giờ thì lỡ.
 	if step.has("window") and clock() > float(step.window[1]):

@@ -7,7 +7,9 @@
   "chau_hung": "Cái chậu mới cho cây húng",
   "ho_so": "Bộ hồ sơ thực tập của Linh",
   "com_tang_ca": "12 suất cơm tăng ca",
-  "bap": "Cu Bin (đang dắt tay)"
+  "bap": "Cu Bin (đang dắt tay)",
+  "com_chia_minh": "Phần cơm chia tuyến với Minh",
+  "com_phan_gan": "Phần cơm gần quán"
  },
  "quests": [
   {
@@ -606,6 +608,254 @@
      "consume": true,
      "carry": true,
      "text": "Dắt cu Bin về Cơm Hạnh chờ Minh (45 phút)"
+    }
+   ]
+  },
+  {
+   "id": "ngay5_xem_phong",
+   "title": "Xem phòng cùng bà",
+   "who": "Gia đình và chị Hạnh",
+   "giver": "com_hanh",
+   "offer": false,
+   "days": [
+    5,
+    5
+   ],
+   "intro": "Hai cuộc hẹn trùng giờ — Đi xem phòng với bà, từ chối ca trước khi nhận",
+   "deadline_days": 1,
+   "deadline_hour": 18,
+   "reward_hint": "Chỉ nhận công và ghi nhận kết quả sau khi hoàn thành",
+   "reward": {
+    "rep.BA_TU": 6,
+    "rep.HANH": 1,
+    "flag.xemPhongVoiBa": true,
+    "family": {
+     "who": "BA_TU",
+     "kind": "support",
+     "text": "Đi xem phòng cùng bà"
+    },
+    "diary": "Đi xem phòng với bà. Bà đứng trước bậc cửa, đếm từng bậc thành tiếng. Mất một ca phụ quán, mà biết bà sợ bậc thứ ba."
+   },
+   "reward_text": "Đã hoàn thành việc hẹn. Kết quả được ghi vào sổ.",
+   "fail": {},
+   "fail_text": "Lỡ giờ hẹn. Việc thường ngày vẫn mở; có thể quay lại quán hỏi ca mới hoặc hẹn xem phòng khác.",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "hem_dua",
+     "hours": 0.15,
+     "text": "Tới Ngõ Gạch xem bậc cửa và chỗ phơi với bà",
+     "effects": {
+      "housing_seen": "hem_dua"
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "home",
+     "hours": 0.15,
+     "text": "Về nhà bàn với bà về căn phòng vừa xem"
+    }
+   ]
+  },
+  {
+   "id": "ngay5_ca_hanh",
+   "title": "Ca phụ quán đã hẹn",
+   "who": "Gia đình và chị Hạnh",
+   "giver": "com_hanh",
+   "offer": false,
+   "days": [
+    5,
+    5
+   ],
+   "intro": "Hai cuộc hẹn trùng giờ — Hỏi Linh đi cùng bà được không, đưa đủ thông tin và tiền xe",
+   "deadline_days": 1,
+   "deadline_hour": 18,
+   "reward_hint": "Chỉ nhận công và ghi nhận kết quả sau khi hoàn thành",
+   "reward": {
+    "cash": 130000,
+    "cash_label": "Ca phụ quán đột xuất (đã đưa Linh tiền xe)",
+    "rep.LINH": 4,
+    "rep.HANH": 3,
+    "respect": 1,
+    "family": {
+     "who": "LINH",
+     "kind": "support",
+     "text": "Hỏi Linh đi cùng bà, đưa đủ thông tin"
+    },
+    "diary": "Nhờ Linh dẫn bà đi xem phòng, đưa đủ tiền xe. Tối về hai bà cháu kể toàn chuyện mình không nghĩ tới: chỗ đó không có cái ghế nào ngoài cửa."
+   },
+   "reward_text": "Đã hoàn thành việc hẹn. Kết quả được ghi vào sổ.",
+   "fail": {},
+   "fail_text": "Lỡ giờ hẹn. Việc thường ngày vẫn mở; có thể quay lại quán hỏi ca mới hoặc hẹn xem phòng khác.",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "ngay5_ca_hanh_lam",
+     "loc": "com_hanh",
+     "manual": true,
+     "min_ratio": 0.5,
+     "text": "Tự làm ca phụ quán đã hẹn (đạt ít nhất 50% chỉ tiêu)"
+    },
+    {
+     "kind": "visit",
+     "loc": "com_hanh",
+     "hours": 0.15,
+     "text": "Báo xong ca với chị Hạnh để nhận tiền công"
+    }
+   ]
+  },
+  {
+   "id": "ngay5_hai_hen",
+   "title": "Hai cuộc hẹn trùng giờ",
+   "who": "Gia đình và chị Hạnh",
+   "giver": "com_hanh",
+   "offer": false,
+   "days": [
+    5,
+    5
+   ],
+   "intro": "Hai cuộc hẹn trùng giờ — Nhận cả hai, định chạy cho kịp",
+   "deadline_days": 1,
+   "deadline_hour": 18,
+   "reward_hint": "Chỉ nhận công và ghi nhận kết quả sau khi hoàn thành",
+   "reward": {
+    "cash": 160000,
+    "cash_label": "Ca phụ quán đột xuất",
+    "rep.BA_TU": -4,
+    "rep.HANH": 1,
+    "family": {
+     "who": "BA_TU",
+     "kind": "time_lost",
+     "text": "Để bà chờ vì nhận hai lịch trùng"
+    },
+    "diary": "Chạy cả hai đầu. Tới chỗ xem phòng muộn bốn chục phút, bà ngồi chờ trên bậc thềm, không trách câu nào. Thế mới khó chịu."
+   },
+   "reward_text": "Đã hoàn thành việc hẹn. Kết quả được ghi vào sổ.",
+   "fail": {},
+   "fail_text": "Lỡ giờ hẹn. Việc thường ngày vẫn mở; có thể quay lại quán hỏi ca mới hoặc hẹn xem phòng khác.",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "ngay5_hai_hen_lam",
+     "loc": "com_hanh",
+     "manual": true,
+     "min_ratio": 0.5,
+     "text": "Tự làm ca phụ quán đã hẹn (đạt ít nhất 50% chỉ tiêu)"
+    },
+    {
+     "kind": "visit",
+     "loc": "hem_dua",
+     "hours": 0.15,
+     "text": "Tới xem phòng sau ca và nhận trách nhiệm về cuộc hẹn muộn",
+     "effects": {
+      "housing_seen": "hem_dua"
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "com_hanh",
+     "hours": 0.15,
+     "text": "Báo xong ca với chị Hạnh để nhận tiền công"
+    }
+   ]
+  },
+  {
+   "id": "ngay6_chia_tuyen",
+   "title": "Phần cơm chia tuyến với Minh",
+   "who": "Chị Hạnh",
+   "giver": "com_hanh",
+   "offer": false,
+   "days": [
+    6,
+    6
+   ],
+   "intro": "Phần cơm chia tuyến với Minh",
+   "deadline_days": 0,
+   "deadline_hour": 19,
+   "reward_hint": "Chỉ nhận công và ghi nhận kết quả sau khi hoàn thành",
+   "reward": {
+    "cash": 70000,
+    "cash_label": "Chia công giao cơm với Minh",
+    "rep.MINH": 8,
+    "rep.HANH": 3,
+    "flag.chiaTuyenMinh": true,
+    "diary": "Chia tuyến cơm với Minh. Minh kịp đón Bin, còn gửi cái ảnh con mèo chắp tay cảm ơn."
+   },
+   "reward_text": "Đã hoàn thành việc hẹn. Kết quả được ghi vào sổ.",
+   "fail": {
+    "item.com_chia_minh": -1
+   },
+   "fail_text": "Lỡ giờ hẹn. Việc thường ngày vẫn mở; có thể quay lại quán hỏi ca mới hoặc hẹn xem phòng khác.",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "com_hanh",
+     "hours": 0.15,
+     "text": "Nhận phần cơm đã thống nhất ở quán Hạnh",
+     "effects": {
+      "item.com_chia_minh": 1
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "ben_can",
+     "hours": 0.15,
+     "text": "Giao phần cơm cho khách và xác nhận nhận đủ",
+     "need_items": {
+      "com_chia_minh": 1
+     },
+     "consume": true,
+     "carry": true,
+     "within": 1.5
+    }
+   ]
+  },
+  {
+   "id": "ngay6_phan_gan",
+   "title": "Phần cơm gần quán",
+   "who": "Chị Hạnh",
+   "giver": "com_hanh",
+   "offer": false,
+   "days": [
+    6,
+    6
+   ],
+   "intro": "Phần cơm gần quán",
+   "deadline_days": 0,
+   "deadline_hour": 19,
+   "reward_hint": "Chỉ nhận công và ghi nhận kết quả sau khi hoàn thành",
+   "reward": {
+    "cash": 60000,
+    "cash_label": "Giao một phần cơm tăng ca",
+    "rep.HANH": 4,
+    "diary": "Chỉ nhận phần chắc làm được, chị Hạnh gọi thêm người. Hóa ra nói \"phần này em không kịp\" cũng không chết ai."
+   },
+   "reward_text": "Đã hoàn thành việc hẹn. Kết quả được ghi vào sổ.",
+   "fail": {
+    "item.com_phan_gan": -1
+   },
+   "fail_text": "Lỡ giờ hẹn. Việc thường ngày vẫn mở; có thể quay lại quán hỏi ca mới hoặc hẹn xem phòng khác.",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "com_hanh",
+     "hours": 0.15,
+     "text": "Nhận phần cơm đã thống nhất ở quán Hạnh",
+     "effects": {
+      "item.com_phan_gan": 1
+     }
+    },
+    {
+     "kind": "visit",
+     "loc": "cho_cau_nho",
+     "hours": 0.15,
+     "text": "Giao phần cơm cho khách và xác nhận nhận đủ",
+     "need_items": {
+      "com_phan_gan": 1
+     },
+     "consume": true,
+     "carry": true,
+     "within": 1.5
     }
    ]
   }

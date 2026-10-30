@@ -14,6 +14,8 @@ func fresh():
 	var g := Logic.new()
 	g.load_data()
 	g.new_game("full")
+	# Isolate route availability from the separately tested 46k opening budget.
+	g.s.cash = 100000
 	g.s.queue.clear()
 	g.s.scenes.clear()
 	g.s.neighborhood = {"stage":"done"}

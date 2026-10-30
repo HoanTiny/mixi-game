@@ -833,11 +833,16 @@ func _open_minigame(id: String, a: Dictionary) -> void:
 	var token: String = game.start_minigame(id)
 	if token == "": return
 	var mcfg: Dictionary = game.MiniGames.view_cfg(game, str(a.minigame))
+	if a.has("quest_contract"):
+		mcfg["contract_pay"] = int(game.quest_def(str(a.quest_contract)).get("reward",{}).get("cash",0))
+		mcfg["minRatio"] = 0.0
+		mcfg["bonusPerExtra"] = 0
+		mcfg["cleanBonus"] = 0
 	mcfg["session"] = token
 	minigame = MiniGameViews.make(mcfg)
 	minigame.cfg = mcfg
 	minigame.kind = str(mcfg.get("kind", a.minigame))
-	minigame.last = game.s.get("job_last", {}).get(id, {})
+	minigame.last = {} if a.has("quest_contract") else game.s.get("job_last", {}).get(id, {})
 	minigame.title = str(a.name)
 	var opened := minigame
 	minigame.finished.connect(func(r: Dictionary) -> void:
@@ -2380,7 +2385,7 @@ func _fill_objectives(s: Dictionary) -> void:
 	if not targets.is_empty():
 		var primary: Dictionary = targets[0]
 		_guide_primary_id = str(primary.id)
-		_objective(str(primary.title), _guide_description(primary), "current")
+		_objective(str(primary.title) if _obj_expanded else str(primary.get("step",primary.title)), _guide_description(primary), "current")
 		var loc := str(primary.get("location", ""))
 		if _obj_expanded and bool(primary.get("navigable", true)) and world.LOCATIONS.has(loc):
 			_guide_location = loc
@@ -2924,10 +2929,16 @@ func _quest_card(title: String, hint: String, lock: String, on_press: Callable) 
 	v.offset_top = 8
 	v.offset_right = -12
 	v.offset_bottom = -8
-	v.add_child(UI.label(title, 15, Color("6b4a00")))
+	v.add_child(UI.wrap(title, 15, UI.GOLD, 296))
 	v.add_child(UI.wrap(hint, 12, UI.INK_SOFT, 296))
 	if lock != "" and lock != "-":
 		v.add_child(UI.small(lock, UI.STAMP))
+	var fit := func() -> void:
+		if is_instance_valid(btn) and is_instance_valid(v):
+			btn.custom_minimum_size.y = maxf(92.0,v.get_combined_minimum_size().y+16.0)
+	v.minimum_size_changed.connect(fit)
+	btn.resized.connect(fit)
+	fit.call_deferred()
 	return btn
 
 

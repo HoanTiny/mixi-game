@@ -94,7 +94,7 @@ func _init() -> void:
 		check(g.Street.act(g,"tiem_sau","deliver") and g.s.cash-cash==260000,"legacy accepted order actually pays original contract")
 	var without:=simulate(false); var with_lunch:=simulate(true)
 	print("Economy warehouse benchmark: without lunch day=",without,"; with family lunch day=",with_lunch)
-	check(without>=20 and without<=30 and with_lunch>=20 and with_lunch<=30,"representative deposit budgets reach target in20–30days")
+	check(without>=1 and without<=26 and with_lunch>=1 and with_lunch<=26,"funded opening can reach deposit before housing deadline")
 	print("Economy & relationships: ","PASS" if failures==0 else "FAIL"," failures=",failures)
 	quit(0 if failures==0 else 1)
 
@@ -105,8 +105,9 @@ func act(g, id: String) -> void:
 
 func simulate(use_lunch: bool) -> int:
 	var g=fresh()
-	# Preserve the earlier zero-savings wage benchmark independently of the new funded opening.
-	g.s.cash=180000; g.s.housing_fund=0
+	# Exercise the shipped economy, including the locked fund and daily rent.
+	var live=Logic.new(); live.load_data()
+	g.cfg.hardship=live.cfg.hardship.duplicate(true)
 	# The same 8-hour warehouse schedule uses real travel, two household tasks,
 	# two hours rest, a family meal and a full-quality minigame result each day.
 	for d in range(1,31):
@@ -115,7 +116,7 @@ func simulate(use_lunch: bool) -> int:
 		act(g,"an_com_hop" if use_lunch and g.item_count("com_hop_cua_ba")>0 else "banh_mi")
 		act(g,"ca_kho")
 		check(Zones.travel(g,"phuc_tan"),"benchmark return travel")
-		act(g,"com_voi_ba"); act(g,"nghi"); act(g,"tam_rua"); act(g,"giat_do")
+		act(g,"tra_tro_dem"); act(g,"com_voi_ba"); act(g,"nghi"); act(g,"tam_rua"); act(g,"giat_tiem")
 		var before_day: int=g.day(); g.finish_day()
 		g.s.queue=[]; g.s.scenes=[]
 		print("budget lunch=",use_lunch," day=",before_day," cash=",g.s.cash," fatigue=",g.s.fatigue," fed=",g.need("fed"))

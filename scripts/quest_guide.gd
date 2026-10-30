@@ -10,6 +10,18 @@ static func targets(g) -> Array:
 	if not g.is_started() or g.is_over() or not g.s.get("queue", []).is_empty():
 		return []
 	var out := []
+	# A cashless, exhausted newcomer must have a visible recovery step before work.
+	if g.is_full() and g.chapter()==1 and g.day()<=7:
+		var recovery := ""
+		if g.need("fed")<30: recovery="com_voi_ba"
+		elif float(g.s.fatigue)>=75: recovery="nghi_san_tro"
+		if recovery != "":
+			var action: Dictionary = g.get_action(recovery)
+			if not action.is_empty() and not g.is_hidden(action) and g.action_status(action).ok:
+				var item := _entry("recovery:"+recovery,"Hồi sức trước khi làm tiếp",str(action.name),g.action_loc(action),300)
+				item["action"]=recovery
+				item.hint="Không tốn tiền; tiền trọ đêm nay vẫn tính riêng."
+				out.append(item)
 	out.append_array(g.Day23.targets(g))
 	var repair := _repair(g)
 	for id in g.quests_active():

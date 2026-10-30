@@ -1,23 +1,14 @@
-> Cập nhật Phúc Tân: mở đầu mới có **46.000đ trong ví + 1.400.000đ quỹ cọc khóa**. Quỹ chỉ thanh toán phần cọc nhà; không mua đồ, trả trọ hay bù chi phí sinh hoạt. Vì đã có sẵn phần lớn tiền cọc, mốc 20–30 ngày bên dưới chỉ còn là benchmark cũ bắt đầu với 180k và không có quỹ. Không áp mốc đó cho mở đầu mới. Trả trọ thủ công 60k sẽ bỏ khoản trọ tự thu của đúng đêm đó; nợ cũ vẫn phải trả. Save ngày 1 chưa tách quỹ có tiền mặt ≥1,4 triệu được chuyển 1,4 triệu sang quỹ một lần, giữ nguyên tổng tài sản. Save khác giữ nguyên tiền.
+> Cập nhật Phúc Tân: mở đầu mới có **46.000đ trong ví + 1.400.000đ quỹ cọc khóa**. Quỹ chỉ thanh toán phần cọc nhà; không mua đồ, trả trọ hay bù chi phí sinh hoạt. Vì đã có sẵn phần lớn tiền cọc, mốc 20–30 ngày bên dưới chỉ còn là benchmark cũ bắt đầu với 180k và không có quỹ. Không áp mốc đó cho mở đầu mới. Trả trọ thủ công 60k sẽ bỏ khoản trọ tự thu của đúng đêm đó; hệ hardship hiện ghi số đêm nợ; cơ chế thu nợ tiền của Economy là nhánh riêng, chưa thống nhất. Save ngày 1 chưa tách quỹ có tiền mặt ≥1,4 triệu được chuyển 1,4 triệu sang quỹ một lần, giữ nguyên tổng tài sản. Save khác giữ nguyên tiền.
 
 # Economy, survival and relationships
 
 ## Data and saved state
 
-- `data/systems/economy.json` sets new full-game cash to 180,000đ. Loading an
+- `data/systems/economy.json` sets new full-game cash to 46,000đ plus a locked 1,400,000đ deposit fund. Loading an
   existing save never replaces the player's cash. Slice presets and later
   chapters keep their existing budgets.
-- Chapter 1 charges **60,000đ room rent per night**, itemized separately from
-  **60,000đ family upkeep** (household supplies, medicine and utilities; excludes
-  An's purchased meals). This replaces the old undifferentiated 120,000đ expense.
-  Sleeping elsewhere replaces that night's room charge. Unpaid rent persists as
-  `s.economy.rentArrears` and is collected on later nights; repeated callbacks
-  cannot charge the same night twice.
-- Repeatable work has a base ceiling of 28,000đ/hour before performance and
-  career modifiers. The eight-hour warehouse shift, which includes a meal, pays
-  200,000đ at full quota instead of 300,000đ. Grades still matter; the cap does
-  not flatten Perfect/Good/Fail into the same result. Existing money rounding
-  is in 10,000đ steps.
+- Shipped chapter 1 uses hardship: 60,000đ nightly rent and zero automatic family upkeep. These values are loaded from economy.json. Meals are separate actions. Hardship records unpaid nights; the legacy Economy arrears API is still tested independently and is not the live chapter-one collection path.
+- With hardship active, ordinary authored job pay is retained (warehouse base 300,000đ); beer service retains the hourly cap. The 28,000đ/hour and 200,000đ warehouse cap apply to the legacy economy path. Work performance is sampled before action time passes.
 - Repeatable 3D repair orders use the same economy data when quoted: fan
   90,000đ and kettle 110,000đ before the existing 10% independent-trade and
   20,000đ loyal-customer bonuses. Buying the part from the shop costs 50,000đ
@@ -64,28 +55,10 @@ item. It cannot be eaten twice, stacked across days or used while at home;
 unused food expires next morning. Linh/Duyên trust gains from supportive
 actions are also bounded to once per NPC per day.
 
-## Deterministic budget test
+## Budget regression
 
-Run `tests/economy_relationships.gd` with Godot 4.7.2 headless. This test uses
-the real `do_action`, zone-travel, need-decay, `finish_day` and money APIs. It
-disables authored events/contracts/one-off rewards only, explicitly isolating
-the repeatable work budget. No daily stat or money resets occur during the
-simulation. Initial needs are standardized to 80 and fatigue to zero to avoid
-the opening conversation affecting the comparison.
+`tests/economy_relationships.gd` retains focused survival/relationship/legacy-arrears checks, then enables the shipped hardship policy for its route simulation. Initial wallet is 46,000đ and housing fund 1,400,000đ. The route pays rent before resting and uses paid laundry, rather than attempting laundry without soap.
 
-Daily route: 25 minutes to the market, breakfast or packed lunch, eight-hour
-warehouse shift at full quota, 25 minutes home, shared family meal, two hours
-rest, bath and laundry, then sleep around 18:41 (19:05 with lunch preparation).
-This leaves about three hours of the 16-hour day for story errands; skipping
-rest or meals can reduce performance and income.
+A full-quota warehouse route with meals, rest, bathing and paid laundry reaches the 1.8m deposit on day 2 (456,000đ cash + 1.4m fund), before the family-lunch unlock. This is not the full 4.2m housing cost and not proof of balanced 30-day play. The old 22/25-day zero-fund benchmark is retired. The test checks feasibility before day 26, not a minimum grind duration. A three-career/performance/old-wage scenario matrix remains outstanding.
 
-| Strategy | Daily net after baseline expenses | First deposit-ready evening |
-| --- | --- | --- |
-| Buy 15,000đ breakfast every day | 65,000đ | Day 25: 1,805,000đ |
-| Unlock and use family lunch after seven shared meals | 65,000đ through day 7, then 80,000đ | Day 22: 1,835,000đ |
-
-These are representative successful schedules, not a hard time gate. Perfect
-results, additional shifts, contracts, risk-taking and easy-mode starting
-money can shorten the route; failed shifts and entertainment spending extend
-it. Tests additionally cover rent arrears, alternate lodging, one-time
-settlement, relationship reload, threshold slicing and lunch consumption.
+See WEEK_ONE_IMPLEMENTATION.md for the new authored day 5–6 contracts and save recovery checks.

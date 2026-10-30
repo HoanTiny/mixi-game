@@ -19,6 +19,9 @@ func fresh():
 	g.load_data()
 	g.new_game("full")
 	settle(g)
+	# This suite isolates story transitions, including the 50k shop-part path.
+	# The shipped 46k opening and cashless recovery have separate economy checks.
+	g.s.cash = 200000
 	return g
 
 func day2(choice := 1):

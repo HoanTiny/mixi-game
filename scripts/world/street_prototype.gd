@@ -7,6 +7,7 @@ const WorkProps := preload("res://scripts/work/work_props.gd")
 const Models := preload("res://scripts/world/models.gd")
 const Architecture := preload("res://scripts/architecture/street_kit.gd")
 const StoryFronts := preload("res://scripts/architecture/story_fronts.gd")
+const FrontCache := preload("res://scripts/architecture/front_cache.gd")
 const PRIMARY := ["com_hanh", "tiem_sau", "xom_bo_me"]
 const LOCATIONS := ["com_hanh", "tiem_sau", "xom_bo_me", "cho_cau_nho", "ben_xe_6",
 	"nha_di_nam", "hem_dua", "ben_can", "cau_tre", "bai_boc_vac", "xe_tho",
@@ -123,12 +124,15 @@ static func signboard(world, parent: Node3D, text: String, pos: Vector3, width: 
 		parent.add_child(small)
 
 static func build(world, parent: Node3D, id: String, width: float, depth: float, seed := -1) -> Dictionary:
+	var actual_seed := LOCATIONS.find(id) if seed < 0 else seed
 	if id not in PRIMARY:
-		var city_kit := StoryFronts.build(parent, id, width, depth, LOCATIONS.find(id) if seed < 0 else seed)
+		var city_kit := FrontCache.restore(parent,id,width,depth,actual_seed)
+		if city_kit.is_empty(): city_kit = StoryFronts.build(parent,id,width,depth,actual_seed)
 		signboard(world, city_kit.front_walls, city_kit.sign_text, city_kit.sign_position, city_kit.sign_width, city_kit.sign_color)
 		return city_kit
 	var kinds := {"com_hanh": "restaurant", "tiem_sau": "repair", "xom_bo_me": "lodging"}
-	var kit := Architecture.build(parent, kinds[id], width, depth, LOCATIONS.find(id) if seed < 0 else seed)
+	var kit := FrontCache.restore(parent,id,width,depth,actual_seed)
+	if kit.is_empty(): kit = Architecture.build(parent,kinds[id],width,depth,actual_seed)
 	var sign_pos: Vector3 = kit.sign_position
 	var sign_width: float = kit.sign_width
 	sign_width = minf(sign_width, 4.8)

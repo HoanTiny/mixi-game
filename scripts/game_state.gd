@@ -2,6 +2,7 @@ extends Node
 ## Autoload: giữ một ván chơi cho cả game và tự lưu vào user:// sau mỗi thay đổi.
 
 const GameLogic := preload("res://scripts/game_logic.gd")
+const SafeSave := preload("res://scripts/safe_save.gd")
 const SAVE_PATH := "user://save.json"
 const NOTES_PATH := "user://notes.json"
 
@@ -116,14 +117,9 @@ func _save() -> void:
 
 
 func _read(path: String) -> Variant:
-	if not FileAccess.file_exists(path):
-		return null
-	return JSON.parse_string(FileAccess.get_file_as_string(path))
+	return SafeSave.read_data(path)
 
 
 func _write(path: String, data: Variant) -> void:
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f == null:
-		push_warning("Không lưu được " + path)
-		return
-	f.store_string(JSON.stringify(data))
+	var error := SafeSave.write_data(path, data)
+	if error != OK: push_warning("Không lưu được %s (%s)" % [path, error_string(error)])

@@ -2,7 +2,7 @@
   "version": 2,
   "initialCash": 46000,
   "nightlyRent": 60000,
-  "familyUpkeep": 60000,
+  "familyUpkeep": 0,
   "familyLabel": "Góp sinh hoạt gia đình, thuốc và điện nước (không gồm bữa ăn của An)",
   "depositTarget": 1800000,
   "hourlyBaseCap": 28000,

@@ -226,19 +226,31 @@ var _lane_t := 0.0
 var _idle_t := 0.0
 var _night_prompt_day := -1
 var _mat_cache := {}
+var build_timings := {}
+var _build_stamp := 0
+
+func _build_checkpoint(label: String) -> void:
+	var now := Time.get_ticks_msec()
+	build_timings[label] = now - _build_stamp
+	_build_stamp = now
+	if OS.get_cmdline_user_args().has("--profile-world"):
+		print("[build] %s: %d ms" % [label, build_timings[label]])
 
 
 func _ready() -> void:
 	var t0 := Time.get_ticks_msec()
+	_build_stamp = t0
 	game = GameState.game
 	font = UI.text_font()
 	var map_id := _map_id()
 	real = map_id != "an_hoa" and FileAccess.file_exists("res://data/maps/%s.json" % map_id)
 	city = RealCity.new(map_id) if real else CityMap.new()
+	_build_checkpoint("navigation")
 	for id in ALL_LOCATIONS:
 		if city.locs.has(id):
 			LOCATIONS[id] = ALL_LOCATIONS[id]
 	_build_environment()
+	_build_checkpoint("environment")
 	tubes = TubeHouse.new(0.0, font)
 	if real:
 		_build_real()
@@ -257,6 +269,7 @@ func _ready() -> void:
 		_build_grime()
 		_build_traffic()
 	player = _character("player", Color("3d6fa8"), Color("2c2f3a"))
+	_build_checkpoint("player")
 	player_body = player.get_child(0)
 	add_child(player)
 	# Vòng vàng dưới chân để luôn nhận ra An giữa đám đông.
@@ -296,6 +309,7 @@ func _ready() -> void:
 	life = StreetLife.new()
 	add_child(life)
 	life.setup(self)
+	_build_checkpoint("street_life")
 	if real and (city.pilot_active or city.street_upgrade):
 		pilot_life = PilotLife.new()
 		add_child(pilot_life)
@@ -306,6 +320,7 @@ func _ready() -> void:
 		opening.setup(self)
 
 	hud = Hud.new()
+	_build_checkpoint("opening_life")
 	hud.world = self
 	hud.game = game
 	add_child(hud)
@@ -323,6 +338,7 @@ func _ready() -> void:
 	game.changed.connect(_on_changed)
 	_migrate_neighborhood()
 	_on_changed()
+	_build_checkpoint("hud_audio")
 	print("[world] dựng màn phố %d ms (map %s)" % [Time.get_ticks_msec() - t0, _map_id()])
 	# Vào thẳng chế độ Dựng khu thật: bản web có "?khu" trên địa chỉ, hay đối số "--realmap-auto=…" khi thử tự động.
 	_ink_pass()
@@ -1525,6 +1541,7 @@ func _build_real() -> void:
 	# Đồ phố Việt quanh các địa điểm của truyện; biển hiệu, cổng hẻm, bảng tên đường có chữ ở gần, tên đường hư cấu.
 	area.dress_opts = {"center": mid / maxf(city.locs.size(), 1.0), "radius": 300.0, "label_radius": 190.0, "name_of": city.street_name}
 	area.build(city.data, city.clip, city.grid)
+	_build_checkpoint("area_geometry")
 	for m in area.cut_materials:
 		m.set_shader_parameter("cut_on", true)
 	var ground := StaticBody3D.new()
@@ -1534,13 +1551,17 @@ func _build_real() -> void:
 	add_child(ground)
 	for id in LOCATIONS:
 		if city.locs.has(id):
+			var location_start := Time.get_ticks_msec()
 			_build_location(id, LOCATIONS[id])
+			if OS.get_cmdline_user_args().has("--profile-world"):
+				print("[front] %s: %d ms" % [id,Time.get_ticks_msec()-location_start])
 	if city.pilot_active:
 		_build_pilot_street()
 	elif city.street_upgrade:
 		# Layout 2 retired the isolated pilot, but its authored working props still
 		# belong at the same three named locations in the compact story map.
 		add_child(PilotDetails.build(self))
+	_build_checkpoint("story_fronts")
 	for h in city.homes:
 		homes.append({"pos": _v3(h.pos), "no": str(h.no), "name": "Nhà " + str(h.address)})
 	var i := 0
@@ -1559,8 +1580,10 @@ func _build_real() -> void:
 	_build_lanterns()
 	_build_lamp_pools()
 	_build_real_traffic()
+	_build_checkpoint("lamps_traffic")
 	_build_real_canal()
 	Landmarks.build(self, city.story.get("landmarks", []), font)
+	_build_checkpoint("landmarks")
 	# Cây dừa đầu hẻm của Phòng Hẻm Dừa: tên hẻm từ đây mà ra. Đứng chắn trước An thì thu nhỏ như cây thường.
 	if city.locs.has("hem_dua"):
 		var rng := RandomNumberGenerator.new()

@@ -12,7 +12,10 @@ static func configure(g) -> void:
 	if not bath.is_empty():
 		bath.name = "Tắm nước lạnh"
 		bath.effects["need.clean"] = 40
-	if g.cfg.has("hardship"): g.cfg.hardship.startCash = int(data(g).get("initialCash",46000))
+	if g.cfg.has("hardship"):
+		g.cfg.hardship.startCash = int(data(g).get("initialCash",46000))
+		g.cfg.hardship.nightRent = int(data(g).get("nightlyRent",60000))
+		g.cfg.hardship.livingCost = int(data(g).get("familyUpkeep",0))
 
 static func initialize(g) -> void:
 	g.s["housing_fund"] = int(data(g).get("initialHousingFund",1400000)) if g.is_full() else 0

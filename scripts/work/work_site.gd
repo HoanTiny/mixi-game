@@ -1295,9 +1295,12 @@ func _show_end() -> void:
 	_menu.add_child(UI.label("HẾT CA", 12, UI.INK_SOFT))
 	_menu.add_child(UI.wrap(_goal_text(), 26, UI.INK, 560))
 	var lines := "Được %d%% tiền công, thưởng thêm %s." % [int(ratio * 100.0), GameLogic.fmt_k(_bonus)]
-	if _done < int(cfg.target):
+	if cfg.has("contract_pay"):
+		lines = "Đạt %d%% chỉ tiêu. " % int(ratio*100.0)
+		lines += ("Báo xong nhiệm vụ với chị Hạnh để nhận %s." % GameLogic.fmt_money(int(cfg.contract_pay))) if ratio >= 0.5 else "Chưa đạt 50%; có thể làm lại nếu còn thời gian hẹn."
+	elif _done < int(cfg.target):
 		lines += " Chưa đủ chỉ tiêu nên bị trừ công."
 	if _miss > 0:
 		lines += " %d khách bỏ đi vì chờ lâu." % _miss
 	_menu.add_child(UI.wrap(lines, 15, UI.INK, 560))
-	_menu.add_child(UI.choice("Nhận tiền", "", "", func() -> void: finished.emit({"ratio": ratio, "bonus": _bonus})))
+	_menu.add_child(UI.choice("Hoàn tất ca" if cfg.has("contract_pay") else "Nhận tiền", "", "", func() -> void: finished.emit({"ratio": ratio, "bonus": _bonus})))

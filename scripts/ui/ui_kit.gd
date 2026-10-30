@@ -192,7 +192,16 @@ static func action_card(game, a: Dictionary, width := 270, on_press := Callable(
 	elif a.has("note"):
 		foot = a.note
 	if foot != "":
-		v.add_child(small(foot, foot_color))
+		var note_label := label(foot,12,foot_color)
+		note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note_label.custom_minimum_size.x = width-24
+		v.add_child(note_label)
+	var fit := func() -> void:
+		if is_instance_valid(btn) and is_instance_valid(v):
+			btn.custom_minimum_size.y = maxf(104.0,v.get_combined_minimum_size().y+24.0)
+	v.minimum_size_changed.connect(fit)
+	btn.resized.connect(fit)
+	fit.call_deferred()
 	if btn.disabled:
 		for i in range(0, 3):
 			v.get_child(i).modulate.a = 0.5
@@ -222,6 +231,9 @@ static func effects_text(game, a: Dictionary) -> String:
 
 
 static func pay_text(game, a: Dictionary) -> Array:
+	if a.has("quest_contract"):
+		var q: Dictionary = game.quest_def(str(a.quest_contract))
+		return [GameLogic.fmt_k(int(q.get("reward",{}).get("cash",0))) + " khi bàn giao", GOOD]
 	if a.has("pay"):
 		return ["+" + GameLogic.fmt_k(game.Economy.base_pay(game, a, int(a.pay))), GOOD]
 	var cost: int = game.action_money(a)
@@ -238,6 +250,7 @@ static func money_lines(game) -> Array:
 	var best_name := "chưa đủ cả chỗ ở tạm" if best == "" else str(game.cfg.housing[best].name)
 	return [
 		["Tiền mặt", GameLogic.fmt_money(int(game.s.cash))],
+		["Quỹ chỉ dùng đặt cọc", GameLogic.fmt_money(game.Economy.fund(game))],
 		["Phải thu trước ngày 30", GameLogic.fmt_money(game.receivable_sum(0, 30))],
 		["Phải thu sau ngày 30", GameLogic.fmt_money(game.receivable_sum(31, 999))],
 		["Phải trả", GameLogic.fmt_money(game.payable_sum(999))],
@@ -251,7 +264,16 @@ static func ledger_bbcode(game) -> String:
 	if not game.is_started():
 		return ""
 	var s: Dictionary = game.s
-	var lines := ["[b]Phải thu[/b]"]
+	var lines := ["[b]Tiền và chỗ ở[/b]", "Trong ví: %s · Quỹ cọc riêng: %s" % [GameLogic.fmt_money(int(s.cash)),GameLogic.fmt_money(game.Economy.fund(game))]]
+	for id in ["hem_dua","cau_tre","di_nam"]:
+		if not game.cfg.housing.has(id): continue
+		var room: Dictionary = game.cfg.housing[id]
+		var paid := int(game.housing().paid) if game.housing().place == id else 0
+		var deposit := maxi(0,int(room.get("deposit",0))-paid)
+		lines.append("• %s: cọc còn %s · tổng còn phải trả để vào ở %s" % [esc(str(room.name)),GameLogic.fmt_money(deposit),GameLogic.fmt_money(game.housing_cost(id))])
+	lines.append("Đủ tiền cọc chưa có nghĩa đã thanh toán đủ tiền vào ở.")
+	lines.append("")
+	lines.append("[b]Phải thu[/b]")
 	for r in s.receivables:
 		var state := "đã nhận" if r.status == "collected" else "ngày %d" % int(r.due)
 		var mark := "" if r.status == "collected" else ("  (cần nghiệm thu)" if r.get("needsProgress", false) else "")
