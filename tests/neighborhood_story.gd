@@ -39,6 +39,14 @@ func reload_game(g):
 func street(g, action: String, loc := "tiem_sau") -> void:
 	check(g.Street.act(g,loc,action),"Street action "+action+" at "+str(g.clock()))
 
+## The 46.000đ opening wallet cannot cover a fan part with the shop markup (price + 20.000đ);
+## day-one orders buy the part at the market and fit it at the bench.
+func market_part(g) -> void:
+	if int(g.s.cash)<int(g.s.street.job.price)+20000:
+		check(not g.Street.act(g,"tiem_sau","shop_part"),"shop part needs enough cash")
+	street(g,"part_"+str(int(g.s.street.job.kind)),"cho_cau_nho")
+	street(g,"own_part")
+
 func bench(g) -> void:
 	var token := str(g.s.street.accepted_day)+":"+str(int(g.s.street.job.kind))
 	g.Street.bench_action(g,"open",0,token)
@@ -52,6 +60,8 @@ func bench(g) -> void:
 	check(g.s.street.job.stage=="test","assembly needs test")
 
 func _initialize() -> void:
+	# A script error aborts _initialize before quit(); fail instead of idling forever.
+	create_timer(120).timeout.connect(func(): push_error("Neighborhood story: did not finish"); quit(1))
 	var g = fresh()
 	check(g.neighborhood_target().action=="pho_chao_son","day1 has workshop introduction")
 	# Late arrival retains the ordinary daily-order path; the early fan is covered separately.
@@ -61,7 +71,7 @@ func _initialize() -> void:
 	street(g,"accept")
 	check(g.is_hidden(g.get_action("sua_do_le")),"parallel repair menu hidden while order active")
 	street(g,"inspect")
-	street(g,"shop_part")
+	market_part(g)
 	bench(g)
 	street(g,"test")
 	street(g,"deliver")
@@ -176,7 +186,7 @@ func _initialize() -> void:
 	g.s.used=2
 	street(g,"accept")
 	street(g,"inspect")
-	street(g,"shop_part")
+	market_part(g)
 	g.finish_day()
 	settle(g)
 	g.open_scene("ngay2")
