@@ -30,6 +30,11 @@ func snapshot(name: String) -> void:
 
 func _init() -> void:
 	await process_frame
+	# Without --demo, GameState would run on (and save over) the player's real save.
+	if root.get_node("GameState")._persist:
+		push_error("Repair work site: run with -- --demo --demo-full so the test cannot save over player progress")
+		quit(1)
+		return
 	create_timer(45).timeout.connect(func(): push_error("Repair test timed out"); quit(1))
 	visual = "--repair-visual" in OS.get_cmdline_user_args()
 	root.size = Vector2i(1280, 720)
