@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-29",
+  "stage": "First playable asset integration; not a full-map replacement",
+  "renderer": "Godot 4.7.2 Compatibility",
+  "assets": [
+    {
+      "key": "street_food_cart",
+      "status_label": "Đã tích hợp vào Godot",
+      "note": "Xe đã ở quán cơm: sửa kính, dựng lại nan và tách hai bánh; có va chạm đơn giản. Nắp nồi còn cố định.",
+      "runtime": "assets/higgsfield/street_food_cart/cart.tscn",
+      "source": "art/higgsfield/source-3d/street_food_cart-web.glb",
+      "pipeline": "tools/prepare_higgsfield_cart.mjs",
+      "triangles_drawn": 7762,
+      "textures_max_px": 1024,
+      "height_m": 1.8,
+      "limitations": ["Nắp nồi chưa tách để mở/đóng", "Chưa có hoạt cảnh đẩy xe", "Kính alpha blend, không khúc xạ"]
+    },
+    {
+      "key": "character_hanh",
+      "status_label": "Nhân vật 3D đã tích hợp",
+      "note": "Mô hình mới từ Higgsfield, gắn lại vào bộ xương An: đứng thở và đi bộ. Đã thay NPC Chị Hạnh; chưa có hoạt cảnh nấu ăn hay hội thoại bằng khuôn mặt.",
+      "runtime": "assets/characters/hanh/hanh.glb",
+      "adapter": "scripts/world/named_character.gd",
+      "source": "art/higgsfield/source-3d/hanh-static.glb",
+      "pipeline": ["tools/prepare_higgsfield_hanh.mjs", "tools/bind_hanh_to_verified_rig.mjs"],
+      "image_job_id": "7e0fb838-2e9e-4e58-81a0-65a181350ae0",
+      "mesh_job_id": "c364e4a7-c36a-48da-8690-1f4f4e943070",
+      "rejected_rig_job_id": "bb5ff568-ddf2-4183-89cb-543abb807efa",
+      "rig_method": "Local pose-fit and weight transfer from the project's verified An rig; original auto-rig failed orientation QA",
+      "triangles": 15404,
+      "bones": 24,
+      "textures_max_px": 2048,
+      "height_m": 1.58,
+      "limitations": ["Tạp dề dùng trọng số cứng theo hông, không mô phỏng vải", "Chưa có rig ngón tay/khuôn mặt", "Chưa có LOD riêng; chỉ dùng cho NPC có tên, không dùng cho đám đông"]
+    },
+    {
+      "key": "rice_shop",
+      "status_label": "Đã nâng chi tiết mô-đun",
+      "note": "Đã thêm mái tôn có gân, cửa xếp và cửa gỗ tầng trên; đặt xe đồ ăn mới bên phải. Giữ bố cục chơi hiện tại, chưa dựng lại y hệt hình mẫu.",
+      "runtime": "scenes/architecture/rice_shop.tscn",
+      "triangles": 6528,
+      "surfaces": 25
+    },
+    {
+      "key": "repair_workshop",
+      "status_label": "Đã nâng chi tiết mô-đun",
+      "note": "Đã thêm mái tôn có độ dày, mái hắt và thanh chống; đưa lại góc đồ nghề vào bản đồ thu gọn. Chưa thay toàn bộ kiến trúc theo hình mẫu.",
+      "runtime": "scenes/architecture/repair_workshop.tscn",
+      "triangles": 5648,
+      "surfaces": 22
+    },
+    {
+      "key": "lodging_courtyard",
+      "status_label": "Đã nâng chi tiết mô-đun",
+      "note": "Đã thêm cửa gỗ, ô thông gió và mái tôn dốc. Tách phần che khuất để giữ lối vào và thao tác trong sân trọ.",
+      "runtime": "scenes/architecture/lodging_courtyard.tscn",
+      "triangles": 6342,
+      "surfaces": 29
+    }
+  ],
+  "generation": {
+    "successful_jobs_this_stage": 2,
+    "quoted_credits_mesh": 12,
+    "quoted_credits_rejected_rig": 8,
+    "quoted_credits_total_submitted": 20,
+    "note": "Estimated from preflight quotes, not a billing reconciliation. A corrected rig request was rejected before submission because the Higgsfield workspace had no credits; local rig transfer completed instead."
+  },
+  "scope_remaining": [
+    "Các nhân vật có tên còn lại và LOD đám đông",
+    "Xe máy số, xe tay ga và các phương tiện khác từ bộ hình mẫu",
+    "Các cửa hàng còn lại, bộ nhà nền và đạo cụ mới",
+    "Hoạt cảnh làm việc, mô phỏng vải và chuyển động khuôn mặt",
+    "Đánh giá đầy đủ hiệu năng trình duyệt trên thiết bị mục tiêu"
+  ],
+  "provenance": "Original Higgsfield generations plus authored project geometry; no Nobody game assets extracted."
+}

@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "initialCash": 46000,
+  "nightlyRent": 60000,
+  "familyUpkeep": 0,
+  "familyLabel": "Góp sinh hoạt gia đình, thuốc và điện nước (không gồm bữa ăn của An)",
+  "depositTarget": 1800000,
+  "hourlyBaseCap": 28000,
+  "basePayOverrides": {
+    "ca_kho": 200000
+  },
+  "repairBasePay": {
+    "fan": 90000,
+    "kettle": 110000
+  },
+  "targetDays": [
+    20,
+    30
+  ],
+  "_note": "Opening: 46k spendable cash + 1.4m locked housing fund. Fund pays housing deposits only; ordinary costs never draw it. Legacy day-one cash >=1.4m is split once, preserving wealth.",
+  "initialHousingFund": 1400000
+}

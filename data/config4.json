@@ -1,0 +1,178 @@
+{
+ "_ghi_chu": "Việc làm, sinh hoạt, việc tùy chọn thêm ở chương 4 (cùng cú pháp actions trong config.json). \"home\" là chỗ ở hiện tại.",
+ "actions": [
+  {
+   "id": "lam_tiem", "minigame": "repair",
+   "group": "work",
+   "location": "tiem_sau",
+   "name": "Mở tiệm cả ngày (khách quạt, nồi cơm, máy bơm)",
+   "hours": 6,
+   "pay": 340000,
+   "perDay": 1,
+   "window": [
+    7,
+    20
+   ],
+   "days": [
+    91,
+    150
+   ],
+   "showIf": {
+    "flag_any": [
+     "tiemChung",
+     "tiemMotMinh"
+    ]
+   },
+   "dirty": {
+    "clean": -8,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 16
+   },
+   "desc": "Tháng đầu của tiệm: khách lẻ, khách quen của chú Sơn, phiếu nhận sửa có báo giá. Tiền công phần của An."
+  },
+  {
+   "id": "tho_khoan", "minigame": "repair",
+   "group": "work",
+   "location": "tiem_sau",
+   "name": "Làm thợ nhận khoán ở tiệm (quạt, nồi cơm, máy bơm)",
+   "hours": 5,
+   "pay": 270000,
+   "perDay": 1,
+   "window": [
+    8,
+    20
+   ],
+   "days": [
+    91,
+    150
+   ],
+   "showIfFlag": "tiemKhongNhan",
+   "dirty": {
+    "clean": -6,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 14
+   },
+   "desc": "Tiệm chú Sơn dưới tay chủ mới cần người sửa quạt, nồi cơm, máy bơm. Công chia theo phiếu."
+  },
+  {
+   "id": "sua_quat_truong",
+   "group": "work",
+   "location": "cho_cau_nho",
+   "name": "Kiểm, sửa quạt trần và ổ điện ở trường cấp hai",
+   "hours": 4,
+   "perDay": 2,
+   "window": [
+    7,
+    21
+   ],
+   "days": [
+    92,
+    94
+   ],
+   "showIf": {
+    "flag_any": [
+     "nhanDonTruong",
+     "chiaDonTruong",
+     "nhanVuaSuc"
+    ]
+   },
+   "hideIfFlag": "donTruongXong",
+   "dirty": {
+    "clean": -10,
+    "neat": -8
+   },
+   "effects": {
+    "fatigue": 16,
+    "rep.MAI": 1
+   },
+   "desc": "Bốn phòng học mỗi buổi: tháo cánh, tra dầu, thay tụ, siết lại móc treo, kiểm ổ cắm. Trường trả gọn một lần khi xong."
+  },
+  {
+   "id": "nhan_may_bao_hanh",
+   "group": "work",
+   "location": "tiem_sau",
+   "name": "Nhận máy bảo hành hộ trung tâm Thăng Long",
+   "hours": 1,
+   "pay": 90000,
+   "perDay": 2,
+   "days": [
+    110,
+    150
+   ],
+   "showIfFlag": "daiLyBaoHanh",
+   "effects": {
+    "fatigue": 3,
+    "rep.QUAN": 1
+   },
+   "desc": "Khách gửi máy còn bảo hành ở tiệm, An ghi phiếu, kiểm qua, chuyển cho trung tâm. Ba chục nghìn mỗi máy."
+  },
+  {
+   "id": "coc_hem_dua_t9",
+   "group": "optional",
+   "location": "hem_dua",
+   "name": "Đặt cọc phòng ngõ Gạch, hẹn dọn mùng 1 tháng Chín",
+   "hours": 1,
+   "days": [
+    91,
+    116
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 2200000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "hem_dua",
+    "flag.datCocC4": true,
+    "payable": {
+     "id": "phong_moi_t9",
+     "to": "",
+     "label": "Phần còn lại phòng ngõ Gạch (dọn mùng 1 tháng Chín)",
+     "amount": 2800000,
+     "due": 120
+    },
+    "diary": "Đặt cọc phòng ngõ Gạch, hẹn dọn vào mùng một tháng Chín. Còn hai triệu tám, hạn tối ngày 120."
+   },
+   "desc": "Chủ phòng giữ chỗ tới hết tháng Tám. Phần còn lại trả trước tối ngày 120."
+  },
+  {
+   "id": "coc_cau_tre_t9",
+   "group": "optional",
+   "location": "cau_tre",
+   "name": "Đặt cọc phòng Ngọc Thụy, hẹn dọn mùng 1 tháng Chín",
+   "hours": 1,
+   "days": [
+    91,
+    116
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 1800000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "cau_tre",
+    "flag.datCocC4": true,
+    "payable": {
+     "id": "phong_moi_t9",
+     "to": "",
+     "label": "Phần còn lại phòng Ngọc Thụy (dọn mùng 1 tháng Chín)",
+     "amount": 2400000,
+     "due": 120
+    },
+    "diary": "Đặt cọc phòng Ngọc Thụy, hẹn dọn vào mùng một tháng Chín. Còn hai triệu tư, hạn tối ngày 120."
+   },
+   "desc": "Chủ phòng giữ chỗ tới hết tháng Tám. Phần còn lại trả trước tối ngày 120."
+  }
+ ]
+}

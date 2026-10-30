@@ -1,0 +1,278 @@
+{
+ "_ghi_chu": "Quần áo bóc túi mù ở shop si-đa Hàng Đào (GameLogic._pull). order: hạng từ thấp tới cao; rarities: w trọng số, sell giá bán lại món trùng, color màu khung thẻ. pity: túi thứ mấy liền chưa ra từ Hiếm thì chắc chắn Hiếm. items: slot (ao, quan, giay, mu, phu_kien), style cộng vào điểm phong cách (mỗi sáng Tâm trạng + nửa điểm, tối đa 8; vài cảnh đòi điểm), perk: thưởng tiền công theo id việc, hat: mũ hiện trên đầu An, featured: món bày bán theo tuần. rb: áo có thân người thật (assets/rb) thì mặc vào An thay cả thân.",
+ "order": [
+  "thuong",
+  "kha",
+  "hiem",
+  "hieu"
+ ],
+ "rarities": {
+  "thuong": {
+   "name": "Thường",
+   "w": 60,
+   "sell": 20000,
+   "color": "a8a090"
+  },
+  "kha": {
+   "name": "Khá",
+   "w": 28,
+   "sell": 40000,
+   "color": "5aa36b"
+  },
+  "hiem": {
+   "name": "Hiếm",
+   "w": 10,
+   "sell": 90000,
+   "color": "4f8fd6"
+  },
+  "hieu": {
+   "name": "Hàng hiệu cũ",
+   "w": 2,
+   "sell": 250000,
+   "color": "e8a33c"
+  }
+ },
+ "pity": 10,
+ "slots": {
+  "ao": "Áo",
+  "quan": "Quần",
+  "giay": "Giày dép",
+  "mu": "Mũ",
+  "phu_kien": "Phụ kiện"
+ },
+ "items": [
+  {
+   "id": "ao_phong_xam",
+   "name": "Áo phông trơn xám",
+   "slot": "ao",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "9a9a9a"
+  },
+  {
+   "id": "ao_phong_hn",
+   "name": "Áo phông in chữ \"Hà Nội phố\"",
+   "slot": "ao",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "e8e2d0"
+  },
+  {
+   "id": "ao_caro",
+   "name": "Áo sơ mi kẻ ca-rô",
+   "slot": "ao",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "8a4a3a",
+   "rb": "Male_Adult_02"
+  },
+  {
+   "id": "quan_bo_bac",
+   "name": "Quần bò bạc màu",
+   "slot": "quan",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "5a7aa0"
+  },
+  {
+   "id": "quan_kaki",
+   "name": "Quần kaki ống rộng",
+   "slot": "quan",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "b8a07a"
+  },
+  {
+   "id": "quan_dui",
+   "name": "Quần đùi thể thao",
+   "slot": "quan",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "2a4a6a"
+  },
+  {
+   "id": "dep_to_ong",
+   "name": "Dép tổ ong",
+   "slot": "giay",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "f0f0e8"
+  },
+  {
+   "id": "dep_le",
+   "name": "Dép lê quai ngang",
+   "slot": "giay",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "2a2a2a"
+  },
+  {
+   "id": "mu_luoi_trai",
+   "name": "Mũ lưỡi trai cũ",
+   "slot": "mu",
+   "rarity": "thuong",
+   "style": 1,
+   "color": "4a5a6a",
+   "hat": "cap"
+  },
+  {
+   "id": "ao_phan_quang",
+   "name": "Áo bảo hộ phản quang",
+   "slot": "ao",
+   "rarity": "kha",
+   "style": 2,
+   "color": "e8c020",
+   "perk": {
+    "boc_vac_toi": 0.1,
+    "keo_xe_tho": 0.1
+   },
+   "rb": "Construction_Male_02"
+  },
+  {
+   "id": "giay_thuong_dinh",
+   "name": "Giày vải Thượng Đình",
+   "slot": "giay",
+   "rarity": "kha",
+   "style": 3,
+   "color": "f0ede0",
+   "perk": {
+    "keo_xe_tho": 0.05,
+    "phat_to_roi": 0.05
+   }
+  },
+  {
+   "id": "ao_so_mi_trang",
+   "name": "Áo sơ mi trắng là phẳng",
+   "slot": "ao",
+   "rarity": "kha",
+   "style": 3,
+   "color": "f6f6f2",
+   "perk": {
+    "chay_ban_ta_hien": 0.05
+   },
+   "rb": "Male_Adult_05"
+  },
+  {
+   "id": "quan_au_den",
+   "name": "Quần âu đen",
+   "slot": "quan",
+   "rarity": "kha",
+   "style": 3,
+   "color": "2a2a30"
+  },
+  {
+   "id": "ao_khoac_bo",
+   "name": "Áo khoác bò",
+   "slot": "ao",
+   "rarity": "kha",
+   "style": 3,
+   "color": "4a6a90",
+   "rb": "Male_Adult_14"
+  },
+  {
+   "id": "mu_coi",
+   "name": "Mũ cối xanh bộ đội",
+   "slot": "mu",
+   "rarity": "kha",
+   "style": 3,
+   "color": "5a6a3a",
+   "hat": "cap"
+  },
+  {
+   "id": "tui_deo_cheo",
+   "name": "Túi vải đeo chéo",
+   "slot": "phu_kien",
+   "rarity": "kha",
+   "style": 2,
+   "color": "8a7a5a",
+   "perk": {
+    "xe_om": 0.05
+   }
+  },
+  {
+   "id": "ao_khoac_da",
+   "name": "Áo khoác da cũ",
+   "slot": "ao",
+   "rarity": "hiem",
+   "style": 6,
+   "color": "3a2a20",
+   "featured": true,
+   "rb": "Male_Adult_17"
+  },
+  {
+   "id": "ao_len_co_lo",
+   "name": "Áo len cổ lọ đan tay",
+   "slot": "ao",
+   "rarity": "hiem",
+   "style": 5,
+   "color": "7a2a2a"
+  },
+  {
+   "id": "giay_da_nau",
+   "name": "Giày da nâu đánh xi",
+   "slot": "giay",
+   "rarity": "hiem",
+   "style": 6,
+   "color": "6a3a1a",
+   "featured": true
+  },
+  {
+   "id": "mu_phot",
+   "name": "Mũ phớt dạ",
+   "slot": "mu",
+   "rarity": "hiem",
+   "style": 5,
+   "color": "3a3a3a",
+   "hat": "cap",
+   "featured": true
+  },
+  {
+   "id": "dong_ho_co",
+   "name": "Đồng hồ cơ mặt tròn đời cũ",
+   "slot": "phu_kien",
+   "rarity": "hiem",
+   "style": 5,
+   "color": "c0a060"
+  },
+  {
+   "id": "quan_bo_xin",
+   "name": "Quần bò dáng chuẩn",
+   "slot": "quan",
+   "rarity": "hiem",
+   "style": 5,
+   "color": "2a3a5a"
+  },
+  {
+   "id": "ao_khoac_gio_hieu",
+   "name": "Áo khoác gió hàng hiệu (đồ si)",
+   "slot": "ao",
+   "rarity": "hieu",
+   "style": 9,
+   "color": "c03030",
+   "rb": "Male_Adult_07"
+  },
+  {
+   "id": "giay_the_thao_hieu",
+   "name": "Giày thể thao hàng hiệu (đồ si)",
+   "slot": "giay",
+   "rarity": "hieu",
+   "style": 9,
+   "color": "f8f8f8",
+   "perk": {
+    "phat_to_roi": 0.1,
+    "keo_xe_tho": 0.1
+   }
+  },
+  {
+   "id": "kinh_ram_phi_cong",
+   "name": "Kính râm phi công",
+   "slot": "phu_kien",
+   "rarity": "hieu",
+   "style": 8,
+   "color": "c0a040",
+   "perk": {
+    "xe_om": 0.1
+   }
+  }
+ ]
+}

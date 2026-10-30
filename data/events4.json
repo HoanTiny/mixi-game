@@ -1,0 +1,2355 @@
+[
+ {
+  "id": "c4_mo_dau",
+  "system": true,
+  "eyebrow": "Chương 4 · Tháng Tám trăng tròn",
+  "title": "Mùng một tháng Tám",
+  "who": "",
+  "text": "Hết tháng cô hồn. Sáng mùng một tháng Tám trời trong, mưa ngâu đã dứt, trên cành bàng đầu ngõ còn đọng mấy giọt nước. Bà Thoa gỡ tờ lịch kiêng xuống, gấp tư, cất vào hộp thiếc chung với xấp biên lai.\nChú Sơn đã hẹn: sáng nay giao chìa khóa tiệm. Ba mươi ngày tới: tháng đầu của cái tiệm, rằm Trung thu, tiền nhà tháng sau hạn tối ngày 120.",
+  "quote": "Bà Thoa: \"Tháng Bảy kiêng vội. Tháng Tám thì chẳng phải kiêng, mà cũng đừng vội.\"",
+  "variants": [
+   {
+    "when": {
+     "flag.donPhongMoi4": true
+    },
+    "text": "Hết tháng cô hồn, sáng mùng một tháng Tám cả nhà dọn khỏi nhà dì Nga về phòng mới, hai chuyến ba gác của Minh. Bà Thoa gỡ tờ lịch kiêng xuống, gấp tư, cất vào hộp thiếc chung với xấp biên lai.\nChú Sơn đã hẹn: sáng nay giao chìa khóa tiệm. Ba mươi ngày tới: tháng đầu ở chỗ mới, rằm Trung thu, tiền nhà tháng sau hạn tối ngày 120."
+   },
+   {
+    "when": {
+     "flag.tiemChung": false,
+     "flag.tiemMotMinh": false
+    },
+    "text": "Hết tháng cô hồn. Sáng mùng một tháng Tám trời trong, mưa ngâu đã dứt. Bà Thoa gỡ tờ lịch kiêng xuống, gấp tư, cất vào hộp thiếc chung với xấp biên lai.\nSáng nay tiệm chú Sơn kéo cửa cuốn dưới tay người nhận. An không nhận tiệm, nhưng nghề vẫn là nghề. Ba mươi ngày tới: tìm chỗ đứng của mình bên cạnh cái tiệm, rằm Trung thu, tiền nhà tháng sau hạn tối ngày 120."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Bắt đầu tháng thứ tư",
+    "hint": "Ngày 91–120 · tiền nhà tháng sau hạn tối ngày 120",
+    "effects": {
+     "diary": "Mùng một tháng Tám. Bà gỡ tờ lịch kiêng, gấp tư, cất vào hộp thiếc. Tháng Bảy qua rồi, tháng Tám không kiêng gì, chỉ còn mình tự kiêng."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.maOLai": true
+      },
+      "effects": {
+       "diary": "Mẹ đi làm xưởng từ sáu giờ rưỡi, để lại nồi cháo trên bếp và tờ giấy: \"Khai trương thì đừng ăn bánh mì.\""
+      }
+     },
+     {
+      "when": {
+       "flag.linhHocTiep": true
+      },
+      "effects": {
+       "diary": "Linh đi làm chi nhánh từ sớm, tối đi học. Em để trên bàn cuốn sổ chung, mở sẵn trang có dòng trả nợ đầu tiên."
+      }
+     },
+     {
+      "when": {
+       "flag.linhOXa": true
+      },
+      "effects": {
+       "diary": "Linh nhắn từ thị xã: \"Chúc anh khai trương. Em chưa về được, cuối tuần em gọi.\""
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ngay91",
+  "day": 91,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   6,
+   10
+  ],
+  "hours": 1,
+  "title": "Cửa cuốn kêu rè rè",
+  "who": "Chú Sơn",
+  "text": "Bảy giờ sáng, chú Sơn đã ngồi sẵn trên cái ghế đẩu trước tiệm, ấm trà đặt dưới chân. Chú đưa chùm chìa khóa, tay run mà đưa thẳng. Cửa cuốn kéo lên kêu rè rè như ba chục năm nay. Bên trong, đồ nghề vẫn nằm đúng chỗ của chú: mỏ hàn bên trái, đồng hồ đo bên phải, hộp ốc vít xếp theo cỡ.\nChú không vào tiệm. Chú ngồi ngoài, chờ xem An làm gì trước.",
+  "quote": "Chú Sơn: \"Tiệm của cháu rồi. Cháu muốn để đồ chỗ nào thì để. Chú chỉ ngồi xem thôi.\"",
+  "missed": "Chú Sơn tự kéo cửa cuốn lúc bảy giờ, ngồi trước tiệm đến trưa, rồi gửi chùm chìa khóa cho chị Hạnh giữ hộ. \"Nó bận thì thôi. Tiệm có chạy mất đâu.\"",
+  "variants": [
+   {
+    "when": {
+     "flag.tiemChung": false,
+     "flag.tiemMotMinh": false
+    },
+    "who": "Chú Sơn",
+    "text": "Bảy giờ sáng, cửa cuốn tiệm chú Sơn kéo lên dưới tay người nhận. Chú Sơn ngồi ghế đẩu trước tiệm, ấm trà dưới chân, chỉ việc cho chủ mới. Thấy An đi ngang, chú vẫy vào: \"Tiệm cần một tay sửa quạt, nồi cơm. Người ta hỏi cháu. Cháu tính thế nào thì tính cho rõ.\"",
+    "quote": "Chú Sơn: \"Không nhận tiệm thì làm thợ cho tiệm. Làm thợ thì phải có giấy, đừng có 'người quen mà'.\"",
+    "choices": [
+     {
+      "label": "Hỏi rõ: mình làm phần nào, công tính thế nào, ghi ra giấy",
+      "hint": "Chú Sơn +2",
+      "effects": {
+       "rep.SAU": 2,
+       "flag.giayKhoan": true,
+       "diary": "Ghi giấy nhận khoán với tiệm: quạt, nồi cơm, máy bơm là phần mình, công chia sáu bốn, phiếu nào cũng hai chữ ký. Chú Sơn đọc lại, gật: \"Giấy này ba chục năm trước chú cũng nên ghi.\""
+      }
+     },
+     {
+      "label": "Làm trước, tính sau, người quen mà",
+      "hint": "",
+      "effects": {
+       "flag.khongGiayKhoan": true,
+       "log": "Bắt tay làm luôn, không ghi gì. Chú Sơn lắc đầu, không nói."
+      }
+     },
+     {
+      "label": "Chỉ ghé chúc mừng rồi về giữ nhịp riêng",
+      "hint": "",
+      "effects": {
+       "flag.giuNhipRieng": true,
+       "diary": "Ghé chúc mừng tiệm mới, uống với chú Sơn một chén trà rồi về. Nhịp của mình vẫn là nhịp của mình."
+      }
+     }
+    ]
+   }
+  ],
+  "choices": [
+   {
+    "label": "Mời chú ngồi trong, nhờ chú chỉ lại chỗ từng món",
+    "hint": "Chú Sơn +3",
+    "effects": {
+     "rep.SAU": 3,
+     "flag.hoiChuSau": true,
+     "diary": "Mời chú Sơn vào tiệm, nhờ chú chỉ lại từng món. Chú chỉ đến cây mỏ hàn thì dừng: \"Cái này để bên trái vì chú thuận tay trái. Cháu thuận tay phải thì đổi sang.\" Rồi chú tự đổi sang hộ."
+    }
+   },
+   {
+    "label": "Xếp lại tiệm theo cách của mình ngay buổi đầu",
+    "hint": "Chú Sơn −1",
+    "effects": {
+     "rep.SAU": -1,
+     "flag.xepLaiTiem": true,
+     "diary": "Xếp lại tiệm theo cách của mình ngay buổi đầu. Chú Sơn ngồi ngoài, không nói gì, chỉ uống hết ba chén trà."
+    }
+   },
+   {
+    "label": "Treo bảng \"Báo giá trước khi sửa\" trước, rồi mới mở cửa",
+    "hint": "Có bảng giá",
+    "effects": {
+     "flag.bangGia": true,
+     "diary": "Việc đầu tiên ở tiệm mới: treo tấm bảng \"Báo giá trước khi sửa\". Chú Sơn đọc, cười: \"Chú ba chục năm báo giá bằng mồm. Mồm thì quên, bảng thì không.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay92",
+  "day": 92,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   15,
+   19
+  ],
+  "hours": 1,
+  "title": "Ba mươi hai cái quạt trần",
+  "who": "Cô Mai",
+  "text": "Cô Mai, cô dạy hè của Tín, giờ phụ trách cơ sở vật chất trường cấp hai cuối phố Hàng Khoai, đứng trước tiệm với một xấp giấy. Tám phòng học, ba mươi hai cái quạt trần, mấy chục ổ cắm. Hè này không ai trông, khai giảng sáng thứ Năm (ngày 95). Trường trả bốn triệu, xong trước tối ngày 94.\nBốn buổi làm, mỗi buổi bốn tiếng, trong ba ngày. Cộng với việc của tiệm.",
+  "quote": "Cô Mai: \"Tôi hỏi ba chỗ, chỗ nào cũng bảo 'được, xong ngay'. Tôi không tin chữ 'xong ngay'. Anh nói thật hộ tôi: kịp không?\"",
+  "missed": "Cô Mai chờ ở tiệm tới tối, để lại tờ danh sách phòng học và số điện thoại. Sáng hôm sau cô gọi một tiệm điện ở chợ khác.",
+  "missed_effects": {
+   "rep.MAI": -2
+  },
+  "choices": [
+   {
+    "label": "Nhận, rủ tổ điện của Trâm làm chung, chia đôi công",
+    "hint": "Hai buổi của mình · 2.000.000đ · Trâm +2",
+    "effects": {
+     "rep.MAI": 3,
+     "rep.TRAM": 2,
+     "flag.chiaDonTruong": true,
+     "quest_start": "don_truong_chung",
+     "diary": "Nhận đơn quạt của trường, gọi Trâm làm chung: tổ của Trâm bốn phòng, mình bốn phòng, công chia đôi, phiếu kiểm từng cái quạt. Trâm bảo: \"Lần đầu có người chia việc cho tổ mà không phải phần bẩn.\""
+    }
+   },
+   {
+    "label": "Nhận hết, hứa xong trước khai giảng",
+    "hint": "Bốn buổi trong ba ngày · 4.000.000đ",
+    "effects": {
+     "rep.MAI": 4,
+     "flag.nhanDonTruong": true,
+     "quest_start": "don_truong",
+     "diary": "Nhận hết đơn quạt của trường: ba mươi hai cái, bốn buổi, ba ngày. Cô Mai hỏi lại: \"Chắc không?\" Mình bảo chắc. Nói xong mới tính giờ ngủ."
+    }
+   },
+   {
+    "label": "Nói thật: kịp bốn phòng, bốn phòng kia làm sau khai giảng",
+    "hint": "Hai buổi · 2.000.000đ",
+    "effects": {
+     "rep.MAI": 1,
+     "flag.nhanVuaSuc": true,
+     "quest_start": "don_truong_vua",
+     "diary": "Nói thật với cô Mai: kịp bốn phòng trước khai giảng, bốn phòng kia làm tuần sau. Cô ghi vào sổ, gạch dưới hai lần: \"Thế tôi xếp lớp lớn vào bốn phòng có quạt.\""
+    }
+   },
+   {
+    "label": "Từ chối: tháng đầu của tiệm, chưa dám nhận",
+    "hint": "Cô Mai −1",
+    "effects": {
+     "rep.MAI": -1,
+     "flag.tuChoiDon": true,
+     "log": "Cô Mai gật: \"Từ chối thẳng còn hơn nhận rồi bỏ. Tôi nhớ tiệm này.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay93",
+  "day": 93,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "window": [
+   8,
+   12
+  ],
+  "hours": 0.5,
+  "title": "Người quen cũ",
+  "who": "Anh Quân",
+  "text": "Ở đầu phố Hàng Chiếu, chỗ cái hiệu vàng cũ, người ta treo băng rôn đỏ: \"Trung tâm bảo hành Điện máy Thăng Long · Khai trương\". Đứng trước cửa phát tờ rơi là anh Quân, tổ trưởng kỹ thuật cũ của An ở chi nhánh đóng cửa hồi tháng trước tháng trước.\nAnh Quân nhận ra An trước. Anh đưa tờ rơi, rồi rút lại, đưa danh thiếp.",
+  "quote": "Anh Quân: \"Hồi đó danh sách cho nghỉ không phải tao lập. Mà tao cũng không cãi. Tao nợ mày một câu xin lỗi.\"",
+  "missed": "Anh Quân để lại danh thiếp ở chỗ chị Hạnh, mặt sau viết: \"Tao ở trung tâm đầu phố. Rảnh ghé uống cà phê.\"",
+  "missed_effects": {
+   "flag.gapQuan": true
+  },
+  "choices": [
+   {
+    "label": "Bắt tay, hỏi thăm anh em cũ",
+    "hint": "Anh Quân +3",
+    "effects": {
+     "rep.QUAN": 3,
+     "flag.gapQuan": true,
+     "diary": "Gặp lại anh Quân, tổ trưởng cũ. Anh em cũ người về quê, người chạy xe ôm, người vào trung tâm của anh. Anh bảo tao nợ mày một câu xin lỗi. Mình bắt tay, chưa biết nhận câu đó thế nào."
+    }
+   },
+   {
+    "label": "Nói thẳng: hồi đó không ai báo trước, em mất ba tháng lương mới đòi đủ",
+    "hint": "Anh Quân +1",
+    "effects": {
+     "rep.QUAN": 1,
+     "flag.gapQuan": true,
+     "flag.noiChuyenCu": true,
+     "diary": "Nói thẳng với anh Quân chuyện bị cho nghỉ không báo trước, ba tháng mới đòi đủ lương. Anh không cãi. Anh bảo: \"Mày nói đúng. Ở trung tâm này, tao ghi lương lên giấy trước khi ai bắt tay vào làm.\""
+    }
+   },
+   {
+    "label": "Gật đầu chào rồi đi",
+    "hint": "Anh Quân −2",
+    "effects": {
+     "rep.QUAN": -2,
+     "flag.gapQuan": true,
+     "log": "Gật đầu chào anh Quân rồi đi. Đi đến đầu chợ còn nghe tiếng anh phát tờ rơi."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay94",
+  "day": 94,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   7,
+   12
+  ],
+  "hours": 1.5,
+  "title": "Cái đài và cái ghế đẩu",
+  "who": "Ông Bảo",
+  "text": "Ông Bảo dọn sang căn tầng một sát mép sông mới kè. Anh Tài thuê xe tải nhỏ, mà ông không cho bốc đồ trước khi ông chỉ. Món đầu tiên: cái đài. Món thứ hai: cái ghế đẩu. Món thứ ba là tấm ván cái hiên cũ ông nhờ thợ cạy ra nguyên miếng, có vết dao khắc năm 1976.\nÔng đứng giữa nhà trống, gõ vách hai tiếng, theo thói quen, rồi cười.",
+  "quote": "Ông Bảo: \"Gõ rồi mới nhớ bên kia làm gì còn ai nghe.\"",
+  "missed": "Anh Tài với thợ dọn đồ cho ông Bảo hết buổi sáng. Tấm ván cái hiên bị bỏ lại ngoài vỉa hè, chiều ông Bảo tự khiêng về, đau lưng ba ngày.",
+  "missed_effects": {
+   "rep.ONG_BA": -2
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.ongBaLenTai": true
+    },
+    "text": "Ông Bảo từ chỗ anh Tài về lại ngõ một buổi, dọn nốt mấy món trong căn nhà cũ trước khi người ta tháo dỡ. Món đầu tiên: cái đài. Món thứ hai: cái ghế đẩu. Món thứ ba là tấm ván cái hiên ông cạy ra nguyên miếng, có vết dao khắc năm 1976.\nÔng đứng giữa nhà trống, gõ vách hai tiếng, theo thói quen, rồi cười."
+   },
+   {
+    "when": {
+     "flag.ongBaGiuNha": true
+    },
+    "text": "Công trình kè sông bắt đầu đóng cọc ở đoạn dưới. Mỗi lần búa máy nện, cái đài của ông Bảo nhảy trên kệ, bụi vữa rơi lả tả trên hiên. Ông Bảo không dọn đi đâu cả. Ông ngồi trên ghế đẩu, chỉ vào vết nứt mới chạy dọc vách, như chỉ một con thằn lằn.",
+    "quote": "Ông Bảo: \"Tôi ở thì tôi chịu. Mà cái vết này tôi muốn có người ghi lại.\"",
+    "choices": [
+     {
+      "label": "Kiểm tra dây điện, ổ cắm nhà ông sau mấy trận rung",
+      "hint": "Ông Bảo +3",
+      "effects": {
+       "rep.ONG_BA": 3,
+       "hours": 1,
+       "flag.kiemDienOngBa": true,
+       "diary": "Kiểm lại điện nhà ông Bảo sau mấy trận đóng cọc: một mối nối lỏng sau cái kệ đài, suýt nữa là chập. Ông Bảo bảo: \"Tôi cứ tưởng tại cái đài già.\""
+      }
+     },
+     {
+      "label": "Chụp ảnh, đo vết nứt, viết hộ ông đơn gửi ban quản lý công trình",
+      "hint": "Ông Bảo +4",
+      "effects": {
+       "rep.ONG_BA": 4,
+       "hours": 1,
+       "flag.donVetNut": true,
+       "diary": "Đo vết nứt nhà ông Bảo, chụp ảnh có thước kê bên cạnh, viết hộ ông lá đơn. Ông đọc lại, sửa một chữ: \"rung\" thành \"rung dữ\"."
+      }
+     },
+     {
+      "label": "Chuyện công trình, mình không biết làm gì",
+      "hint": "",
+      "effects": {
+       "log": "Ông Bảo gật, mở đài to lên một nấc cho át tiếng búa."
+      }
+     }
+    ]
+   },
+   {
+    "when": {
+     "flag.ongBaDi": true
+    },
+    "who": "Anh Tài",
+    "text": "Anh Tài về ngõ một buổi, dọn nốt căn nhà cũ của ông Bảo trước khi người ta tháo dỡ. Anh mang theo cái đài, nói ông dặn đưa cho bà Thoa: \"Ông ấy bảo ở trên đó nghe đài chẳng ai nghe cùng.\" Tấm ván cái hiên cũ thì anh không biết tính sao.",
+    "quote": "Anh Tài: \"Bố tôi bảo giữ tấm ván. Giữ ở đâu thì ông ấy không nói.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Phụ ông, để ông chỉ món nào trước",
+    "hint": "Ông Bảo +3 · Mệt +6",
+    "effects": {
+     "rep.ONG_BA": 3,
+     "fatigue": 6,
+     "flag.phuDonOngBa": true,
+     "diary": "Phụ ông Bảo dọn đồ, ông chỉ món nào thì khiêng món đó. Tấm ván cái hiên ông bắt kê ngay cửa nhà mới, làm bậc ngồi. Ông ngồi thử, bảo: \"Vừa. Năm bảy sáu nó cũng vừa thế.\""
+    }
+   },
+   {
+    "label": "Thuê xe ba gác của Minh chở mấy món ông quý",
+    "hint": "−150.000đ · Minh +2",
+    "effects": {
+     "cash": -150000,
+     "cash_label": "Xe ba gác chở đồ cho ông Bảo",
+     "rep.MINH": 2,
+     "rep.ONG_BA": 2,
+     "log": "Minh chở cái đài, cái ghế đẩu, tấm ván cái hiên bằng xe ba gác, chạy chậm như rước dâu."
+    }
+   },
+   {
+    "label": "Để anh Tài lo, chiều ghé thăm chỗ mới",
+    "hint": "Ông Bảo −1",
+    "effects": {
+     "rep.ONG_BA": -1,
+     "log": "Chiều ghé chỗ mới của ông Bảo. Ông đang ngồi trên tấm ván cái hiên, kê ngay cửa, nghe đài một mình."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay95",
+  "day": 95,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   6,
+   8
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.luaCam": false,
+   "flag_any": [
+    "tinOTiem",
+    "tinDiHoc",
+    "tinChuNhat"
+   ]
+  },
+  "title": "Bộ đồng phục là thẳng",
+  "who": "Tín",
+  "text": "Sáu giờ rưỡi sáng khai giảng, Tín đứng trước tiệm trong bộ đồng phục chị Lụa là thẳng đến mức cổ áo cứng như bìa. Nó không vào, đứng ngoài cửa, chân này đá chân kia.\n\"Con ghé xem tiệm mở chưa thôi.\" Cặp nó có thêm cây tua vít bốn đầu, khắc chữ T trên cán.",
+  "quote": "Tín: \"Lớp Tám học Vật lý. Có bài về điện. Con đọc trước rồi, dễ.\"",
+  "missed": "Tín đứng trước cửa tiệm còn đóng một lúc rồi đi học. Chiều nó nhắn cho chị Hạnh chuyển lời: \"Khai giảng có trống to lắm.\"",
+  "choices": [
+   {
+    "label": "Sửa lại cổ áo cho nó, dặn học xong Chủ Nhật ghé",
+    "hint": "Tín +2",
+    "effects": {
+     "rep.TIN": 2,
+     "flag.tinVaoLop8": true,
+     "diary": "Sáng khai giảng Tín ghé tiệm trong bộ đồng phục là thẳng. Sửa cổ áo cho nó, dặn Chủ Nhật ghé. Nó đi được mười bước, quay lại hỏi: \"Bài điện có câu nào khó chú chỉ con nhé.\""
+    }
+   },
+   {
+    "label": "Cho nó cái bánh mì, bảo đi nhanh kẻo muộn",
+    "hint": "Tín +1",
+    "effects": {
+     "rep.TIN": 1,
+     "flag.tinVaoLop8": true,
+     "cash": -15000,
+     "cash_label": "Bánh mì cho Tín",
+     "log": "Tín ôm cái bánh mì chạy, vạt áo bung ra khỏi quần ngay chỗ rẽ."
+    }
+   },
+   {
+    "label": "Nói: \"Học cho đàng hoàng, bớt ra tiệm\"",
+    "hint": "Tín −3",
+    "effects": {
+     "rep.TIN": -3,
+     "flag.duoiTin4": true,
+     "flag.tinVaoLop8": true,
+     "log": "Tín gật, mặt xị, đi học không quay lại."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay95_truong",
+  "day": 95,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "window": [
+   7,
+   10
+  ],
+  "hours": 1,
+  "when": {
+   "flag_any": [
+    "nhanDonTruong",
+    "chiaDonTruong",
+    "nhanVuaSuc"
+   ]
+  },
+  "title": "Trống khai giảng",
+  "who": "Cô Mai",
+  "text": "Bảy giờ, trống khai giảng nổ ở sân trường cuối phố Hàng Khoai. Tám phòng học, ba mươi hai cái quạt trần quay đều trên đầu học trò áo trắng. Cô Mai đứng ở cửa phòng cuối, ngước nhìn từng cái quạt như đếm.",
+  "quote": "Cô Mai: \"Quay đủ. Tôi tưởng sẽ có một cái kêu.\"",
+  "missed": "Cô Mai nhắn: \"Khai giảng xong rồi. Anh ghé lấy phiếu nghiệm thu khi nào rảnh.\"",
+  "variants": [
+   {
+    "when": {
+     "quest_failed": "don_truong"
+    },
+    "text": "Bảy giờ, trống khai giảng nổ ở sân trường cuối phố Hàng Khoai. Năm phòng có quạt quay, ba phòng cuối quạt đứng im, học trò lấy vở quạt phành phạch. Cô Mai đứng ở cửa phòng cuối, không nhìn quạt, nhìn An.",
+    "quote": "Cô Mai: \"Anh nói chắc. Tôi xếp lớp theo chữ 'chắc' của anh.\"",
+    "choices": [
+     {
+      "label": "Xin lỗi, nói rõ ngày nào xong, làm bù không lấy thêm tiền",
+      "hint": "Cô Mai +2",
+      "effects": {
+       "rep.MAI": 2,
+       "flag.xinLoiTruong": true,
+       "hours": 1,
+       "diary": "Muộn đơn quạt của trường: ba phòng chưa có quạt sáng khai giảng. Xin lỗi cô Mai, hẹn rõ chiều thứ Sáu xong, làm bù không lấy thêm tiền. Cô ghi vào sổ, không nói thêm."
+      }
+     },
+     {
+      "label": "Đổ tại linh kiện về muộn",
+      "hint": "Cô Mai −3",
+      "effects": {
+       "rep.MAI": -3,
+       "log": "Cô Mai nghe, gật, rồi hỏi: \"Linh kiện về muộn mà sao hôm qua anh không gọi?\""
+      }
+     }
+    ]
+   },
+   {
+    "when": {
+     "quest_done": "don_truong_chung"
+    },
+    "text": "Bảy giờ, trống khai giảng nổ ở sân trường cuối phố Hàng Khoai. Tám phòng học, ba mươi hai cái quạt trần quay đều. Bốn phòng có phiếu của An, bốn phòng có phiếu của tổ Trâm, chữ ký nghiệm thu chung một dòng. Cô Mai đứng ở cửa phòng cuối, ngước nhìn từng cái quạt như đếm."
+   },
+   {
+    "when": {
+     "quest_done": "don_truong_vua"
+    },
+    "text": "Bảy giờ, trống khai giảng nổ ở sân trường cuối phố Hàng Khoai. Bốn phòng có quạt quay, bốn phòng cuối dán tờ giấy \"Đang sửa · xong thứ Hai\". Cô Mai xếp lớp lớn vào bốn phòng có quạt như đã tính. Không ai bất ngờ.",
+    "quote": "Cô Mai: \"Tờ giấy này tôi dán hôm qua. Biết trước thì dán được.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Đứng cuối sân nghe chào cờ một lúc",
+    "hint": "Nghỉ",
+    "effects": {
+     "rested": true,
+     "fatigue": -4,
+     "diary": "Đứng cuối sân trường nghe chào cờ khai giảng, ngước lên thấy cái quạt mình sửa đang quay. Lần đầu nghe tiếng quạt mình sửa giữa năm trăm đứa trẻ."
+    }
+   },
+   {
+    "label": "Lấy phiếu nghiệm thu rồi về mở tiệm",
+    "hint": "",
+    "effects": {
+     "log": "Cô Mai ký phiếu nghiệm thu, ghi thêm một dòng: \"Tháng sau kiểm lại.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay96",
+  "day": 96,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   14,
+   18
+  ],
+  "hours": 1,
+  "title": "Giá người quen",
+  "who": "Cô Bích",
+  "text": "Trời mưa trưa. Cô Bích tổ trưởng ôm cái nồi cơm điện chạy vào tiệm, tóc ướt sũng. Nồi không nóng, đèn không lên. Bệnh dễ: hỏng rơ-le nhiệt, linh kiện tám chục, công năm chục.\nCô Bích chưa hỏi giá đã nói trước, nói to cho người ngồi chờ ngoài hiên cũng nghe.",
+  "quote": "Cô Bích: \"Người quen thì tính giá người quen nhé. Hồi trước cô ghi tên cháu vào danh sách 'người biết điện' đấy.\"",
+  "missed": "Cô Bích mang cái nồi cơm sang tiệm ở chợ khác, về kể với cả tổ là tiệm chú Sơn giờ khó gặp.",
+  "missed_effects": {
+   "rep.DUYEN": -1
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.tiemChung": false,
+     "flag.tiemMotMinh": false
+    },
+    "text": "Trời mưa trưa. Cô Bích tổ trưởng ôm cái nồi cơm điện chạy vào tiệm, tóc ướt sũng, gặp An đang ngồi làm phần khoán. Nồi không nóng, đèn không lên. Bệnh dễ: hỏng rơ-le nhiệt, linh kiện tám chục, công năm chục.\nCô Bích chưa hỏi giá đã nói trước, nói to cho người ngồi chờ ngoài hiên cũng nghe."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Báo giá đúng, bớt tiền công chứ không bớt linh kiện, ghi phiếu",
+    "hint": "+100.000đ · có phiếu",
+    "effects": {
+     "cash": 100000,
+     "cash_label": "Sửa nồi cơm cho cô Bích (bớt công)",
+     "flag.giaDung": true,
+     "diary": "Cô Bích xin giá người quen. Báo giá đúng: linh kiện tám chục không bớt, công năm chục bớt còn hai chục, ghi đủ trên phiếu. Cô đọc phiếu, cười: \"Người quen mà có phiếu. Lạ. Mà được.\""
+    }
+   },
+   {
+    "label": "Sửa không lấy tiền, người quen mà",
+    "hint": "−80.000đ linh kiện",
+    "effects": {
+     "cash": -80000,
+     "cash_label": "Linh kiện nồi cơm cô Bích (không lấy tiền)",
+     "flag.giaNguoiQuen": true,
+     "score.lamFree": 1,
+     "diary": "Sửa nồi cơm cho cô Bích không lấy tiền, bù tám chục linh kiện. Chiều đó thêm ba người quen của cô Bích ôm đồ đến, ai cũng bảo \"cô Bích giới thiệu\"."
+    }
+   },
+   {
+    "label": "Lấy đúng giá, không bớt",
+    "hint": "+130.000đ · Cô Bích hơi phật ý",
+    "effects": {
+     "cash": 130000,
+     "cash_label": "Sửa nồi cơm cho cô Bích",
+     "log": "Cô Bích trả đủ một trăm ba chục, đếm từng tờ, rồi bảo: \"Ừ. Đúng giá.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay97",
+  "day": 97,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   17,
+   21
+  ],
+  "hours": 1,
+  "when": {
+   "flag.maVe": true,
+   "flag.maDaDi": false
+  },
+  "title": "Mười hai cái máy may",
+  "who": "Mẹ",
+  "text": "Mẹ về đến nhà còn đeo cái kéo trên cổ. Xưởng ngõ 88 có mười hai cái máy may, ba cái kêu như máy cày, hai cái đứt dây curoa, một cái chập mô-tơ. Ông chủ xưởng nhờ mẹ hỏi \"thằng con có tiệm\".\nMẹ đặt lên bàn tờ giấy ghi tình trạng từng máy, chữ nghiêng đều như máy in, rồi nói trước khi An kịp nói.",
+  "quote": "Mẹ: \"Ông chủ trả tiền, không phải mẹ trả. Con báo giá như khách. Đừng làm free rồi mẹ mang tiếng mang con ra sai vặt.\"",
+  "missed": "Mẹ chờ đến chín giờ, rồi gấp tờ giấy để trên bàn. Sáng hôm sau ông chủ xưởng gọi thợ ở chợ Hàng Da.",
+  "missed_effects": {
+   "rep.MA": -2
+  },
+  "choices": [
+   {
+    "label": "Báo giá như khách, đưa mẹ xem trước rồi mới gửi ông chủ",
+    "hint": "+450.000đ · 3 giờ · Mẹ +3",
+    "effects": {
+     "rep.MA": 3,
+     "hours": 3,
+     "fatigue": 10,
+     "cash": 450000,
+     "cash_label": "Sửa máy may xưởng ngõ 88",
+     "flag.giaDungMa": true,
+     "diary": "Sửa mười hai cái máy may ở xưởng của mẹ, báo giá như khách, đưa mẹ duyệt trước. Mẹ sửa một dòng: \"Dây curoa ghi rõ hiệu gì.\" Ông chủ xưởng trả đủ, bảo lần sau gọi thẳng tiệm."
+    }
+   },
+   {
+    "label": "Làm không lấy tiền, xưởng của mẹ mà",
+    "hint": "Mẹ −1 · 3 giờ",
+    "effects": {
+     "rep.MA": -1,
+     "hours": 3,
+     "fatigue": 10,
+     "flag.lamFreeMa": true,
+     "score.lamFree": 1,
+     "diary": "Sửa mười hai cái máy may ở xưởng của mẹ không lấy tiền. Mẹ không vui: \"Ông chủ giàu hơn nhà mình. Con thương mẹ thì lấy tiền cho đàng hoàng.\""
+    }
+   },
+   {
+    "label": "Từ chối: tiệm đang vướng đơn trường",
+    "hint": "Mẹ −1",
+    "effects": {
+     "rep.MA": -1,
+     "log": "Mẹ gật, gọi thợ khác. \"Vướng thì nói vướng. Thế là được.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay97_xa",
+  "day": 97,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   19,
+   22
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.maDaDi": true,
+   "flag_any": [
+    "maDiXa",
+    "thamMa",
+    "goiMaVuLan"
+   ]
+  },
+  "title": "Rằm tháng Tám mẹ về",
+  "who": "Mẹ",
+  "text": "Mẹ gọi video từ Nam Định, màn hình rung theo tiếng máy may ở xưởng. Mẹ hỏi bà nhỏ thuốc chưa, hỏi cái tiệm có khách chưa, rồi mới nói chuyện chính: rằm tháng Tám xưởng nghỉ ba ngày. Mẹ về.\nMẹ không hỏi có được không. Mẹ hỏi chỗ nào cho mẹ ngủ.",
+  "quote": "Mẹ: \"Mẹ về ba ngày. Ngủ đâu cũng được, miễn đừng ai nhường giường cho mẹ.\"",
+  "missed": "Mẹ nhắn tin: \"Rằm mẹ về. Đừng dọn dẹp gì cả.\"",
+  "missed_effects": {
+   "flag.maVeTrungThu": true
+  },
+  "choices": [
+   {
+    "label": "Hỏi mẹ muốn ở mấy ngày, muốn đi đâu, rồi dọn chỗ theo ý mẹ",
+    "hint": "Mẹ +3",
+    "effects": {
+     "rep.MA": 3,
+     "flag.maVeTrungThu": true,
+     "flag.noiThatC4": true,
+     "diary": "Mẹ gọi, bảo rằm tháng Tám mẹ về ba ngày. Hỏi mẹ muốn đi đâu: mẹ muốn đi chợ đêm ăn bánh rán, muốn xem cái tiệm, muốn ngủ chung phòng bà. Ghi vào sổ, đủ ba điều."
+    }
+   },
+   {
+    "label": "\"Vâng, mẹ về thì về\"",
+    "hint": "",
+    "effects": {
+     "flag.maVeTrungThu": true,
+     "log": "Mẹ cười: \"Ừ. Về thì về.\" Rồi mẹ hỏi đến cái tiệm, hỏi kỹ hơn mọi lần."
+    }
+   },
+   {
+    "label": "Dọn giường mình cho mẹ, mình ngủ tiệm",
+    "hint": "Mẹ −1",
+    "effects": {
+     "rep.MA": -1,
+     "flag.maVeTrungThu": true,
+     "log": "Mẹ bảo: \"Mẹ đã bảo đừng nhường giường.\" Mẹ vẫn nói câu đó y như hồi An mười ba tuổi."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay98",
+  "day": 98,
+  "mode": "full",
+  "loc": "ben_xe_6",
+  "window": [
+   6,
+   9
+  ],
+  "hours": 0.5,
+  "title": "Đi khám tay",
+  "who": "Chú Sơn",
+  "text": "Chú Sơn có lịch khám thần kinh ở bệnh viện thành phố, xe buýt chạy lúc sáu giờ rưỡi. Chú đứng ở điểm xe buýt Long Biên, áo sơ mi cài đến khuy trên cùng, tay trái nắm tay phải cho đỡ run. Cái túi ni lông đựng xấp giấy khám cũ gấp tư.\nChú không nhờ ai đi cùng. Chú chỉ nói giờ xe chạy, nói hai lần.",
+  "quote": "Chú Sơn: \"Bác sĩ hỏi gì chú nghe không kịp. Mà thôi, chú tự đi được.\"",
+  "missed": "Chú Sơn đi khám một mình. Chiều chú về, xấp giấy khám dày thêm, chú không kể gì, chỉ bảo bác sĩ cho thuốc mới.",
+  "missed_effects": {
+   "rep.SAU": -2
+  },
+  "choices": [
+   {
+    "label": "Đi cùng chú, ngồi chờ, ghi lại lời bác sĩ",
+    "hint": "4 giờ · Chú Sơn +4",
+    "effects": {
+     "rep.SAU": 4,
+     "flag.khamTaySau": true,
+     "hours": 3.5,
+     "diary": "Đưa chú Sơn đi khám tay. Bác sĩ bảo bệnh không chữa dứt, uống thuốc đều thì chậm lại; đừng cầm mỏ hàn nữa. Ghi hết vào sổ cho chú. Ra cổng bệnh viện chú bảo: \"Ba chục năm cầm mỏ hàn. Bỏ thì bỏ. Còn cầm chén trà được.\""
+    }
+   },
+   {
+    "label": "Gọi xe công nghệ đưa đón chú, trả tiền trước",
+    "hint": "−120.000đ · Chú Sơn +1",
+    "effects": {
+     "cash": -120000,
+     "cash_label": "Xe đưa chú Sơn đi khám",
+     "rep.SAU": 1,
+     "log": "Chú Sơn lên xe, hạ kính xuống: \"Tiền xe chú trả lại cháu sau.\" Rồi chú không trả, mà chiều mang sang tiệm một túi cam."
+    }
+   },
+   {
+    "label": "Để chú tự đi, chú bảo được mà",
+    "hint": "Chú Sơn −2",
+    "effects": {
+     "rep.SAU": -2,
+     "log": "Chú Sơn lên xe buýt một mình, tay trái nắm tay phải."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay99_xa",
+  "day": 99,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   19,
+   22
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.linhOXa": true
+  },
+  "title": "Ca đến mười giờ đêm",
+  "who": "Linh",
+  "text": "Linh gọi lúc mười giờ rưỡi, còn mặc đồ bảo hộ. Công ty nhận đơn bảo trì cho một khu công nghiệp, thợ chính ca nào cũng tăng đến mười giờ đêm, cả tuần. Em không than. Em kể như kể chuyện người khác, rồi im một lúc lâu.",
+  "quote": "Linh: \"Em không xin anh gì cả. Em chỉ muốn có người nghe em kể.\"",
+  "missed": "Linh nhắn: \"Anh ngủ rồi à. Không có gì đâu, em mệt tí thôi.\"",
+  "choices": [
+   {
+    "label": "Nghe hết, rồi hỏi em muốn tính thế nào",
+    "hint": "Linh +3",
+    "effects": {
+     "rep.LINH": 3,
+     "flag.ngheLinh4": true,
+     "flag.noiThatC4": true,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Nghe Linh kể chuyện tăng ca"
+     },
+     "diary": "Linh gọi lúc mười giờ rưỡi đêm, kể chuyện tăng ca. Nghe hết, rồi hỏi em muốn tính thế nào. Em bảo em sẽ hỏi phòng nhân sự có bù giờ không. Câu đó em tự nghĩ ra, mình chỉ hỏi."
+    }
+   },
+   {
+    "label": "\"Nghỉ đi, về đây anh lo\"",
+    "hint": "Linh −2",
+    "effects": {
+     "rep.LINH": -2,
+     "flag.epLinh4": true,
+     "family": {
+      "who": "LINH",
+      "kind": "pressure",
+      "text": "Bảo Linh nghỉ việc về nhà"
+     },
+     "log": "Linh im một lúc: \"Em gọi để kể, không phải để xin về.\""
+    }
+   },
+   {
+    "label": "Chuyển cho em năm trăm mua đồ ăn đêm",
+    "hint": "−500.000đ · Linh +1",
+    "effects": {
+     "cash": -500000,
+     "cash_label": "Gửi Linh tiền ăn đêm",
+     "rep.LINH": 1,
+     "log": "Linh nhận, nhắn lại: \"Em cảm ơn. Mà lần sau anh nghe em kể là đủ rồi.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay99_hoc",
+  "day": 99,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   19,
+   22
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.linhHocTiep": true
+  },
+  "title": "Dòng trả nợ đầu tiên",
+  "who": "Linh",
+  "text": "Linh đi học về lúc chín giờ, đặt lên bàn ba tờ một trăm nghìn kẹp trong cuốn sổ chung, mở sẵn trang có dòng chữ in hoa của em. Em không nói gì, chỉ đẩy cuốn sổ sang.",
+  "quote": "Linh: \"Tháng đầu. Anh ký nhận đi. Ký thì em mới tính tháng sau.\"",
+  "missed": "Linh kẹp ba trăm nghìn trong cuốn sổ chung, tự ghi \"đã trả tháng 1\", để trên bàn của An.",
+  "missed_effects": {
+   "cash": 300000,
+   "cash_label": "Linh trả nợ tháng đầu",
+   "flag.nhanTraNo": true
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.gopHocLinh": false
+    },
+    "text": "Linh đi học về lúc chín giờ, đặt lên bàn ba tờ một trăm nghìn kẹp trong cuốn sổ chung. Đợt học phí đầu em tự đóng bằng tiền ca đêm, giờ em muốn góp tiền chợ như mọi người trong nhà. Em đã tự ghi một dòng mới, chữ in hoa.",
+    "quote": "Linh: \"Em ở nhà thì em góp. Anh ký nhận đi, ký thì em mới tính tháng sau.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Nhận, ký vào sổ chung",
+    "hint": "+300.000đ · Linh +3",
+    "effects": {
+     "cash": 300000,
+     "cash_label": "Linh góp vào sổ chung",
+     "rep.LINH": 3,
+     "flag.nhanTraNo": true,
+     "flag.noiThatC4": true,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Nhận khoản Linh góp, ký vào sổ chung"
+     },
+     "diary": "Nhận ba trăm nghìn của Linh, ký vào sổ chung. Em gật, gạch chéo ô tháng đầu, rồi đi ngủ, không nói thêm. Ký nhận một khoản tiền của em gái mà thấy em lớn hơn mình tưởng."
+    }
+   },
+   {
+    "label": "\"Thôi em giữ mà tiêu\"",
+    "hint": "Linh −2",
+    "effects": {
+     "rep.LINH": -2,
+     "flag.khongNhanLinh": true,
+     "log": "Linh cầm lại ba tờ tiền, nói khẽ: \"Anh cứ coi em như trẻ con mãi.\""
+    }
+   },
+   {
+    "label": "Nhận, rồi lén kẹp lại vào cặp em",
+    "hint": "Che giấu",
+    "effects": {
+     "flag.lenTraLinh": true,
+     "score.giauTot": 1,
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Lén trả lại tiền Linh góp"
+     },
+     "log": "Kẹp lại ba trăm vào cặp Linh. Sáng ra em để lại trên bàn, kèm tờ giấy: \"Anh kẹp nhầm cặp.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay99_to",
+  "day": 99,
+  "mode": "full",
+  "loc": "ben_can",
+  "window": [
+   16,
+   20
+  ],
+  "hours": 1,
+  "when": {
+   "flag.linhVeGan": true
+  },
+  "title": "Một ô ghi \"đạt\"",
+  "who": "Linh",
+  "text": "Ở dãy quán bia Tạ Hiện, Linh kéo An ra sau quầy. Hôm qua em kiểm điện cho tổ của Trâm, ghi \"đạt\" một cái ổ cắm em chưa kịp đo vì quán đông khách. Sáng nay em quay lại đo: ổ đó lỏng chân, nóng. Trâm chưa biết. Phiếu nghiệm thu đã nộp.",
+  "quote": "Linh: \"Anh sửa hộ em cái ổ đó đi, đừng nói chị Trâm. Lần sau em không thế nữa.\"",
+  "missed": "Linh tự thay cái ổ cắm, mà không nói với Trâm. Tối em ngồi nhìn cuốn sổ bảo trì lâu thật lâu.",
+  "missed_effects": {
+   "flag.linhGiuPhieu": true
+  },
+  "choices": [
+   {
+    "label": "Khuyên em tự nói với Trâm, anh đi cùng nếu em muốn",
+    "hint": "Linh +2 · Trâm +2",
+    "effects": {
+     "rep.LINH": 2,
+     "rep.TRAM": 2,
+     "flag.linhTuNoi": true,
+     "flag.noiThatC4": true,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Đi cùng Linh nói thật với Trâm"
+     },
+     "diary": "Linh ghi \"đạt\" một cái ổ chưa đo. Khuyên em tự nói với Trâm, mình đứng bên cạnh, không nói câu nào. Trâm nghe xong, sửa phiếu, rồi bảo: \"Chưa đo thì ghi chưa đo. Em nhớ câu này là đủ.\" Linh về khóc một lúc, rồi ngủ ngon."
+    }
+   },
+   {
+    "label": "Anh sửa hộ cái ổ, chẳng ai biết",
+    "hint": "Che giấu",
+    "effects": {
+     "flag.cheLoiLinh": true,
+     "rep.LINH": 1,
+     "score.giauTot": 1,
+     "family": {
+      "who": "LINH",
+      "kind": "conceal",
+      "text": "Sửa hộ lỗi của Linh, giấu Trâm"
+     },
+     "log": "Thay cái ổ cắm lúc quán vắng, không ai biết. Linh cảm ơn, mà cả buổi tối em không nhìn vào mắt anh."
+    }
+   },
+   {
+    "label": "Anh nói với Trâm hộ em",
+    "hint": "Linh −3",
+    "effects": {
+     "rep.LINH": -3,
+     "rep.TRAM": 1,
+     "flag.noiThayLinh": true,
+     "family": {
+      "who": "LINH",
+      "kind": "pressure",
+      "text": "Nói thay Linh với Trâm"
+     },
+     "log": "Nói với Trâm thay Linh. Trâm sửa phiếu. Linh không giận, chỉ bảo: \"Việc của em mà anh.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay100",
+  "day": 100,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   18,
+   21
+  ],
+  "hours": 1,
+  "title": "Cuộc gọi video đầu tiên",
+  "who": "Bà Thoa",
+  "text": "Bà Thoa ngồi ngay ngắn trên giường, cái điện thoại cũ của Linh trên tay, cầm như cầm bát nước đầy. Bà muốn gọi video cho chị Cả ở Giao Thủy trước rằm, mà không muốn nhờ ai bấm. \"Lần nào cũng nhờ thì lần nào cũng phải chờ người ta rảnh.\"",
+  "quote": "Bà Thoa: \"Con chỉ bà nút nào thì bà nhớ nút đó. Đừng bấm hộ.\"",
+  "missed": "Linh chỉ bà qua điện thoại. Bà bấm nhầm ba lần, lần thứ tư thấy mặt chị Cả, hai bà già cười đến mức không ai nghe ai nói gì.",
+  "variants": [
+   {
+    "when": {
+     "flag.daMo": false
+    },
+    "text": "Bà Thoa ngồi ngay ngắn trên giường, cái điện thoại cũ của Linh trên tay, đưa sát mắt. Bà muốn gọi video cho chị Cả ở Giao Thủy trước rằm, mà không muốn nhờ ai bấm. \"Lần nào cũng nhờ thì lần nào cũng phải chờ người ta rảnh.\" Mắt bà chưa mổ, chữ trên màn hình bà phải dí sát mới thấy."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Chỉ từng nút, để bà tự bấm, chậm cũng được",
+    "hint": "Bà Thoa +3 · 1 giờ",
+    "effects": {
+     "rep.BA_TU": 3,
+     "flag.baTuGoi": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Chỉ bà tự gọi video"
+     },
+     "diary": "Chỉ bà gọi video, từng nút, để bà tự bấm. Lần thứ ba thì được. Chị Cả hiện lên, hai bà nhìn nhau một lúc không nói gì, rồi cùng nói một lúc. Bà dán một miếng băng dính đỏ lên nút gọi, để lần sau khỏi hỏi."
+    }
+   },
+   {
+    "label": "Bấm hộ bà cho nhanh",
+    "hint": "Bà Thoa +1",
+    "effects": {
+     "rep.BA_TU": 1,
+     "log": "Bấm hộ bà. Bà nói chuyện vui, mà tắt máy rồi bà hỏi: \"Lần sau nút nào?\""
+    }
+   },
+   {
+    "label": "Hẹn cuối tuần Linh về chỉ",
+    "hint": "Bà Thoa −1",
+    "effects": {
+     "rep.BA_TU": -1,
+     "log": "Bà gật, cất điện thoại vào ngăn tủ."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay101",
+  "day": 101,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   8,
+   11
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.luaCam": false,
+   "flag.tinVaoLop8": true
+  },
+  "title": "Tiết thứ ba",
+  "who": "Tín",
+  "text": "Chín giờ sáng thứ Hai, mưa lâm thâm. Tín ngồi ở góc tiệm, cặp còn trên vai, đang tháo cái quạt hộp của khách mà nó biết đã rút điện. Tiết ba là Toán. Nó bảo cô cho nghỉ. Cô Mai nhắn cho An đúng lúc đó: \"Tín có ở tiệm không? Nó trốn tiết.\"",
+  "quote": "Tín: \"Con học Toán không vào. Ở đây con hiểu hết.\"",
+  "missed": "Tín ngồi ở tiệm đến trưa, rồi về nhà bảo với mẹ nó là cô cho nghỉ. Cô Mai gọi chị Lụa lúc tối.",
+  "missed_effects": {
+   "rep.LUA": -2,
+   "flag.tinCupHoc": true
+  },
+  "choices": [
+   {
+    "label": "Chở nó về trường, nói thẳng với cô Mai",
+    "hint": "Cô Mai +3 · Tín −1",
+    "effects": {
+     "rep.MAI": 3,
+     "rep.TIN": -1,
+     "flag.choTinVeTruong": true,
+     "diary": "Tín trốn tiết Toán ra tiệm. Chở nó về trường, nói thẳng với cô Mai. Trên đường nó không nói gì. Đến cổng nó hỏi: \"Chú có nói với mẹ con không?\" Bảo: \"Chú nói với cô. Mẹ cháu thì cháu nói.\""
+    }
+   },
+   {
+    "label": "Gọi chị Lụa trước, để chị quyết",
+    "hint": "Chị Lụa +3",
+    "effects": {
+     "rep.LUA": 3,
+     "flag.baoLua4": true,
+     "diary": "Tín trốn tiết ra tiệm. Gọi chị Lụa trước. Chị phóng xe đến, áo còn dính bột, không mắng nó. Chị ngồi xuống ghế đẩu, hỏi Tín bài Toán nào khó. Nó nói không ra. Chị chở nó về trường."
+    }
+   },
+   {
+    "label": "Cho ngồi đến trưa, coi như chưa thấy",
+    "hint": "Che giấu",
+    "effects": {
+     "flag.giauCupHoc": true,
+     "rep.TIN": 2,
+     "score.giauTot": 1,
+     "log": "Nhắn cô Mai: \"Không thấy.\" Tín ngồi tháo quạt đến trưa, cười suốt."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay102",
+  "day": 102,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "window": [
+   17,
+   20
+  ],
+  "hours": 1,
+  "when": {
+   "flag.gapQuan": true
+  },
+  "title": "Chín triệu một tháng",
+  "who": "Anh Quân",
+  "text": "Anh Quân mời cà phê ở quán đầu chợ. Trung tâm cần một thợ chính cho đồ gia dụng: chín triệu một tháng, giờ hành chính, có bảo hiểm, nghỉ Chủ Nhật. Bắt đầu mùng một tháng Chín. Anh đặt tờ giấy ghi đủ mấy con số lên bàn, chữ đánh máy.\nAnh nói thêm, không nhìn An: ở trung tâm không ai sửa quạt bàn. Hỏng thì đổi mới.",
+  "quote": "Anh Quân: \"Tao không ép. Tao biết mày có cái tiệm. Mà tiệm thì có tháng lãi tháng lỗ, ở đây thì tháng nào cũng chín triệu. Trả lời tao trước hai mươi sáu tháng này (ngày 116).\"",
+  "missed": "Anh Quân để tờ giấy ở tiệm, kẹp dưới ấm trà của chú Sơn: \"Trả lời tao trước ngày 116.\"",
+  "missed_effects": {
+   "flag.loiMoiQuan": true
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.tiemChung": false,
+     "flag.tiemMotMinh": false
+    },
+    "text": "Anh Quân mời cà phê ở quán đầu chợ. Trung tâm cần một thợ chính cho đồ gia dụng: chín triệu một tháng, giờ hành chính, có bảo hiểm, nghỉ Chủ Nhật. Bắt đầu mùng một tháng Chín. Anh đặt tờ giấy ghi đủ mấy con số lên bàn, chữ đánh máy.\nAnh nói thêm: mày không có tiệm, làm khoán cho người ta, thế thì về đây cho chắc.",
+    "quote": "Anh Quân: \"Tao không ép. Mà làm khoán thì tháng có tháng không, ở đây thì tháng nào cũng chín triệu. Trả lời tao trước ngày 116.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Xin anh cho làm thử một buổi rồi tính",
+    "hint": "Hẹn thử việc ngày 108",
+    "effects": {
+     "rep.QUAN": 2,
+     "flag.loiMoiQuan": true,
+     "flag.henThuViec": true,
+     "diary": "Anh Quân mời về trung tâm bảo hành: chín triệu, giờ hành chính, có bảo hiểm. Xin làm thử một buổi ngày 108. Anh gật: \"Thử thì thử cho thật. Đừng thử cho có.\""
+    }
+   },
+   {
+    "label": "Hỏi kỹ từng dòng, xin tờ giấy về bàn với cả nhà",
+    "hint": "Anh Quân +1",
+    "effects": {
+     "rep.QUAN": 1,
+     "flag.loiMoiQuan": true,
+     "flag.henBanNha": true,
+     "flag.noiThatC4": true,
+     "diary": "Hỏi anh Quân từng dòng: lương, giờ, bảo hiểm, nghỉ phép, nghỉ việc báo trước mấy ngày. Xin tờ giấy mang về bàn với cả nhà. Lần này không giấu chuyện việc làm, không định giấu."
+    }
+   },
+   {
+    "label": "Từ chối ngay: em có chỗ đứng rồi",
+    "hint": "Anh Quân −1",
+    "effects": {
+     "rep.QUAN": -1,
+     "flag.loiMoiQuan": true,
+     "flag.tuChoiQuan": true,
+     "log": "Anh Quân gấp tờ giấy, cất vào túi áo: \"Ừ. Mày nói thế tao mừng. Mà có gì cứ gọi.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay103",
+  "day": 103,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "window": [
+   8,
+   16
+  ],
+  "hours": 1,
+  "title": "Dây đèn sân kho",
+  "who": "Cô Duyên",
+  "text": "Tổ dân phố mượn sân kho mới trên nền xóm cũ làm đêm Trung thu cho trẻ con hai ngõ. Cô Duyên chỉ cái cây góc sân: muốn giăng hai trăm bóng đèn lồng từ gốc cây ra đến cổng, điện kéo từ ổ trong kho. Tổ có sẵn một cuộn dây đơn mua ở chợ, ba cuộn băng dính đen.\nTrời mấy hôm nay chiều nào cũng mưa. Máng nước kho bằng tôn.",
+  "quote": "Cô Duyên: \"Cô biết cháu sẽ bảo cuộn dây này không được. Cháu nói luôn đi, cô nghe.\"",
+  "missed": "Tổ dân phố tự giăng đèn bằng cuộn dây đơn, quấn băng dính đen ở mấy chỗ nối.",
+  "missed_effects": {
+   "flag.denTam": true
+  },
+  "choices": [
+   {
+    "label": "Làm đúng: dây đôi, hộp nối kín, aptomat riêng ở gốc cây (tổ góp thêm ba trăm)",
+    "hint": "3 giờ · Mệt +10 · Cô Duyên +3",
+    "effects": {
+     "hours": 3,
+     "fatigue": 10,
+     "rep.DUYEN": 3,
+     "flag.denDungChuan": true,
+     "diary": "Giăng đèn Trung thu ở sân kho bằng dây đôi, hộp nối kín, cái aptomat riêng gắn vào gốc cây góc sân. Tổ góp thêm ba trăm, cô Bích cằn nhằn. Cô Duyên trả lời hộ: \"Ba trăm là rẻ.\""
+    }
+   },
+   {
+    "label": "Làm tạm cho kịp: dây đơn, quấn băng dính kỹ",
+    "hint": "1 giờ",
+    "effects": {
+     "hours": 1,
+     "flag.denTam": true,
+     "log": "Giăng đèn bằng dây đơn, quấn băng dính ba lớp ở mỗi mối nối. Đèn sáng đẹp. Máng nước ngay trên đầu."
+    }
+   },
+   {
+    "label": "Làm đúng, rủ Tín ngồi xem, chỉ nó đọc sơ đồ (đã hỏi chị Lụa)",
+    "hint": "3 giờ · Tín +3 · Cô Duyên +3",
+    "showIf": {
+     "flag.luaCam": false,
+     "flag.luaDongY": true
+    },
+    "effects": {
+     "hours": 3,
+     "fatigue": 10,
+     "rep.DUYEN": 3,
+     "rep.TIN": 3,
+     "flag.denDungChuan": true,
+     "flag.tinPhuDen": true,
+     "diary": "Giăng đèn Trung thu ở sân kho, Tín ngồi dưới gốc cây cầm sơ đồ, đọc to từng mối nối, mình làm. Nó hỏi sao phải có aptomat ở gốc cây. Chỉ nó cái máng nước. Nó gật, ghi vào lòng bàn tay: \"nước + điện = aptomat\"."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay104",
+  "day": 104,
+  "mode": "full",
+  "loc": "com_hanh",
+  "window": [
+   15,
+   19
+  ],
+  "hours": 0.5,
+  "title": "Đèn ông sao",
+  "who": "Minh",
+  "text": "Cu Bin ngồi trước quán chị Hạnh, ôm bó nan tre với ba tờ giấy bóng kính đỏ. Cô giáo lớp Một dặn mỗi đứa làm một cái đèn ông sao, phụ huynh giúp được, mà không được mua. Minh chạy hàng đến tối. Bin nhìn An như nhìn người duy nhất trên đời biết uốn nan tre.",
+  "quote": "Cu Bin: \"Cô bảo đèn mua là đèn của hàng. Đèn làm là đèn của con.\"",
+  "missed": "Chị Hạnh giúp Bin làm đèn ông sao, năm cánh không đều, một cánh to gấp đôi. Bin vẫn thích.",
+  "choices": [
+   {
+    "label": "Ngồi làm cùng, để Bin tự dán giấy bóng kính",
+    "hint": "Mở việc nhờ · Minh +2",
+    "effects": {
+     "rep.MINH": 2,
+     "flag.lamDenChung": true,
+     "quest_start": "den_ong_sao",
+     "log": "Hứa với Bin: mua thêm nan tre, dây thép ở chợ, chiều mai làm xong trước rằm."
+    }
+   },
+   {
+    "label": "Mua cho Bin cái đèn lồng điện có nhạc",
+    "hint": "−120.000đ · Minh +1",
+    "effects": {
+     "cash": -120000,
+     "cash_label": "Đèn lồng điện cho cu Bin",
+     "rep.MINH": 1,
+     "log": "Bin cầm cái đèn lồng điện, bấm nút cho nó hát, rồi hỏi: \"Cô có cho cái này không chú?\""
+    }
+   },
+   {
+    "label": "Hẹn hôm khác, tiệm đang vướng",
+    "hint": "",
+    "effects": {
+     "log": "Bin gật, ôm bó nan tre vào quán."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay105",
+  "day": 105,
+  "mode": "full",
+  "loc": "xom_bo_me",
+  "window": [
+   18,
+   21
+  ],
+  "hours": 2,
+  "title": "Đêm rằm tháng Tám",
+  "who": "Bà Thoa",
+  "text": "Sân kho mới trên nền xóm cũ sáng hai trăm bóng đèn lồng. Trẻ con hai ngõ rước đèn vòng quanh cái cây góc sân, đứa cầm đèn ông sao, đứa cầm đèn lồng điện hát. Bà Thoa ngồi trên cái ghế đá dưới gốc cây, chỗ ngày xưa là phòng số 4, hộp bánh nướng để trên đùi, cắt từng miếng nhỏ chia cho ai đi ngang.",
+  "quote": "Bà Thoa: \"Rằm tháng Tám năm ngoái bà ngồi đây, trong phòng. Năm nay bà ngồi đây, ngoài sân. Thế là đi được một quãng rồi.\"",
+  "missed": "Đêm rằm, bà Thoa ngồi ở sân kho đến chín giờ, cắt bánh nướng chia cho trẻ con. Phần của An bà gói giấy báo, để trên bàn.",
+  "variants": [
+   {
+    "when": {
+     "flag.denTam": true,
+     "flag.denDungChuan": false
+    },
+    "text": "Sân kho mới trên nền xóm cũ sáng hai trăm bóng đèn lồng. Trẻ con hai ngõ rước đèn vòng quanh cái cây góc sân. Gần chín giờ mưa lắc rắc, nước từ máng tôn nhỏ xuống một mối nối quấn băng dính. Cả dãy đèn tắt phụt, lóe một tia lửa xanh ở gốc cây. Bọn trẻ kêu ầm lên. Không ai bị làm sao, chỉ một bé gái đánh rơi đèn.\nBà Thoa ngồi trên ghế đá dưới gốc cây, hộp bánh nướng trên đùi, không quát, chỉ gọi bọn trẻ lại gần bà.",
+    "quote": "Bà Thoa: \"Không sao. Tối thì mình ngồi gần nhau.\""
+   },
+   {
+    "when": {
+     "flag.maVeTrungThu": true
+    },
+    "text": "Sân kho mới trên nền xóm cũ sáng hai trăm bóng đèn lồng. Trẻ con hai ngõ rước đèn vòng quanh cái cây góc sân. Bà Thoa ngồi trên cái ghế đá dưới gốc cây, chỗ ngày xưa là phòng số 4. Mẹ ngồi bên cạnh, về từ chiều, cắt bánh nướng thành tám miếng đều như kẻ chỉ. Hai mẹ con không nói gì nhiều, chỉ chỉ cho nhau xem đứa bé nào cầm đèn đẹp."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Ngồi với bà, ăn bánh, kể chuyện tháng này",
+    "hint": "Nghỉ · Bà Thoa +2",
+    "effects": {
+     "rested": true,
+     "fatigue": -6,
+     "rep.BA_TU": 2,
+     "flag.ngoiRam": true,
+     "diary": "Đêm rằm tháng Tám ngồi với bà ở sân kho, ăn bánh nướng, kể chuyện tháng này. Bà nghe hết, rồi chỉ lên cái cây góc sân: \"Cây này năm nào cũng có trăng đậu trên ngọn. Năm nay cũng có.\"",
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Ngồi với bà đêm Trung thu"
+     }
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.maVeTrungThu": true
+      },
+      "effects": {
+       "rep.MA": 3,
+       "flag.noiThatC4": true,
+       "diary": "Mẹ ngồi bên kia bà. Ba người ăn hết một cái bánh nướng thập cẩm, mẹ kể chuyện con bé tổ phó ở Nam Định sinh con. Lần đầu nghe mẹ kể chuyện người khác vui như kể chuyện nhà."
+      }
+     },
+     {
+      "when": {
+       "flag.maVe": true,
+       "flag.maDaDi": false
+      },
+      "effects": {
+       "rep.MA": 2,
+       "diary": "Mẹ mang ra ấm trà, rót cho bà trước, cho An sau, cho mình sau cùng."
+      }
+     }
+    ]
+   },
+   {
+    "label": "Đi một vòng xem lại dây đèn",
+    "hint": "Cô Duyên +1",
+    "effects": {
+     "rep.DUYEN": 1,
+     "log": "Đi một vòng xem dây đèn. Cô Duyên đi theo, cầm đèn pin, hỏi từng mối nối như hỏi bài."
+    }
+   },
+   {
+    "label": "Đứng nhìn bọn trẻ rước đèn",
+    "hint": "Nghỉ",
+    "effects": {
+     "rested": true,
+     "fatigue": -4,
+     "log": "Cu Bin rước cái đèn ông sao năm cánh, giơ cao quá đầu, chạy qua trước mặt ba lần cho chắc là chú An thấy."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay106",
+  "day": 106,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   6,
+   10
+  ],
+  "hours": 1,
+  "title": "Nước rằm tháng Tám",
+  "who": "",
+  "text": "Sáng mười sáu, con nước rằm tháng Tám lên cao nhất năm. Nước sông Hồng tràn qua bờ kè cũ, ngập đến bậc thềm, mấy cái dép trôi ra giữa ngõ. Điện thoại có hai tin nhắn: khách hỏi máy để ở tiệm có sao không, và ông Bảo hỏi An còn nhớ năm bảy lăm nước lên đến đâu không.",
+  "quote": "Ông Bảo (tin nhắn, chữ to): \"Bậc thứ ba. Năm nay bậc thứ hai. Kè mới tốt.\"",
+  "missed": "Nước rút lúc mười giờ. Ở tiệm, hai cái máy của khách để dưới đất bị ướt chân, phải sấy lại.",
+  "missed_effects": {
+   "rep.SAU": -1
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.ongBaGiuNha": true
+    },
+    "text": "Sáng mười sáu, con nước rằm tháng Tám lên cao nhất năm. Đoạn kè mới chưa xong, nước tràn qua chỗ đang đóng cọc, vào thẳng nhà ông Bảo. Ông ngồi trên tấm ván cái hiên kê cao, cái đài đặt trên đùi, gõ vách hai tiếng. Bên này An nghe.",
+    "quote": "Ông Bảo: \"Năm bảy lăm bậc thứ ba. Năm nay bậc thứ ba. Kè chưa xong thì nước chưa biết.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Kê đồ trong nhà xong, chạy sang xem nhà ông Bảo",
+    "hint": "Ông Bảo +3",
+    "effects": {
+     "rep.ONG_BA": 3,
+     "hours": 1,
+     "fatigue": 6,
+     "diary": "Nước rằm tháng Tám lên đến bậc thềm. Kê đồ xong chạy sang nhà ông Bảo. Ông ngồi trên tấm ván cái hiên, kể năm bảy lăm, chỉ đúng bậc nước lên. Mình chỉ ngồi nghe, chân ngâm nước."
+    }
+   },
+   {
+    "label": "Ra tiệm trước, kê máy của khách lên kệ",
+    "hint": "Chú Sơn +1",
+    "effects": {
+     "rep.SAU": 1,
+     "hours": 1,
+     "fatigue": 4,
+     "log": "Kê hết máy của khách lên kệ cao. Chú Sơn đã ngồi sẵn ở đó, ống quần xắn đến gối: \"Ba chục năm, nước rằm tháng Tám chưa lần nào lên đến cái kệ đó.\""
+    }
+   },
+   {
+    "label": "Ngồi chờ nước rút",
+    "hint": "Nghỉ",
+    "effects": {
+     "rested": true,
+     "fatigue": -3,
+     "log": "Ngồi ở bậc thềm chờ nước rút, nhìn cái dép của ai trôi qua trôi lại."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay107",
+  "day": 107,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   14,
+   18
+  ],
+  "hours": 0.5,
+  "title": "Con tem bảo hành",
+  "who": "Khách",
+  "text": "Một chị mang đến cái nồi cơm điện tử còn mới, không lên nguồn. Dưới đáy nồi dán con tem bạc: \"Điện máy Thăng Long · Bảo hành 12 tháng\". Mở nắp mà bóc tem là mất bảo hành. Chị bảo chị không biết trung tâm ở đâu, tiệm gần thì sửa bừa cho nhanh, bao nhiêu chị cũng trả.",
+  "quote": "Chị khách: \"Sửa luôn đi em. Bảo hành gì đâu, mang đi mang về mất cả buổi.\"",
+  "missed": "Chị khách chờ không được, mang nồi đi chỗ khác.",
+  "choices": [
+   {
+    "label": "Nói thật: còn bảo hành thì trung tâm đầu phố sửa miễn phí",
+    "hint": "Không lấy tiền · Anh Quân +2",
+    "effects": {
+     "rep.QUAN": 2,
+     "flag.noiBaoHanh": true,
+     "diary": "Chị khách mang nồi cơm còn tem bảo hành đến, muốn sửa luôn. Nói thật: còn bảo hành thì mang ra trung tâm đầu phố, miễn phí. Chị nhìn như nhìn người lạ: \"Tiệm gì mà đuổi khách.\" Rồi chị đi, chiều quay lại mua thêm cái ổ cắm."
+    }
+   },
+   {
+    "label": "Gọi anh Quân hỏi, nhận hộ khách mang sang trung tâm",
+    "hint": "Anh Quân +3",
+    "effects": {
+     "rep.QUAN": 3,
+     "flag.quenDaiLy": true,
+     "hours": 0.5,
+     "diary": "Gọi anh Quân, nhận hộ chị khách cái nồi còn bảo hành, chiều mang sang trung tâm. Anh Quân bảo: \"Ừ. Tiệm mày nhận máy hộ tao được không? Tao trả công.\""
+    }
+   },
+   {
+    "label": "Sửa luôn, lấy tiền, không nhắc chuyện bảo hành",
+    "hint": "+150.000đ",
+    "effects": {
+     "cash": 150000,
+     "cash_label": "Sửa nồi cơm còn tem bảo hành",
+     "flag.giauBaoHanh": true,
+     "score.giauTot": 1,
+     "log": "Bóc tem, thay cái cầu chì nhiệt, lấy một trăm rưỡi. Chị khách vui. Con tem bạc nằm trong thùng rác."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay108",
+  "day": 108,
+  "mode": "full",
+  "loc": "ben_xe_6",
+  "window": [
+   7,
+   12
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag_any": [
+    "henThuViec",
+    "henBanNha"
+   ],
+   "flag.tuChoiQuan": false
+  },
+  "title": "Một buổi thử việc",
+  "who": "Anh Quân",
+  "text": "Trung tâm bảo hành sáng đèn trắng, điều hòa mười tám độ. Bàn làm việc có đồng hồ đo đời mới, linh kiện chính hãng xếp trong ngăn có mã vạch. Mỗi máy có mười lăm phút, quá giờ thì ghi lý do. Bên cạnh An là một thằng bé hai mươi tuổi, tay nhanh, đọc mã lỗi trên màn hình chứ không nghe tiếng máy.\nAnh Quân đứng sau lưng, không nói gì, chỉ nhìn đồng hồ.",
+  "quote": "Anh Quân: \"Ở đây không có ai sửa quạt bàn. Mà ở đây có lương ngày mùng năm, không muộn ngày nào.\"",
+  "missed": "An không đến buổi thử việc. Anh Quân nhắn: \"Không sao. Câu trả lời của mày vẫn để ngày 116.\"",
+  "choices": [
+   {
+    "label": "Làm hết buổi, ghi lại cái được cái mất",
+    "hint": "4 giờ · +300.000đ",
+    "effects": {
+     "hours": 4,
+     "fatigue": 12,
+     "cash": 300000,
+     "cash_label": "Một buổi thử việc ở trung tâm bảo hành",
+     "flag.thuViec": true,
+     "rep.QUAN": 2,
+     "diary": "Thử việc một buổi ở trung tâm bảo hành. Được: lương đúng ngày, linh kiện thật, điều hòa. Mất: không nghe tiếng máy, không thấy mặt khách, không có cái ghế đẩu. Ghi hai cột, cột nào cũng dài."
+    }
+   },
+   {
+    "label": "Hỏi anh Quân: tiệm nhận máy bảo hành hộ trung tâm được không",
+    "hint": "1 giờ · Anh Quân +2",
+    "effects": {
+     "hours": 1,
+     "rep.QUAN": 2,
+     "flag.hoiDaiLy": true,
+     "diary": "Thử việc chưa hết buổi thì hỏi anh Quân một câu khác: tiệm nhận máy còn bảo hành hộ trung tâm, ghi phiếu, chuyển sang, ăn công được không. Anh cười: \"Mày lúc nào cũng tìm đường thứ ba.\""
+    }
+   },
+   {
+    "label": "Về sớm, thấy không hợp",
+    "hint": "",
+    "effects": {
+     "hours": 1,
+     "flag.khongHop": true,
+     "log": "Làm được hai máy thì xin về. Anh Quân gật, ghi vào sổ: \"Không hợp. Không sao.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay109",
+  "day": 109,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   16,
+   19
+  ],
+  "hours": 1,
+  "when": {
+   "flag.luaCam": false,
+   "flag.tinVaoLop8": true
+  },
+  "title": "\"Con nghỉ học theo chú\"",
+  "who": "Tín",
+  "text": "Tín không tháo đồ. Nó ngồi trên ghế đẩu, hai tay kẹp giữa đầu gối, bài kiểm tra Toán gấp tư trong túi áo: ba điểm. Nó nói một hơi, như đã tập trước ở nhà: con học kém, con có nghề rồi, con nghỉ học theo chú làm thợ, chú nói với mẹ con hộ.",
+  "quote": "Tín: \"Chú nói thì mẹ con nghe. Con nói thì mẹ con mắng.\"",
+  "missed": "Tín chờ ở tiệm đến tối rồi về. Tối đó chị Lụa gọi: \"Nó nói với chú chuyện nghỉ học chưa?\"",
+  "missed_effects": {
+   "flag.tinMuonNghi": true
+  },
+  "choices": [
+   {
+    "label": "Nghe hết, rồi rủ nó cùng đi nói với mẹ nó, nó nói, mình ngồi bên",
+    "hint": "Tín +2 · Chị Lụa +2",
+    "effects": {
+     "rep.TIN": 2,
+     "rep.LUA": 2,
+     "flag.tinNoiVoiMa": true,
+     "diary": "Tín đòi nghỉ học theo mình làm thợ, nhờ mình nói với mẹ nó. Không nói hộ. Đi cùng nó ra hàng bánh rán, nó tự nói, mình ngồi bên. Chị Lụa nghe hết, không mắng. Chị hỏi: \"Ba điểm Toán. Còn Vật lý?\" Tám. Chị gật: \"Thế học tiếp cho đến lớp Chín, rồi tính.\" Nó gật."
+    }
+   },
+   {
+    "label": "\"Ừ, chú nhận. Để chú nói với mẹ cháu\"",
+    "hint": "Tín +3 · Chị Lụa −6",
+    "effects": {
+     "rep.TIN": 3,
+     "rep.LUA": -6,
+     "flag.quyetThayTin": true,
+     "diary": "Nhận lời Tín: cho nó nghỉ học theo mình làm thợ, mình nói với mẹ nó. Ra chợ đêm nói với chị Lụa. Chị rán xong mẻ bánh, tắt bếp, nói một câu: \"Nó là con tôi.\" Rồi chị gọi Tín về."
+    }
+   },
+   {
+    "label": "Mắng nó: \"Nghỉ học là chú đuổi khỏi tiệm\"",
+    "hint": "Tín −4",
+    "effects": {
+     "rep.TIN": -4,
+     "flag.doaTin": true,
+     "log": "Tín đứng dậy, cầm cặp, đi. Bài kiểm tra ba điểm rơi lại dưới ghế."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay109_cam",
+  "day": 109,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "window": [
+   18,
+   22
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.luaCam": true
+  },
+  "title": "Hàng bánh rán, chín giờ tối",
+  "who": "Chị Lụa",
+  "text": "Chị Lụa gọi An ra hàng, lần đầu từ hồi tháng Bảy. Tín đòi nghỉ học, bảo đi làm thợ. Nó không nói ở đâu, mà chị biết. Chị không nhờ An gì. Chị chỉ muốn biết An nói gì với nó, nếu nó đến.",
+  "quote": "Chị Lụa: \"Tôi cấm nó lui tới tiệm. Mà tôi không cấm được nó nghĩ.\"",
+  "missed": "Chị Lụa không chờ. Tối đó chị rán bánh đến khuya, Tín ngồi rửa bát bên cạnh.",
+  "choices": [
+   {
+    "label": "Nói với chị: em không nhận nó nghỉ học theo em, ai hỏi em cũng nói thế",
+    "hint": "Chị Lụa +4",
+    "effects": {
+     "rep.LUA": 4,
+     "flag.khongNhanTin": true,
+     "diary": "Chị Lụa hỏi nếu Tín đến thì nói gì. Nói thật: không nhận nó nghỉ học theo mình. Chị gật, đẩy sang một đĩa bánh rán còn nóng. \"Ăn đi. Không phải trả.\""
+    }
+   },
+   {
+    "label": "Hứa nói chuyện với nó, nếu chị cho",
+    "hint": "Chị Lụa +2",
+    "effects": {
+     "rep.LUA": 2,
+     "flag.luaChoGap": true,
+     "log": "Chị Lụa nghĩ một lúc: \"Chủ Nhật. Ở đây. Tôi ngồi đó.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay110",
+  "day": 110,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   19,
+   22
+  ],
+  "hours": 1,
+  "when": {
+   "flag_any": [
+    "tiemChung",
+    "tiemMotMinh"
+   ]
+  },
+  "title": "Sổ tháng đầu",
+  "who": "",
+  "text": "Tối thứ Bảy đóng cửa tiệm, trải cuốn sổ ra bàn. Tháng đầu: khách lẻ nhiều hơn tưởng, khách của chú Sơn ít hơn tưởng, tiền điện gấp đôi vì cái máy hàn. Cộng trừ xong, phần lãi chỉ vừa đủ tiền mặt bằng tháng sau và đợt đồ nghề trả chú Sơn.",
+  "quote": "",
+  "missed": "Cuốn sổ nằm trên bàn đến sáng, chưa ai cộng. Tiền điện tháng đầu nằm kẹp ở trang cuối, chưa chia.",
+  "missed_effects": {
+   "flag.doiSo": true
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.tiemChung": true
+    },
+    "text": "Tối thứ Bảy đóng cửa tiệm, cả mấy người đứng tên ngồi quanh cái bàn chung, cuốn sổ trải giữa. Tháng đầu: góc nào cũng có khách, mà tiền điện gấp đôi vì cái máy hàn, và chưa ai ghi tiền nước. Có người bảo chia theo góc ai làm được bao nhiêu, có người bảo chia đều theo phần góp. Ai cũng đúng một nửa.",
+    "quote": "Kha: \"Góc em ngày nào cũng có khách. Chia đều thì em bị lỗ.\""
+   }
+  ],
+  "choices": [
+   {
+    "label": "Ngồi tính đủ: tiền điện theo số máy, lãi theo phần góp, ghi giấy dán sau cửa",
+    "hint": "1 giờ · có giấy",
+    "effects": {
+     "hours": 1,
+     "flag.soThangDau": true,
+     "diary": "Tính sổ tháng đầu của tiệm cho đủ: tiền điện chia theo số máy, tiền nước chia đều, lãi chia theo phần góp, góc nào làm thêm giờ thì ghi riêng. Dán tờ giấy sau cửa, cạnh tờ giấy góp vốn. Không ai vui hẳn, mà không ai thấy mình bị lỗ."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.gopKha": true
+      },
+      "effects": {
+       "rep.KHA": 2
+      }
+     },
+     {
+      "when": {
+       "flag.gopTram": true
+      },
+      "effects": {
+       "rep.TRAM": 2
+      }
+     },
+     {
+      "when": {
+       "flag.gopMa": true
+      },
+      "effects": {
+       "rep.MA": 2,
+       "flag.noiThatC4": true
+      }
+     }
+    ]
+   },
+   {
+    "label": "Mình bù phần chênh cho êm, khỏi tính li ti",
+    "hint": "−500.000đ · che giấu",
+    "effects": {
+     "cash": -500000,
+     "cash_label": "Bù tiền điện tháng đầu cho êm",
+     "flag.buLo": true,
+     "score.giauTot": 1,
+     "log": "Bù năm trăm tiền điện cho êm, không nói với ai. Tháng sau tiền điện vẫn gấp đôi."
+    }
+   },
+   {
+    "label": "Để cuối tháng sau tính luôn hai tháng",
+    "hint": "",
+    "effects": {
+     "flag.doiSo": true,
+     "log": "Gấp cuốn sổ lại. Tháng sau sẽ dày gấp đôi."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay110_khoan",
+  "day": 110,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   19,
+   22
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.tiemKhongNhan": true
+  },
+  "title": "Đối chiếu phiếu khoán",
+  "who": "",
+  "text": "Tối thứ Bảy, người nhận tiệm đưa xấp phiếu tháng đầu ra đối chiếu với phần khoán của An. Có mấy phiếu thiếu chữ ký, có cái máy bơm An sửa mà ghi tên người khác.",
+  "quote": "",
+  "missed": "Không ai đối chiếu phiếu. Tiền khoán tháng đầu tính theo trí nhớ của người nhận tiệm.",
+  "choices": [
+   {
+    "label": "Ngồi đối chiếu từng phiếu, ký nhận, sửa cái tên ghi nhầm",
+    "hint": "+150.000đ",
+    "effects": {
+     "cash": 150000,
+     "cash_label": "Phần khoán còn thiếu sau khi đối chiếu phiếu",
+     "flag.soThangDau": true,
+     "diary": "Đối chiếu phiếu khoán tháng đầu. Cái máy bơm ghi nhầm tên, sửa lại, được thêm một trăm rưỡi. Người nhận tiệm cảm ơn vì có phiếu để mà sửa."
+    }
+   },
+   {
+    "label": "Người quen, chẳng cần đối chiếu",
+    "hint": "",
+    "effects": {
+     "log": "Ký nhận xấp phiếu không đọc."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay111",
+  "day": 111,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   18,
+   22
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.maVe": true,
+   "flag.maDaDi": false
+  },
+  "title": "Mẹ được mời làm quản đốc",
+  "who": "Mẹ",
+  "text": "Ông chủ xưởng ngõ 88 mời mẹ làm quản đốc: lương thêm hai triệu, mà phải ở xưởng đến tám giờ tối, nhận đơn gấp cuối tuần. Mẹ kể khi đang nhặt rau, giọng như kể chuyện người khác, rồi hỏi An một câu mẹ chưa từng hỏi.",
+  "quote": "Mẹ: \"Con thấy thế nào? Mẹ hỏi ý, chứ không phải mẹ xin phép.\"",
+  "missed": "Mẹ tự trả lời ông chủ xưởng. Tối mẹ về muộn, nói ngắn: \"Mẹ nhận thử một tháng.\"",
+  "missed_effects": {
+   "flag.maQuanDoc": true
+  },
+  "choices": [
+   {
+    "label": "Nói thật con lo gì, rồi hỏi mẹ muốn gì",
+    "hint": "Mẹ +3",
+    "effects": {
+     "rep.MA": 3,
+     "flag.noiThatC4": true,
+     "flag.maTuQuyet4": true,
+     "family": {
+      "who": "MA",
+      "kind": "support",
+      "text": "Nói thật với mẹ, để mẹ tự quyết"
+     },
+     "diary": "Mẹ được mời làm quản đốc xưởng. Nói thật: con lo mẹ về muộn, bà ăn cơm một mình. Rồi hỏi mẹ muốn gì. Mẹ muốn thử một tháng, tối thứ Tư với Chủ Nhật về sớm ăn cơm với bà. Mẹ tự ghi lịch đó lên tủ, cạnh hai cột vạch."
+    }
+   },
+   {
+    "label": "\"Mẹ đừng nhận, mệt lắm\"",
+    "hint": "Mẹ −2",
+    "effects": {
+     "rep.MA": -2,
+     "flag.epMa4": true,
+     "family": {
+      "who": "MA",
+      "kind": "pressure",
+      "text": "Khuyên mẹ đừng nhận làm quản đốc"
+     },
+     "log": "Mẹ gật, không nói gì. Sáng hôm sau mẹ vẫn nhận."
+    }
+   },
+   {
+    "label": "\"Mẹ nhận đi, nhà con lo\"",
+    "hint": "Mẹ +1",
+    "effects": {
+     "rep.MA": 1,
+     "flag.maQuanDoc": true,
+     "log": "Mẹ nhận. Mẹ bảo: \"Con lo nhà thì ai lo con?\" rồi cười."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay111_xa",
+  "day": 111,
+  "mode": "full",
+  "loc": "ben_xe_6",
+  "window": [
+   5.5,
+   8
+  ],
+  "hours": 1,
+  "when": {
+   "flag.maVeTrungThu": true,
+   "flag.maDaDi": true
+  },
+  "title": "Chuyến xe sáu giờ",
+  "who": "Mẹ",
+  "text": "Ba ngày mẹ về hết rồi. Sáng mười một, mẹ xách cái làn cói đứng ở điểm xe buýt Long Biên chờ xe ra bến Giáp Bát, trong làn có hộp bánh nướng bà gửi cho con bé tổ phó. Mẹ không cho ai xách làn. Mẹ chỉ hỏi, lúc xe đến.",
+  "quote": "Mẹ: \"Tết này nhà mình ăn Tết ở đâu?\"",
+  "missed": "Mẹ đi chuyến xe sáu giờ một mình, nhắn lúc đến Nam Định: \"Mẹ đến rồi. Tết tính sau.\"",
+  "choices": [
+   {
+    "label": "\"Ở nhà mình. Mẹ về thì có chỗ của mẹ\"",
+    "hint": "Mẹ +3",
+    "effects": {
+     "rep.MA": 3,
+     "flag.henTetMa": true,
+     "flag.noiThatC4": true,
+     "family": {
+      "who": "MA",
+      "kind": "support",
+      "text": "Hẹn mẹ về ăn Tết"
+     },
+     "diary": "Tiễn mẹ ra điểm xe buýt. Mẹ hỏi Tết ăn ở đâu. Bảo: ở nhà mình, mẹ về thì có chỗ của mẹ. Mẹ gật, lên xe, ngồi đúng ghế cạnh cửa sổ để nhìn ra. Xe chạy rồi mẹ mới vẫy."
+    }
+   },
+   {
+    "label": "Hỏi mẹ có muốn về ở hẳn không, không ép",
+    "hint": "Mẹ +2",
+    "effects": {
+     "rep.MA": 2,
+     "flag.hoiMaVeHan": true,
+     "log": "Mẹ nghĩ lâu: \"Chưa. Mà con hỏi thì mẹ nhớ.\""
+    }
+   },
+   {
+    "label": "Xách làn lên xe hộ mẹ, không nói gì",
+    "hint": "",
+    "effects": {
+     "log": "Mẹ để yên cho xách, lần đầu tiên."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay112",
+  "day": 112,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   6,
+   9
+  ],
+  "hours": 0.5,
+  "title": "Bà muốn tự đi",
+  "who": "Bà Thoa",
+  "text": "Hôm nay bà Thoa tái khám mắt ở bệnh viện thành phố. Bà dậy từ năm giờ, mặc bộ áo cánh tím, cái túi đựng sổ khám kẹp nách. Bà bảo bà tự đi xe buýt ở điểm Long Biên: hỏi đường rồi, có số điện thoại rồi, có miếng băng dính đỏ trên nút gọi rồi.",
+  "quote": "Bà Thoa: \"Con đưa bà đi mãi thì đến lúc con bận, bà ngồi nhà chờ con mãi.\"",
+  "missed": "Bà tự đi xe buýt tái khám. Trưa bà gọi video, bấm đúng nút đỏ: \"Bác sĩ khen. Bà về đến chợ rồi.\"",
+  "missed_effects": {
+   "flag.baTuDi": true
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.daMo": false
+    },
+    "text": "Hôm nay bà Thoa đi khám mắt để hẹn lịch mổ sau Tết. Bà dậy từ năm giờ, mặc bộ áo cánh tím, cái túi đựng sổ khám kẹp nách. Bà bảo bà tự đi xe buýt ở điểm Long Biên: hỏi đường rồi, có số điện thoại rồi, có miếng băng dính đỏ trên nút gọi rồi."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Để bà tự đi, dặn đến nơi gọi một tiếng",
+    "hint": "Bà Thoa +3",
+    "effects": {
+     "rep.BA_TU": 3,
+     "flag.baTuDi": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "support",
+      "text": "Để bà tự đi khám"
+     },
+     "diary": "Bà tự đi tái khám bằng xe buýt. Chín giờ bà gọi, bấm đúng nút băng dính đỏ: \"Bà đến rồi. Đông quá. Bà ngồi chờ.\" Mười một giờ bà gọi: \"Bác sĩ khen. Bà đi chợ rồi về.\" Cả buổi sáng làm việc mà nhìn điện thoại mười lần."
+    }
+   },
+   {
+    "label": "Không được, con chở bà đi",
+    "hint": "Bà Thoa −1 · 3 giờ",
+    "effects": {
+     "rep.BA_TU": -1,
+     "hours": 3,
+     "flag.epBa4": true,
+     "family": {
+      "who": "BA_TU",
+      "kind": "pressure",
+      "text": "Không cho bà tự đi khám"
+     },
+     "log": "Chở bà đi khám. Bà ngồi sau xe không nói gì cả đường."
+    }
+   },
+   {
+    "label": "Để bà đi, rồi lén chạy xe theo sau xe buýt",
+    "hint": "Che giấu · 3 giờ",
+    "effects": {
+     "hours": 3,
+     "flag.theoBa": true,
+     "score.giauTot": 1,
+     "rep.BA_TU": 1,
+     "family": {
+      "who": "BA_TU",
+      "kind": "conceal",
+      "text": "Lén theo bà đi khám"
+     },
+     "log": "Chạy xe máy theo sau xe buýt đến bệnh viện. Bà thấy từ điểm dừng thứ hai, không nói, chỉ vẫy tay qua cửa kính."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay113",
+  "day": 113,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   18,
+   22
+  ],
+  "hours": 0.5,
+  "title": "Tháng lương đầu",
+  "who": "Linh",
+  "text": "Linh về nhà tối thứ Năm với tháng lương đầu tiên trong đời. Em mua cho bà một cái quạt cây mới, loại có điều khiển, rồi đứng nhìn bà bấm thử. Còn lại em chia làm ba phong bì, ghi chữ in hoa: \"TIỀN NHÀ\", \"TIỀN HỌC\", \"TIỀN EM\". Em đưa An phong bì thứ nhất.",
+  "quote": "Linh: \"Năm trăm tiền nhà. Em ở nhà thì em góp như mẹ, như anh.\"",
+  "missed": "Linh để phong bì \"TIỀN NHÀ\" trên bàn, kẹp trong cuốn sổ chung.",
+  "missed_effects": {
+   "cash": 500000,
+   "cash_label": "Linh góp tiền nhà từ lương đầu",
+   "flag.linhGopNha": true
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.cheLoiLinh": true,
+     "flag.suaCheLoi": false
+    },
+    "text": "Linh về nhà tối thứ Năm, không mua gì. Hôm nay Trâm kiểm lại dãy quán bia Tạ Hiện, thấy cái ổ cắm mới thay mà phiếu ghi đã đạt từ trước. Trâm hỏi Linh. Linh bảo không biết ai thay. Em kể lại, rồi nhìn An.",
+    "quote": "Linh: \"Em nói dối chị Trâm vì anh sửa hộ. Giờ em không biết sửa lại câu nào trước.\"",
+    "choices": [
+     {
+      "label": "Cùng em đi gặp Trâm, nói thật cả chuyện cái phiếu lẫn chuyện anh sửa hộ",
+      "hint": "Trâm +2 · Linh +3",
+      "effects": {
+       "rep.TRAM": 2,
+       "rep.LINH": 3,
+       "flag.suaCheLoi": true,
+       "flag.noiThatC4": true,
+       "family": {
+        "who": "LINH",
+        "kind": "support",
+        "text": "Cùng Linh nói thật với Trâm"
+       },
+       "diary": "Cùng Linh đến gặp Trâm, nói thật: cái phiếu em ghi sai, cái ổ anh sửa hộ cho khỏi ai biết. Trâm nghe xong, ghi lại phiếu, rồi nói với An chứ không nói với Linh: \"Anh che cho em anh thì em anh học được cách che.\" Câu đó đúng."
+      }
+     },
+     {
+      "label": "\"Chuyện qua rồi, đừng nhắc\"",
+      "hint": "Linh −2",
+      "effects": {
+       "rep.LINH": -2,
+       "log": "Linh gật, đi vào phòng. Tối đó em không ra ăn cơm."
+      }
+     }
+    ]
+   }
+  ],
+  "choices": [
+   {
+    "label": "Nhận phong bì, ghi vào sổ chung",
+    "hint": "+500.000đ · Linh +3",
+    "effects": {
+     "cash": 500000,
+     "cash_label": "Linh góp tiền nhà từ lương đầu",
+     "rep.LINH": 3,
+     "flag.linhGopNha": true,
+     "family": {
+      "who": "LINH",
+      "kind": "support",
+      "text": "Nhận tiền Linh góp từ lương đầu"
+     },
+     "diary": "Linh lĩnh tháng lương đầu: mua cho bà cái quạt cây có điều khiển, chia ba phong bì, đưa mình phong bì \"TIỀN NHÀ\". Nhận, ghi vào sổ chung. Bà bấm điều khiển cái quạt mười lần, mỗi lần một số, cười như trẻ con."
+    }
+   },
+   {
+    "label": "\"Em giữ đi, nhà anh lo\"",
+    "hint": "Linh −1",
+    "effects": {
+     "rep.LINH": -1,
+     "log": "Linh cất phong bì lại, nói khẽ: \"Lo mãi thế anh không mệt à.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay114",
+  "day": 114,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   15,
+   19
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag_any": [
+    "hoiDaiLy",
+    "quenDaiLy"
+   ],
+   "flag.tuChoiQuan": false
+  },
+  "title": "Đường thứ ba",
+  "who": "Anh Quân",
+  "text": "Anh Quân ghé tiệm, đặt lên bàn xấp phiếu bảo hành in sẵn logo Thăng Long. Trung tâm cần chỗ nhận máy hộ ở chợ: khách gửi máy còn bảo hành, tiệm ghi phiếu, kiểm qua, chiều xe trung tâm sang lấy. Ba chục nghìn mỗi máy. Không phải bỏ tiệm, không phải vào trung tâm.",
+  "quote": "Anh Quân: \"Mày hỏi tao đường thứ ba. Đây. Mà nhận thì phải giữ phiếu cho đúng, sai một tờ là tao mất uy tín với công ty.\"",
+  "missed": "Anh Quân để xấp phiếu bảo hành trên bàn: \"Muốn nhận thì gọi.\"",
+  "choices": [
+   {
+    "label": "Nhận làm chỗ nhận máy, đọc kỹ quy định, ký giấy",
+    "hint": "Việc mới: nhận máy bảo hành",
+    "effects": {
+     "flag.daiLyBaoHanh": true,
+     "rep.QUAN": 3,
+     "diary": "Nhận làm chỗ nhận máy bảo hành hộ trung tâm Thăng Long. Đọc hết bốn trang quy định, ký giấy. Anh Quân bảo: \"Mày là thằng duy nhất đọc hết bốn trang.\""
+    }
+   },
+   {
+    "label": "Cảm ơn, mà tiệm còn non, chưa nhận thêm",
+    "hint": "",
+    "effects": {
+     "rep.QUAN": 1,
+     "log": "Anh Quân gật, cất xấp phiếu: \"Còn non thì biết mình non. Được.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay115",
+  "day": 115,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   15,
+   19
+  ],
+  "hours": 1,
+  "title": "Thái Bình",
+  "who": "Chú Sơn",
+  "text": "Chú Sơn ngồi ghế đẩu, rót trà cho An trước, cho mình sau. Con gái chú ở Thái Bình có vườn cau, có cái chái sau nhà trống, có thằng cháu ngoại chín tuổi mê tháo đồ. Chú đi chuyến xe sáng hai mươi chín. Chú nói xong mới uống trà, như sợ uống trước thì không nói được.",
+  "quote": "Chú Sơn: \"Ba mươi lăm năm ngồi đây. Giờ chú về ngồi dưới gốc cau. Ngồi đâu cũng là ngồi.\"",
+  "missed": "Chú Sơn kể với chị Hạnh trước. Chị Hạnh kể lại với An, mắt đỏ hoe.",
+  "missed_effects": {
+   "flag.chuSauVeQue": true
+  },
+  "choices": [
+   {
+    "label": "Hỏi chú muốn mang theo món gì, giúp chú gói",
+    "hint": "Chú Sơn +3",
+    "effects": {
+     "rep.SAU": 3,
+     "flag.chuSauVeQue": true,
+     "flag.goiDoChuSau": true,
+     "diary": "Chú Sơn về Thái Bình ở với con gái, đi chuyến xe sáng hai mươi chín. Hỏi chú muốn mang gì. Chú chỉ ba món: ấm trà, cuốn sổ khách cũ nhất (năm tám chín), cái đèn pin. \"Còn lại để tiệm. Đồ nghề không về hưu.\""
+    }
+   },
+   {
+    "label": "Nài chú ở lại, tiệm còn cần chú",
+    "hint": "Chú Sơn −2",
+    "effects": {
+     "rep.SAU": -2,
+     "flag.chuSauVeQue": true,
+     "flag.giuChuSau": true,
+     "log": "Chú Sơn cười: \"Tiệm cần thợ, không cần ông già ngồi chỉ. Cháu nói thế là thương chú, mà thương thì để chú đi.\""
+    }
+   },
+   {
+    "label": "Hứa Tết chở Tín về Thái Bình thăm chú",
+    "hint": "Chú Sơn +2 · lời hứa",
+    "showIf": {
+     "flag.luaCam": false
+    },
+    "effects": {
+     "rep.SAU": 2,
+     "flag.chuSauVeQue": true,
+     "flag.huaVeBenTre": true,
+     "diary": "Chú Sơn về Thái Bình sau rằm. Hứa Tết chở Tín về thăm chú, nếu chị Lụa cho. Chú bảo: \"Hứa ít thôi.\" Rồi chú tự sửa: \"Mà cái này hứa được.\""
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay116",
+  "day": 116,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "window": [
+   16,
+   20
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.loiMoiQuan": true,
+   "flag.tuChoiQuan": false
+  },
+  "title": "Trả lời anh Quân",
+  "who": "Anh Quân",
+  "text": "Quán cà phê đầu chợ, cái bàn cũ, tờ giấy đánh máy anh Quân đưa hôm trước nằm trên bàn, đã có mấy vết gấp. Anh Quân không hỏi. Anh chỉ đẩy cốc cà phê sang, chờ.",
+  "quote": "Anh Quân: \"Nói đi. Tao chịu được cả hai câu.\"",
+  "missed": "An không đến. Anh Quân nhắn: \"Không đến tức là không. Tao hiểu.\"",
+  "missed_effects": {
+   "flag.tuChoiQuan": true
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.thuViec": true
+    },
+    "text": "Quán cà phê đầu chợ, cái bàn cũ. Tờ giấy đánh máy anh Quân đưa hôm trước nằm trên bàn, bên cạnh tờ giấy hai cột An viết sau buổi thử việc: được và mất, cột nào cũng dài. Anh Quân đọc tờ giấy hai cột trước, không hỏi gì."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Từ chối, cảm ơn anh. Tiệm nhận máy hộ nếu anh cần",
+    "hint": "Anh Quân +2",
+    "effects": {
+     "flag.tuChoiQuan": true,
+     "rep.QUAN": 2,
+     "diary": "Từ chối lời mời của anh Quân, cảm ơn đàng hoàng. Anh gấp tờ giấy, bảo: \"Tao đoán thế. Mà tao mừng là mày tính chứ không phải mày sợ.\" Hai anh em uống hết cốc cà phê, nói chuyện cái máy hàn đời mới."
+    }
+   },
+   {
+    "label": "Xin thêm một tháng để tính",
+    "hint": "Anh Quân −1",
+    "effects": {
+     "flag.tuChoiQuan": true,
+     "flag.hoanTraLoi": true,
+     "rep.QUAN": -1,
+     "log": "Anh Quân lắc đầu: \"Một tháng thì tao tuyển người khác rồi. Không sao. Lần sau.\""
+    }
+   },
+   {
+    "label": "Nhận: thợ chính trung tâm từ mùng một tháng Chín",
+    "hint": "Lương cứng, giờ hành chính",
+    "effects": {
+     "flag.vaoTrungTam": true,
+     "rep.QUAN": 4,
+     "diary": "Nhận lời anh Quân: thợ chính trung tâm bảo hành từ mùng một tháng Chín, chín triệu, giờ hành chính, nghỉ Chủ Nhật. Đọc lại tờ giấy, ký. Không thấy mình thua ai. Chỉ thấy tháng sau có một con số chắc chắn."
+    },
+    "bonus": [
+     {
+      "when": {
+       "flag.tiemChung": true
+      },
+      "effects": {
+       "diary": "Tối đó nói với những người đứng tên tiệm: mình rút ra làm công, giữ phần góp, Chủ Nhật vẫn ra tiệm sửa quạt. Có người giận, có người hiểu. Ghi giấy lại hết."
+      }
+     },
+     {
+      "when": {
+       "flag.tiemMotMinh": true
+      },
+      "effects": {
+       "diary": "Tối đó ngồi tính chuyện cái tiệm: Chủ Nhật mở, ngày thường gửi chìa cho chị Hạnh giữ, khách gửi máy thì để lại phiếu. Không đẹp, mà làm được."
+      }
+     },
+     {
+      "when": {
+       "flag.henBanNha": true
+      },
+      "effects": {
+       "flag.noiThatC4": true
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ngay117",
+  "day": 117,
+  "mode": "full",
+  "loc": "cho_cau_nho",
+  "window": [
+   18,
+   21
+  ],
+  "hours": 1.5,
+  "when": {
+   "flag.luaCam": false,
+   "flag.tinVaoLop8": true
+  },
+  "title": "Họp phụ huynh",
+  "who": "Chị Lụa",
+  "text": "Trường cuối phố Hàng Khoai họp phụ huynh lớp Tám lúc bảy giờ tối, đúng giờ hàng bánh rán của chị Lụa đông khách nhất. Chị đứng trước hàng, tạp dề còn dính bột, cầm tờ giấy mời. Chị không nhờ. Chị hỏi An tối nay có rảnh không, hỏi xong thì nhìn chỗ khác.",
+  "quote": "Chị Lụa: \"Tôi nghỉ một tối thì mất ba trăm. Mà tôi không muốn người khác ngồi chỗ của tôi.\"",
+  "missed": "Chị Lụa dọn hàng sớm, tự đi họp. Tối đó hàng bánh rán tắt bếp lúc sáu giờ.",
+  "missed_effects": {
+   "rep.LUA": 1
+  },
+  "variants": [
+   {
+    "when": {
+     "flag.quyetThayTin": true
+    },
+    "text": "Trường cuối phố Hàng Khoai họp phụ huynh lớp Tám. Cô Mai giữ chị Lụa lại sau buổi họp: Tín nghỉ học ba hôm, bảo là \"chú An nhận con làm thợ\". Chị Lụa đi thẳng ra tiệm, không cởi tạp dề.",
+    "quote": "Chị Lụa: \"Anh không phải bố nó. Anh không quyết chuyện học của nó.\"",
+    "choices": [
+     {
+      "label": "Nhận sai, nói với Tín trước mặt chị: chú rút lại, cháu đi học",
+      "hint": "Chị Lụa +3 · Tín −2",
+      "effects": {
+       "rep.LUA": 3,
+       "rep.TIN": -2,
+       "flag.rutLaiTin": true,
+       "diary": "Chị Lụa ra tiệm sau buổi họp phụ huynh. Nhận sai, nói với Tín trước mặt chị: chú rút lại lời hôm trước, cháu đi học, Chủ Nhật mới ra tiệm. Tín khóc. Chị Lụa không khóc. Chị bảo: \"Thế là được.\""
+      }
+     },
+     {
+      "label": "Cãi: nó có nghề, học làm gì",
+      "hint": "Chị Lụa −5",
+      "effects": {
+       "rep.LUA": -5,
+       "flag.luaCam": true,
+       "log": "Chị Lụa kéo Tín về. Từ mai nó không được đến tiệm."
+      }
+     }
+    ]
+   }
+  ],
+  "choices": [
+   {
+    "label": "Trông hàng hộ chị một tối, để chị đi họp",
+    "hint": "Chị Lụa +4 · 2 giờ",
+    "effects": {
+     "rep.LUA": 4,
+     "hours": 2,
+     "fatigue": 6,
+     "flag.trongSapLua": true,
+     "diary": "Trông hàng bánh rán hộ chị Lụa một tối để chị đi họp phụ huynh của Tín. Rán cháy hai cái, khách vẫn ăn. Chị về, đếm tiền, đếm lại bánh, bảo: \"Cháy hai cái. Biết ngay.\" Rồi chị kể cô Mai khen Tín môn Vật lý."
+    }
+   },
+   {
+    "label": "Đi họp thay chị, về kể lại",
+    "hint": "Chị Lụa +1",
+    "effects": {
+     "rep.LUA": 1,
+     "rep.MAI": 1,
+     "flag.diHopThay": true,
+     "log": "Đi họp thay chị Lụa, ghi đủ lời cô Mai. Chị nghe, gật, mà hỏi lại ba lần: \"Cô có nói gì riêng về nó không?\""
+    }
+   },
+   {
+    "label": "Không đi, chuyện nhà chị",
+    "hint": "",
+    "effects": {
+     "log": "Chị Lụa gật, dọn hàng sớm."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay118",
+  "day": 118,
+  "mode": "full",
+  "loc": "tiem_sau",
+  "window": [
+   14,
+   18
+  ],
+  "hours": 0.5,
+  "when": {
+   "flag.luaCam": false,
+   "flag.tinVaoLop8": true,
+   "flag.quyetThayTin": false
+  },
+  "title": "Cuốn phiếu Chủ Nhật",
+  "who": "Tín",
+  "text": "Chủ Nhật, mưa chiều. Tín ngồi ở góc tiệm, làm bài Vật lý trên mặt bàn chung. Trên kệ là cuốn phiếu nhận sửa mới in, còn nguyên tờ đầu. Sáng Chủ Nhật nào khách cũng đông, mà An thì một tay ghi phiếu một tay mở ốc.",
+  "quote": "Tín: \"Chủ Nhật con ghi phiếu được. Con không đụng điện. Con chỉ ghi.\"",
+  "missed": "Tín làm xong bài Vật lý, ngồi xem đến tối. Cuốn phiếu mới vẫn còn nguyên tờ đầu.",
+  "choices": [
+   {
+    "label": "Giao nó ghi phiếu sáng Chủ Nhật, mình ký duyệt, có công (đã hỏi chị Lụa)",
+    "hint": "Tín +3",
+    "effects": {
+     "rep.TIN": 3,
+     "flag.giaoTinPhieu": true,
+     "diary": "Giao Tín cuốn phiếu Chủ Nhật: nó ghi, mình ký duyệt, công năm chục một buổi, chị Lụa đồng ý qua tin nhắn. Tờ đầu tiên nó ghi: \"Khách: cô Bích. Máy: nồi cơm. Đã báo giá: rồi.\" Chữ in hoa, giống chữ Linh."
+    }
+   },
+   {
+    "label": "Để nó ngồi xem thôi, lớn thêm tí rồi tính",
+    "hint": "",
+    "effects": {
+     "log": "Tín gật, quay lại bài Vật lý."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay119",
+  "day": 119,
+  "mode": "full",
+  "loc": "ben_xe_6",
+  "window": [
+   5.5,
+   8
+  ],
+  "hours": 1,
+  "when": {
+   "flag.chuSauVeQue": true
+  },
+  "title": "Chuyến xe về Thái Bình",
+  "who": "Chú Sơn",
+  "text": "Sáu giờ sáng, điểm xe buýt Long Biên. Chú Sơn đội cái mũ lưỡi trai bạc màu, xách ấm trà và cuốn sổ khách năm tám chín. Cái ghế đẩu chú để lại ở tiệm, đặt sát cửa, như mọi sáng. Xe buýt ra bến Giáp Bát chưa đến, chú ngồi trên bậc thềm điểm xe, chỗ nhìn được về phía chợ.",
+  "quote": "Chú Sơn: \"Cái ghế đó đừng sơn lại. Để nó cũ.\"",
+  "missed": "Chú Sơn đi chuyến xe sáu giờ. Chị Hạnh tiễn, mang theo hộp cơm. Chú nhắn lại một câu cho An: \"Ghế đừng sơn.\"",
+  "missed_effects": {
+   "rep.SAU": -2
+  },
+  "choices": [
+   {
+    "label": "Ngồi với chú đến lúc xe đến, hứa Tết về thăm",
+    "hint": "Chú Sơn +3",
+    "effects": {
+     "rep.SAU": 3,
+     "flag.tienChuSau": true,
+     "rested": true,
+     "diary": "Tiễn chú Sơn ra điểm xe buýt, chú ra bến Giáp Bát về Thái Bình. Ngồi trên bậc thềm với chú đến lúc xe đến, không nói gì nhiều. Xe chạy rồi, chú mở cửa sổ, nói vọng ra: \"Ghế đừng sơn!\" Cả điểm xe quay lại nhìn."
+    }
+   },
+   {
+    "label": "Đưa chú cuốn sổ phiếu đầu tiên của tiệm mới, giữ làm kỷ niệm",
+    "hint": "Chú Sơn +4",
+    "effects": {
+     "rep.SAU": 4,
+     "flag.tienChuSau": true,
+     "flag.soPhieuChoChu": true,
+     "diary": "Tiễn chú Sơn, đưa chú cuốn phiếu đầu tiên của tiệm mới, có cả tờ của Tín. Chú lật từng trang đến khi xe đến, rồi kẹp cuốn phiếu vào cuốn sổ năm tám chín. \"Hai cuốn này ở chung một chỗ.\""
+    }
+   },
+   {
+    "label": "Khiêng đồ lên xe, không nói gì",
+    "hint": "",
+    "effects": {
+     "flag.tienChuSau": true,
+     "log": "Xách ấm trà lên xe hộ chú. Chú vỗ vai hai cái, như gõ vách."
+    }
+   }
+  ]
+ },
+ {
+  "id": "ngay120",
+  "day": 120,
+  "mode": "full",
+  "loc": "home",
+  "window": [
+   17,
+   21
+  ],
+  "hours": 2,
+  "title": "Đêm cuối tháng Tám",
+  "who": "Cả nhà",
+  "text": "Đêm ba mươi tháng Tám. Mâm cơm dọn ra hiên, trăng đã khuyết một nửa. Trên cánh tủ có hai cột vạch, tờ lịch kiêng tháng Bảy đã cất, giờ dán tờ lịch trả tiền tháng Chín, chữ của mấy người khác nhau. Trong túi đồ nghề có cái mỏ lết khắc tên và một chùm chìa khóa đã mở được ba mươi lần.\nTối nay đóng tiền nhà tháng sau: {rent}.",
+  "quote": "Bà Thoa: \"Tháng Tám trăng tròn rồi khuyết. Mà khuyết thì tháng sau tròn lại. Ăn cơm đi con.\"",
+  "variants": [
+   {
+    "when": {
+     "long_home": false
+    },
+    "text": "Đêm ba mươi tháng Tám. Mâm cơm dọn ra hiên, trăng đã khuyết một nửa. Trên cánh cái tủ dì Nga cho mượn, tờ lịch kiêng tháng Bảy đã cất, giờ dán tờ lịch trả tiền tháng Chín, chữ của mấy người khác nhau. Trong túi đồ nghề có cái mỏ lết khắc tên và một chùm chìa khóa đã mở được ba mươi lần.\nTối nay góp tiền chợ cho dì Nga."
+   }
+  ],
+  "choices": [
+   {
+    "label": "Ăn cơm, kể chuyện tháng Tám cho cả nhà nghe",
+    "hint": "Kết chương 4",
+    "effects": {
+     "special": "end_game",
+     "diary": "Đêm cuối tháng Tám. Ăn cơm, kể chuyện tháng này: cái tiệm, ba mươi hai cái quạt, cái đèn ông sao cánh lệch, chú Sơn về Thái Bình. Kể xong mới thấy tháng này mình để người khác làm nhiều việc hơn mọi tháng, mà không có việc nào hỏng."
+    }
+   },
+   {
+    "label": "Ra tiệm ngồi trên cái ghế đẩu một lúc",
+    "hint": "Kết chương 4",
+    "effects": {
+     "special": "end_game",
+     "diary": "Đêm cuối tháng Tám, ra tiệm ngồi trên cái ghế đẩu của chú Sơn. Ghế cũ, một chân hơi cập kênh. Không sơn, không sửa. Ngồi được."
+    }
+   },
+   {
+    "label": "Ra hiên gọi video cho người ở xa",
+    "hint": "Kết chương 4",
+    "effects": {
+     "special": "end_game",
+     "diary": "Đêm cuối tháng Tám, ra hiên gọi video. Bà đã gọi trước, đang nói chuyện với chị Cả, bấm đúng nút băng dính đỏ. Đứng chờ bà nói xong."
+    }
+   }
+  ]
+ }
+]

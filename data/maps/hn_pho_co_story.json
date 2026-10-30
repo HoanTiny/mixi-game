@@ -1,0 +1,506 @@
+{
+ "_ghi_chu": "Sinh bằng tools/gen_phocu_map.py. Bố trí mới giữ tỷ lệ nhà/người, giảm khoảng trống giữa hoạt động.",
+ "map": "hn_pho_co",
+ "displayName": "Phố cổ Hà Nội",
+ "layoutVersion": 2,
+ "walkHoursPerMeter": 0.0032,
+ "locations": {
+  "xom_bo_me": {
+   "at": [
+    -8,
+    16
+   ],
+   "w": 13,
+   "d": 10,
+   "road": "Ngõ 25 Phúc Tân"
+  },
+  "tiem_sau": {
+   "at": [
+    -8,
+    -10.8
+   ],
+   "w": 9,
+   "d": 11,
+   "road": "Phố Hàng Chiếu"
+  },
+  "cho_cau_nho": {
+   "at": [
+    16,
+    -12.3
+   ],
+   "w": 26,
+   "d": 14,
+   "road": "Phố Hàng Chiếu"
+  },
+  "com_hanh": {
+   "at": [
+    16,
+    15.5
+   ],
+   "w": 8,
+   "d": 11,
+   "road": "Ngõ 25 Phúc Tân"
+  },
+  "nha_di_nam": {
+   "at": [
+    -31,
+    16
+   ],
+   "w": 7,
+   "d": 10,
+   "road": "Ngõ 25 Phúc Tân"
+  },
+  "hem_dua": {
+   "at": [
+    50,
+    -14
+   ],
+   "w": 5.5,
+   "d": 8,
+   "road": "Ngõ Gạch"
+  },
+  "cam_do": {
+   "at": [
+    35,
+    14
+   ],
+   "w": 5,
+   "d": 8,
+   "road": "Ngõ Gạch"
+  },
+  "ben_xe_6": {
+   "at": [
+    65.2,
+    -10
+   ],
+   "w": 7,
+   "d": 3,
+   "road": "Phố Trần Nhật Duật",
+   "inset": 3.5
+  },
+  "bai_boc_vac": {
+   "at": [
+    67,
+    -20
+   ],
+   "w": 8,
+   "d": 6,
+   "road": "Phố Trần Nhật Duật",
+   "inset": 0
+  },
+  "xe_tho": {
+   "at": [
+    48,
+    -5.3
+   ],
+   "w": 6,
+   "d": 4,
+   "road": "Phố Hàng Chiếu",
+   "inset": 0
+  },
+  "nha_tro_giuong": {
+   "at": [
+    60,
+    16
+   ],
+   "w": 12,
+   "d": 10,
+   "road": "Ngõ 25 Phúc Tân"
+  },
+  "quan_net": {
+   "at": [
+    -42.7,
+    45
+   ],
+   "w": 6,
+   "d": 10,
+   "road": "Phố Hàng Bạc"
+  },
+  "shop_ao": {
+   "at": [
+    -43.7,
+    65
+   ],
+   "w": 6,
+   "d": 8,
+   "road": "Phố Hàng Bạc"
+  },
+  "tiem_toc": {
+   "at": [
+    -43.7,
+    80
+   ],
+   "w": 5,
+   "d": 8,
+   "road": "Phố Hàng Bạc"
+  },
+  "ve_so": {
+   "at": [
+    -34,
+    -8.3
+   ],
+   "w": 4,
+   "d": 6,
+   "road": "Phố Hàng Chiếu"
+  },
+  "bi_a": {
+   "at": [
+    -24,
+    68.8
+   ],
+   "w": 8,
+   "d": 9,
+   "road": "Phố Lương Ngọc Quyến"
+  },
+  "ben_can": {
+   "at": [
+    50,
+    73
+   ],
+   "w": 24,
+   "d": 10,
+   "road": "Phố Tạ Hiện"
+  },
+  "ho_guom": {
+   "at": [
+    4,
+    88.5
+   ],
+   "w": 8,
+   "d": 3,
+   "road": "Đường dạo Hồ Gươm",
+   "inset": 0
+  },
+  "cau_tre": {
+   "at": [
+    147.2,
+    12
+   ],
+   "w": 9,
+   "d": 9,
+   "road": "Phố Ngọc Thụy"
+  }
+ },
+ "names": {
+  "Cầu Long Biên": "Cầu Long Biên",
+  "Lối sang chợ Phúc Tân": "Lối sang chợ Phúc Tân",
+  "Lối xuống Hồ Gươm": "Lối xuống Hồ Gươm",
+  "Ngõ 25 Phúc Tân": "Ngõ 25 Phúc Tân",
+  "Ngõ Gạch": "Ngõ Gạch",
+  "Phố Cầu Gỗ": "Phố Cầu Gỗ",
+  "Phố Gầm Cầu": "Phố Gầm Cầu",
+  "Phố Hàng Bạc": "Phố Hàng Bạc",
+  "Phố Hàng Chiếu": "Phố Hàng Chiếu",
+  "Phố Lương Ngọc Quyến": "Phố Lương Ngọc Quyến",
+  "Phố Ngọc Thụy": "Phố Ngọc Thụy",
+  "Phố Trần Nhật Duật": "Phố Trần Nhật Duật",
+  "Phố Tạ Hiện": "Phố Tạ Hiện",
+  "Đường dạo Hồ Gươm": "Đường dạo Hồ Gươm",
+  "Đường dạo phía tây": "Đường dạo phía tây"
+ },
+ "fallbackNames": [
+  "Phố cổ"
+ ],
+ "descriptions": {
+  "xom_bo_me": "Xóm trọ Phúc Tân có sân chung và dây phơi. Ra đầu ngõ là quán cơm Hạnh; qua lối ngang tới tiệm chú Sơn và chợ. Cuối tháng cả xóm phải chuyển đi.",
+  "tiem_sau": "Tiệm chú Sơn ở góc Hàng Chiếu, sát dãy vòm cầu Gầm Cầu: sửa xe máy và đồ điện gia dụng. Bàn sửa nhìn sang sạp linh kiện ở chợ.",
+  "cho_cau_nho": "Chợ Long Biên thu gọn quanh sân bốc hàng: rau quả, linh kiện, đồ cũ, sạp cô Thắm và bảng tin nhà trọ. Ngõ Gạch rẽ ngay bên chợ.",
+  "com_hanh": "Quán cơm Hạnh ở cửa ngõ Phúc Tân. Thợ sửa, người bốc vác và shipper ghé ăn rồi quay lại ca làm. Từ đây đi một đoạn ngõ ngắn là tới sân trọ.",
+  "nha_di_nam": "Nhà dì Nga cùng ngõ Phúc Tân, cách sân trọ vài cửa. Ở tạm được bảy ngày, phải gửi bớt đồ; ra chợ và điểm xe đều thuận đường.",
+  "hem_dua": "Phòng gác xép trong ngõ Gạch ngay bên chợ. Cửa sát ngõ, trần thấp, ít chỗ phơi; có người bán rau và tiệm cầm đồ ở đầu ngõ.",
+  "cam_do": "Tiệm cầm đồ đầu ngõ Gạch: cầm đồ lấy tiền ngay, hẹn mười ngày chuộc, có lãi.",
+  "ben_xe_6": "Điểm xe buýt Long Biên trên Trần Nhật Duật, ở mép cụm chợ. Xe đưa công nhân và học viên tới khu công nghiệp; từ đây cũng có chuyến sang khu khác.",
+  "bai_boc_vac": "Bãi xe tải rau quả cạnh chợ Long Biên, ngay trước điểm xe buýt. Người bốc vác nhận ca và tiền công tại bàn điều phối.",
+  "xe_tho": "Điểm thuê xe thồ cạnh sạp đầu chợ. Kéo hàng giữa kho và các sạp, trả theo chuyến.",
+  "nha_tro_giuong": "Nhà trọ giường tầng ở cuối ngõ Phúc Tân, 30.000đ một đêm: phòng chung, quạt trần và tủ khóa nhỏ.",
+  "quan_net": "Quán net Hàng Bạc trên phố dịch vụ cạnh khu trọ: tìm việc, đọc tin, chơi một ván hoặc nghỉ qua đêm.",
+  "shop_ao": "Shop quần áo si-đa của chị Vy trên phố dịch vụ Hàng Bạc: bán lẻ và túi mù 99.000đ.",
+  "tiem_toc": "Tiệm tóc Hàng Bạc gần lối xuống hồ, mở 08:00–19:00: cắt gọn, tỉa và nhuộm tóc.",
+  "ve_so": "Đại lý vé số ở đầu Hàng Chiếu: vé 10.000đ một tờ, chiều mở thưởng.",
+  "bi_a": "Quán bi-a anh Dũng trên Lương Ngọc Quyến. Gần phố Tạ Hiện, tối có người nghỉ ca ghé chơi.",
+  "ben_can": "Dãy quán bia Tạ Hiện chung lối đi và đường điện cũ. Hợp đồng sửa điện của anh Phúc dẫn An sang cụm việc làm này.",
+  "ho_guom": "Dãy ghế đá đầu đường dạo hồ Gươm. Có bàn cờ, người tập dưỡng sinh và chỗ nghỉ sau ca làm; đường dạo nối lại phố dịch vụ.",
+  "cau_tre": "Phòng Ngọc Thụy bên kia sông Hồng. Hiên rộng, thoáng và tiền vào ở thấp hơn, nhưng đi làm phải qua cầu hoặc đi xe."
+ },
+ "landmarks": [
+  {
+   "kind": "truss",
+   "a": [
+    110,
+    -30
+   ],
+   "b": [
+    140,
+    -30
+   ],
+   "w": 9,
+   "h": 8,
+   "spans": 1
+  },
+  {
+   "kind": "thap_rua",
+   "pos": [
+    4,
+    121
+   ]
+  },
+  {
+   "kind": "viaduct_top",
+   "a": [
+    -45,
+    -44
+   ],
+   "b": [
+    32,
+    -44
+   ],
+   "y": 6.4,
+   "w": 9
+  },
+  {
+   "kind": "arches",
+   "a": [
+    -45,
+    -38.9
+   ],
+   "b": [
+    32,
+    -38.9
+   ],
+   "h": 4.8,
+   "step": 6
+  }
+ ],
+ "questAreas": {
+  "meo_be_bap": {
+   "around": "cho_cau_nho",
+   "radius": 35
+  }
+ },
+ "vendorRoutes": {
+  "banh_mi": [
+   [
+    -48,
+    0
+   ],
+   [
+    70,
+    0
+   ],
+   [
+    70,
+    24
+   ],
+   [
+    -48,
+    24
+   ],
+   [
+    -48,
+    0
+   ]
+  ],
+  "xoi": [
+   [
+    1.5,
+    0
+   ],
+   [
+    28,
+    0
+   ],
+   [
+    28,
+    24
+   ],
+   [
+    1.5,
+    24
+   ],
+   [
+    1.5,
+    0
+   ]
+  ],
+  "ve_chai": [
+   [
+    -48,
+    24
+   ],
+   [
+    70,
+    24
+   ],
+   [
+    70,
+    60
+   ],
+   [
+    -48,
+    60
+   ],
+   [
+    -48,
+    24
+   ]
+  ],
+  "che": [
+   [
+    -48,
+    60
+   ],
+   [
+    36,
+    60
+   ],
+   [
+    36,
+    94
+   ],
+   [
+    -48,
+    94
+   ],
+   [
+    -48,
+    60
+   ]
+  ],
+  "hu_tieu": [
+   [
+    -48,
+    60
+   ],
+   [
+    70,
+    60
+   ],
+   [
+    70,
+    24
+   ],
+   [
+    -48,
+    24
+   ],
+   [
+    -48,
+    60
+   ]
+  ],
+  "kem": [
+   [
+    -24,
+    94
+   ],
+   [
+    -24,
+    140
+   ],
+   [
+    34,
+    140
+   ],
+   [
+    34,
+    94
+   ],
+   [
+    -24,
+    94
+   ]
+  ],
+  "hoa_qua": [
+   [
+    16,
+    0
+   ],
+   [
+    70,
+    0
+   ],
+   [
+    70,
+    -30
+   ],
+   [
+    16,
+    -30
+   ],
+   [
+    16,
+    0
+   ]
+  ],
+  "hoa": [
+   [
+    -48,
+    0
+   ],
+   [
+    -48,
+    60
+   ],
+   [
+    4,
+    60
+   ],
+   [
+    4,
+    24
+   ],
+   [
+    -48,
+    24
+   ],
+   [
+    -48,
+    0
+   ]
+  ],
+  "bong_bay": [
+   [
+    -48,
+    60
+   ],
+   [
+    36,
+    60
+   ],
+   [
+    36,
+    94
+   ],
+   [
+    -48,
+    94
+   ],
+   [
+    -48,
+    60
+   ]
+  ],
+  "banh_ran": [
+   [
+    -48,
+    24
+   ],
+   [
+    28,
+    24
+   ],
+   [
+    28,
+    0
+   ],
+   [
+    -48,
+    0
+   ],
+   [
+    -48,
+    24
+   ]
+  ]
+ }
+}

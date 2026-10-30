@@ -1,0 +1,179 @@
+{
+ "_ghi_chu": "Việc nhờ của chương 4, cùng cú pháp với quests.json. \"home\" là chỗ ở hiện tại.",
+ "items": {
+  "nan_tre": "Bó nan tre, dây thép và giấy kính đỏ"
+ },
+ "quests": [
+  {
+   "id": "don_truong",
+   "title": "Ba mươi hai cái quạt trần",
+   "who": "Cô Mai",
+   "giver": "cho_cau_nho",
+   "offer": false,
+   "deadline_days": 2,
+   "deadline_hour": 22,
+   "intro": "",
+   "reward_hint": "4.000.000đ khi xong cả tám phòng",
+   "reward": {
+    "cash": 4000000,
+    "cash_label": "Trường cấp hai trả công kiểm, sửa quạt trần",
+    "flag.donTruongXong": true,
+    "rep.MAI": 4,
+    "diary": "Ba mươi hai cái quạt trần của trường quay đủ, tám phòng, trước khai giảng. Bốn buổi trong ba ngày, ngủ được mười tiếng cộng lại. Cô Mai trả bốn triệu, đếm hai lần."
+   },
+   "reward_text": "Cô Mai đi một vòng tám phòng, bật từng công tắc. Ba mươi hai cái quạt quay đều. Cô ký phiếu, trả đủ bốn triệu, rồi nói: \"Anh làm một mình à? Lần sau đừng.\"",
+   "fail": {
+    "flag.treDonTruong": true,
+    "flag.donTruongXong": true,
+    "rep.MAI": -8
+   },
+   "fail_text": "Tối ngày 94 vẫn còn phòng chưa xong. Cô Mai nhắn: \"Sáng mai khai giảng. Tôi xếp lớp theo chữ 'chắc' của anh.\"",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "sua_quat_truong",
+     "count": 4,
+     "text": "Làm 4 buổi ở trường cấp hai cuối phố Hàng Khoai trước tối ngày 94"
+    }
+   ]
+  },
+  {
+   "id": "don_truong_chung",
+   "title": "Quạt trần trường cấp hai (làm chung với tổ Trâm)",
+   "who": "Cô Mai",
+   "giver": "cho_cau_nho",
+   "offer": false,
+   "deadline_days": 2,
+   "deadline_hour": 22,
+   "intro": "",
+   "reward_hint": "2.000.000đ phần của An",
+   "reward": {
+    "cash": 2000000,
+    "cash_label": "Trường cấp hai trả công kiểm, sửa quạt trần",
+    "flag.donTruongXong": true,
+    "rep.MAI": 4,
+    "diary": "Xong bốn phòng phần mình ở trường, tổ Trâm xong bốn phòng kia. Hai xấp phiếu, một dòng nghiệm thu. Trâm nói lần sau chia việc kiểu này nữa."
+   },
+   "reward_text": "Hai xấp phiếu kiểm quạt, một của An, một của tổ Trâm, kẹp chung. Cô Mai ký một dòng nghiệm thu cho cả hai, trả phần của An hai triệu.",
+   "fail": {
+    "flag.treDonTruong": true,
+    "flag.donTruongXong": true,
+    "rep.MAI": -8
+   },
+   "fail_text": "Tối ngày 94 vẫn còn phòng chưa xong. Cô Mai nhắn: \"Sáng mai khai giảng. Tôi xếp lớp theo chữ 'chắc' của anh.\"",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "sua_quat_truong",
+     "count": 2,
+     "text": "Làm 2 buổi ở trường cấp hai cuối phố Hàng Khoai trước tối ngày 94"
+    }
+   ]
+  },
+  {
+   "id": "don_truong_vua",
+   "title": "Bốn phòng học trước khai giảng",
+   "who": "Cô Mai",
+   "giver": "cho_cau_nho",
+   "offer": false,
+   "deadline_days": 2,
+   "deadline_hour": 22,
+   "intro": "",
+   "reward_hint": "2.000.000đ cho bốn phòng",
+   "reward": {
+    "cash": 2000000,
+    "cash_label": "Trường cấp hai trả công kiểm, sửa quạt trần",
+    "flag.donTruongXong": true,
+    "rep.MAI": 4,
+    "diary": "Xong bốn phòng ở trường đúng như đã nói. Bốn phòng kia hẹn tuần sau, cô Mai đã dán giấy. Không ai phải chờ chữ \"chắc\"."
+   },
+   "reward_text": "Bốn phòng có quạt quay, đúng như đã hẹn. Cô Mai trả hai triệu, đưa luôn danh sách bốn phòng còn lại: \"Tuần sau anh làm tiếp, tôi không tìm ai khác.\"",
+   "fail": {
+    "flag.treDonTruong": true,
+    "flag.donTruongXong": true,
+    "rep.MAI": -8
+   },
+   "fail_text": "Tối ngày 94 vẫn còn phòng chưa xong. Cô Mai nhắn: \"Sáng mai khai giảng. Tôi xếp lớp theo chữ 'chắc' của anh.\"",
+   "steps": [
+    {
+     "kind": "action",
+     "action": "sua_quat_truong",
+     "count": 2,
+     "text": "Làm 2 buổi ở trường cấp hai cuối phố Hàng Khoai trước tối ngày 94"
+    }
+   ]
+  },
+  {
+   "id": "den_ong_sao",
+   "title": "Đèn ông sao của cu Bin",
+   "who": "Cu Bin",
+   "giver": "com_hanh",
+   "offer": false,
+   "deadline_days": 1,
+   "deadline_hour": 19,
+   "intro": "",
+   "reward_hint": "Minh +4",
+   "reward": {
+    "rep.MINH": 4,
+    "flag.denOngSao": true,
+    "fatigue": -3,
+    "diary": "Làm đèn ông sao với cu Bin ở quán chị Hạnh: mình uốn nan, buộc dây thép, nó quét hồ dán giấy kính đỏ, lưỡi thè ra một bên."
+   },
+   "reward_text": "Cu Bin giơ cái đèn ông sao lên, xoay một vòng cho đỏ cả quán. Minh về kịp, đứng ngoài cửa quán chụp ảnh, gửi cho cả nhóm xe: \"Con tao làm.\"",
+   "fail": {
+    "rep.MINH": -2
+   },
+   "fail_text": "Tối mười bốn vẫn chưa xong cái đèn ông sao. Chị Hạnh làm hộ cu Bin phần còn lại.",
+   "steps": [
+    {
+     "kind": "visit",
+     "loc": "cho_cau_nho",
+     "hours": 0.5,
+     "effects": {
+      "cash": -30000,
+      "cash_label": "Nan tre, dây thép, giấy kính",
+      "item.nan_tre": 1
+     },
+     "text": "Mua nan tre, dây thép, thêm giấy kính ở chợ Long Biên"
+    },
+    {
+     "kind": "visit",
+     "loc": "com_hanh",
+     "hours": 1.5,
+     "window": [
+      15,
+      19
+     ],
+     "need_items": {
+      "nan_tre": 1
+     },
+     "consume": true,
+     "text": "Về quán chị Hạnh, ngồi làm đèn ông sao với cu Bin (15:00–19:00)",
+     "scene": {
+      "title": "Năm cánh sao",
+      "who": "Cu Bin",
+      "text": "An uốn nan tre thành năm cánh, buộc dây thép. Cu Bin quét hồ, dán giấy kính đỏ, lưỡi thè ra một bên. Một cánh dán lệch. Nó nhìn cánh lệch rất lâu.",
+      "choices": [
+       {
+        "label": "Để nguyên cánh lệch, khen nó dán khéo",
+        "hint": "Minh +2",
+        "effects": {
+         "rep.MINH": 2,
+         "flag.canhLech": true,
+         "diary": "Cu Bin dán lệch một cánh đèn ông sao, không cho sửa: \"Lệch là của cháu.\" Để nguyên. Cái đèn ông sao năm cánh, một cánh nghiêng, đẹp nhất xóm."
+        }
+       },
+       {
+        "label": "Gỡ ra dán lại cho thẳng",
+        "hint": "",
+        "effects": {
+         "log": "Dán lại cánh cho thẳng. Cu Bin gật, mà không nói gì thêm."
+        }
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,174 @@
+{
+ "_ghi_chu": "Việc làm, sinh hoạt, việc tùy chọn thêm ở chương 3 (cùng cú pháp actions trong config.json). \"home\" là chỗ ở hiện tại.",
+ "actions": [
+  {
+   "id": "kiem_tra_dien_nguoi_gia",
+   "group": "work",
+   "location": "home",
+   "name": "Kiểm tra an toàn điện nhà người già (tổ của phường)",
+   "hours": 1.5,
+   "pay": 100000,
+   "perDay": 2,
+   "days": [
+    65,
+    150
+   ],
+   "dirty": {
+    "clean": -6,
+    "neat": -4
+   },
+   "effects": {
+    "fatigue": 9,
+    "rep.TRAM": 1
+   },
+   "desc": "Tổ của phường do Trâm phụ trách: kiểm ổ điện, cầu dao, dây nối cho từng nhà có người già, ghi phiếu cho nhà đó giữ. Mỗi nhà 100.000đ."
+  },
+  {
+   "id": "trong_tiem_chieu", "minigame": "repair",
+   "group": "work",
+   "location": "tiem_sau",
+   "name": "Trông tiệm chú Sơn buổi chiều (chia đôi tiền công)",
+   "hours": 5,
+   "pay": 260000,
+   "perDay": 1,
+   "window": [
+    12,
+    19
+   ],
+   "days": [
+    63,
+    89
+   ],
+   "showIfFlag": "trongTiem",
+   "dirty": {
+    "clean": -6,
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 14,
+    "rep.SAU": 1
+   },
+   "desc": "Chú Sơn ngồi trông, An làm tay. Khách của tiệm, tiền công chia đôi, ghi sổ."
+  },
+  {
+   "id": "day_tin",
+   "group": "optional",
+   "location": "tiem_sau",
+   "name": "Chỉ Tín tháo lắp một món đã rút điện",
+   "hours": 1,
+   "window": [
+    14,
+    18
+   ],
+   "perDay": 1,
+   "days": [
+    66,
+    150
+   ],
+   "showIfFlag": "tinOTiem",
+   "hideIfFlag": "luaCam",
+   "rest": true,
+   "effects": {
+    "fatigue": -3,
+    "rep.TIN": 2,
+    "flag.dayTin": true
+   },
+   "desc": "Rút điện trước, hỏi sau. Tín xếp ốc vít thành hàng, đọc tên từng linh kiện."
+  },
+  {
+   "id": "goi_ma_chu_nhat",
+   "group": "optional",
+   "location": "home",
+   "name": "Gọi video cho mẹ tối cuối tuần",
+   "hours": 0.5,
+   "window": [
+    18,
+    22
+   ],
+   "perDay": 1,
+   "days": [
+    61,
+    150
+   ],
+   "showIf": {
+    "flag_any": [
+     "maDiXa",
+     "goiMaVuLan",
+     "thamMa"
+    ],
+    "weekend": true
+   },
+   "hideIfFlag": "maOLai",
+   "rest": true,
+   "effects": {
+    "rep.MA": 2,
+    "fatigue": -2
+   },
+   "desc": "Mẹ hỏi chuyện bà trước, chuyện tiền sau."
+  },
+  {
+   "id": "coc_hem_dua_t8",
+   "group": "optional",
+   "location": "hem_dua",
+   "name": "Đặt cọc phòng ngõ Gạch, hẹn dọn mùng 1 tháng Tám",
+   "hours": 1,
+   "days": [
+    61,
+    86
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 2200000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "hem_dua",
+    "flag.datCocC3": true,
+    "payable": {
+     "id": "phong_moi_t8",
+     "to": "",
+     "label": "Phần còn lại phòng ngõ Gạch (dọn mùng 1 tháng Tám)",
+     "amount": 2800000,
+     "due": 90
+    },
+    "diary": "Đặt cọc phòng ngõ Gạch, hẹn dọn vào mùng một tháng Tám, qua tháng cô hồn cho bà yên bụng. Còn hai triệu tám, hạn tối ngày 90."
+   },
+   "desc": "Chủ phòng giữ chỗ tới hết tháng Bảy. Phần còn lại trả trước tối ngày 90."
+  },
+  {
+   "id": "coc_cau_tre_t8",
+   "group": "optional",
+   "location": "cau_tre",
+   "name": "Đặt cọc phòng Ngọc Thụy, hẹn dọn mùng 1 tháng Tám",
+   "hours": 1,
+   "days": [
+    61,
+    86
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 1800000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "cau_tre",
+    "flag.datCocC3": true,
+    "payable": {
+     "id": "phong_moi_t8",
+     "to": "",
+     "label": "Phần còn lại phòng Ngọc Thụy (dọn mùng 1 tháng Tám)",
+     "amount": 2400000,
+     "due": 90
+    },
+    "diary": "Đặt cọc phòng Ngọc Thụy, hẹn dọn vào mùng một tháng Tám, qua tháng cô hồn cho bà yên bụng. Còn hai triệu tư, hạn tối ngày 90."
+   },
+   "desc": "Chủ phòng giữ chỗ tới hết tháng Bảy. Phần còn lại trả trước tối ngày 90."
+  }
+ ]
+}

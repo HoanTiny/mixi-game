@@ -1,0 +1,57 @@
+{
+  "_ghi_chu": "Đặt truyện lên map thật Quận 8 (data/maps/q8_tau_hu.json, tọa độ mét: x hướng đông, z hướng nam, gốc ở giữa khung). Tên trong truyện giữ hư cấu: phường An Hòa, rạch Bờ Me, chợ Cầu Nhỏ, Hẻm Dừa… locations: 'at' là điểm trên căn nhà muốn đặt địa điểm; game tự tìm đường gần nhất làm mặt tiền, quay cửa ra đường, dọn nhà thật chỗ đó. w, d: bề ngang, chiều sâu (mét). names: tên đường thật → tên trong truyện ('Hẻm 304 Phạm Thế Hiển' thành 'Hẻm 304 Bờ Me'). walkHoursPerMeter: map thật rộng hơn nên đi bộ tính giờ nhẹ hơn.",
+  "map": "q8_tau_hu",
+  "displayName": "Phường An Hòa",
+  "walkHoursPerMeter": 0.0013,
+  "locations": {
+    "xom_bo_me": {"at": [-122, 72], "w": 13, "d": 10},
+    "cho_cau_nho": {"at": [57, 57], "w": 14, "d": 10},
+    "hem_dua": {"at": [66, 10], "w": 5.5, "d": 8},
+    "ben_can": {"at": [8, 60], "w": 18, "d": 8},
+    "com_hanh": {"at": [-28, 84], "w": 8, "d": 11},
+    "tiem_sau": {"at": [-65, 94], "w": 8, "d": 11},
+    "cau_tre": {"at": [-135, -38], "w": 9, "d": 9},
+    "ben_xe_6": {"at": [-186, 178], "w": 7, "d": 3},
+    "nha_di_nam": {"at": [-232, 214], "w": 7, "d": 10}
+  },
+  "names": {
+    "Phạm Thế Hiển": "Đường Bờ Me",
+    "Dạ Nam": "Đường Chợ Cầu Nhỏ",
+    "Âu Dương Lân": "Đường An Hòa",
+    "Nguyễn Thị Tần": "Đường Cây Bàng",
+    "Hưng Phú": "Đường Cầu Tre",
+    "Võ Văn Kiệt": "Đại lộ Ven Kênh",
+    "Đặng Chất": "Đường Ông Tạ",
+    "Dương Bá Trạc": "Đường Bến Gỗ",
+    "Ba Đình": "Đường Bến Đò",
+    "Cầu Chữ Y": "Cầu Nhỏ",
+    "Cầu Nguyễn Văn Cừ": "Cầu Lớn",
+    "Nguyễn Văn Cừ": "Đường Cầu Lớn",
+    "Trần Hưng Đạo": "Đường Chợ Lớn",
+    "Trần Bình Trọng": "Đường Bến Muối",
+    "Cao Đạt": "Đường Lò Gạch",
+    "Nguyễn Biểu": "Đường Bến Lúa",
+    "Trần Văn Thành": "Đường Xóm Củi",
+    "Cầu Mật": "Cầu Ván"
+  },
+  "fallbackNames": ["Đường Xóm Chiếu", "Đường Bến Phà", "Đường Ông Lãnh", "Đường Xóm Dầu", "Đường Bến Vựa"],
+  "descriptions": {
+    "ben_xe_6": "Trạm xe đưa rước công nhân trên đường Bờ Me, xe chạy ra khu công nghiệp. Trung tâm nghề của Linh cũng đi xe ở đây.",
+    "cho_cau_nho": "Chợ ở góc đường Bờ Me và đường Chợ Cầu Nhỏ, ngay chân Cầu Nhỏ, cây cầu chữ Y bắc qua rạch: sạp vật tư, hàng đồ cũ, tiệm photo, sạp ve chai của cô Út và quán trà đá có bảng tin cho thuê phòng.",
+    "com_hanh": "Quán cơm phần cho người làm ca trên đường Bờ Me, gần đầu hẻm vô xóm trọ. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.",
+    "tiem_sau": "Tiệm sửa xe ở đầu hẻm ra đường Bờ Me, cách xóm trọ vài bước, có thêm một bàn sửa đồ gia dụng.",
+    "xom_bo_me": "Tám phòng quanh khoảng sân cuối hẻm, sau lưng là rạch Bờ Me; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
+    "hem_dua": "Phòng trong hẻm nhỏ rẽ ra từ đường Bờ Me, sát chân Cầu Nhỏ, đầu hẻm có cây dừa, cách chợ vài bước. Phòng nhỏ, cửa sát mặt hẻm, ít chỗ phơi.",
+    "cau_tre": "Bên kia rạch, phải đi vòng qua Cầu Nhỏ. Dãy nhà lưng quay ra kênh; phòng thoáng, có hiên rộng, đi làm xa hơn.",
+    "nha_di_nam": "Nhà dì Năm trên đường An Hòa, gần trạm xe. Ở tạm được bảy ngày, phải gửi bớt đồ.",
+    "ben_can": "Năm quán ven rạch trên đường Bờ Me, gần chân Cầu Nhỏ, lưng quay ra kênh, chung lối đi và hạ tầng điện cũ. Hợp đồng của anh Phúc."
+  },
+  "questAreas": {"meo_be_bap": {"around": "cho_cau_nho", "radius": 80}},
+  "vendorRoutes": {
+    "banh_mi": [[40, 98], [-60, 140], [-150, 180], [-60, 140], [40, 98], [120, 40], [200, 5], [120, 40]],
+    "xoi": [[90, 160], [130, 175], [150, 80], [130, 175], [90, 160], [40, 200], [90, 160]],
+    "ve_chai": [[-150, 180], [-60, 140], [40, 98], [90, 160], [60, 230], [-40, 250], [-150, 180]],
+    "che": [[40, 98], [90, 160], [130, 175], [200, 120], [130, 175], [90, 160]],
+    "hu_tieu": [[-60, 140], [40, 98], [120, 40], [40, 98], [-60, 140], [-150, 180]]
+  }
+}

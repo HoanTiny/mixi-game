@@ -1,0 +1,21 @@
+{
+  "id": "minh",
+  "name": "Minh",
+  "age": 31,
+  "description": "A 31-year-old Vietnamese delivery driver and father, medium athletic everyday build, square friendly distinct face, short black hair, worn olive-gray lightweight zip jacket partially open over muted dark blue T-shirt, faded charcoal denim trousers, dusty black athletic shoes. No helmet, logo, backpack or parcel.",
+  "status": "2D reference ready; no 3D model or rig created",
+  "selected_reference": "reference-v2.png",
+  "generator": "image_gen",
+  "versions": [
+    {
+      "file": "reference-v1.png",
+      "prompt": "Create a single original character production reference for a grounded Vietnamese urban life-simulation game. Use the attached An reference ONLY to match the realistic visual quality, neutral studio setup and full-body framing; create a completely different person described below, not An's face. Full-body single FRONT view, relaxed neutral A-pose, arms 25 degrees away from torso, hands separated from hips, fingers visible, feet apart, entire shoes visible, centered with generous margins on a plain medium-gray background. Realistic human anatomy and age-appropriate proportions, natural cloth drape, subtle fabric weave, seams and wear, convincing face and hands. Soft neutral even diffuse lighting without strong baked shadows. Realistic textured 3D game-character reference, not cartoon, not primitive shapes, not plastic or doll-like, no exaggerated head or muscularity. Exactly one person, no text, UI, scenery, floor platform, logo, watermark or extra views. This is an image-to-3D source reference, not a screenshot of implemented gameplay. Character: A 31-year-old Vietnamese delivery driver and father, medium athletic everyday build, square friendly distinct face, short black hair, worn olive-gray lightweight zip jacket partially open over muted dark blue T-shirt, faded charcoal denim trousers, dusty black athletic shoes. No helmet, logo, backpack or parcel.",
+      "reference_image": "../an/reference-v1.png"
+    },
+    {
+      "file": "reference-v2.png",
+      "prompt": "Create one original realistic full-body Vietnamese male game character production reference. A 31-year-old delivery driver and father named Minh, stocky compact everyday build, broad round face, wide nose, slightly hooded eyes, close-cropped buzzcut black hair, faint stubble, friendly tired expression. Worn olive-gray lightweight zip jacket partially open over muted dark blue T-shirt, faded charcoal denim trousers, dusty black athletic shoes. Full-body single FRONT view neutral relaxed A-pose, arms 25 degrees away from torso, hands separated from hips, feet apart, entire shoes visible, generous margins, plain medium-gray studio background. Realistic anatomy, natural cloth folds, subtle fabric weave and wear, believable skin and hands. Soft even diffuse lighting, no dramatic shadows. Grounded realistic textured 3D game-character reference for Vietnamese urban life simulation. No helmet, logo, bag, parcel, text, scenery, extra views, cartoon or plastic skin. Exactly one person. Image-to-3D source reference, not implemented gameplay.",
+      "reference_image": null
+    }
+  ]
+}

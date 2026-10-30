@@ -1,0 +1,294 @@
+{
+  "_ghi_chu": "Danh mục trò chơi nhỏ (scripts/minigames/minigames.gd). Mỗi trò là một mục games.<id>, tự sinh việc (action) đặt ở địa điểm: type leisure thành việc Sinh hoạt, labor thành việc Kiếm tiền. Điều kiện vào: require (điều kiện như mọi việc: stat.X, prof.X, no_cond…), cert (bằng cấp, careers.json), cost (tiền mỗi lượt), hours (giờ tiêu tốn), window (khung giờ), perDay. view: cảnh vẽ (scripts/minigames/views/), params: số liệu của cảnh; scaling nhân params theo thuộc tính, tay nghề (prof), mg.time: hệ số = 1 + Σ hệ số × (cấp − 1) (mg.time: × phần thêm giờ của Nhanh nhẹn). Kết quả: cảnh trả về score 0..1+ (phần chỉ tiêu đạt được) và fails (số lần hỏng); outcomes xét từ trên xuống, lấy mục đầu tiên có score ≥ atLeast; win đánh dấu thắng. Mỗi mục có effects (như effects của việc: need.X, item.X, rep.X…), xp (thuộc tính), prof (EXP nghề). pay của việc lao động nhân score (không dưới minRatio nếu thắng); tay nghề cộng thêm careers.json perLevel.pay. risk: chấn thương ngẫu nhiên sau ca, xác suất base + perFail × fails (+ tired khi Mệt từ mức cảnh báo), nhân (1 + mod injury, Thể chất giảm), tối đa max; injuries chọn theo trọng số w: bật trạng thái cond (survival.json) và trả viện phí bill.",
+  "items": {
+    "moc_khoa_ca": "Móc khóa con cá",
+    "gau_bong": "Gấu bông nhỏ"
+  },
+  "games": {
+    "nem_vong": {
+      "type": "leisure",
+      "view": "ring_toss",
+      "action": {
+        "id": "nem_vong",
+        "location": "ho_guom",
+        "name": "Ném vòng cổ chai ở góc phố đi bộ",
+        "window": [
+          16,
+          22
+        ],
+        "perDay": 3
+      },
+      "hours": 0.5,
+      "cost": 20000,
+      "require": {},
+      "params": {
+        "rings": 5,
+        "bottles": 6,
+        "firstBottle": 2.4,
+        "gap": 0.36,
+        "neck": 0.08,
+        "sweep": 0.5,
+        "powerSweep": 0.4,
+        "angleMin": 30,
+        "angleMax": 62,
+        "speedMin": 4.6,
+        "speedMax": 6.2,
+        "windMax": 1.0,
+        "windAccel": 1.6
+      },
+      "scaling": {
+        "sweep": {
+          "stat.agi": -0.07
+        },
+        "powerSweep": {
+          "stat.agi": -0.07
+        },
+        "windMax": {
+          "stat.per": -0.1
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.6,
+          "win": true,
+          "label": "Trúng lớn",
+          "effects": {
+            "need.mood": 15,
+            "item.gau_bong": 1
+          },
+          "xp": {
+            "agi": 5
+          },
+          "when": "trúng từ 3 vòng"
+        },
+        {
+          "atLeast": 0.2,
+          "win": true,
+          "label": "Trúng",
+          "effects": {
+            "need.mood": 10,
+            "item.moc_khoa_ca": 1
+          },
+          "xp": {
+            "agi": 4
+          },
+          "when": "trúng 1–2 vòng"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Trượt cả",
+          "effects": {
+            "need.mood": 2
+          },
+          "xp": {
+            "agi": 2
+          },
+          "when": "không trúng vòng nào"
+        }
+      ]
+    },
+    "be_gach": {
+      "type": "labor",
+      "view": "brick_balance",
+      "action": {
+        "id": "be_gach",
+        "location": "bai_boc_vac",
+        "name": "Bê gạch ở bãi vật liệu ven sông",
+        "window": [
+          7,
+          17
+        ],
+        "note": "Gánh gạch trên đòn gánh từ xe xuống bãi, xếp vào khuôn chồng cao"
+      },
+      "hours": 4,
+      "cost": 0,
+      "require": {
+        "stat.str": 1
+      },
+      "tags": [
+        "heavy",
+        "outdoor"
+      ],
+      "pay": 240000,
+      "minRatio": 0.5,
+      "effects": {
+        "fatigue": 22
+      },
+      "prof": "boc_vac",
+      "params": {
+        "seconds": 80,
+        "target": 8,
+        "walkSec": 4.5,
+        "returnSec": 1.5,
+        "instability": 3.8,
+        "noise": 2.6,
+        "torque": 5.0,
+        "damping": 1.2,
+        "maxTilt": 0.55,
+        "swing": 0.7,
+        "tolerance": 0.22
+      },
+      "scaling": {
+        "seconds": {
+          "mg.time": 1.0
+        },
+        "instability": {
+          "stat.str": -0.08,
+          "prof": -0.06
+        },
+        "noise": {
+          "stat.str": -0.05
+        },
+        "swing": {
+          "stat.agi": -0.06
+        },
+        "tolerance": {
+          "prof": 0.08
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 1.0,
+          "win": true,
+          "label": "Đủ chỉ tiêu",
+          "effects": {
+            "need.clean": -35,
+            "need.fed": -20
+          },
+          "xp": {
+            "str": 14
+          },
+          "prof": 25,
+          "when": "đủ 8 chuyến"
+        },
+        {
+          "atLeast": 0.5,
+          "win": true,
+          "label": "Xong ca",
+          "effects": {
+            "need.clean": -30,
+            "need.fed": -18
+          },
+          "xp": {
+            "str": 10
+          },
+          "prof": 18,
+          "when": "từ 4 chuyến"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Không đủ ca",
+          "effects": {
+            "need.clean": -25,
+            "need.fed": -15,
+            "need.mood": -4
+          },
+          "xp": {
+            "str": 5
+          },
+          "prof": 8,
+          "when": "dưới 4 chuyến"
+        }
+      ],
+      "risk": {
+        "base": 0.03,
+        "perFail": 0.04,
+        "tired": 0.05,
+        "max": 0.4,
+        "injuries": [
+          {
+            "cond": "treo_lung",
+            "w": 3,
+            "bill": 120000,
+            "log": "Trẹo lưng khi đỡ gánh gạch, phải ghé trạm y tế"
+          },
+          {
+            "cond": "dap_ngon",
+            "w": 2,
+            "bill": 60000,
+            "log": "Gạch rơi dập ngón tay, băng bó ở trạm y tế"
+          }
+        ]
+      }
+    },
+    "bia_service": {
+      "type": "labor",
+      "view": "beer_service",
+      "requiresSession": true,
+      "allowAuto": false,
+      "action": {
+        "id": "bia_service",
+        "location": "ben_can",
+        "name": "Chạy bàn quán bia",
+        "window": [
+          16,
+          24
+        ],
+        "perDay": 1,
+        "note": "Canh nhịp dọn cốc; chất lượng ca quyết định tiền công và sức lực."
+      },
+      "hours": 4,
+      "cost": 0,
+      "pay": 112000,
+      "tags": [
+        "service"
+      ],
+      "params": {
+        "seconds": 30,
+        "target": 12,
+        "beatSeconds": 2.0,
+        "windowStart": 0.4,
+        "windowEnd": 0.7,
+        "missPenalty": 0.035
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.9,
+          "win": true,
+          "label": "Perfect",
+          "payRatio": 1.25,
+          "effects": {
+            "fatigue": 12,
+            "need.clean": -8,
+            "need.mood": 3
+          },
+          "xp": {
+            "agi": 6
+          },
+          "when": "từ 90% sau khi trừ lỗi"
+        },
+        {
+          "atLeast": 0.6,
+          "win": true,
+          "label": "Good",
+          "payRatio": 1.0,
+          "effects": {
+            "fatigue": 16,
+            "need.clean": -14
+          },
+          "xp": {
+            "agi": 4
+          },
+          "when": "từ 60% đến dưới 90%"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Fail",
+          "payRatio": 0.2857142857,
+          "effects": {
+            "fatigue": 22,
+            "need.clean": -22,
+            "need.mood": -4
+          },
+          "xp": {
+            "agi": 1
+          },
+          "when": "dưới 60%"
+        }
+      ]
+    }
+  }
+}

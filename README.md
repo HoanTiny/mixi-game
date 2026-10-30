@@ -1,76 +1,417 @@
-# Lên Phố: 30 Ngày
+# Trên Phố · Trước mùa mưa
 
-Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh một con phố ở Bình Thạnh, Sài Gòn. Minh từ Hà Tĩnh lên thành phố, có 30 ngày để trả nợ nặng lãi cho gia đình và lo học phí cho em gái.
+**Bản web 1.13 · phố bụi bặm, ngày khắc nghiệt**
 
-Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người và xe lấy mô hình thật trong `assets/` nếu có, chưa có thì dùng khối hình tạm (xem mục *Thêm mô hình thật*).
+- **Đồ họa kiểu "Nobody":**
+  - lọc màu gritty (bão hòa 0,8, tương phản 1,15, ám vàng bụi, tối góc);
+  - viền đen inverted hull, đổ bóng cel 3 cấp;
+  - nắng 45° bóng đậm 0,75, bóng chân dưới người và đồ vật;
+  - đèn đường kèm quầng sáng từ 18:00;
+  - vỉa hè gạch lục giác hay gạch vuông có vân bẩn, bó vỉa 15 cm, vạch trắng đứt;
+  - vết bẩn, lá rơi, vũng nước, thùng rác xanh, biển quảng cáo đứng, xe máy dựng, bàn ghế nhựa.
+- **Ngày 1 khắc nghiệt:**
+  - An còn 50.000đ; tiền trọ 60.000đ mỗi đêm trả trước khi ngủ.
+  - Tắm nước lạnh +40 Vệ sinh và dễ cảm lạnh; giặt đồ cần xà phòng hoặc gửi tiệm 20.000đ.
+  - Mỗi sáng có việc thưởng nóng ×2; mục tiêu ngắn hạn hiện ngay trên HUD.
+- **Độ cuốn:**
+  - chữ nổi nảy khi tiền và nhu cầu đổi;
+  - rung máy quay và hạt bung khi xong trò chơi nhỏ;
+  - đói hay buồn thì rũ vai, mây đen trên đầu; bốc mùi thì người qua đường né;
+  - màn Tổng kết cuối ngày; điện thoại báo lúc 06:00.
+- Chi tiết ở [docs/NOBODY_STYLE.md](docs/NOBODY_STYLE.md). Từng phần đồ họa bật tắt bằng `look` trong `data/config.json`.
+
+**Bản web 1.11 · Chị Hạnh và góc phố mới**
+
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.11) ·
+[Xem phố trong chế độ thử](https://hoantiny.github.io/mixi-game/?street-demo&v=1.11).
+
+- Thay Chị Hạnh bằng mô hình Higgsfield gắn xương, có đứng thở và đi bộ.
+- Xe đồ ăn mới ở quán cơm: kính trong, nan bánh dựng lại, hai trục bánh riêng và va chạm đơn giản.
+- Thêm mái tôn có gân, cửa xếp, cửa gỗ và ô thông gió cho quán cơm, tiệm sửa xe và nhà trọ.
+- Giữ gameplay, quan hệ và cân bằng buôn bán của 1.10.1. Đây là đợt asset đầu, chưa thay toàn bộ bản đồ.
+- Chi tiết phạm vi: [manifest tích hợp](art/higgsfield/runtime-integration.json).
+- Bản tải Windows vẫn là 1.6; đợt phát hành này cập nhật web.
+
+**Bản web 1.10.1 · quan hệ NPC và buôn bán**
+
+[Chơi bản mới](https://hoantiny.github.io/mixi-game/?v=1.10.1). 1.10.1 cân lại tiền buôn bán cho sát chương đầu: bán rong ngang việc làm thường, live gấp khoảng 1,5–2,4 lần, hàng đắt khó bán rong. Chi tiết thiết kế ở
+[docs/RELATIONSHIPS_COMMERCE.md](docs/RELATIONSHIPS_COMMERCE.md), kiểu dữ liệu TypeScript ở `docs/schema/`.
+
+- **Quan hệ NPC** (`data/systems/relationships.json`):
+  - Bậc quan hệ theo điểm 0–100.
+  - Mốc mở tin nhắn và cảnh truyện.
+  - Trạng thái **Cặp đôi**: Tâm trạng hồi +1,5 mỗi giờ, mệt chậm hơn 15%. Lâu không gặp thì quan hệ nguội đi.
+  - Tuyến tình cảm mới với **Hân bán hoa xe đạp**, có 4 cảnh truyện.
+  - Điện thoại có thêm app **Tin nhắn**, trả lời được.
+- **Buôn bán** (`data/systems/commerce.json`):
+  - Nhập sỉ ở chợ Long Biên theo giá thị trường đổi hằng ngày.
+  - Xe đẩy và kho thuê (hàng mốc nếu kho chưa có quạt hút ẩm).
+  - Bày bán hàng rong ở bờ hồ, Tạ Hiện, điểm xe buýt, cổng chợ; ở chỗ không được phép thì có rủi ro trật tự đô thị.
+  - App **Shippy**: giá sỉ, đơn chờ, uy tín, định giá.
+  - **Livestream** học từ chị Vy: chọn kịch bản, thuê người, tung voucher đúng lúc. Đơn có thể bị hoàn (boom hàng).
+- Kiểm thử: `tests/relationships_commerce.gd`.
+
+**Bản web 1.8 · nhân vật và minigame 3D**
+
+[Chơi thử bản mới](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.8).
+Phím **C** mở nhân vật: An dùng cùng model, rig và màu đồ như ngoài phố; kéo để
+xoay, lăn chuột để xem gần. Ngăn quần áo lấy đồ thực sự sở hữu ở shop si-đa,
+có thể mặc và trở về bộ gốc. Save cũ có túi áo/quần vẫn được đọc.
+
+- Bàn sửa có dây dẫn, lồng/cánh quạt cong, đáy ấm, đầu cầu chì, nhãn tụ,
+  đồng hồ hiện số, mặt bàn gỗ và ba bước thao tác rõ ràng. Giữ tiến độ kéo thả cũ.
+- Bi-a dùng bàn, bi, gậy và bóng 3D với máy quay nghiêng. Chuột và đường ngắm
+  quy đổi qua máy quay, khớp mô phỏng sau khi thay đổi kích thước cửa sổ.
+- Da và vải bớt bóng; màn nhân vật có nền riêng, ánh sáng dịu hơn; nắng và
+  ánh sáng hắt ở khu phố được cân lại. Vẫn chạy Compatibility cho web.
+
+Đây là lượt hoàn thiện hình ảnh trên asset hiện có: chưa tạo lại topology/mặt An,
+chưa có mesh riêng cho từng kiểu áo khoác, và chưa thay toàn bộ model NPC.
+Đồ mua hiển thị màu trên áo/jeans của An. Windows tải về vẫn là bản 1.6.
+Kiểm tra mới: `tests/visual_redesign.gd`; ảnh render ở `build/design-preview/`.
+
+**Bản web 1.7 · ba ngày đầu, chiếc quạt và cuộc hẹn với Linh**
+
+[Chơi thử ngày 1–3](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.7)
+· [Chơi bản chính](https://hoantiny.github.io/mixi-game/?v=1.7).
+Link chơi thử không ghi đè save chính. Bản tải Windows vẫn là 1.6.
+
+Chào chú Sơn trước 10:30 ngày 1 để gặp khách cần quạt cho buổi chợ. Chọn giờ hẹn,
+đọc số đo, tìm linh kiện, sửa trên bàn 3D và mang ra chợ trả. Quạt chạy tại sạp
+sau khi giao; khách gửi xoài về cho bà và nhớ An ở lần gặp ngày hôm sau.
+Có thể từ chối hoặc nhận sai rồi chuyển sang phụ quán; save cũ và lần tới tiệm
+muộn vẫn dùng cuộc gặp ngày 2. Bản web đã có nội dung này; bản tải Windows chưa cập nhật.
+
+Chạy thử không ghi save chính: `godot --path . -- --demo --demo-full`.
+Trên máy Windows hiện tại có thể mở `play-story-demo.cmd` để chơi từ ngày 1;
+hoặc kéo file Godot executable vào launcher nếu Godot nằm ở chỗ khác.
+Các kiểm tra của lát cắt: `tests/opening_slice.gd`, `tests/opening_visual.gd`
+(thêm `--capture` để lưu ảnh vào `build/opening-preview`), cùng
+`tests/neighborhood_story.gd`, `tests/neighborhood_world.gd`, `tests/location_panel_layout.gd`.
+Các bài kiểm tra dựng thế giới cần `-- --demo --demo-full`.
+
+Phần hình ảnh mới tập trung ở tiệm, sạp khách và hiên nhà: quạt có lồng/cánh,
+hoa quả và đồ đóng gói; nền bê tông bớt ô kẻ; giảm nhóm đứng chắn cửa. An dùng
+cùng rig và màu đồ khi vào ca làm.
+
+**Tiếp nối ngày 2–3 · chiếc ấm và cuộc hẹn với Linh**
+
+- Khi đã gặp khách ngày 1, sáng ngày 2 có lời nhắn của Linh: xem phòng ngõ Gạch
+  lúc 12 hoặc 16 giờ. Báo trước 11:30 được đổi từ trưa sang chiều một lần.
+  Vắng quá 15 phút, Linh tự đi và mang ảnh về; tình cảm chỉ giảm nếu đã hứa.
+- Ở tiệm Sơn, nhận hoặc từ chối chiếc ấm hàng nước. Đo dây, mâm nhiệt, cầu chì;
+  đọc số đo; báo giá; chờ khách xác nhận 15 phút rồi mới mua đồ.
+- Cầu chì mới: báo 180k, mua chợ 25k hoặc tiệm 45k. Tồn kho cũ: báo 175k,
+  túi 10k, thêm 30 phút kiểm tra và chọn đúng mẫu 184°C. Chọn sai không lắp được.
+  Có thể đổi phương án, báo lại giá; tiền túi cũ đã mua vẫn được tính.
+- Bàn sửa mất 90 phút khi siết vít cuối; rời bàn giữ tiến độ. Trả tại chợ trước
+  14 giờ ngày 2, hoặc gọi xin dời 17 giờ. Trễ không báo giảm 20%; báo sau hạn giảm
+  10%. Giữ hẹn mở khoản giới thiệu +20k cho đơn thường ở Sơn.
+- Có thể ứng linh kiện; hủy đơn vẫn hoàn tiền hoặc ghi nợ. Hết ngày 3 Sơn nhận
+  lại đơn còn dang dở, tránh chiếm bàn sửa mãi.
+- Sau 17 giờ ngày 3, Linh đến quán Hạnh. Cuộc nói chuyện phản ánh việc đã làm
+  và cho chọn chỗ ở cần khảo sát tiếp. Nếu bỏ lỡ, có thể bàn tại nhà tối hôm sau.
+- An mang quạt/ấm đã thử trên tay, có tư thế đặt đồ và ngồi nghỉ trên ghế;
+  tay được giải IK trên rig hiện có, chưa có khớp ngón tay riêng. Linh đi theo
+  cuộc hẹn qua hệ thống đường có sẵn. Cột che mặt tiền được bỏ khỏi đường nhìn;
+  thêm hàng nước, biển báo giá và đèn hiên bật buổi chiều.
+
+Kiểm tra thêm: `tests/day23.gd` (hai lịch sống, sai chẩn đoán, save/load,
+vỡ hẹn, nợ linh kiện) và `tests/day23_visual.gd` (GPU, kéo thả ấm, đường của
+Linh, tư thế An, ảnh ở `build/day23-preview`). Bản thử web 1.7 có các thay đổi này;
+chưa đo thời lượng 20–30 phút với người chơi thật. Bản Windows vẫn là 1.6.
+
+**Bản web/Windows 1.6 · phố gọn, nhiệm vụ liền mạch**
+
+- [Chơi bản chính](https://hoantiny.github.io/mixi-game/) ·
+  [Thử từ ngày đầu](https://hoantiny.github.io/mixi-game/?neighborhood-demo&v=1.6) ·
+  [Tải Windows 1.6](https://hoantiny.github.io/mixi-game/download/TruocMuaMua-Windows.zip).
+- Gom nhà trọ, tiệm sửa, chợ và quán cơm: vòng đi từ 477 xuống 148,5 m; giữ 19 địa điểm, 195 nhà nền và 182 địa chỉ giao hàng.
+- Nối ba ngày đầu với bàn sửa, nhận công, ăn/nghỉ và xem phòng tại chỗ; HUD và bản đồ dẫn cùng một mục tiêu.
+- Có chuyến xe tới khu xa, hiện giá và thời gian; đơn giao đầu game ở gần người chơi.
+- Đi bộ 1,7 m/s, Shift chạy nhẹ; nhân vật và xe tăng/giảm tốc, nhịp bước theo quãng đường thật.
+- Chế độ xem thử không ghi save chính. Phố mẫu cũ vẫn có ở `?street-demo`.
+- Chi tiết: [cụm phố và truyện 1.6](docs/NEIGHBORHOOD_UPDATE.md), [di chuyển](docs/LOCOMOTION_UPDATE.md),
+  [đợt tiếp theo](docs/NEXT_UPDATE.md), [triển khai web](docs/WEB_RELEASE.md).
+- ZIP Windows: giải nén rồi mở `TrenPho.exe`, không cần cài Godot; save Windows và web riêng nhau.
+
+Phần dưới ghi lại nội dung các phiên bản trước; bố cục/khoảng cách hiện tại theo bản 1.6 ở trên.
+
+**Bản 1.0: truyện chuyển sang phố cổ Hà Nội, dùng tên thật.** An, 27 tuổi, vừa mất việc ở Điện máy Thăng Long. Cả nhà có 30 ngày để dọn khỏi **xóm trọ Phúc Tân** (ngõ 25 Phúc Tân, ngoài đê sông Hồng) trước mùa mưa; truyện đi tiếp năm chương, 150 ngày. Cốt truyện, lựa chọn, con số giữ nguyên; người, đất, giọng nói đổi theo [docs/HA_NOI.md](docs/HA_NOI.md):
+- **Người:** bà Thoa (bà ngoại của An, Linh), ông Thịnh (ông ngoại đã mất), chú Sơn tiệm sửa xe, dì Nga, ông Bảo, cô Bích tổ trưởng, cô Tâm chủ mặt bằng, bà Cả, bà Bính, cô Thắm đồng nát, cu Bin, Mẹ. Kha quê Thanh Hóa; chị Lụa bán bánh rán ở chợ Long Biên.
+- **Đất:** chợ Long Biên dưới chân cầu Long Biên, điểm xe buýt Long Biên (xe đưa công nhân ra khu công nghiệp Bắc Thăng Long), tiệm chú Sơn trong vòm cầu đường sắt phố Gầm Cầu, Cơm Hạnh cuối phố Hàng Chiếu sau lưng chợ Đồng Xuân, nhà dì Nga phố Hàng Chiếu, dãy năm quán bia Tạ Hiện, gác xép ngõ Gạch (cây bàng đầu ngõ), phòng Ngọc Thụy bên kia sông. Quê Nam Định, Giao Thủy, Thái Bình; xe khách đi từ bến xe Giáp Bát.
+- **Giọng Hà Nội:** ngõ, mẹ, bố, vào, không, nhé, thế, đấy, bát, đĩa, cốc… Công cụ `python3 tools/check_hanoi.py data/<file>.json` so cấu trúc với bản gốc trong git và báo từ miền Nam còn sót.
+
+**Map phố cổ tám khu** (`"map": "hn_pho_co"`, sinh bằng `python3 tools/gen_phocu_map.py` ra `data/maps/hn_pho_co.json` và `hn_pho_co_story.json`), tên phố thật, bố cục giản lược từ bắc xuống nam: (1) cầu Long Biên, đoạn cầu sắt bắc qua sông Hồng, chợ đầu mối Long Biên; (2) bãi Phúc Tân ngoài đê Trần Nhật Duật, ngõ 25–131 Phúc Tân, bãi đồng nát; (3) dãy vòm cầu đường sắt Phùng Hưng – Gầm Cầu (sửa xe, hàn tiện); (4) chợ Đồng Xuân ba đầu hồi, phố Hàng Chiếu, ngõ chợ, kho shipper; (5) mê cung ngõ Hàng Buồm, Hàng Bạc, Mã Mây, Đinh Liệt, ngõ Gạch (gác xép, quán net, cầm đồ); (6) phố Tạ Hiện, Lương Ngọc Quyến (quán bia đêm); (7) quảng trường Đông Kinh Nghĩa Thục, hồ Hoàn Kiếm có Tháp Rùa, đền Ngọc Sơn, cầu Thê Húc; (8) phố Tràng Tiền, Tràng Tiền Plaza, phố Pháp quanh Lý Thái Tổ. Công trình nhận diện dựng riêng trong `scripts/world/landmarks.gd` (dàn thép cầu nóc cong từng nhịp, mặt cầu cạn có hai đường ray, ô vòm, đầu hồi chợ, Tháp Rùa, lan can đỏ cầu Thê Húc, chữ lớn tên khu hiện khi tới gần hay thu nhỏ). Map cũ vẫn chọn được: `hn_an_hoa`, `q8_tau_hu`, `an_hoa`.
+
+**Bản 1.1:**
+- **Bản đồ M** vẽ lại kiểu bản đồ minh họa (`scripts/world/street_map.gd`): mái phố cổ nâu đất, cam gạch có nóc mái; chợ Đồng Xuân, chợ Long Biên cam có ô sạp; phố đêm Tạ Hiện tím hồng; vành cây quanh hồ Gươm có đường dạo, Tháp Rùa, đền Ngọc Sơn, cầu Thê Húc đỏ; sông Hồng bờ uốn lượn có bãi bồi cát; cầu Long Biên khung sắt gỉ có đường ray; cầu cạn đường sắt trên dãy vòm.
+  - Tên phố chữ hoa nhỏ, trắng mờ, xoay theo chiều đường, nằm trong lòng đường; ngõ chỉ hiện khi phóng gần. Tên khu lớn chữ kem.
+  - Địa điểm là biểu tượng tròn theo loại (chỗ ở, ăn uống, việc làm, giải trí, bến xe), tên nằm trên dải băng nền tối dưới biểu tượng khi phóng gần hay rê chuột; dải nào đè dải khác thì bỏ. Bảng chú thích ở góc dưới.
+  - Lăn chuột (hay nút +/−) để phóng 1–5 lần quanh con trỏ, kéo để dời.
+- **Ẩn nhà kiểu Nobody** (`AreaBuilder.update_cut`, `ray_cap`): bỏ hẳn lưới chấm bi. Chỉ căn nào bị tia từ máy quay tới đầu, ngực, gối của An xuyên qua mới bị cắt tầng như nhà búp bê: tầng trên, ban công, mái ẩn dần, còn tầng trệt (3,4 m) với mái hiên, biển hiệu; vẫn chắn thì thấp hơn nhưng không dưới 1 m; An đứng lọt trong lô thì còn 1 m. Nhà sau lưng An (An đi trên vỉa hè trước mặt tiền) không bao giờ bị cắt. Mặt cắt là sàn nâu sẫm. Máy quay đặt `near = 0.1`.
+- Sông Hồng bờ uốn lượn, bãi bồi cát vàng ở bờ Phúc Tân; đáy hồ là phố Hàng Khay nối sang Tràng Tiền.
+
+**Bản 1.3.1 · gộp nhánh `feature/thoi-gian-troi`** (bản sửa của Hoàn Tiny, dựng trên bản đời đầu). Những phần dùng được đã nối vào bản phố cổ:
+- **Mô hình An gắn xương** (`assets/characters/an/an-rigged.glb`, `scripts/world/an_character.gd`): An trên phố là mô hình này, có đi, đứng; đổi được màu tóc, áo, quần. Áo, quần đang mặc trong tủ đồ túi mù tô lên người An. Đặt `"anModel": "rocketbox"` trong `data/config.json` để dùng lại người thật Rocketbox.
+- **Đơn sửa đồ ở tiệm chú Sơn** (`scripts/street_life.gd`, `scripts/quest_guide.gd`):
+  - Các bước: nhận đơn → rút điện, đo kiểm → linh kiện (mua ở chợ Long Biên rẻ hơn, hay dùng đồ tiệm) → **bàn sửa 3D** (`scripts/world/repair_bench.gd`: kéo linh kiện hỏng ra, lắp linh kiện mới, siết hai vít) → chạy thử → trả khách đúng hẹn 17:00 hôm sau.
+  - Tay nghề tăng theo số món, mua đồng hồ đo riêng thì đo nhanh hơn, chọn hướng thợ sửa độc lập thì đơn tăng 10% tiền công.
+  - Bước tiếp theo của đơn hiện trong bảng mục tiêu.
+- **Tiệm tóc Hàng Bạc:** cắt gọn, tỉa tự nhiên, nhuộm đen, nâu hạt dẻ, nâu khói (`scripts/wardrobe.gd`, HAIR).
+- **Bản 1.3.2 nối thêm:**
+  - **Giao diện tối** theo bảng màu của nhánh (`scripts/ui/ui_kit.gd`): bảng địa điểm, sổ, nhật ký, tủ đồ, thẻ việc nhờ, màn cân bằng. Điện thoại vẫn nền sáng như màn hình máy thật.
+  - **Người đi tránh nhau** theo cách của `crowd_motion.gd`, viết lại cho phố cổ:
+    - An không đi xuyên người (nhân vật có tên, người đứng chờ, người đi bộ gần An). Bấm chuột để đi thì An lượn qua, ưu tiên bên phải; đi bằng phím thì trượt dọc người đó.
+    - Người đi bộ thấy An chắn phía trước thì bước lệch sang bên thoáng và đi chậm lại, qua rồi trở về làn (`crowd.gd`, `_dodge_step`).
+    - Đo khi An đứng giữa vỉa hè đông trong 10 giây: số khung hình có người lấn dưới 0,5 m giảm từ 168 xuống 1.
+- **Chưa nối, giữ trong repo:**
+  - Nhà chia gian (`neighborhood.gd`), tuyến vỉa hè (`resident_routes.gd`): dựng cho con phố thẳng đời đầu, phố cổ đã có nhà ống và tuyến đi bộ riêng.
+  - Cư dân có khớp (`citizen.gd`): người dựng bằng khối hình học; phố cổ đã dùng người Rocketbox có xương nên không thay.
+  - Chế độ chơi thử 5 ngày, nhu cầu kiểu mới (No, Sạch, Tinh thần), bảng Nhân vật dạng cửa sổ: bản phố cổ đã có phần tương ứng.
+  - Các bản mô hình An thử nghiệm, ảnh tham chiếu nhân vật: không đưa vào bản xuất (`exclude_filter`).
+
+**Bản 1.3 · đời sống phố cổ** (gói nội dung `data/*_pho.json` nạp cùng năm chương, `GameLogic._merge_pack`; chỉ có trên map phố cổ):
+- **Shop si-đa Hàng Đào của chị Vy, túi mù** (`data/clothes.json`, `GameLogic._pull`):
+  - Bóc một túi 99.000đ, hoặc năm túi 450.000đ (chắc chắn có món từ Khá).
+  - Bốn hạng: Thường 60%, Khá 28%, Hiếm 10%, Hàng hiệu cũ 2%. Mười túi liền chưa ra món Hiếm thì túi sau chắc chắn Hiếm.
+  - Món hàng hiệu cũ bày bán theo tuần (350.000đ). Đồ trùng bán lại cho shop. Làm thêm: phân loại hàng thùng.
+- **Tủ đồ** (phím T, hay "Thử đồ" ở shop): 25 món chia năm chỗ mặc (áo, quần, giày dép, mũ, phụ kiện).
+  - Điểm phong cách: mỗi sáng Tâm trạng cộng nửa điểm, tối đa 8.
+  - Vài món thưởng tiền công: áo phản quang +10% bốc vác, kéo xe thồ; kính râm +10% xe ôm…
+  - Áo có thân người thật thì An mặc vào thật; mũ đội lên đầu.
+- **Quán bi-a anh Dũng** (Lương Ngọc Quyến), trò chơi bàn bi-a `scripts/work/billiards.gd`:
+  - Bàn lỗ nhìn từ trên xuống, kéo lùi để ngắm và lấy lực. Có đường ngắm, bi ma ở chỗ chạm, hướng bi màu sẽ chạy.
+  - Thuê bàn một giờ 30.000đ. Ván cược 50.000đ: vào 3 bi trong 10 cơ thì ăn 100.000đ.
+  - Làm thêm: trông quán ca tối.
+- **Hàng rong mua được:** đứng cạnh xe, gánh (trong 2,8 m) thì hiện lời nhắc, phím E mua món đầu, phím 1–3 chọn món. Hành động có `location` là `vendor:<id>`.
+  - Có sẵn: bánh mì, xôi, chè, phở đêm, bán đồng nát.
+  - Thêm năm người bán mới có tuyến và tiếng rao: kem Tràng Tiền, gánh hoa quả, xe hoa, bóng bay, gánh bánh rán. Mua kem, hoa quả, hoa về cho bà và Linh thì thân hơn.
+- **Mạch truyện phụ** (`talks_pho.json`, `quests_pho.json`):
+  - Chị Vy: 8 đoạn chuyện. Lô hàng thùng ẩm mốc, cái Ngân lớp 9; chị can khi An bóc túi quá tay.
+  - Anh Dũng: 7 đoạn chuyện. Thợ điện cũ ngã giàn giáo, quán không ghi nợ.
+  - Năm việc nhờ: lô hàng ướt (bán thật hay giấu đồ mốc vào túi mù); Minh nợ cược bi-a (trả giấu, đánh gỡ, để Minh tự nói với chị Hạnh hay nói thay); giải bi-a cuối tuần; xe hoa của cô Huệ bị thu ở hồ Gươm; bộ đồ đi phỏng vấn của Linh.
+- **Điều kiện mới cho truyện:** `count.<việc>`, `style_min`, `owned_min`, `worn`.
+
+**Bản 1.2.1 · bản đồ M vẽ tay** (`street_map.gd`, `_organic`): nhà là đa giác méo, dãy nhà ống cắt thành căn to nhỏ lùi lệch, xoay nghiêng, có chái cơi nới; mái màu rải ngẫu nhiên có nhiễu sáng tối, bóng đổ lệch, nóc và mái chảy hay gờ ngói, viền sẫm. Đường lượn chậm, phình ra thắt lại, đầu đường bo tròn, chỗ giao đường lớn vạt rộng. Sông, hồ bờ cong méo (hồ Gươm méo theo thùy), bãi cát lồi lõm ven sông Hồng. Ngõ ngách ngoằn ngoèo đâm vào giữa khối nhà, có ngõ cụt. Cây mọc theo cụm, mỗi tán một cỡ, một sắc. Hình tính một lần theo tọa độ thế giới (chừng 50 ms), phóng, dời chỉ chiếu lại; chỉ là hình minh họa, phố 3D không đổi.
+
+**Bản 1.2 · giai đoạn 4, việc làm và hoạt động mới** (chỉ có trên map phố cổ `hn_pho_co`; map khác không có chỗ thì bỏ qua):
+- **Bảy chỗ mới:**
+  - bãi bốc vác sát chợ Long Biên;
+  - điểm thuê xe thồ đầu Hàng Chiếu sau chợ Đồng Xuân;
+  - nhà trọ giường tầng ngõ 79 Phúc Tân;
+  - quán net Hàng Bạc;
+  - tiệm cầm đồ ngõ Gạch;
+  - đại lý vé số Mã Mây;
+  - ghế đá hồ Gươm, có đường dạo bờ bắc hồ, ghế đá và bàn cờ.
+
+  Trên bản đồ M có biểu tượng theo loại, thêm loại "Dịch vụ".
+- **Việc làm:**
+  - Bốc vác ca tối 18–22 giờ, 260.000đ. Trò chơi nhỏ: dỡ bao bắp cải, sọt cà chua, bao khoai.
+  - Kéo xe thồ chợ Đồng Xuân, 220.000đ, thuê xe 20.000đ. Trò chơi nhỏ: chất cuộn vải, bao dép, thùng hàng.
+  - Chạy bàn quán bia Tạ Hiện ca tối, 190.000đ. Trò chơi nhỏ: bưng bia hơi, lạc rang, nem chua rán.
+  - Phát tờ rơi quanh hồ, 120.000đ.
+  - Chạy xe ôm công nghệ, 240.000đ, thuê xe 50.000đ.
+  - Thu mua đồng nát cùng cô Thắm, 110.000đ.
+- **Trò chơi nhỏ mới:** dùng lại cảnh có sẵn, khóa `kind` trong `minigames`, kèm hàng, chữ, biển riêng.
+- **Ngủ ngoài nhà** (`sleepAway`, `GameLogic.sleep_away`): giường tầng 30.000đ, gục ở quán net 40.000đ, ghế đá hồ Gươm không mất tiền. Mỗi chỗ cộng Mệt, trừ Tâm trạng khác nhau, sáng dậy ở chính chỗ đó, có cảnh kể lại đêm qua.
+- **Dịch vụ:**
+  - Cầm đồng hồ lấy 500.000đ, mười ngày sau chuộc 560.000đ. Tới hạn đủ tiền thì tự chuộc, không đủ thì mất đồng hồ.
+  - Vé số 10.000đ một tờ: chừng 1% trúng 500.000đ, 8% trúng 20.000đ.
+  - Quán net: đọc tin, tìm việc, chơi một ván cho khuây.
+- **Hoạt động:** dưỡng sinh 6–8 giờ sáng với các cụ, đánh cờ tướng, ngồi ghế đá hóng gió. Đều bớt Mệt hoặc lên Tâm trạng.
+
+Phần dưới đây là ghi chép từ các bản trước, còn dùng tên cũ miền Nam (bà Tư, chú Sáu, Bờ Me, Cầu Nhỏ…); bảng đổi tên ở [docs/HA_NOI.md](docs/HA_NOI.md).
+
+## Ghi chép các bản trước
+
+Game mô phỏng đời sống lấy cảm hứng từ *Nobody: The Turnaround*, bối cảnh phường An Hòa của thành phố hư cấu Bình Giang. An, 27 tuổi, vừa mất việc ở tiệm điện máy. Cả nhà có 30 ngày để dọn khỏi xóm trọ Bờ Me và tìm chỗ ở mới; chơi tiếp 30 ngày nữa ở chỗ mới khi mùa mưa tới và má An về nhà sau mười sáu năm, rồi tháng Bảy mưa ngâu khi chú Sáu muốn sang lại tiệm, rồi tháng Tám trăng tròn với tháng đầu của cái tiệm. Thiết kế đầy đủ nằm trong [docs/](docs/README.md).
+
+Làm bằng **Godot 4.7**. Phố dựng bằng nhà ống kiểu Sài Gòn tạo tự động (`scripts/world/tube_house.gd`): ban công lan can sắt, mái hiên tôn, biển hiệu, đồ phơi, bồn nước inox. Người là người thật của bộ Microsoft Rocketbox (MIT, `assets/rb/NGUON.md`): mặt, tóc, quần áo chụp thật, có xương và động tác đứng, đi, ngồi, nói chuyện (`scripts/world/human.gd`); Việt hoá bằng cách ghép đầu người châu Á lên thân, đưa da về một tông da người Việt, tóc đen hay bạc theo tuổi, hạ chiều cao (`tools/viet_look.py`); đám đông và người lái xe máy dùng tư thế nướng sẵn thành lưới nhẹ (`tools/bake_people.gd`), người đi bộ gần An thì có động tác thật. Xe máy, ô tô, xe đẩy, ghe, cây dựng bằng code thành lưới 3D bo tròn (`scripts/world/props3d.gd`); có file mô hình thật trong `assets/` thì dùng file đó (xem mục *Thêm mô hình thật*).
+
+**Trạng thái:** chơi được **đủ 30 ngày** và **8 kết thúc**: ba tuyến nghề chọn ở ngày 11, tiền mặt tách khỏi tiền phải thu và phải trả, hợp đồng Bến Cạn, chỗ ở (xem, cọc, chốt ngày 26), mưa ngày 15 và 29 (rạch dâng, chỗ trũng ngập, lội nước tốn giờ), chỉ số Mệt, sổ lời hứa, sổ gia đình, quyền tự quyết của Linh. Lát cắt ngày 18–22 vẫn giữ ở màn đầu để thử nhanh một tuyến.
+
+**Chương 2 · Mùa mưa (ngày 31–60):** màn kết ngày 30 có nút **Chơi tiếp**; chỗ ở, tuyến nghề, tiền, độ thân thiết, Linh đi xa hay gần và mọi lựa chọn đi tiếp. Ba nhân vật mới: **má** (cô Hậu) về nhà sau mười sáu năm chỉ về ngày Tết, **ông Ba Lành** hàng xóm sát vách xưa chèo đò ngang, **Kha** thợ sửa điện thoại năm sao trên ứng dụng. Các mạch: đôi mắt của bà (khám, ai quyết lịch mổ, ngày mổ, nhỏ thuốc, tái khám), mùa mưa (mưa ngày 35, 41, 45, 52, 57, đêm triều cường ngày 45, bao cát, sửa máy bơm giá thường hay giá mưa), bí mật cái mỏ lết khắc tên và xấp biên lai gửi "Lê Văn Sáu", má mất việc mà giấu, Linh và cuốn sổ bảo trì, con trai ông Ba tới đón ông, sạp chung với Kha, giỗ ông ngoại tối ngày 60. Gồm 38 cảnh chính và 4 sự kiện tự bật với 133 lựa chọn (nhiều cảnh đổi lời theo chỗ ở, tuyến, lựa chọn cũ), 20 việc mới (ứng dụng Thợ Tới, tổ trưởng ca chiều ở kho, đi lại điện chợ với tổ Trâm, đơn sửa sau mưa, ngồi bàn chú Sáu thứ Bảy, nghe radio và đánh cờ với ông Ba, ăn cơm má nấu, nhỏ thuốc mắt cho bà…), 5 việc nhờ, 32 đoạn thoại và 36 câu chuyện phiếm, **6 kết thúc** K1–K6 và thẻ hậu truyện của má, bà, Linh. Chương 1 có gieo sẵn manh mối: bà nhờ đọc tờ thông báo vì chữ in nhỏ, cái mỏ lết là món duy nhất trong thùng đồ nghề có khắc tên, xấp biên lai kẹp riêng dưới đáy hộp thiếc. Thử nhanh chương 2: thêm `?ch2` vào địa chỉ bản web (máy tự chơi xong chương 1 rồi mở sáng ngày 31, không ghi đè bản lưu thật).
+
+**Chương 3 · Tháng Bảy mưa ngâu (ngày 61–90):** màn kết ngày 60 có nút **Chơi tiếp**; mọi thứ của hai tháng trước đi tiếp (má ở hay đi, mắt bà đã mổ chưa, Linh, sạp chung với Kha, chỗ ở). Tháng cô hồn nên nhà nào cũng kiêng dọn nhà, kiêng khai trương, kiêng ký giấy lớn: còn ở nhờ dì Năm thì đặt cọc phòng trong tháng, dọn mùng một tháng Tám. Hai nhân vật mới: **Tín** mười ba tuổi, giật cô hồn ôm nhầm hộp rơ-le của chú Sáu rồi quay lại trả, và **chị Lụa** bán bánh xèo chợ đêm, một mình nuôi Tín; thêm cô Tám chủ mặt bằng, anh Khoa cán bộ địa chính, bà Hai Lài (chị cả của bà Tư ở Cần Giuộc), anh Tài con ông Ba. Bảy mạch: tiệm Sáu sang tay (trông tiệm buổi chiều; ngày 80 nhận một mình, nhận chung với Kha, Trâm, má, hay không nhận; cọc mặt bằng hạn tối ngày 89), thằng Tín (nói với má nó hay giấu, cái CB chống giật, ngày 72 quên rút điện), kè kênh và cái hiên gỗ năm 1976 của ông Ba (giấy tờ trong hộp thiếc, họp dân, ông tự quyết), Linh hết thực tập và tiền học bậc hai (nói thẳng mình góp được bao nhiêu, lén đóng giùm, hay để em tự tính), má (xưởng may hẻm 88, cuộc gọi tối Chủ Nhật, hay chuyến xe đi thăm), bà về quê mừng thọ chị Hai, phố mới và phố cũ (tổ kiểm tra điện nhà người già, đèn học cho bé Bắp, kho mới trên nền xóm cũ). Câu hỏi của chương: giúp người theo cách giấu đi, hay nói thật để người ta còn quyền chọn. Gồm 35 cảnh chính và 3 sự kiện tự bật với 140 lựa chọn, 6 việc mới (trông tiệm Sáu buổi chiều, kiểm tra điện nhà người già, chỉ Tín tháo ráp đồ đã rút điện, gọi má tối cuối tuần, đặt cọc phòng Hẻm Dừa hay Cầu Tre hẹn dọn tháng Tám), 5 việc nhờ, 28 đoạn thoại và 43 câu chuyện phiếm, **6 kết thúc** L1–L6 và sáu thẻ hậu truyện (Tín, ông Ba, Linh, bà Tư, má, chú Sáu) chọn theo điều kiện ghi trong dữ liệu. Thiết kế: [docs/cot-truyen/10-chuong-3-thang-bay.md](docs/cot-truyen/10-chuong-3-thang-bay.md). Thử nhanh chương 3: thêm `?ch3` vào địa chỉ bản web (máy tự chơi xong hai chương đầu rồi mở sáng ngày 61).
+
+**Chương 4 · Tháng Tám trăng tròn (ngày 91–120):** màn kết ngày 90 có nút **Chơi tiếp**. Hết tháng cô hồn, chú Sáu giao chìa khóa tiệm (nhận một mình, nhận chung, hay làm thợ nhận khoán cho người nhận tiệm). Hai nhân vật mới: **anh Quân**, tổ trưởng cũ của An ở chi nhánh đã cho anh nghỉ, giờ quản lý trung tâm bảo hành mới mở ở đầu đường và mời An về làm thợ chính chín triệu một tháng; **cô Mai** lo cơ sở vật chất của trường cấp hai, đặt kiểm ba mươi hai cái quạt trần trước khai giảng (nhận chung với tổ Trâm, nhận hết, nhận vừa sức, hay từ chối). Các mạch: tháng đầu của tiệm (giá người quen, sổ tháng đầu với người đứng tên chung), Tín vào lớp Tám rồi đòi nghỉ học theo An, rằm Trung thu ở sân kho trên nền xóm cũ (dây đèn, lồng đèn ông sao, con nước rằm tháng Tám), má được mời làm quản đốc hay về ba ngày rằm, Linh với cái phiếu ghi sai và tháng lương đầu, bà tự gọi video và tự đi xe buýt tái khám, chú Sáu về Bến Tre. Câu hỏi của chương: có quyền quyết rồi, An có quyết thay người khác không. Gồm 37 cảnh chính và 1 sự kiện tự bật với 119 lựa chọn, 6 việc mới, 4 việc nhờ, 21 đoạn thoại và 41 câu chuyện phiếm, **6 kết thúc** M1–M6 và bảy thẻ hậu truyện (Tín, anh Quân, chú Sáu, Linh, bà Tư, má, ông Ba). Thiết kế: [docs/cot-truyen/11-chuong-4-thang-tam.md](docs/cot-truyen/11-chuong-4-thang-tam.md). Thử nhanh chương 4: thêm `?ch4` vào địa chỉ bản web.
+
+**Chương 5 · Tháng Chín gió chướng (ngày 121–150):** màn kết ngày 120 có nút **Chơi tiếp**. Gió chướng thổi ngược từ phía biển vô; bà dán tờ lịch trả tiền tháng Chín, chừa dòng cuối trống cho An, và hỏi câu chưa ai hỏi: "còn con, con muốn gì?". Nhân vật mới: **thầy Phong**, thợ điện lạnh bốn mươi năm, dạy ở trung tâm nghề cạnh bến xe số 6, mời An vô lớp điện lạnh buổi tối có giấy chứng nhận (đóng đủ, đóng hai đợt, trung tâm trả, hay để năm sau). Các mạch: cái lưng của An sau khi khiêng một mình cái tủ lạnh hai cửa lên lầu ba (đi khám và kể với nhà, hay gồng), chợ Cầu Nhỏ lợp mái nên chị Lụa xin đặt bếp dưới mái hiên tiệm (hỏi người góp trước, hay quyết một mình), Kha về Cà Mau muốn rút phần góp, cô Tám tăng tiền mặt bằng, cái ghế đẩu của chú Sáu gãy chân, bà xuống Cần Giuộc chăm chị Hai, ông Ba nằm viện (chia lịch trực đêm), con nước rằm tháng Chín và tổ an toàn điện mùa triều, ba của Tín về, Linh thi liên thông một mình, má tròn năm mươi. Câu hỏi của chương: An có dám tiêu tiền, tiêu thời gian, nói "không" cho chính mình. Gồm 41 cảnh chính (kể cả cảnh thay thế theo lựa chọn trước) và 1 sự kiện tự bật với 111 lựa chọn, 8 việc mới, 2 việc nhờ, 17 đoạn thoại và 37 câu chuyện phiếm, **6 kết thúc** N1–N6 và bảy thẻ hậu truyện (thầy Phong, chị Lụa, Tín, bà Tư, má, Linh, ông Ba). Thiết kế: [docs/cot-truyen/12-chuong-5-thang-chin.md](docs/cot-truyen/12-chuong-5-thang-chin.md). Thử nhanh chương 5: thêm `?ch5` vào địa chỉ bản web.
+
+**Chỗ ở trên phố:** Phòng Hẻm Dừa trong hẻm cụt rẽ ra từ đường Chợ, Phòng Cầu Tre bên kia rạch (qua cây cầu tre sau Bến Cạn), nhà dì Năm ở đầu đường An Hòa gần trạm xe. Tới tận nơi để xem phòng hay dắt bà đi thử bậc cửa (đi càng xa càng tốn giờ). Ngày 30, cảnh khép lại diễn ra trước chỗ ở đã chọn: bà Tư, chậu húng dưới mái hiên, Linh có mặt nếu em không đi thực tập xa.
+
+**Map của truyện là phường An Hòa dựng tay kiểu phố Hà Nội** (`"map": "hn_an_hoa"` trong `data/config.json`), không lấy bản đồ thật: gọn như map của Nobody, vài con phố rõ ràng, mỗi khu một vẻ, đi bộ từ đầu này sang đầu kia chừng bốn trăm mét. Rạch Bờ Me chạy ngang phía bắc, bờ kè trồng cây, Cầu Nhỏ bắc qua sang phố Bên Kia Rạch (dãy nhà lưng quay ra kênh). Phố Bờ Me buôn bán, xe đông, chạy dọc rạch: ngõ Bờ Me vào xóm trọ, quán cơm, tiệm sửa xe đầu ngõ, năm quán ven rạch, chợ Cầu Nhỏ ở chân cầu, điểm đón xe công nhân. Phố An Hòa song song ở giữa, ngõ Giếng, ngõ Trạm, ngõ Dừa nối các phố. Phía tây là phố đường tàu: đường ray chạy sát hai dãy nhà, quán nước kê ghế nhựa sát đường ray. Phía nam là hồ An Hòa có đường ven hồ, vườn hoa, hàng cây, đình làng sau hồ có sân, cổng, hai cây đa; phía đông là khu tập thể năm tầng với sân chơi. Chừng 900 căn nhà ống (bản đồ thật Quận 8 có 4.400 căn): mặt phố 3–5 tầng, mỗi căn cao một khác, tường vàng Hà Nội, kem, xám, ít căn nhà cổ mái ngói; biển hiệu kiểu ngoài Bắc (phở bò, bún chả, bún đậu, bia hơi, trà đá…), cổng ngõ "Tổ dân phố văn hóa". Map sinh bằng `python3 tools/gen_hanoi_map.py` (sửa bố cục, phố, ngõ, chỗ đặt địa điểm ngay trong file đó) ra `data/maps/hn_an_hoa.json` và `data/maps/hn_an_hoa_story.json`; phố ghi bề ngang vỉa hè riêng (`sw`), địa điểm ghi phố quay mặt ra (`road`).
+
+Map khu thật Quận 8, ven kênh Tàu Hủ vẫn giữ (`"map": "q8_tau_hu"`): đường, hẻm, kênh, cầu, nhà lấy từ OpenStreetMap và Open Buildings, nướng sẵn vào `data/maps/q8_tau_hu.json` (4.400 nhà, 415 đoạn đường) nên người chơi không cần mạng. Truyện giữ tên hư cấu: con kênh là rạch Bờ Me, cầu chữ Y là Cầu Nhỏ, đường Phạm Thế Hiển là đường Bờ Me… (bảng `names` trong `data/maps/q8_tau_hu_story.json`). File đặt truyện ghi chỗ của từng địa điểm (game tự tìm đường gần nhất làm mặt tiền, quay cửa ra đường, dọn nhà thật ở lô đó), lời tả địa điểm theo địa hình thật, vùng tìm mèo, tuyến người bán rong, giờ đi bộ mỗi mét. Nhà có số để giao hàng, thùng rác, đèn đường, chỗ ngập ngày mưa (đường sát kênh ngập ngày 15, lan vào trong ngày 29), xe máy và người đi bộ đều tính theo đường thật. Dọc kênh có bờ kè đá, ghe xuồng neo sát bờ và vài chiếc ghe chở hàng trôi qua lại. Bản đồ lớn (phím M) có chấm cho từng nhân vật đang ở đâu, rê chuột tới để xem tên. Khi An đi tới đâu, mặt đường hiện vệt chấm vàng chỉ lối (chấm đi qua rồi thì tắt) và bản đồ vẽ nét vàng đường đang đi; rê chuột lên một địa điểm trên bản đồ lớn thì thấy đường đi tới đó, số mét và số phút đi bộ.
+
+Đường đi bám theo phố, hẻm, vỉa hè, công viên; khe hở giữa các dãy nhà và bãi đất trống vẫn đi được (phím WASD) nhưng tìm đường tính đắt gấp 6 lần nên chỉ chui khe khi không còn lối nào. Nhà nào che An thì nhìn xuyên được như Nobody: căn nhà giữ nguyên hình, phần cao hơn tầm nhìn tới An thành lưới thưa (ma trận Bayer, `see_through` trong `BUILDING_SHADER`), hiện và tan từ từ; trước đây hạ nguyên căn xuống thành khối thấp nên đi trong ngõ trông như nhà vỡ (đặt `see_through = false` để dùng lại). Nhà đứng ngang An như chính tiệm An đang đứng trước cửa thì để nguyên; cây chắn trước mặt thì thu tán lại. Quanh các địa điểm có đồ phố Việt: mái hiên tôn, bạt, biển hiệu có chữ (tạp hóa, phở, cơm tấm, sửa xe…), bàn ghế nhựa quán cóc, cột điện bê tông và dây điện võng, dây giăng ngang hẻm, cổng hẻm "khu phố văn hóa", bảng tên đường xanh, xe máy dựng vào lề. Đi qua cầu thì An đứng trên mặt cầu.
+
+**Phố kiểu mô hình sa bàn** (giống các mô hình "khu phố mùa hạ"): nhà sơn trắng, kem, xanh bạc hà, xanh lá non, vàng, cam đào; cửa sổ nhỏ có khung xanh ngọc, trắng, nâu; tầng trên có ban công lan can song sắt, hoa giấy hồng rủ qua lan can, cục nóng máy lạnh; có nhà lợp mái ngói đỏ cam ở đỉnh mặt tiền. Sân thượng có tường lan can, bồn nước nhựa đen và inox, tum cầu thang lợp ngói, giàn hoa giấy, chậu cây. Đường phố theo kiểu từng vùng (`AreaBuilder.PAVINGS`, chọn theo tọa độ khu): trung tâm TP.HCM (quanh chợ Bến Thành 2 km) và Hà Nội lát đá granite tấm 60 × 30 cm như các tuyến đã cải tạo; TP.HCM ngoài trung tâm phần nhiều gạch terrazzo 40 × 40 cm hai màu bàn cờ (đỏ xen vàng đất, xám xen đỏ) có chín nút nổi; các tỉnh gạch block tự chèn "con sâu" xám hay đỏ, terrazzo. Bó vỉa đá xám chừa chỗ ngã ba, ngã tư, miệng hẻm; rãnh biên xi măng có ga thu nước khung gang mỗi chừng 26 m; gốc cây ven đường quét vôi trắng chừng một mét, ô gốc cây viền xi măng. Vạch kẻ theo QCVN 41: tim đường từ 8 m vạch vàng liền (1.2), đường 6–8 m vạch vàng đứt (1.1), vạch trắng mép đường, vạch chia làn; ngã tư đường lớn có vạch qua đường kẻ sọc và đèn giao thông; sân, hẻm láng xi măng chia ô; cây phượng đỏ xen cây xanh. Gần 500 xe máy (tay ga, xe số, nhiều xe chở thêm người ngồi sau; mỗi người một màu áo, mũ cùng màu xe) và ô tô chạy hai chiều theo làn bên phải, quanh chỗ của truyện đông nhất; ngày mưa vắng bớt một nửa. Nút **Toàn cảnh** ở thanh dưới (hay con lăn chuột) lùi máy quay ra xa ngắm cả khu như mô hình; lúc đó nhà không hạ. Ban công, hoa, đồ trên sân thượng nằm trong lưới chi tiết chia ô 100 m, nhìn xa quá 170 m thì khỏi vẽ; nhà chia ô 200 m; xe chạy gom theo cụm tuyến, cụm xa An thì khỏi cập nhật hình; xe máy có bóng giả dưới bánh thay cho bóng nắng thật.
+
+**Người và đồ vật 3D:** người là người thật Rocketbox đã Việt hoá (mặt châu Á, da ngăm sáng, tóc đen hay bạc, chiều cao người Việt), đội nón lá, nón kết, mũ bảo hiểm; đi, đứng, ngồi xe, ngồi ghế đẩu, nói chuyện, đẩy xe, gánh hàng. Người đứng, ngồi, đi xa An và người lái xe là tư thế nướng sẵn (chừng 900 tam giác, ảnh mọi người gom vào một tấm atlas nên mỗi nhóm vẽ một lần) vẽ hàng loạt, chia ô 90 m (ô ngoài khung nhìn khỏi vẽ, mỗi ô bốn kiểu người); người đi bộ, trẻ con gần An có động tác thật, ra khỏi khung nhìn thì dừng động tác. Khung người dựng bằng code (`character.gd`) chỉ còn làm dự phòng. Xe máy tay ga và xe số chạy ngoài đường có người lái đội mũ bảo hiểm, nhiều chiếc chở thêm người ngồi sau (map thật: dòng xe gộp thành MultiMesh, xem `scripts/world/traffic.gd`). Phố đông người như video mẫu (map thật, `scripts/world/crowd.gd`, khoảng 600 người gộp thành MultiMesh, càng gần chỗ của truyện càng đông): khách ngồi ghế đẩu quán cóc, chủ tiệm và khách mua trước cửa tiệm, nhóm hai ba người đứng nói chuyện trên vỉa hè, người bán và người mua ở sạp chợ, người đứng quanh chợ, bến xe, quán cơm, người đi bộ qua lại vỉa hè và hẻm (tay chân vung theo bước, ai cũng đi lệch bên phải để tránh người ngược chiều, đi tránh bàn ghế, gốc cây, cột điện), trẻ con đá banh trong hẻm; không ai đứng giữa lòng đường hay trên cầu, tối vắng dần, ngày mưa vắng hẳn. Người bán rong: xe bánh mì có tủ kính bày ổ bánh mì, xe chè với hai tầng hũ chè, xe hủ tiếu gõ có nồi nước lèo, xe ve chai chất các-tông và bao tải, chị bán xôi gánh hai thúng trên vai. Trên kênh: ghe chở hàng có mui bạt, mắt ghe, máy đuôi tôm, bao hàng; xuồng có mái chèo. Trên phố: ghế đẩu, bàn nhựa quán cóc, cột điện bê tông tròn có sứ cách điện và bình biến áp, ô tô, xe máy đậu dọc lề, cây tán lồi lõm, cây dừa đầu Hẻm Dừa. Mỗi món dựng một lần rồi dùng chung, màu sơn từng chiếc là tham số; cây, xe đậu chia theo ô 200 m nên chỉ vẽ phần đang thấy.
+
+Nướng thêm khu khác: `Godot --headless --path . -s res://tools/bake_map.gd -- --id=<tên> --bbox=nam,tây,bắc,đông [--osm=<file overpass.json>]`, rồi viết `data/maps/<tên>_story.json` và đổi `"map"` trong config. Đặt `"map": "an_hoa"` (hay chạy với `-- --map=an_hoa`) để chơi lại phường vẽ tay bên dưới.
+
+**Phường An Hòa vẽ tay** (`data/map.json`, dựng bởi `scripts/world/city_map.gd`): không còn là một con phố thẳng mà là một khu ven kênh kiểu Sài Gòn, bố cục dựa theo các xóm hẻm và rạch thật ở TP.HCM:
+- **Đường An Hòa** (đường lớn, hai chiều, có trạm xe số 6 và cổng khu công nghiệp ở đầu đường), **đường Chợ Cầu Nhỏ** chạy xuống tới chân cầu (kiểu chợ đầu cầu), **đường Bờ Me** ven rạch có lan can, hàng cây và đèn.
+- **Hẻm 42** (cổng "Khu phố 3"), **Hẻm 88** (cổng "Khu phố 4", hẻm ba gác hẹp hơn), hẻm nhánh **42/7** nối ngang hai hẻm, **Hẻm Dừa** là hẻm cụt rẽ từ đường Chợ, đầu hẻm có cây dừa. Dây điện chằng chịt trên hẻm.
+- **Rạch Bờ Me** uốn nhẹ, có bờ kè, ghe xuồng; **Cầu Nhỏ** (cầu bê tông) và **Cầu Tre** (cầu ván) bắc sang **Hẻm Bờ Nam**, nhà sàn chân cột quay lưng ra rạch, phía sau là ruộng rau muống.
+- Số nhà đánh như thật: số lẻ một bên, chẵn một bên; nhà trong hẻm mang số có gạch chéo theo căn ở đầu hẻm (42/3, 42/7/5…), app Giao Nhanh giao tới đúng các địa chỉ này.
+- An đi theo đường thật (tìm đường A* trên lưới 1 m, không xuyên nhà), nhà che khuất An thì tự ẩn. Bản đồ nhỏ góc trên; phím **M** hoặc bấm bản đồ nhỏ mở **bản đồ lớn** có tên đường, bấm chỗ nào thì An đi tới đó.
+
+**Dựng một khu thật ở Việt Nam** (chế độ riêng, ngoài truyện; nút ở màn đầu, hay thêm `?khu` vào địa chỉ bản web). Giao diện kiểu Tiny Map:
+- Bên trái là bản đồ nền tối vẽ từ OSM (kéo để dời, con lăn hay +/− để phóng): ô tìm địa điểm (Nominatim), công cụ vẽ khung chữ nhật hay đa giác, nút xóa; vùng vẽ ghi diện tích, tối đa 1,2 km². Nút **Ví dụ Khương Thượng** dựng sẵn một khu.
+- Bấm **Dựng mô hình 3D**: thẻ tiến độ bốn bước (OpenStreetMap, Open Buildings, Ghép dữ liệu, Dựng mô hình), hai nguồn đầu tải cùng lúc.
+- Bên phải là mô hình thu nhỏ của đúng vùng đã vẽ trên tấm đế đất: kéo chuột trái để xoay, nghiêng; chuột phải (hay Shift) để dời; con lăn để phóng; la bàn ghi hướng và độ nghiêng; nút quay về hướng bắc, tải mô hình về (.glb), toàn màn hình; **Thả An vào đi dạo** để đi bộ trong khu. Vạch giữa hai nửa kéo được.
+
+Trình duyệt tự gọi thẳng ba nguồn miễn phí, không qua máy chủ nào khác:
+
+| Nguồn | Lấy gì |
+|---|---|
+| OpenStreetMap qua Overpass API | Nhà vẽ tay (số tầng, chiều cao, màu tường, kiểu và màu mái nếu có), đường, sông, hồ, kênh, công viên, cây, đình chùa, di tích, điểm tham quan, tường rào, đường sắt. Hỏi `overpass-api.de` trước; sau 7 giây chưa trả lời (hay báo lỗi) thì hỏi thêm `overpass.private.coffee` và `maps.mail.ru`, máy nào trả trước thì dùng. |
+| Open Buildings (Google + Microsoft, bản gộp của VIDA) | Đường viền nhà dò từ ảnh vệ tinh, kèm độ tin cậy: `data.source.coop/vida/google-microsoft-open-buildings/flatgeobuf/by_country/country_iso=VNM/VNM.fgb` (17,5 GB, 68,5 triệu nhà). App chỉ đọc đúng phần byte của vùng đã vẽ qua chỉ mục không gian (khoảng 0,5–1,5 MB cho một khu nửa km²). |
+| Nominatim | Tên khu ra tọa độ, khung và mã nước (để biết đọc file Open Buildings nào). |
+
+Ghép nhà: nhà OSM được ưu tiên; nhà Open Buildings bị bỏ nếu độ tin cậy dưới 0,7, trùng chỗ nhà OSM, nằm trên lòng đường hoặc trên mặt nước. Ảnh vệ tinh hay gộp mái hai dãy nhà thành một khối phủ qua hẻm: tim đường, hẻm chạy xuyên khối nhà quá 1,5 m thì cắt lòng hẻm ra khỏi khối (`AreaData.drop_buildings_over_lanes`), hẻm hiện ra, không ai đi xuyên nhà. Nhà không ghi số tầng lấy 2–5 tầng như nhà ống, một phần nhà thấp lợp ngói đỏ; cao ốc kính; mặt tường có cửa sổ theo tầng (mờ dần khi nhìn xa); sân thượng có bồn nước inox; mái ngói đỏ cam có hàng ngói; chùa, đình mái bốn dốc; vỉa hè lát đá granite, gạch terrazzo hay gạch block tùy vùng (TP.HCM, Hà Nội, các tỉnh), bó vỉa, ga thu nước, vạch kẻ theo QCVN 41, sân láng xi măng; gốc cây quét vôi; cây ven đường xen cây phượng, ô tô và xe máy đậu dọc đường; nhãn địa danh có chấm cam. Màu nhà, màu mặt đất ghi bằng mã màu sRGB như trong bảng màu. Địa chỉ máy chủ, giờ chờ, ngưỡng tin cậy, bề rộng đường, màu nhà nằm trong `data/realmap.json`. Bản cài trên máy đi qua proxy được (đọc `HTTPS_PROXY`, chứng chỉ gốc ở `SSL_CERT_FILE`).
+
+**Gợi ý cách chơi:** lần đầu gặp chuyện gì (có cảnh chính, đói, bẩn, Mệt lên, có người nhờ việc, đứng cạnh thùng rác, sau 20 giờ…) thì ô Gợi ý ở góc trái hiện một lần. Nội dung ở mục `tips` của `data/story.json`.
+
+**Cảnh chính mỗi ngày:** bảng mục tiêu ghi "Hôm nay: …" kèm nơi và khung giờ, trên phố có dấu ◆ vàng. Tới nơi bấm thẻ ◆ để vào cảnh, chọn một trong ba cách. Bỏ lỡ thì sáng hôm sau có tin kể lại, việc không tự xong. Tin nhắn, mưa và ngày 30 tự bật buổi sáng.
 
 ## Mở project
 
 1. Mở Godot, chọn **Import**, trỏ tới file `project.godot` trong thư mục này.
 2. Bấm **Run** (F5). Màn chính là phố 3D (`scenes/world.tscn`).
 
-**Điều khiển:**
+**Màn đầu game** (`scripts/ui/title_screen.gd`): nền là chính hẻm Bờ Me nhìn qua máy quay dựng cảnh, phủ shader vẽ mực (viền nét, màu ngả nâu, vân giấy, tối bốn góc); tên game chữ bút lông trên vệt sơn. Menu: **Chơi tiếp** (khi có ván dở), **Bắt đầu**, **Cài đặt**, **Giới thiệu**, **Thoát** (bản cài trên máy).
+- **Câu chuyện của bạn:** truyện chính (5 chương, 150 ngày), ba lát cắt ngày 18–22 theo tuyến A, B, C, và Dựng khu thật. Chọn bên trái, lời giới thiệu bên phải, bấm **Vào game**. Đang có ván dở thì hỏi trước khi xóa.
+- **Chọn độ khó:** *Dễ thở* (thêm 500.000đ tiền mặt lúc đầu, đói, bẩn chậm hơn 30%, mệt chậm hơn 20%) hay *Đúng đời* (số liệu gốc). Số liệu trong `difficulty` của `data/config.json`; đổi được giữa chừng trong Cài đặt.
+- **Tin nhắn mở đầu:** 5 giờ 40 sáng ngày 1, điện thoại của An nhận tin của chú Hòa (tiệm cũ), cô Duyên (chủ đất), Linh; bấm hay phím cách để đọc nhanh, có nút Bỏ qua. Viết trong `prologue.intro` của `data/story.json`.
+- **Cài đặt** (lưu ở `user://settings.json`): âm lượng, toàn màn hình, bóng nắng nhẹ, độ khó.
+
+Chữ: [Sedgwick Ave Display](https://fonts.google.com/specimen/Sedgwick+Ave+Display) và [Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand) (SIL OFL, giấy phép kèm trong `assets/fonts/`). Chạy với `-- --no-title` (hay các chế độ `--demo…`) để vào thẳng phố.
+
+**Điều khiển ở màn phố:**
 
 | Thao tác | Tác dụng |
 |---|---|
-| Chuột trái | Đi tới chỗ bấm |
-| Bấm vào cửa tiệm hoặc người | Đi tới và mở việc làm, lớp học ở đó |
+| Chuột trái | Đi tới chỗ bấm. Đi bộ tốn giờ trong game. |
+| Bấm vào cửa tiệm hoặc người | Đi tới và mở việc ở đó |
 | WASD hoặc phím mũi tên | Đi lại |
 | E | Vào địa điểm đang đứng gần |
-| Esc | Đóng bảng |
+| M | Mở/đóng bản đồ lớn; bấm một chỗ trên bản đồ để đi tới |
+| Con lăn chuột, nút **Toàn cảnh** | Kéo máy quay gần, xa; xa hẳn là nhìn toàn cảnh khu phố |
 
-**Thời gian:** đi bộ trên phố tốn giờ (chỉnh bằng `walkHoursPerMeter`). Làm việc hay đi học thì Minh vào trong tiệm, thanh thời gian chạy (`workSecondsPerHour` giây thật cho mỗi giờ trong game) rồi mới tính kết quả. Nút **Về phòng trọ** dẫn Minh về nhà, vào phòng trọ để **Đi ngủ**. Tới 22 giờ mà chưa về thì Minh ngủ gục ngoài đường, bị trừ Sức khỏe và Tinh thần (`sleepOutside`).
+**Chơi trên điện thoại** (bản web, nên xoay ngang; màn dọc có tấm nhắc xoay và nút Toàn màn hình): chạm mặt đường để đi, chạm cửa tiệm hay người để vào; chụm, mở hai ngón để kéo máy quay xa, gần; chạm lời nhắc giữa màn hình thay cho phím E; bản đồ lớn có nút Đóng. Giao diện tự co theo màn (`scripts/ui/screen_fit.gd`, autoload `ScreenFit`): máy tính giữ cỡ chữ theo mật độ điểm ảnh, màn thấp như điện thoại nằm ngang thì vào chế độ gọn (bảng mục tiêu chỉ hiện hai mục, chạm để xem hết; bản đồ nhỏ thu lại; mở Sổ, Nhật ký, điện thoại hay bảng địa điểm thì cất hàng trên cho bảng đủ cao; ô gợi ý nổi trên thanh công cụ; Bảng cân bằng bỏ cột Sổ). Điện thoại vẽ cảnh 3D ở nửa độ nét (giao diện vẫn nét), bóng nắng hai tầng trên bản đồ bóng nhỏ hơn, đồ chi tiết của nhà chỉ vẽ trong 120 m, bớt một phần ba số xe. Thử trên máy tính: chạy với `-- --phone --dpr=3` ở cửa sổ 2532×1170.
+| Esc | Đóng bảng; không có bảng nào mở thì về màn đầu (menu) |
+| Nút hình ngôi nhà (trên cùng) | Đi về Bờ Me. Chỉ ngủ được ở đó; 22 giờ chưa về thì ngủ gục ngoài đường, Mệt +15. |
 
-**Nhu cầu cơ thể và Phong độ (kiểu Nobody):** No bụng, Vệ sinh, Quần áo tự giảm theo giờ; việc bẩn (phụ hồ, rửa bát, lục rác) làm bẩn người và đồ. Cùng Tinh thần, chúng gộp thành **Phong độ**: từ 55 trở lên đủ lương, 30–55 chỉ được 70%, dưới 30 chỉ 50% và đi chậm. Nhịn đói tới 0 thì mất Sức khỏe. Ăn ở quán cơm tấm, cửa hàng 24 giờ, xe bánh mì; tắm và giặt đồ ở phòng trọ. Số liệu trong `needs` của `data/config.json`.
+**Giao diện màn phố** (gọn như Nobody, `scripts/world/hud.gd`): thanh mảnh trên cùng có ngày, buổi, giờ, tiền mặt, vòng giữa ghi số ngày còn lại tới mốc của chương, và các nút biểu tượng: Nhân vật, Sổ, Nhật ký, Điện thoại, Bản đồ, Toàn cảnh, Về chỗ ở (dấu ! đỏ khi có lời hứa đến hạn, có đơn giao hàng mới). Mục tiêu hiện ba mục đầu bằng chữ nổi, bấm để xem hết. Góc dưới trái là vòng Phong độ (Tích cực, Bình thường, Uể oải, Kiệt sức), cạnh vòng hiện biểu tượng thứ đang thiếu; bấm vòng mở bảng Nhân vật. Tên người chỉ hiện khi An tới gần (7 m), tên địa điểm thành thẻ nhỏ ngang cửa (11 m). Cảnh 3D: khử răng cưa (bản cài 4×, web 2×), lọc texture dị hướng, màu bớt rực, tối nhẹ bốn góc; nhà nằm giữa máy quay và An sẫm, nhạt màu đi (`focus_depth` trong `[shader_globals]` của project.godot) cho mắt dồn vào An và người trên phố. Bảng cân bằng (công cụ chỉnh số) không còn nút trên màn phố: mở `scenes/board.tscn` trong Godot.
 
-**Trò chơi nhỏ khi đi làm (kiểu Nobody):** phụ hồ là tự bưng đúng loại gạch (đỏ, block, ống) bỏ vào thùng cẩu trong 60 giây. Đủ 8 thùng thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%); thùng càng nhiều gạch thưởng càng cao; bỏ nhầm loại là đổ bỏ. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, giao diện ở `scripts/ui/minigame_bricks.gd`.
+**Điều khiển, giờ và chỉ số (giai đoạn 1 của "Trên Phố"):**
+- **Chạy nhanh:** giữ **Shift** (màn cảm ứng: nút **Chạy** cạnh cần điều khiển) thì nhanh gấp 1,65 lần, mỗi mét chỉ tốn 60% giờ đi bộ nhưng cứ 70 m Mệt +1; trong ngõ hẹp (đường dưới 5 m) không chạy được và đi chậm còn 82% vì chật người, xe. Hằng số `SPRINT`, `RUN_TIME`, `RUN_FATIGUE_M`, `LANE_SLOW` trong `scripts/world/world.gd`.
+- **Cần điều khiển ảo** (`scripts/ui/joystick.gd`, chỉ hiện trên màn cảm ứng) góc dưới trái: kéo theo hướng muốn đi (trên màn là hướng bắc, đúng hướng máy quay), đẩy nhẹ thì đi chậm; vòng Phong độ dời sang góc dưới phải.
+- **Kéo màn hình để nhìn quanh:** kéo chuột trái (quá 14 điểm ảnh), giữ chuột phải hay chuột giữa mà kéo, một ngón trên màn cảm ứng; máy quay lệch khỏi An tối đa 80 m, An đi tiếp thì trôi về, **Space** về ngay. Máy quay vẫn khóa góc, không xoay.
+- **Đồng hồ kết hợp:** đi bộ, làm việc tính giờ như cũ; đứng chơi trên phố (không mở bảng, không làm việc) thì giờ vẫn trôi chậm, `idleMinutesPerSecond` (0,4) phút mỗi giây thật.
+- **Bảng sinh tồn góc trên trái:** giờ, buổi, ngày, tiền mặt, thanh **Thể lực** (100 trừ Mệt), **Tâm trạng**, **Độ no**; bấm vào mở bảng Nhân vật. Tâm trạng tự giảm 1,2 mỗi giờ, một đêm ngủ ở nhà +8; nghỉ ngơi, trà đá, ăn cơm với bà (việc có `rest`) +12, nói chuyện với người quen +5, việc bẩn −3, ngủ ngoài đường −15 (`needs` trong `data/config.json`); góp 12% vào Phong độ.
+- **Hành động nhanh trước cửa:** đứng gần cửa một địa điểm thì dưới lời nhắc hiện tối đa ba việc sinh hoạt (ăn, tắm, nghỉ…) kèm giá, tác dụng, số phút, như "[1] Ăn dĩa cơm phần · −30.000đ · No bụng +60 · 20 phút"; phím **1–3** hay bấm để làm ngay, khỏi mở bảng địa điểm; việc chưa làm được thì ghi lý do.
+- Không đi được ra ngoài mép map (lưới đi bộ chặn phần ngoài khung đã dựng).
 
-**Ve chai:** thùng rác xanh dọc vỉa hè, đứng gần bấm **E** để lục (mỗi thùng một lần mỗi ngày): được chai nhựa, lon, bìa giấy nhưng bẩn người. Mang ra **Vựa ve chai cô Tám** cuối phố để bán.
+**Ánh sáng ngày đêm (giai đoạn 2):** sáng nắng vàng ấm, trưa trong, chiều cam đậm, chạng vạng trời tím hồng, đêm xanh tím (trăng yếu, ánh sáng nền hạ dần theo `night` 0..1, tính trong `_update_lighting` của `world.gd`). Về đêm chừng bốn phần mười ô cửa sổ sáng đèn (đa số vàng ấm, ít ô đèn tuýp trắng xanh), phần lớn cửa tiệm tầng trệt sáng (shader nhà đọc biến chung `night` trong `[shader_globals]` của project.godot); ba phần mười biển hiệu có chữ thành chữ neon hồng, xanh, cam, xanh lá, vàng, tím; đèn lồng đỏ treo dưới một phần biển hiệu (MultiMesh, phát sáng về đêm); vầng sáng đèn đường vẽ thẳng xuống mặt đất dọc mọi phố (20 m một chỗ, hai bên xen kẽ) và giữa ngõ (15 m), vì bộ dựng hình Compatibility chỉ cho mỗi lưới nhận tám đèn thật; quầng sáng (glow) bật lúc tối trên máy tính. Đi vào ngõ hẹp thì tầng trên các căn trong vòng 7 m quanh An cũng nhìn xuyên, chỉ giữ tầng trệt (`lane_mode` trong `area_builder.gd`), như bỏ mái khi đi sâu vào ngõ.
 
-**Giao đồ ăn (kiểu Nobody):** bấm **Điện thoại** ở thanh dưới, bật *App Giao Nhanh*. Đơn hiện lên (lấy món ở quán nào, giao tới nhà số mấy, tiền công, hạn giờ), nhận thì tự đi tới quán lấy món rồi tìm đúng nhà để giao: mũi tên cam chỉ quán, xanh chỉ nhà khách, chấm trên bản đồ phố. Giao sớm có tip, trễ bị trừ tiền và mất Tinh thần. Giờ cao điểm 10:00–13:30 và 17:00–21:00 đơn nhiều, ngoài giờ ít. Số liệu trong `delivery` của `data/config.json`.
+**Bảng Nhân vật** (phím **C**, nút **Nhân vật** trên thanh dưới; `scripts/ui/character_panel.gd`), dựng theo bảng nhân vật của Nobody, nền là phố phủ shader vẽ mực tối:
+- **Hành trang** bên trái, bốn ngăn: *Công cụ* (điện thoại cũ, túi đồ nghề, căn cước, quạt bàn hỏng, chìa khóa xe), *Quần áo* (áo thun đen, sơ mi caro, áo khoác gió; bấm **Mặc bộ này** là An đổi đồ thật trên phố, trong ca làm: ghép đầu An lên thân người Rocketbox mặc bộ đó), *Phế* (ve chai đang mang, ước giá bán), *Đồ giữ* (đồ việc nhờ đang mang và kỷ vật của chương). Hình đồ vật vẽ bằng nét trong `scripts/ui/item_icon.gd`; danh sách trong `items` của `data/config.json`.
+- **Giữa:** An 3D đứng xoay được (kéo chuột), bốn ô đang dùng: đồ nghề, điện thoại, quần áo, chỗ ở.
+- **Bên phải:** mặt Phong độ (vui, lo, mếu theo mức), Tỉnh táo, No bụng, Vệ sinh cá nhân, Quần áo (rê chuột xem cách hồi lại); **Đặc điểm tính cách** rút ra từ cách đã sống (`traits()` trong `scripts/game_logic.gd`: Tiết kiệm hay Tay rộng, Chăm chỉ, Giữ lời hay Hứa trước lo sau, Ôm việc một mình hay Biết nhờ người, Thương nhà, Được lòng xóm, Cố quá sức, Lôi thôi); **Mối quan hệ** với từng người (Thân thiết, Quen, Xa cách).
 
-**Nói chuyện:** vào tiệm có người đứng trước cửa (Cô Sáu, Chú Bảy, Vy, Tuấn, Ông Tư) sẽ thấy nút **Nói chuyện**, tốn 30 phút, mỗi người một lần mỗi ngày. Mỗi người có vài đoạn mạch chuyện mở dần theo độ thân thiết và ngày; kể hết thì tán gẫu, được thêm chút thân thiết. Hội thoại viết trong `data/talks.json`.
+**Thời gian:** đi bộ trên phố tốn giờ (chỉnh bằng `walkHoursPerMeter`). Làm việc thì An vào trong, thanh thời gian chạy (`workSecondsPerHour` giây thật cho mỗi giờ trong game) rồi mới tính kết quả. Làm việc kéo qua 20 giờ thì Mệt tăng thêm. Vào **Xóm trọ Bờ Me** để **Đi ngủ**.
 
-**Quận 1:** từ ngày 23, khi Ngoại ngữ đủ 3, trạm xe buýt có việc *Dẫn khách Úc đi chợ Bến Thành*. Nhận việc thì sang màn Quận 1 (`scenes/quan1.tscn`): dẫn ba vị khách qua cổng chợ, sạp lưu niệm, xe bánh xèo, mỗi chỗ một lựa chọn. Xong chuyến thì đón xe buýt về, tiền công và giờ tính lúc đó. Nội dung chuyến đi viết trong `data/tour_ben_thanh.json`.
+**Tiền và Mệt:** góc phải hiện tiền mặt tiêu được, tách riêng khỏi tiền phải thu (trước và sau ngày 30) và khoản phải trả. Mỗi tối trừ tiền sinh hoạt của cả nhà (`livingCostPerDay`, chưa gồm cơm của An). Mệt từ 70 trở lên là mức cảnh báo; nghỉ ở phòng, ăn cơm với bà, ngồi trà đá giúp giảm Mệt. Nút **Sổ** mở các khoản phải thu, phải trả, sổ lời hứa, sổ gia đình, độ thân thiết và đồ đang mang.
 
-Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. Nút **Chơi lại** trong Bảng cân bằng xóa ván đang chơi.
+**Nhu cầu cơ thể và Phong độ (kiểu Nobody):** No bụng, Vệ sinh, Quần áo tự giảm theo giờ; việc bẩn (ca kho, phụ quán, lục rác) làm bẩn người và đồ. Cùng độ tỉnh táo (100 − Mệt), chúng gộp thành **Phong độ**: từ 55 trở lên đủ lương, 30–55 chỉ được 70%, dưới 30 chỉ 50% và đi chậm. Nhịn đói tới 0 thì Mệt tăng nhanh. Ăn ở Cơm Hạnh, bánh mì ở chợ Cầu Nhỏ buổi sáng; tắm và giặt đồ ở xóm trọ. Số liệu trong `needs` của `data/config.json`.
+
+**Ca làm việc 3D (kiểu Nobody):** mỗi việc có một bản đồ nhỏ riêng, An tự đi lại làm (WASD hay bấm, chạm xuống sàn để đi; tới gần rồi bấm E, Space hay bấm thẳng vào chỗ đó). Nhãn treo trên đầu từng chỗ ghi cần gì, còn bao lâu.
+- **Kho khu công nghiệp** (ca kho, tổ trưởng ca chiều): bưng thùng mì, lốc nước, bao gạo từ đống bên trái lên pallet bên phải đúng loại nhãn ghi, đầy pallet thì xe nâng chở đi.
+- **Công trình điện Bến Cạn** (làm cùng tổ, điều phối, bảo trì sau mưa, đi lại điện chợ): đưa cuộn dây, ống luồn, hộp CB tới từng điểm thi công.
+- **Quán Cơm Hạnh** (ca phụ quán): khách ngồi bàn gọi món, lấy cơm sườn, canh chua, trà đá ở quầy bưng ra đúng bàn; khách ăn xong thì dọn bát dơ về chậu rửa; khách chờ lâu sẽ bỏ đi.
+- **Tiệm Sáu** (sửa đồ lẻ, trông tiệm, ngồi bàn thứ Bảy, mở tiệm, làm khoán): khách mang quạt, nồi cơm, máy bơm, bàn ủi tới quầy; đem lên bàn sửa, lấy đúng linh kiện ở kệ (tụ quạt, cầu chì nhiệt, phốt bơm, rơ le nhiệt), đứng tại bàn sửa xong rồi trả đúng khách.
+
+Đủ chỉ tiêu trong giờ thì đủ công, thiếu thì tính theo tỉ lệ (thấp nhất 50%), làm nhanh, khéo được thưởng. Từ lần thứ hai có thể **làm tự động**, lặp lại kết quả lần tự làm gần nhất. Thông số trong `minigames` của `data/config.json`, cảnh dựng ở `scripts/work/work_site.gd`. Đồ vật và vật liệu là mô hình chụp từ đồ thật của [Poly Haven](https://polyhaven.com) (CC0: thùng carton, sóng nhựa, thùng phuy, ghế nhựa trắng, nồi, bàn sắt, ê tô, tủ đồ nghề, kệ gỗ, sàn bê tông, gạch men, tường vữa, tôn), danh sách ở `assets/ph/NGUON.md`; pallet, cuộn dây, bao gạo, quạt, nồi cơm, tô cơm dựng bằng khối phủ vật liệu thật (`scripts/work/work_props.gd`).
+
+**Ve chai:** thùng rác dọc vỉa hè, đứng gần bấm **E** để lục (mỗi thùng một lần mỗi ngày): được chai nhựa, lon, bìa giấy nhưng bẩn người. Mang ra sạp của cô Út ở **chợ Cầu Nhỏ** để bán.
+
+**Giao đồ (kiểu Nobody):** bấm **Điện thoại** ở thanh dưới, bật *App Giao Nhanh*. Đơn hiện lên (lấy ở Cơm Hạnh, chợ hay tiệm Sáu, giao tới nhà số mấy, tiền công, hạn giờ), nhận thì tự đi lấy rồi tìm đúng nhà để giao: mũi tên cam chỉ chỗ lấy, xanh chỉ nhà khách. Giao sớm có tip, trễ bị trừ tiền và thêm Mệt. Số liệu trong `delivery` của `data/config.json`.
+
+**Nói chuyện:** người đứng trước cửa (bà Tư, Linh, cô Duyên ở xóm trọ; chị Hạnh, Minh ở Cơm Hạnh; chú Sáu; anh Phúc, Trâm ở Bến Cạn) có nút **Nói chuyện**. Mỗi người có việc riêng theo giờ (`data/schedules.json`) và đi bộ thật trên đường: bà Tư đi chợ sáng, Linh ra bến xe đi học (thứ Hai tới thứ Sáu), Minh chở cơm xuống Bến Cạn, chú Sáu ra chợ trưa, cô Duyên mua cơm tối… Người đang ở đâu thì nói chuyện ở đó; chỗ quen ghi "đi đâu, khoảng mấy giờ về". Người bán rong (bánh mì, xôi buổi sáng, ve chai ban ngày, chè, hủ tiếu gõ buổi tối) đẩy xe vòng qua các hẻm, tiếng rao phát ra từ chính chiếc xe, ngày mưa thì nghỉ. Nói chuyện tốn 30 phút, mỗi người một lần mỗi ngày. Mạch chuyện mở dần theo ngày và độ thân thiết, có lựa chọn ghi vào sổ gia đình. Viết trong `data/talks.json`.
+
+**Việc nhờ (kiểu Nobody):** người trong phố nhờ những việc nhiều bước, có hạn giờ và có lựa chọn. Chỗ có người nhờ hiện dấu **!** vàng; nhận việc thì bảng mục tiêu hiện bước đang làm, dấu **◆** xanh chỉ chỗ cần tới. Lát cắt có 7 việc: sửa quạt của cô bán trái cây (đọc triệu chứng, chọn đúng bệnh, trả trước 18:00), rửa bát đủ chỉ tiêu rồi chở 20 suất cơm xuống Bến Cạn trước khi nguội, gom lon nhôm cho cô Út, tìm mèo của bé Bắp, chậu mới cho cây húng của bà Tư (để bà tự chọn hay chọn thay), in hồ sơ thực tập cho Linh (in đúng bản em gửi hay tự ý sửa), đo lại trước nghiệm thu với Trâm (tuyến B, C). Quá hạn là hỏng việc; làm xong được tiền, thân thiết hoặc ưu đãi (cơm giá quen, ve chai được giá). Viết trong `data/quests.json`.
+
+Ván chơi tự lưu sau mỗi thao tác vào `user://save.json`. **Esc** (khi không có bảng nào mở) về màn đầu: Chơi tiếp, Bắt đầu câu chuyện khác (hỏi trước khi xóa ván đang chơi), Cài đặt.
 
 ## Cấu trúc thư mục
 
 ```
 data/
-  config.json     số liệu cân bằng: tiền, lương, học phí, xác suất, việc làm và địa điểm của từng việc
-  events.json     sự kiện cố định theo ngày, sự kiện ngẫu nhiên, mốc tiền
-  story.json      mở đầu, món mang theo, 5 kết thúc, Sổ tay của Minh
+  realmap.json    chế độ Dựng khu thật: địa chỉ các nguồn, giờ chờ, luật lọc nhà, bề rộng đường, màu nhà
+  schedules.json  việc riêng theo giờ của 8 nhân vật, tuyến của người bán rong
+  maps/           map phố Hà Nội dựng tay (hn_an_hoa.json), khu thật nướng sẵn (q8_tau_hu.json) và file đặt truyện (*_story.json)
+  map.json        bản đồ phường An Hòa: đường, hẻm, rạch, cầu, cổng hẻm, chỗ đặt từng địa điểm
+  config.json     số liệu: tiền sinh hoạt, Mệt, nhu cầu cơ thể, chỗ ở, điểm xuất phát của 3 tuyến, việc làm, trò chơi nhỏ, giao đồ, ve chai
+  events.json     cảnh chính ngày 1–30 (địa điểm, khung giờ, lựa chọn, nếu bỏ lỡ), biến thể theo tuyến, sự kiện hệ thống
+  story.json      lời mở đầu, tên nhân vật, 8 kết thúc, thẻ hậu truyện của Linh, bà Tư và quan hệ nghề
   talks.json      hội thoại với nhân vật: mạch chuyện và chuyện phiếm
-  models.json     file mô hình cho nhà, người, xe, cây và cách co giãn
-  tour_ben_thanh.json  điểm dừng và lựa chọn của chuyến dẫn khách ở Quận 1
+  quests.json     việc nhờ nhiều bước: người nhờ, hạn, các bước, lựa chọn, phần thưởng
+  models.json     file mô hình cho nhà, người, xe, cây, đồ vật và cách co giãn
   sounds.json     âm nền, tiếng rao, còi xe, tiếng hiệu ứng
-assets/           mô hình .glb (chưa có thì dùng khối hình), sounds/ âm thanh
+docs/             tài liệu thiết kế "Trước mùa mưa" (Godot bỏ qua thư mục này)
+assets/           texture, HDRI, mô hình đồ vật Poly Haven, người thật Rocketbox (assets/rb), âm thanh
+prototype/        bản thử HTML đầu tiên (cốt truyện cũ)
 tools/
   gen_sounds.py   tổng hợp âm thanh tạm
+  bake_map.gd     nướng một khu thật thành map của truyện (OSM + Open Buildings, cắt theo khung)
+  gen_hanoi_map.py  dựng tay map phường An Hòa kiểu phố Hà Nội (phố, ngõ, đường tàu, hồ, đình, tập thể)
+  bake_people.gd  nướng tư thế người thật thành lưới nhẹ cho đám đông, người lái xe (chạy có màn hình: xvfb-run)
+  viet_look.py    Việt hoá ảnh người thật: tông da chung cho mặt và thân, tóc bạc, tóc đen (python3 tools/viet_look.py)
 scripts/
   game_logic.gd   toàn bộ luật chơi, không phụ thuộc giao diện
   game_state.gd   autoload GameState: giữ ván chơi, tự lưu
-  world/world.gd  phố 3D: dựng cảnh, nhân vật, xe máy, người đi đường, ánh sáng theo giờ
-  world/models.gd nạp mô hình .glb, co giãn cho vừa chỗ, phát hoạt cảnh đứng, đi, ngồi
+  world/world.gd  phố 3D: địa điểm, nhân vật, rạch và cầu, thùng rác, xe máy, người đi đường, ánh sáng theo giờ
+  world/models.gd nạp mô hình, co giãn cho vừa chỗ, phát hoạt cảnh
+  world/surfaces.gd    vật liệu texture chiếu theo tọa độ thế giới
   world/audio.gd  âm thanh theo giờ, mưa, tiếng rao có chữ nổi
-  world/character.gd   nhân vật có khớp dựng bằng khối: Minh, nhân vật phụ, người đi đường; hoạt cảnh đi, đứng, ngồi xe
+  world/character.gd   ngoại hình từng nhân vật (LOOKS), người đi đường ngẫu nhiên; khung người dựng bằng code làm dự phòng
+  world/human.gd       người thật Rocketbox: đi, đứng, ngồi xe, nói, đẩy xe, gánh, gắn nón
+  world/props3d.gd     đồ vật 3D dựng bằng code: xe máy, ô tô, ghế bàn nhựa, xe đẩy bán rong, gánh hàng, ghe, cây, cây dừa
   world/tube_house.gd  dựng nhà ống: mỗi căn một lưới, ngẫu nhiên màu sơn, ban công, biển hiệu
-  world/street_map.gd  bản đồ phố thu nhỏ, bấm để đi tới
-  world/landmarks.gd   địa danh dựng bằng khối (Chợ Bến Thành) có đèn neon
-  world/quan1.gd       màn Quận 1: dẫn khách Úc đi chợ Bến Thành
-  world/hud.gd    HUD kiểu Nobody: mục tiêu, trạng thái, bảng địa điểm, thanh công cụ
-  ui/ui_kit.gd    màu sắc, theme, thẻ hành động dùng chung
-  ui/dialog_layer.gd  hộp thoại mở đầu, sự kiện, buổi tối, kết thúc
-  board.gd        Bảng cân bằng: chơi bằng nút bấm, thấy hết chỉ số
+  realmap/realmap.gd     chế độ Dựng khu thật: giao diện hai nửa, tiến độ, camera xoay nghiêng, tải .glb, đi dạo
+  realmap/fetcher.gd     gọi Nominatim, Overpass (nhiều máy, chờ 7 s), đọc file theo byte (Range)
+  realmap/fgb_reader.gd  đọc FlatGeobuf từ xa theo chỉ mục không gian (Open Buildings)
+  realmap/area_data.gd   đọc dữ liệu OSM, ghép và lọc nhà Open Buildings
+  realmap/area_builder.gd dựng 3D: nhà, mái, đường, sông hồ, công viên, tường rào, nhãn tên, lưới đi bộ; nhìn xuyên nhà che An
+  realmap/street_dress.gd đồ phố Việt: mái hiên, biển hiệu, ban công hoa giấy, cục nóng, mái ngói mặt tiền, sân thượng (bồn nước, tum, giàn hoa, chậu cây), cột điện, dây điện, cổng hẻm, bảng tên đường, vạch qua đường, đèn giao thông, ghế quán cóc
+  realmap/walk_grid.gd   lưới đi bộ 1 m và tìm đường cho khu thật (đường, hẻm rẻ; khe nhà, bãi trống đắt)
+  realmap/map_view.gd    bản đồ nền tối: kéo, phóng, tìm, vẽ khung hay đa giác
+  world/real_city.gd   map của truyện từ khu thật nướng sẵn: đặt địa điểm, đổi tên đường, nhà có số, thùng rác, chỗ ngập
+  world/street_life.gd nhân vật đi việc riêng theo giờ, người bán rong đẩy xe qua hẻm (data/schedules.json)
+  world/traffic.gd     dòng xe máy có người lái và ô tô chạy theo làn trên đường thật (MultiMesh theo cụm tuyến)
+  world/crowd.gd       đám đông trên đường thật: khách quán cóc, chủ tiệm, người mua, nhóm nói chuyện, người đi bộ, trẻ con đá banh (MultiMesh)
+  world/rain_layer.gd  cảnh ngày mưa: rạch tràn bờ, chỗ ngập, vũng nước, gợn nước, thùng đồ trước xóm trọ theo việc chuẩn bị
+  world/city_map.gd    đọc data/map.json: đường, hẻm, rạch, chia lô mặt tiền, đánh số nhà, lưới đi bộ và tìm đường
+  world/street_map.gd  bản đồ nhỏ và bản đồ lớn (phím M), bấm để đi tới
+  world/hud.gd    HUD kiểu Nobody: mục tiêu, tiền và Mệt, bảng địa điểm, điện thoại, Sổ, Nhật ký, việc nhờ
+  ui/ui_kit.gd    màu sắc, theme, thẻ hành động, hai cột tiền, Sổ dạng chữ
+  ui/screen_fit.gd    autoload ScreenFit: co giao diện theo màn và mật độ điểm ảnh, chế độ gọn cho điện thoại, nhắc xoay ngang
+  ui/dialog_layer.gd  hộp thoại chọn tuyến, sự kiện, đi ngủ, tổng kết lát cắt
+  work/work_site.gd    ca làm việc 3D: kho, công trình, quán cơm, tiệm sửa (mỗi việc một bản đồ nhỏ)
+  board.gd        Bảng cân bằng: chơi bằng nút bấm, thấy hết dòng tiền và các sổ
 scenes/
   world.tscn      màn chính
   board.tscn      Bảng cân bằng
-  quan1.tscn      màn Quận 1
 tests/
-  sim.gd          tự chơi 200 ván để kiểm tra cân bằng
-  playtest.gd     người chơi máy chơi trên màn phố thật, in nhật ký từng ngày
+  sim.gd          tự chơi lát cắt cho 3 tuyến × 3 cách chơi
+  playtest.gd     người chơi máy chơi lát cắt trên màn phố thật, in nhật ký từng ngày
+  realmap_test.gd thử chế độ Dựng khu thật với máy chủ giả (realmap_fixtures/: tạo dữ liệu mẫu, máy chủ có Range)
 ```
 
 ## Texture và ánh sáng tả thực
@@ -81,7 +422,7 @@ Mặt đường, vỉa hè, tường nhà ống và nắp cống dùng texture P
 
 ## Thêm mô hình thật
 
-Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file mô hình nào. Thiếu file nào thì chỗ đó vẫn là khối hình, nên có thể thêm dần từng cái.
+Game đọc `data/models.json` để biết mỗi thứ trên phố dùng file mô hình nào. Thiếu file nào thì người, xe máy, cây dùng lưới dựng bằng code (`character.gd`, `props3d.gd`), nhà dùng nhà ống tự tạo, nên có thể thêm dần từng cái.
 
 1. Tải các bộ miễn phí (giấy phép CC0, dùng thương mại được):
    - Người: [Kenney Mini Characters](https://kenney.nl/assets/mini-characters), có sẵn hoạt cảnh đứng, đi, ngồi.
@@ -103,24 +444,98 @@ Các file `.wav` trong `assets/sounds/` là **tiếng tạm** do `tools/gen_soun
 
 ## Chỉnh cân bằng
 
-- Sửa số trong `data/config.json` rồi chạy lại game. Mỗi việc làm có trường `location` cho biết nó nằm ở tiệm nào ngoài phố.
+- Sửa số trong `data/config.json` rồi chạy lại game. Điểm xuất phát của từng tuyến nằm ở `presets`.
 - Bảng cân bằng (nút **Bảng cân bằng** ở dưới màn phố) cho chơi nhanh bằng nút bấm.
-- Chạy mô phỏng 100 ván cho mỗi chiến lược (chỉ làm chân tay, và học nghề):
+- Chạy mô phỏng:
 
 ```bash
 "C:/Users/Admin/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe" --headless --path . -s res://tests/sim.gd
 ```
 
-Kết quả gần nhất: chỉ làm chân tay thì thua cả 100 ván, học nghề điện lạnh thì 86/100 ván đạt kết đẹp.
+Kết quả gần nhất của bản 30 ngày (bỏ qua đường đi bộ; kết thúc và tiền mặt cuối tháng sau khi đã trả chỗ ở):
 
-- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, nói chuyện, về phòng ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Thêm `--talk` để người chơi máy nói chuyện với nhân vật:
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng (làm 3 việc, không nghỉ) |
+|---|---|---|---|---|
+| A · Làm công | E1 · 6,03 tr | E6 · 3,37 tr | E8 · 3,60 tr | E4 · 2,18 tr |
+| B · Tổ đội | E2 · 3,82 tr | E4 · 0,33 tr | (khóa B, sang A) | E4 · 2,00 tr |
+| C · Dịch vụ riêng | E3 · 4,98 tr | E4 · 1,12 tr | E8 · 1,07 tr | E4 · 1,53 tr |
+
+Chơi tiếp chương 2 (ngày 31–60) từ đúng màn kết ở trên; kết chương 2 và tiền mặt tối ngày 60 sau khi đã đóng tiền nhà tháng sau. "Giấu" giấu chuyện và ép người nhà ở các cảnh gia đình; "Ít việc" mỗi ngày chỉ làm một việc ngắn; "Để má chọn" như lắng nghe nhưng không giữ chỗ cho máy may của má:
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
+|---|---|---|---|---|---|---|---|
+| A | K3 · 7,13 tr | K6 · 3,22 tr | K6 · 11,65 tr | K6 · 1,70 tr | K3 · 4,97 tr | K4 · 0 | K2 · 7,13 tr |
+| B | K3 · 8,32 tr | K6 · 1,67 tr | K6 · 11,65 tr | K6 · 3,24 tr | K6 · 5,36 tr | K4 · 0 | K2 · 8,32 tr |
+| C | K3 · 10,45 tr | K6 · 3,23 tr | K6 · 12,02 tr | K6 · 4,00 tr | K6 · 7,37 tr | K4 · 0 | K2 · 10,45 tr |
+
+Cách chơi không nghỉ (giữ tiếp, áp đặt, gồng) kiệt sức ở mùa mưa (K6) và má đi lặng lẽ; lắng nghe mà chừa chỗ cho máy may thì má ở lại mở sạp (K3), không chừa thì má quay lại nghề ở xa có hẹn gọi về (K2). K1 (má ở lại, mâm giỗ đủ chén) cần bà chưa mổ hay chưa ai hỏi ý má; K5 bị K6 che trong bảng vì các cách chơi giấu chuyện đều làm quá sức.
+
+Chơi tiếp chương 3 (ngày 61–90) từ màn kết chương 2 ở trên; kết chương 3, tiền mặt tối ngày 90 sau khi đóng tiền nhà tháng sau và cọc tiệm. Các cách chơi có nghỉ (lắng nghe, giấu, để má chọn) làm ở tiệm Sáu là chính; lắng nghe và để má chọn ghé nói chuyện với người có chuyện để kể (ai hỏi góp tiệm thì nhận lời), để má chọn ngày 80 không nhận tiệm; thêm cách chơi "Một mình": như lắng nghe nhưng không hỏi ai, ngày 80 nhận tiệm một mình:
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | L3 · 6,06 tr | L6 · 5,98 tr | L6 · 7,70 tr | L6 · 5,10 tr | L5 · 3,30 tr | L4 · 0 | L1 · 7,53 tr | L2 · 2,90 tr |
+| B | L3 · 7,51 tr | L6 · 5,29 tr | L6 · 7,70 tr | L6 · 6,28 tr | L5 · 4,35 tr | L4 · 0 | L1 · 8,72 tr | L2 · 4,09 tr |
+| C | L3 · 9,27 tr | L6 · 7,74 tr | L6 · 9,37 tr | L6 · 7,47 tr | L5 · 5,70 tr | L4 · 0 | L1 · 10,94 tr | L2 · 6,87 tr |
+
+Đủ sáu kết. Nhận tiệm chung với Kha, Trâm, má (L3) thì phần cọc của An còn một phần tư; một mình (L2) phải gánh đủ 4 triệu nên tiền cuối tháng ít nhất. Cách chơi giấu (lén trả tiền cho Tín, lén đóng học phí cho Linh rồi nói là chú Sáu đóng) bị Linh tự phát hiện (L5). Không nghỉ thì kiệt sức (L6); giữ tiếp và gồng cũng lén đóng học phí nên Linh trả lại phong bì. `... -s res://tests/sim.gd -- di_nam` thử riêng ba lối vào chương 3 khi còn ở nhờ dì Năm (chưa giữ phòng, đã trả đủ phòng mới, còn giấy hẹn): cả ba đều dọn được, ra L3.
+
+Chơi tiếp chương 4 (ngày 91–120) từ màn kết chương 3; kết chương 4, tiền mặt tối ngày 120 sau khi đóng tiền nhà, tiền mặt bằng, đồ nghề. "Để má chọn" ngày 116 nhận lời về trung tâm bảo hành; "một mình" ngày 92 nhận đơn quạt của trường vừa sức:
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | M3 · 12,10 tr | M6 · 12,53 tr | M6 · 11,32 tr | M6 · 9,11 tr | M5 · 7,61 tr | M4 · 0,59 tr | M2 · 13,19 tr | M1 · 7,59 tr |
+| B | M3 · 13,55 tr | M6 · 10,05 tr | M6 · 11,32 tr | M6 · 10,08 tr | M5 · 8,91 tr | M4 · 0,59 tr | M2 · 14,38 tr | M1 · 8,78 tr |
+| C | M3 · 15,68 tr | M6 · 15,92 tr | M6 · 14,19 tr | M6 · 11,81 tr | M5 · 10,01 tr | M4 · 0,59 tr | M2 · 16,57 tr | M1 · 11,50 tr |
+
+Đủ sáu kết. Chia đơn quạt với tổ Trâm ra M3, nhận lời anh Quân ra M2, nhận vừa sức ra M1; cách chơi giấu nhận lời cho Tín nghỉ học theo An rồi cãi chị Lụa (M5). Bản tự chơi không tính đường đi bộ nên tiền dư nhiều; chơi trên phố thì sát hơn.
+
+Chơi tiếp chương 5 (ngày 121–150) từ màn kết chương 4; kết chương 5, tiền mặt tối ngày 150 sau khi đóng tiền nhà, tiền mặt bằng, đợt cuối đồ nghề. Các cách chơi có nghỉ tối đi học lớp điện lạnh, đau lưng thì đi khám; "để má chọn" và "một mình" ngày 122 để năm sau mới học:
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | N3 · 12,46 tr | N6 · 11,18 tr | N6 · 11,57 tr | N6 · 7,96 tr | N5 · 5,87 tr | N4 · 0,29 tr | N1 · 15,45 tr | N2 · 9,16 tr |
+| B | N3 · 13,64 tr | N6 · 10,38 tr | N6 · 11,57 tr | N6 · 7,93 tr | N5 · 7,77 tr | N4 · 0,29 tr | N1 · 16,37 tr | N2 · 10,08 tr |
+| C | N3 · 15,63 tr | N6 · 16,39 tr | N6 · 16,58 tr | N6 · 11,11 tr | N5 · 8,41 tr | N4 · 0,29 tr | N1 · 18,36 tr | N2 · 12,07 tr |
+
+Đủ sáu kết. Học xong lớp điện lạnh ra N3; không học mà tiệm chia mái hiên với chị Lụa (đã hỏi người góp) ra N2; không có tiệm, không học ra N1. Cách chơi gồng khiêng một mình cái tủ lạnh rồi dán cao làm tiếp (N6, cùng với các cách chơi không nghỉ); cách chơi giấu nói "cả nhà khỏe là được", giấu chuyện tiền ôn thi của Linh, chuyện ba của Tín, bỏ dở sinh nhật má (N5).
+
+- Đọc lại một lượt chơi chương 2 (lựa chọn và sổ tay ngày 31–60): `... -s res://tests/sim.gd -- trace C 0` (tuyến, cách chơi 0–6); thêm `3`, `4` hay `5` ở cuối (`trace A 0 3`) để đọc chương 3, 4, 5, kèm tiền và Mệt từng ngày, các khoản phải trả, các cờ.
+- Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, cảnh chính, việc nhờ, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Bỏ `--full` để chơi lát cắt; `--ch2` thay cho `--full` để chơi tiếp chương 2 tới ngày 60, thêm `--fast1` để chương 1 chạy nhanh không đi bộ; `--ch3` cho hai chương đầu chạy nhanh rồi chơi chương 3 trên phố, `--ch4` cho ba chương đầu chạy nhanh rồi chơi chương 4, `--ch5` cho bốn chương đầu chạy nhanh rồi chơi chương 5:
 
 ```bash
-Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --talk --seed=1
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s res://tests/playtest.gd -- --demo --full --route=B --talk
 ```
 
-- Chạy `-- --demo` để vào thẳng ngày 1 mà không ghi đè bản lưu; thêm `--demo-open=quan_com` để mở sẵn một địa điểm.
+**Phụ đề hội thoại:** mọi màn có chữ (mở đầu, cảnh truyện, hội thoại với nhân vật, màn "Đi ngủ?" buổi tối với sổ tay và lời hé lộ ngày mai, tổng kết lát cắt, màn kết chương và phần "Xem thêm") không còn là khung chữ dài: lời kể và lời thoại chạy thành phụ đề ở cuối màn hình, mỗi lần một câu, có tên người nói, chữ chạy dần (chạm, bấm chuột hay Space để sang câu sau, "Bỏ qua" để tới lựa chọn ngay), hết lời mới hiện lựa chọn (bấm số 1–9 để chọn nhanh). Màn kết chỉ đọc tên kết, lời kết, câu nói và "về sau"; thẻ hậu truyện, người ở phố, sổ tay mở ở nút "Xem thêm". Cắt câu ở `scripts/ui/subtitle_text.gd`.
+
+**Chạy thử nhanh** (thêm vào sau lệnh chạy game, không ghi đè bản lưu thật):
+
+- `-- --demo --demo-full`: vào thẳng ngày 1 của bản 30 ngày.
+- `-- --demo-ch2`: máy tự chơi xong chương 1, vào thẳng sáng ngày 31 của chương 2 (bản web: `?ch2`).
+- `-- --demo-ch3`: máy tự chơi xong hai chương đầu, vào thẳng sáng ngày 61 của chương 3 (bản web: `?ch3`).
+- `-- --demo-ch4`: máy tự chơi xong ba chương đầu, vào thẳng sáng ngày 91 của chương 4 (bản web: `?ch4`).
+- `-- --demo-ch5`: máy tự chơi xong bốn chương đầu, vào thẳng sáng ngày 121 của chương 5 (bản web: `?ch5`).
+- `-- --demo --demo-route=C`: vào thẳng ngày 18 của tuyến C.
+- Thêm `--demo-open=ben_can`: mở sẵn một địa điểm.
+- Thêm `--demo-end`: tự chơi tới hết ngày 22 để xem bảng tổng kết.
 
 ## Khi xuất bản game
 
 Godot không tự đóng gói file `.json`. Trong **Project → Export**, thêm `*.json` vào ô *Filters to export non-resource files*.
+
+## Chạy mượt trên web
+
+- An và máy quay cập nhật theo nhịp vẽ (`_process`), không theo nhịp vật lý cố định: màn 120 Hz hay khung hình dao động không làm máy quay nhảy cóc.
+- Trình duyệt máy tính màn mật độ cao vẽ cảnh 3D chừng 1,25 điểm mỗi điểm CSS (`ScreenFit.WEB_3D_DENSITY`), giao diện vẫn nét; trên web bóng nắng chỉ hai tầng (`ScreenFit.light_shadows`).
+- Tìm đường (`walk_grid.gd`): nắn thẳng bằng chia đôi trong 48 điểm tới, nhớ sẵn 256 đường; đường đi việc của nhân vật phụ tìm sẵn lúc dựng màn phố, lúc chơi khỏi khựng.
+- Đám đông chia ô, dùng chung một vật liệu atlas; dòng xe gom cụm 100 m.
+
+## Bản Windows
+
+Tải: <https://hoantiny.github.io/mixi-game/download/TruocMuaMua-Windows.zip> (Windows 10/11 64-bit, OpenGL 3.3). Giải nén, bấm đúp `TruocMuaMua.exe`; bản chưa ký số nên lần đầu Windows có thể hỏi, bấm "More info" rồi "Run anyway". Bản cài trên máy vẽ đầy đủ hơn bản web: cảnh 3D đủ độ nét của màn hình, bóng nắng bốn tầng.
+
+Xuất lại: cần khuôn `windows_release_x86_64.exe` của Godot 4.7.2 trong thư mục export_templates, rồi
+`godot --headless --path . --export-release "Windows" build/windows/TruocMuaMua.exe` (dữ liệu game nhúng sẵn trong file exe, biểu tượng `icon.ico`, tên và số phiên bản trong `export_presets.cfg`). Cả bản web và bản Windows dùng bộ vẽ Compatibility (OpenGL) như lúc thử.
+
+**Giao hàng bằng xe máy:** nhận đơn trên app Giao Nhanh thì An lên chiếc tay ga đỏ, đội mũ bảo hiểm, hai tay nắm tay lái; đi nhanh gấp 1,8 lần đi bộ và mỗi mét chỉ tốn 35% giờ so với đi bộ (`world.gd` RIDE_SPEED, RIDE_TIME). Giao xong hay hủy đơn thì dựng xe, đi bộ tiếp.

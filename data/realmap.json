@@ -1,0 +1,173 @@
+{
+  "_ghi_chu": "Chế độ Dựng khu thật: trình duyệt (hay bản máy tính) tự gọi thẳng các nguồn dưới đây, không qua máy chủ nào khác. Đổi địa chỉ, giờ chờ, luật lọc, bề rộng đường, màu nhà ở đây.",
+  "nominatim": {
+    "url": "https://nominatim.openstreetmap.org/search",
+    "countrycodes": "vn",
+    "limit": 6,
+    "userAgent": "TruocMuaMua/1.0 (game Godot, che do dung khu that)"
+  },
+  "overpass": {
+    "_ghi_chu": "Hỏi máy đầu tiên; sau waitSeconds giây chưa trả lời thì hỏi thêm các máy còn lại, máy nào trả trước thì dùng.",
+    "servers": [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.private.coffee/api/interpreter",
+      "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+    ],
+    "waitSeconds": 7,
+    "timeoutSeconds": 60
+  },
+  "openBuildings": {
+    "_ghi_chu": "Bản gộp Google + Microsoft của VIDA trên Source Cooperative, dạng FlatGeobuf một file mỗi nước (có chỉ mục không gian): app chỉ tải phần đầu file, các nút chỉ mục cần thiết và đúng các nhà trong khung, bằng yêu cầu Range. {iso3} là mã nước 3 chữ (VNM). Nếu đường dẫn đổi thì sửa url; đọc lỗi thì vẫn dựng bằng nhà OSM.",
+    "url": "https://data.source.coop/vida/google-microsoft-open-buildings/flatgeobuf/by_country/country_iso={iso3}/{iso3}.fgb",
+    "minConfidence": 0.7,
+    "_unknownConfidence": "Nhà không ghi độ tin cậy (thường là nguồn Microsoft) thì giữ, vì không có số để so.",
+    "keepUnknownConfidence": true,
+    "maxFeatures": 12000,
+    "mergeGapBytes": 65536
+  },
+  "iso3": {
+    "vn": "VNM",
+    "la": "LAO",
+    "kh": "KHM",
+    "th": "THA",
+    "cn": "CHN",
+    "my": "MYS",
+    "id": "IDN",
+    "ph": "PHL",
+    "mm": "MMR",
+    "sg": "SGP"
+  },
+  "area": {
+    "maxKm2": 1.2,
+    "_ghi_chu": "Vùng vẽ lớn hơn maxKm2 thì không cho dựng (dữ liệu nặng, Overpass dễ quá giờ).",
+    "example": {
+      "name": "Khương Thượng, Đống Đa",
+      "lat": 21.004,
+      "lon": 105.8262,
+      "rect": [
+        [
+          105.8228,
+          21.0072
+        ],
+        [
+          105.8296,
+          21.0072
+        ],
+        [
+          105.8296,
+          21.0008
+        ],
+        [
+          105.8228,
+          21.0008
+        ]
+      ]
+    }
+  },
+  "roads": {
+    "_ghi_chu": "Bề rộng mặt đường (mét) theo highway; có tag width hay lanes thì dùng tag. small: tô màu bê tông như hẻm.",
+    "width": {
+      "motorway": 16,
+      "trunk": 14,
+      "primary": 12,
+      "secondary": 10,
+      "tertiary": 8,
+      "unclassified": 6,
+      "residential": 6,
+      "living_street": 4,
+      "service": 4,
+      "pedestrian": 5,
+      "track": 3,
+      "footway": 2,
+      "path": 1.6,
+      "cycleway": 2,
+      "steps": 2,
+      "motorway_link": 7,
+      "trunk_link": 7,
+      "primary_link": 7,
+      "secondary_link": 6,
+      "tertiary_link": 6
+    },
+    "small": [
+      "service",
+      "living_street",
+      "footway",
+      "path",
+      "steps",
+      "track",
+      "pedestrian",
+      "cycleway"
+    ],
+    "default": 4
+  },
+  "waterways": {
+    "river": 14,
+    "canal": 8,
+    "stream": 3,
+    "ditch": 1.5,
+    "drain": 1.5
+  },
+  "buildings": {
+    "levelHeight": 3.2,
+    "_defaultLevels": "Nhà không ghi số tầng: lấy ngẫu nhiên (cố định theo vị trí) trong khoảng này, kiểu nhà ống phố Việt.",
+    "defaultLevels": [
+      2,
+      5
+    ],
+    "_walls": "Sơn phố cũ: vữa xám, vàng đất, xanh bạc và gạch nâu; giữ biển hiệu làm điểm nhấn.",
+    "walls": [
+      "b7ad98",
+      "b9a57c",
+      "99a494",
+      "8d9b8a",
+      "8a9572",
+      "b6a067",
+      "b19963",
+      "b49b82",
+      "aeaba1",
+      "94a4a6",
+      "c3b798",
+      "83947e",
+      "b18b70",
+      "a2a38c",
+      "b8a476",
+      "a67c61"
+    ],
+    "flatRoof": "8e897c",
+    "pitchedRoof": "99644b",
+    "worshipWall": "d9b56b",
+    "worshipRoof": "9a3b26",
+    "tiledShare": 0.38,
+    "tileRoofs": [
+      "9e644c",
+      "a87759",
+      "925b45",
+      "a18568",
+      "895747",
+      "8f8270"
+    ]
+  },
+  "street": {
+    "_ghi_chu": "Đồ phố Việt (scripts/realmap/street_dress.gd): mặt tiền nhìn ra đường có mái hiên (awningShare), biển hiệu (signShare, chữ lấy ngẫu nhiên trong signs, trong hẻm lấy hemSigns), ghế nhựa quán cóc (stoolShare); cột điện mỗi poleStep mét dọc đường, dây giăng ngang hẻm; cổng hẻm ghi gateText ở miệng hẻm có tên.",
+    "_ban_cong": "Tầng trên có ban công lan can sắt; flowerShare: phần nhà có hoa giấy rủ qua lan can (màu trong flowers, lá trong leaves); acShare: mỗi tầng có cục nóng máy lạnh; canopyShare: nhà có mái ngói ở đỉnh mặt tiền. Sân thượng nhà mái bằng: tumShare (tum cầu thang lợp ngói), pergolaShare (giàn hoa giấy), potShare (chậu cây dọc mép); bồn nước nhựa đen trên hầu hết sân thượng.",
+    "awningShare": 0.7,
+    "signShare": 0.5,
+    "stoolShare": 0.12,
+    "poleStep": 27,
+    "flowerShare": 0.18,
+    "acShare": 0.35,
+    "canopyShare": 0.3,
+    "tumShare": 0.32,
+    "pergolaShare": 0.12,
+    "potShare": 0.3,
+    "flowers": ["a15d71", "b37b89", "96566a", "bd8d96", "8b4d60"],
+    "leaves": ["526b44", "647b50", "4c6540", "73805b"],
+    "awnings": ["47687b", "90483b", "456a54", "a6a398", "a47748", "4b7474", "526a4e", "955645"],
+    "boards": ["963f33", "3e5a76", "b3994b", "39674e", "754e6d", "cbc4b3", "a16a3f"],
+    "signs": ["TẠP HÓA", "PHỞ BÒ", "CƠM TẤM", "SỬA XE", "CẮT TÓC", "BÁNH MÌ", "PHOTOCOPY", "NHÀ THUỐC", "SIM THẺ", "GỘI ĐẦU", "BÚN BÒ HUẾ", "ĐIỆN THOẠI", "VẢI SỢI", "CÀ PHÊ", "HỦ TIẾU", "GẠO", "NƯỚC MÍA", "ĐIỆN NƯỚC", "VÀNG BẠC", "XE ÔM", "TIỆM MAY", "BÁNH CUỐN", "TRÀ SỮA", "BIA HƠI", "NHA KHOA", "VẬT LIỆU XÂY DỰNG"],
+    "hemSigns": ["TẠP HÓA", "CẮT TÓC", "CHÈ", "NƯỚC MÍA", "BÁNH CUỐN", "SỬA ĐIỆN THOẠI", "GIẶT ỦI", "BÁNH MÌ", "PHÒNG TRỌ", "BÁN XÔI", "SỬA XE", "NƯỚC ĐÁ"],
+    "gateText": "KHU PHỐ VĂN HÓA", "gateTextHanoi": "TỔ DÂN PHỐ VĂN HÓA",
+    "signsHanoi": ["PHỞ BÒ", "BÚN CHẢ", "BÚN ĐẬU MẮM TÔM", "BÁNH CUỐN", "BIA HƠI", "TẠP HÓA", "CÀ PHÊ", "TRÀ ĐÁ", "SỬA XE", "CẮT TÓC", "NHÀ THUỐC", "PHOTOCOPY", "MIẾN LƯƠN", "XÔI XÉO", "CHÈ", "ĐIỆN NƯỚC", "VÀNG BẠC", "SIM THẺ", "BÁNH MÌ", "LẨU", "GỘI ĐẦU", "MAY ĐO", "KHÓA", "NEM CHUA RÁN", "CƠM BÌNH DÂN", "INTERNET", "CẦM ĐỒ", "VÉ SỐ VIETLOTT", "BÚN THANG", "HÀNG MÃ", "CHẢ CÁ"],
+    "hemSignsHanoi": ["TẠP HÓA", "TRÀ ĐÁ", "CẮT TÓC", "XÔI", "BÁNH CUỐN", "SỬA ĐIỆN", "GIẶT LÀ", "NƯỚC CHÈ", "CHO THUÊ PHÒNG", "SỬA XE", "BÚN ỐC", "CẦM ĐỒ", "NET"]
+  }
+}
