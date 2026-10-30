@@ -73,16 +73,19 @@ the repeatable work budget. No daily stat or money resets occur during the
 simulation. Initial needs are standardized to 80 and fatigue to zero to avoid
 the opening conversation affecting the comparison.
 
-Daily route: 25 minutes to the market, breakfast or packed lunch, eight-hour
-warehouse shift at full quota, 25 minutes home, shared family meal, two hours
-rest, bath and laundry, then sleep around 18:41 (19:05 with lunch preparation).
-This leaves about three hours of the 16-hour day for story errands; skipping
-rest or meals can reduce performance and income.
+Daily route: 25 minutes to the market, breakfast or packed lunch, laundry soap
+when the last bar is used up (15,000đ for three washes), eight-hour warehouse
+shift at full quota, 25 minutes home, shared family meal, two hours rest, bath
+and laundry, then sleep around 18:41 (19:05 with lunch preparation). The cold
+tap bath can give An a cold, so on evenings when mood is already below 50 the
+route pays 25,000đ for the public hot bath instead. This leaves about three
+hours of the 16-hour day for story errands; skipping rest or meals can reduce
+performance and income.
 
 | Strategy | Daily net after baseline expenses | First deposit-ready evening |
 | --- | --- | --- |
-| Buy 15,000đ breakfast every day | 65,000đ | Day 25: 1,805,000đ |
-| Unlock and use family lunch after seven shared meals | 65,000đ through day 7, then 80,000đ | Day 22: 1,835,000đ |
+| Buy 15,000đ breakfast every day | 50,000–65,000đ (soap, occasional hot bath) | Day 28: 1,825,000đ |
+| Unlock and use family lunch after seven shared meals | as above through day 7, then up to 80,000đ | Day 24 |
 
 These are representative successful schedules, not a hard time gate. Perfect
 results, additional shifts, contracts, risk-taking and easy-mode starting

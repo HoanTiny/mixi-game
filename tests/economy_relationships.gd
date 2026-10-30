@@ -113,11 +113,16 @@ func simulate(use_lunch: bool) -> int:
 		if use_lunch and Relationships.unlocked(g): act(g,"nho_ba_com_hop")
 		check(Zones.travel(g,"cho_dau_moi"),"benchmark outbound travel")
 		act(g,"an_com_hop" if use_lunch and g.item_count("com_hop_cua_ba")>0 else "banh_mi")
+		# Home laundry consumes soap (15.000đ per three washes), bought at the same market stall.
+		if g.item_count("xa_phong")==0: act(g,"mua_xa_phong")
 		act(g,"ca_kho")
 		check(Zones.travel(g,"phuc_tan"),"benchmark return travel")
-		act(g,"com_voi_ba"); act(g,"nghi"); act(g,"tam_rua"); act(g,"giat_do")
+		act(g,"com_voi_ba"); act(g,"nghi")
+		# The cold tap can give An a cold (faster mood loss). When mood is already low,
+		# pay for the public hot bath instead: full hygiene, a little mood, no cold.
+		act(g,"tam_nong" if g.need("mood")<50.0 else "tam_rua"); act(g,"giat_do")
 		var before_day: int=g.day(); g.finish_day()
 		g.s.queue=[]; g.s.scenes=[]
-		print("budget lunch=",use_lunch," day=",before_day," cash=",g.s.cash," fatigue=",g.s.fatigue," fed=",g.need("fed"))
+		print("budget lunch=",use_lunch," day=",before_day," cash=",g.s.cash," fatigue=",g.s.fatigue," fed=",g.need("fed")," mood=",g.need("mood"))
 		if Economy.savings(g)>=int(g.cfg.economy.depositTarget): return before_day
 	return -1
