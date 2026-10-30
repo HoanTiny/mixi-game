@@ -1,3 +1,7 @@
+## Bản 1.17
+
+Học nghề buổi tối ở trung tâm nghề cạnh điểm xe buýt Long Biên (lớp hàn điện, kế toán sơ cấp; thi lấy chứng chỉ, lớp điện lạnh chương 5 đổi thành chứng chỉ), ba việc chỉ nhận khi có bằng, cây kỹ năng sáu ô trong bảng Nhân vật (`scripts/systems/careers.gd`). Giữ Shift chạy 4 m/s, chạy được trong ngõ; hết hơi phải nghỉ, thanh hơi trên đầu An (`scripts/world/stamina.gd`). Sửa các test headless cũ; việc cần bằng không bị trần lương chương 1. Kiểm bằng `tests/careers.gd`, `tests/stamina.gd`, `tests/locomotion_pacing.gd`. Web 1.17 giữ gói Windows 1.13.
+
 ## Bản 1.15
 
 Ca sửa Tiệm Chú Sơn: Q bỏ món cuối, khay hoàn trả, tối đa hai linh kiện; giữ E 2 giây để kiểm tra và 3 giây để lắp, sai linh kiện trừ 5 giây. Khung hành động phố mặc định thu gọn, mở bằng E/chạm, đóng bằng Esc hoặc khi đi tiếp; không liệt kê NPC có anchor trống ở giữa đường. Kiểm tra bằng `tests/repair_work_site.gd` và `tests/prompt_declutter.gd`, bao gồm ảnh 3D. Web 1.15 giữ gói Windows 1.13.
