@@ -28,6 +28,8 @@ func reload_game(g):
 func act(g, id: String, loc := "tiem_sau") -> void:
 	check(g.Street.act(g,loc,id),"action succeeds: "+id)
 func _initialize() -> void:
+	# A script error aborts _initialize before quit(); fail instead of idling forever.
+	create_timer(60).timeout.connect(func(): push_error("Opening slice: did not finish"); quit(1))
 	for use_market in [true,false]:
 		var g=fresh()
 		g.resolve_choice(0 if use_market else 1)
@@ -44,7 +46,11 @@ func _initialize() -> void:
 		if use_market:
 			act(g,"part_0","cho_cau_nho")
 			act(g,"own_part")
-		else: act(g,"shop_part")
+		else:
+			# The 46.000đ opening wallet cannot cover the shop part (50.000đ); chú Sơn advances it
+			# and takes it back from the fan payment.
+			check(g.s.cash<50000 and not g.Street.act(g,"tiem_sau","shop_part"),"opening wallet cannot buy the shop part")
+			act(g,"credit_part")
 		var token := str(g.s.street.accepted_day)+":0"
 		g.Street.bench_action(g,"open",0,token)
 		check(g.Street.bench_action(g,"remove",0,token)=="","remove actual part")
