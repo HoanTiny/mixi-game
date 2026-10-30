@@ -8,7 +8,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var world_script = load("res://scripts/world/world.gd")
 	assert(is_equal_approx(world_script.SPEED, 1.7), "Default walk must remain a human walking pace")
-	assert(is_equal_approx(world_script.SPEED * world_script.SPRINT, 3.15), "Shift should remain a purposeful jog")
+	assert(is_equal_approx(world_script.SPEED * world_script.SPRINT, 4.0), "Shift runs at 4 m/s until An is out of breath")
 	assert(is_equal_approx(world_script.SPEED * world_script.RIDE_SPEED, 4.8), "Delivery bike cap must suit the narrow streets")
 	for riding in [false, true]:
 		var speed := 4.8 if riding else 1.7
@@ -57,5 +57,5 @@ func _run() -> void:
 	for delta in [0.0, -0.1, NAN, INF]:
 		assert(blocked.advance(Vector3.RIGHT, 1.7, delta, false) == 0.0)
 		assert(blocked.speed == 0.0)
-	print("PASS pacing: 1.7 m/s walk, 3.15 jog, 4.8 ride; frame-independent acceleration/braking, bounded release drift, short-path arrival, collision reset")
+	print("PASS pacing: 1.7 m/s walk, 4.0 run, 4.8 ride; frame-independent acceleration/braking, bounded release drift, short-path arrival, collision reset")
 	quit()

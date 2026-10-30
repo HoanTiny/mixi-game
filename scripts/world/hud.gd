@@ -15,6 +15,7 @@ const RepairBench := preload("res://scripts/world/repair_bench.gd")
 const ItemIcon := preload("res://scripts/ui/item_icon.gd")
 const MoodRing := preload("res://scripts/ui/mood_ring.gd")
 const Joystick := preload("res://scripts/ui/joystick.gd")
+const StaminaBar := preload("res://scripts/ui/stamina_bar.gd")
 ## Ca làm việc 3D theo trường minigame của việc trong config.json (bricks, site, dishes, repair): mỗi việc một bản đồ
 ## nhỏ riêng, An tự đi lại làm.
 const WorkSite := preload("res://scripts/work/work_site.gd")
@@ -133,6 +134,8 @@ var _st_cash: Label
 var _st_bars := {}
 ## Cần điều khiển ảo, nút Chạy (chỉ màn cảm ứng); null trên máy tính.
 var joystick: Control = null
+## Thanh hơi khi chạy trên đầu An (scripts/ui/stamina_bar.gd).
+var stamina_bar: Control
 ## Hành động nhanh ở lời nhắc trước cửa địa điểm (phím 1–3 hay chạm): id việc theo thứ tự.
 var _quick: VBoxContainer
 var _quick_ids: Array = []
@@ -227,6 +230,8 @@ func _ready() -> void:
 
 	_build_topbar(root)
 	_build_mood(root)
+	stamina_bar = StaminaBar.new()
+	root.add_child(stamina_bar)
 	if ScreenFit.touch:
 		joystick = Joystick.new()
 		joystick.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
@@ -1093,6 +1098,7 @@ func _build_order_strip(parent: Control) -> void:
 func _process(delta: float) -> void:
 	if not game.is_started() or game.is_over():
 		return
+	stamina_bar.update(world, delta)
 	if _prompt_expanded and world.player.position.distance_to(_prompt_origin) > 0.8:
 		_collapse_prompt()
 	var active: Dictionary = game.delivery_active()

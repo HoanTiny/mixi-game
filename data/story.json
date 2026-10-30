@@ -247,7 +247,7 @@
  "tips": [
   {
    "id": "di_lai",
-      "text": "Bấm mặt đường hoặc dùng WASD để đi bộ. Giữ Shift khi cần chạy; thả ra để chậm lại. Tới cửa tiệm hay người quen, bấm E để gặp. Đi lại vẫn tốn giờ trong ngày.",
+      "text": "Bấm mặt đường hoặc dùng WASD để đi bộ. Giữ Shift khi cần chạy; thanh trên đầu là hơi, hết hơi thì phải đi chậm hay đứng nghỉ một lúc mới chạy tiếp. Tới cửa tiệm hay người quen, bấm E để gặp. Đi lại vẫn tốn giờ trong ngày.",
    "textTouch": "Chạm vào mặt đường để đi. Chạm vào cửa tiệm hay người đứng trước cửa để vào. Chụm, mở hai ngón để kéo máy quay xa, gần. Đi bộ cũng tốn giờ."
   },
   {

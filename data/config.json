@@ -17,6 +17,8 @@
     "freeHour": -2,
     "sleepOutside": 15
   },
+  "_stamina": "Hơi khi chạy (giữ Shift, nút Chạy; scripts/world/stamina.gd), tính theo giây thật: chạy tụt drain mỗi giây (Thể chất mỗi cấp trên 1 bớt drainPerStr, đang Mệt từ mức cảnh báo thì tụt thêm tiredDrain), dừng chạy regenDelay giây rồi mới hồi: đi bộ regenWalk, đứng yên regenIdle mỗi giây. Hết hơi là hụt hơi: không chạy được, đi bộ chậm còn windedSlow, phải hồi tới recoverAt mới chạy tiếp.",
+  "stamina": {"max": 100, "drain": 12, "regenWalk": 5, "regenIdle": 11, "recoverAt": 45, "windedSlow": 0.85, "drainPerStr": -0.08, "tiredDrain": 0.5, "regenDelay": 0.6},
   "chatRep": 1,
   "talkHours": 0.5,
   "needs": {

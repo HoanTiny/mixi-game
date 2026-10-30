@@ -256,7 +256,8 @@ func animate_motion(speed: float, delta: float) -> void:
 	# Hysteresis prevents a tiny joystick input from continually restarting clips.
 	var moving := speed > (0.04 if walking else 0.08)
 	if moving:
-		var target := clampf(speed / 1.5, 0.15, 2.3)
+		# Chạy 4 m/s thì clip đi bộ chạy nhanh gần 2,7 lần cho bước chân khớp quãng đường.
+		var target := clampf(speed / 1.5, 0.15, 2.8)
 		if not walking:
 			animation.play(walk_clip, 0.2)
 			_walk_cadence = minf(0.78, target)

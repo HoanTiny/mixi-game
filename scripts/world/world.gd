@@ -30,6 +30,7 @@ const StreetLife := preload("res://scripts/world/street_life.gd")
 const Props3D := preload("res://scripts/world/props3d.gd")
 const PlayerMotion := preload("res://scripts/vehicles/player_motion.gd")
 const TravelPace := preload("res://scripts/vehicles/travel_pace.gd")
+const Stamina := preload("res://scripts/world/stamina.gd")
 const Traffic := preload("res://scripts/world/traffic.gd")
 const Crowd := preload("res://scripts/world/crowd.gd")
 const TitleScreen := preload("res://scripts/ui/title_screen.gd")
@@ -116,9 +117,10 @@ const ALL_LOCATIONS := {
 const SPEED := 1.7
 ## Đi giao hàng thì An chạy xe máy: nhanh gấp chừng này, mỗi mét tốn chừng này phần giờ so với đi bộ.
 const RIDE_SPEED := 4.8 / SPEED
-## Chạy nhanh (giữ Shift, nút Chạy trên màn cảm ứng): nhanh gấp SPRINT lần, mỗi mét chỉ tốn RUN_TIME giờ đi bộ, cứ
-## RUN_FATIGUE_M mét thì Mệt +1; trong ngõ hẹp không chạy được, còn đi chậm lại LANE_SLOW lần vì chật người, xe.
-const SPRINT := 3.15 / SPEED
+## Chạy (giữ Shift, nút Chạy trên màn cảm ứng): nhanh gấp SPRINT lần, mỗi mét chỉ tốn RUN_TIME giờ đi bộ, cứ
+## RUN_FATIGUE_M mét thì Mệt +1, tụt hơi (stamina.gd) tới khi hụt hơi phải nghỉ. Trong ngõ hẹp đi hay chạy đều chậm lại
+## LANE_SLOW lần vì chật người, xe.
+const SPRINT := 4.0 / SPEED
 const RUN_TIME := 0.6
 const RUN_FATIGUE_M := 70.0
 const LANE_SLOW := 0.82
@@ -179,6 +181,8 @@ var _ride_bike: Node3D
 var _riding := false
 var _player_motion := PlayerMotion.new()
 var _travel_pace := TravelPace.new()
+## Hơi khi chạy (scripts/world/stamina.gd, cfg.stamina): hud.gd vẽ thanh hơi trên đầu An.
+var stamina := Stamina.new()
 var _ride_headlight: SpotLight3D
 var _night_factor := 0.0
 var font: SystemFont
@@ -241,6 +245,7 @@ func _ready() -> void:
 	var t0 := Time.get_ticks_msec()
 	_build_stamp = t0
 	game = GameState.game
+	stamina.setup(game.cfg.get("stamina", {}))
 	font = UI.text_font()
 	var map_id := _map_id()
 	real = map_id != "an_hoa" and FileAccess.file_exists("res://data/maps/%s.json" % map_id)
@@ -1934,6 +1939,9 @@ func _process(delta: float) -> void:
 	_update_lane(delta)
 	_update_ride()
 	var actual_travel := _advance_player(key_dir, delta)
+	var moved := actual_travel != Vector3.ZERO
+	if stamina.step(delta, moved and sprinting(), moved, game.Attributes.level(game, "str"), game.fatigue_warn()):
+		_float_text("Hụt hơi! Đi chậm lại cho lại sức", Color("ffb27a"))
 	for c in idlers:
 		c.animate(delta, 0.0)
 	_tick_idle(delta, actual_travel)
@@ -2351,10 +2359,11 @@ func _update_cutaway(delta := 0.0) -> void:
 func _speed() -> float:
 	var v := SPEED * (RIDE_SPEED if _riding else 1.0)
 	if not _riding:
+		if sprinting():
+			v *= SPRINT
 		if _lane:
 			v *= LANE_SLOW
-		elif sprinting():
-			v *= SPRINT
+		v *= stamina.walk_mult()
 	if _wading():
 		v *= RainLayer.WADE_SPEED
 	# Đói lả, trầm cảm, Phong độ thấp thì chậm (lấy mức chậm nhất); Nhanh nhẹn chỉ cộng khi đi bộ (game_logic.move_mult).
@@ -2373,9 +2382,9 @@ func _speed() -> float:
 	return v
 
 
-## Đang chạy nhanh: giữ Shift hay bật nút Chạy, không đi xe, không ở trong ngõ, chưa quá mệt.
+## Đang chạy: giữ Shift hay bật nút Chạy, không đi xe, còn hơi (chưa hụt hơi), chưa quá mệt.
 func sprinting() -> bool:
-	if _riding or _lane or not game.is_started():
+	if _riding or not game.is_started() or not stamina.can_run():
 		return false
 	if float(game.s.fatigue) >= float(game.cfg.fatigue.max):
 		return false
