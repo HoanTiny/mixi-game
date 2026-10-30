@@ -52,9 +52,10 @@ static func active(g) -> bool:
 	return g.is_started() and g.is_full() and g.chapter() == 1 and not data(g).is_empty()
 
 static func base_pay(g, a: Dictionary, pay: int) -> int:
-	# 1.13 authored job-board/hot-job quotes own their economy. Preserve those contracts.
-	if g.Hardship.on(g) and str(a.get("id","")) != "bia_service": return pay
 	if not active(g) or str(a.get("group","")) != "work" or pay <= 0: return pay
+	# 1.13 authored job-board/hot-job quotes own their economy. Preserve those contracts;
+	# every other repeatable job (warehouse, brick carrying, beer service) stays capped.
+	if a.has("scheduler_job") or (g.Hardship.on(g) and g.Hardship.data(g).get("hotJob",{}).get("pool",[]).has(str(a.get("id","")))): return pay
 	var overrides: Dictionary = data(g).get("basePayOverrides",{})
 	if overrides.has(str(a.id)): return mini(pay,int(overrides[str(a.id)]))
 	return mini(pay,g.round_k(float(a.get("hours",0))*float(data(g).get("hourlyBaseCap",28000))))
