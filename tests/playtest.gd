@@ -67,6 +67,11 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	# Không có --demo thì GameState lưu đè lên bản lưu thật của người chơi.
+	if root.get_node("GameState")._persist:
+		push_error("Playtest: chạy với -- --demo để không ghi đè bản lưu thật")
+		quit(1)
+		return
 	w = load("res://scenes/world.tscn").instantiate()
 	root.add_child(w)
 	await process_frame

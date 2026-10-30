@@ -1,7 +1,15 @@
 extends "res://tests/opening_visual.gd"
+## Run with -- --demo --demo-full; add --capture with a renderer for a screenshot.
 const Zones := preload("res://scripts/systems/map_manager.gd")
 
 func run() -> void:
+	# Without --demo the world opens on the title screen over the player's real save.
+	if root.get_node("GameState")._persist:
+		push_error("Map zones: run with -- --demo --demo-full so the test cannot save over player progress")
+		quit(1)
+		return
+	# A script error aborts run() before quit(); fail instead of idling forever.
+	create_timer(120).timeout.connect(func(): push_error("Map zones: did not finish"); quit(1))
 	var world = load("res://scenes/world.tscn").instantiate()
 	root.add_child(world)
 	for i in 12: await process_frame
