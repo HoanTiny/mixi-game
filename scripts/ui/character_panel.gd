@@ -40,6 +40,8 @@ var _bars := {}
 ## Trạng thái đang có (scripts/systems/survival.gd) và bốn thuộc tính {id: {bar, label}} (scripts/systems/attributes.gd).
 var _conds: HFlowContainer
 var _attrs := {}
+## Nghề, bằng, lớp đang học và cây kỹ năng (scripts/systems/careers.gd), dựng lại mỗi lần refresh.
+var _careers: VBoxContainer
 var _traits: HFlowContainer
 var _rels: VBoxContainer
 var _view: SubViewport
@@ -677,6 +679,10 @@ func _build_right(row: HBoxContainer) -> void:
 		var b := UI.bar(9)
 		col.add_child(b)
 		_attrs[at.id] = {"bar": b, "label": lab}
+	_heading(v, "Nghề và kỹ năng", 290)
+	_careers = VBoxContainer.new()
+	_careers.add_theme_constant_override("separation", 6)
+	v.add_child(_careers)
 	_heading(v, "Đặc điểm tính cách", 290)
 	_traits = HFlowContainer.new()
 	_traits.add_theme_constant_override("h_separation", 8)
@@ -713,6 +719,7 @@ func _refresh_status() -> void:
 		var full: bool = int(row.next) == 0
 		UI.set_bar(_attrs[row.id].bar, 1.0 if full else float(row.xp), 1.0 if full else float(row.next), GOLDEN)
 		(_attrs[row.id].label as Label).text = "%s  cấp %d%s" % [row.name, int(row.lv), "  · tối đa" if full else "  · %d/%d XP" % [int(row.xp), int(row.next)]]
+	_refresh_careers()
 	for c in _traits.get_children():
 		_traits.remove_child(c)
 		c.queue_free()
@@ -758,6 +765,42 @@ func _refresh_status() -> void:
 		var b := UI.bar(6)
 		UI.set_bar(b, val, 100.0, Color("4cc46a") if val >= 60 else (GOLDEN if val >= 35 else Color("e0604f")))
 		col2.add_child(b)
+
+
+## Nghề đã làm, bằng đã có, lớp đang học, điểm kỹ năng và các nút học kỹ năng theo nhánh.
+func _refresh_careers() -> void:
+	for c in _careers.get_children():
+		_careers.remove_child(c)
+		c.queue_free()
+	var C = game.Careers
+	for p in C.rows(game):
+		var full: bool = int(p.next) == 0
+		_careers.add_child(UI.label("%s cấp %d%s" % [p.name, int(p.lv), "  · tối đa" if full else "  · %d/%d EXP" % [int(p.xp), int(p.next)]], 13, CREAM))
+	var certs: Array = game.s.get("certs", []).map(func(id) -> String: return C.cert_name(game, str(id)))
+	var school := str(C.data(game).get("school", {}).get("name", ""))
+	_careers.add_child(UI.label("Bằng: " + ", ".join(certs) if not certs.is_empty() else "Chưa có bằng nghề. Học buổi tối ở %s." % school, 13, CREAM if not certs.is_empty() else Color(CREAM, 0.7)))
+	for cr in C.course_rows(game):
+		_careers.add_child(UI.label("Đang học %s: %d/%d%s" % [cr.name, int(cr.progress), int(cr.need), "  · đủ, đi thi được" if cr.ready else ""], 13, GOLDEN))
+		var b := UI.bar(7)
+		UI.set_bar(b, float(cr.progress), float(cr.need), GOLDEN)
+		_careers.add_child(b)
+	_careers.add_child(UI.label("Điểm kỹ năng: %d  (nghề lên cấp, có bằng, việc trong truyện)" % C.points(game), 13, GOLDEN))
+	var branches := {}
+	for t in C.talent_rows(game):
+		if not branches.has(t.branch):
+			var row := HFlowContainer.new()
+			row.add_theme_constant_override("h_separation", 6)
+			row.add_theme_constant_override("v_separation", 6)
+			_careers.add_child(row)
+			branches[t.branch] = row
+		var btn := _dark_button(("✓ " if t.owned else "") + "%s · %d điểm" % [t.name, int(t.cost)])
+		btn.add_theme_font_size_override("font_size", 17)
+		btn.tooltip_text = str(t.desc) + ("" if t.owned or t.lock == "" else "\n" + str(t.lock))
+		btn.disabled = t.lock != ""
+		btn.add_theme_color_override("font_disabled_color", Color("8fd18a") if t.owned else Color(CREAM, 0.4))
+		var id := str(t.id)
+		btn.pressed.connect(func() -> void: game.learn_talent(id))
+		branches[t.branch].add_child(btn)
 
 
 ## Thẻ chữ viết tay nền màu theo tone (good xanh lá, bad cam, base xanh dương), rê chuột hiện lời tả.

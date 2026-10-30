@@ -124,6 +124,8 @@ func load_data(dir := "res://data") -> void:
 	if FileAccess.file_exists(dir + "/systems/minigames.json"):
 		cfg["minigame_catalog"] = _read_json(dir + "/systems/minigames.json")
 		MiniGames.register(self)
+	# Lớp học đêm, việc tự ôn, việc cần bằng (careers.json).
+	Careers.register(self)
 	Relationships.register(self)
 	Economy.configure(self)
 	if FileAccess.file_exists(dir + "/systems/inventory.json"):
@@ -1306,6 +1308,9 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 			s.job_last[id] = {"ratio": float(result.get("ratio", 1.0)), "bonus": int(result.get("bonus", 0))}
 	if pay > 0 and perk_pay(id) > 0.0:
 		pay = round_k(float(pay) * (1.0 + perk_pay(id)))
+	# Tay nghề cao, kỹ năng Thợ lành nghề thì việc của nghề đó trả thêm (careers.json).
+	if pay > 0 and Careers.pay_mult(self, a) > 1.0:
+		pay = round_k(float(pay) * Careers.pay_mult(self, a))
 	if pay > 0 and Hardship.pay_mult(self, id) > 1.0:
 		pay = round_k(float(pay) * Hardship.pay_mult(self, id))
 		add_log("Việc thưởng nóng hôm nay: lương ×%d" % int(Hardship.pay_mult(self, id)), "event")
@@ -1329,6 +1334,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 	Survival.on_action(self, a, float(a.hours))
 	Attributes.on_action(self, a, result)
 	MiniGames.on_action(self, a, result)
+	Careers.on_action(self, a)
 	if not last_minigame.is_empty() and str(last_minigame.get("id", "")) == str(a.get("minigame", "")):
 		last_minigame["pay"] = pay
 		if a.group == "work":
@@ -2754,7 +2760,15 @@ func phong_do() -> float:
 ## Tổng một hiệu ứng bị động từ trạng thái (survival.gd) và thuộc tính (attributes.gd): "move", "xp", "mg.time",
 ## "activity.heavy", "fatigue.heavy", "talk_rep", "talk_mood", "scrap"…
 func mod(key: String) -> float:
-	return Survival.mod(self, key) + Attributes.mod(self, key)
+	return Survival.mod(self, key) + Attributes.mod(self, key) + Careers.talent_mod(self, key)
+
+
+## Học kỹ năng id trong cây kỹ năng (bảng Nhân vật). false nếu chưa đủ điểm hay điều kiện.
+func learn_talent(id: String) -> bool:
+	var ok := Careers.learn(self, id)
+	if ok:
+		_commit()
+	return ok
 
 
 ## Hệ số tốc độ đi (world.gd): lấy mức chậm nhất giữa các trạng thái và Phong độ thấp (không cộng dồn), nhân phần

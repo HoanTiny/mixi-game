@@ -1,12 +1,63 @@
 {
-  "_ghi_chu": "Tay nghề theo nghề và bằng cấp (scripts/systems/careers.gd). profs.<id>: tên nghề; xpToNext[i] là EXP cần để lên từ cấp i+1 (cấp tối đa = số mục + 1). perLevel: hiệu ứng mỗi cấp trên 1 (pay: cộng tiền công trò chơi lao động của nghề đó). certs.<id>: bằng cấp, có được qua hiệu ứng cert.<id> (học xong lớp, sự kiện); điều kiện cert: <id> trong require của việc hay trò chơi nhỏ.",
+  "_ghi_chu": "Tay nghề, bằng cấp, học nghề buổi tối và cây kỹ năng (scripts/systems/careers.gd). profs.<id>: tên nghề; xpToNext[i] là EXP cần để lên từ cấp i+1 (cấp tối đa = số mục + 1); perLevel.pay: cộng tiền công việc của nghề đó mỗi cấp trên 1. certs.<id>: bằng cấp; điều kiện cert: <id> trong require của việc. flagCerts: cờ truyện đã có thì trao bằng (lớp điện lạnh chương 5 bật hocXong). school: chỗ học. courses.<id>: lớp học đêm sinh ba việc ở school: ghi danh (fee, require), đi học (hours, window, ngày thường, mỗi buổi tiến độ perSession × (1 + intBonus × (Trí tuệ − 1)), cần need), thi (examFee; đỗ với xác suất pass + passPerInt × (Trí tuệ − 1), cố định theo ngày và lần thi; trượt thì thi lại hôm khác). review: việc tự ôn cộng tiến độ cho mọi lớp đang học. jobs: việc chỉ nhận khi có bằng (require cert), cộng EXP nghề profXp. talentPoints: điểm kỹ năng có được khi nghề lên cấp và khi có bằng (cộng điểm kỹ năng của lịch sự kiện). talents: cây kỹ năng; cost điểm, require điều kiện (talent: kỹ năng trước), mods cộng vào GameLogic.mod (injury: rủi ro chấn thương, biz.close: tỷ lệ chốt bán hàng, mg.time: thêm giờ trò chơi nhỏ, activity.heavy, fatigue.heavy, pay.cert: tiền công việc cần bằng).",
   "profs": {
-    "boc_vac": {"name": "Bốc vác"}
+    "boc_vac": {"name": "Bốc vác"},
+    "han": {"name": "Thợ hàn"},
+    "dien_lanh": {"name": "Thợ điện lạnh"},
+    "ke_toan": {"name": "Kế toán"}
   },
   "xpToNext": [80, 160, 280, 420],
   "perLevel": {"pay": 0.05},
   "certs": {
     "han": {"name": "Chứng chỉ thợ hàn"},
-    "dien_lanh": {"name": "Chứng chỉ điện lạnh"}
+    "dien_lanh": {"name": "Chứng chỉ điện lạnh"},
+    "ke_toan": {"name": "Chứng chỉ kế toán sơ cấp"}
+  },
+  "flagCerts": {"hocXong": "dien_lanh"},
+  "school": {"location": "ben_xe_6", "name": "trung tâm nghề cạnh điểm xe buýt Long Biên"},
+  "courses": {
+    "han": {
+      "name": "lớp hàn điện", "cert": "han", "fee": 1800000, "examFee": 200000,
+      "require": {"stat.str": 2},
+      "hours": 2.5, "window": [18, 21], "need": 100, "perSession": 14, "intBonus": 0.12,
+      "effects": {"fatigue": 8, "need.clean": -10}, "xp": {"str": 3, "int": 3},
+      "pass": 0.7, "passPerInt": 0.08,
+      "desc": "Que hàn, máy hàn điện, hàn giáp mối và hàn góc trên phôi sắt. Thầy chấm bằng mối hàn thật."
+    },
+    "ke_toan": {
+      "name": "lớp kế toán sơ cấp", "cert": "ke_toan", "fee": 1500000, "examFee": 150000,
+      "require": {"stat.int": 2},
+      "hours": 2.5, "window": [18, 21], "need": 100, "perSession": 12, "intBonus": 0.15,
+      "effects": {"fatigue": 5, "need.mood": -2}, "xp": {"int": 6},
+      "pass": 0.65, "passPerInt": 0.1,
+      "desc": "Sổ thu chi, hóa đơn, đối soát công nợ cho cửa hàng nhỏ. Thi bằng một bộ chứng từ thật."
+    }
+  },
+  "review": {"id": "on_bai_net", "location": "quan_net", "name": "Ôn bài, xem video bài giảng ở quán net", "cost": 10000, "hours": 1, "progress": 5, "xp": {"int": 3}},
+  "jobs": [
+    {"id": "han_khung_sat", "group": "work", "location": "tiem_sau", "name": "Hàn khung cửa sắt ở dãy vòm Gầm Cầu", "hours": 4, "pay": 340000,
+      "window": [7, 17], "require": {"cert": "han"}, "tags": ["heavy"], "prof": "han", "profXp": 22,
+      "effects": {"fatigue": 18, "need.clean": -20}, "xp": {"str": 6, "per": 4}},
+    {"id": "bao_duong_dieu_hoa", "group": "work", "location": "tiem_sau", "name": "Vệ sinh, nạp ga điều hòa cho khách quanh phường", "hours": 3, "pay": 320000,
+      "window": [8, 18], "require": {"cert": "dien_lanh"}, "tags": ["outdoor"], "prof": "dien_lanh", "profXp": 20,
+      "effects": {"fatigue": 12, "need.clean": -12}, "xp": {"int": 4, "per": 4}},
+    {"id": "so_sach_tieu_thuong", "group": "work", "location": "cho_cau_nho", "name": "Ghi sổ thu chi, đối soát công nợ cho tiểu thương chợ", "hours": 3, "pay": 280000,
+      "window": [9, 19], "require": {"cert": "ke_toan"}, "prof": "ke_toan", "profXp": 20,
+      "effects": {"fatigue": 6, "need.mood": -3}, "xp": {"int": 6}}
+  ],
+  "talentPoints": {"perProfLevel": 1, "perCert": 1},
+  "talents": {
+    "khang_chan_thuong": {"name": "Kháng chấn thương", "branch": "Thân", "cost": 1, "require": {"stat.str": 2},
+      "mods": {"injury": -0.5}, "desc": "Biết đỡ, biết ngã: rủi ro chấn thương khi làm nặng giảm một nửa."},
+    "lung_thep": {"name": "Lưng thép", "branch": "Thân", "cost": 2, "require": {"talent": "khang_chan_thuong", "stat.str": 3},
+      "mods": {"activity.heavy": -0.15, "fatigue.heavy": -0.15}, "desc": "Việc nặng bớt đói và bớt mệt thêm 15%."},
+    "mat_day_tiep_thi": {"name": "Mặt dày tiếp thị", "branch": "Miệng", "cost": 1, "require": {"stat.per": 2},
+      "mods": {"biz.close": 0.25}, "desc": "Không ngại mời chào: tỷ lệ chốt đơn khi bán hàng rong và livestream tăng 25%."},
+    "khach_quen": {"name": "Khách quen", "branch": "Miệng", "cost": 2, "require": {"talent": "mat_day_tiep_thi", "stat.per": 3},
+      "mods": {"biz.close": 0.15, "talk_rep": 0.5}, "desc": "Nhớ mặt nhớ tên: chốt đơn thêm 15%, tán gẫu thân hơn."},
+    "ban_tay_kheo": {"name": "Bàn tay khéo léo", "branch": "Tay", "cost": 1, "require": {"stat.agi": 2},
+      "mods": {"mg.time": 0.2}, "desc": "Thao tác chắc tay: thêm 20% thời gian trong các ca có chỉ tiêu."},
+    "tho_lanh_nghe": {"name": "Thợ lành nghề", "branch": "Tay", "cost": 2, "require": {"talent": "ban_tay_kheo", "cert": "han|dien_lanh|ke_toan"},
+      "mods": {"pay.cert": 0.15}, "desc": "Có bằng và có tay: việc cần bằng trả thêm 15%."}
   }
 }
