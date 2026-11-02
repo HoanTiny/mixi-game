@@ -52,3 +52,15 @@ Từng phần bật tắt được trong `data/config.json` → `look` (`postFx`
 - **Bài kiểm thử:** `tests/hardship.gd` mới, đạt hết. Các bài `relationships_commerce`, `day23`, `neighborhood_story`, `opening_slice`, `survival_attributes`, `minigames`, `event_scheduler`, `event_scheduler_world` đều đạt.
 - **Mô phỏng 30 ngày:** vẫn ra đủ các kết như trước. Cả tháng dễ thở hơn một chút vì 60.000đ tiền trọ thấp hơn 120.000đ sinh hoạt cũ. Kết E4 (cách chơi "ít việc") không còn xuất hiện.
 - **Bài đang hỏng:** `location_panel_layout` và `neighborhood_world` hỏng y như trên code trước khi sửa (chuyện ghi save của bản demo), không do lượt này.
+
+## Đối chiếu tài liệu "Nobody: The Turnaround" (bản 1.19)
+
+Đã làm theo đề xuất sau khi đối chiếu tài liệu:
+- **Màn hình ngả xám** khi Tâm trạng thấp, khi bị lừa (Phần 4.2 của tài liệu).
+- **Trò chơi nhỏ cho việc cần bằng:** hàn, kế toán, điện lạnh (Phần 3.3B).
+- **Cạm bẫy theo Nhạy bén** (Phần 2.2, tuyến phản diện).
+- **Mạch chú bảo vệ công trường** (Phần 2.2).
+- **Trò giải trí:** cờ tướng vỉa hè, karaoke, máy gắp thú (Phần 3.3A).
+
+Chủ ý không làm: căn hộ cao cấp, siêu xe, chuỗi nhà hàng (giai đoạn 4–5 của tài liệu). Game kể chuyện một nhà tìm chỗ ở trước mùa mưa, kết thúc khiêm tốn.
+

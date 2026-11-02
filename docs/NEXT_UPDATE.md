@@ -2,24 +2,19 @@
 
 Chơi thử 1.17 bằng người chơi máy đủ 30 ngày ba tuyến A, B, C, cộng một lượt chơi tay trên web tới sáng ngày 1. Kinh tế chương 1 và các lỗi giao diện tìm được đã sửa ở 1.18 (xem [WEB_RELEASE.md](WEB_RELEASE.md)).
 
-Ưu tiên tiếp theo:
+Ưu tiên tiếp theo (sau 1.19):
 
-1. **Đã xong:** kết kiệt sức tính cả những ngày gục vì Tâm trạng chạm đáy (`exhausted()` trong `game_logic.gd`, `burnoutDays`). Sinh hoạt chương 2–5 bỏ tiền ăn của An.
-2. **Chơi thử bằng người thật từ ngày 1 đến ngày 7.** Lượt máy đi bộ, làm việc, nói chuyện như người chơi bấm, nhưng không thay được cảm nhận. Ghi:
-   - thời gian tới mục tiêu;
-   - chỗ phải mở bản đồ;
-   - số lần thiếu tiền trọ hay linh kiện;
-   - lần bỏ dở vì không biết làm gì.
-3. **Cho người chơi máy dùng các hệ thống mới.** Hiện nó không học trường đêm, không học cây tài năng, không bán hàng rong, không livestream, không nhận việc thưởng nóng, và không tán gẫu (Hân chỉ được 20 điểm thân thiết). Thêm các cách chơi này vào `tests/playtest.gd` hoặc `tests/sim.gd` rồi đo lại.
-4. **Trường đêm ở chương 1:**
-   - học phí 1,5–1,8 triệu, việc có bằng chỉ hơn việc thường khoảng 80k mỗi ca, phải 20–25 ca mới hoàn vốn, nên trong 30 ngày đầu là cái bẫy;
-   - hoặc khóa tới chương 2, hoặc thêm gợi ý rõ;
-   - giờ học 18–21h trùng ca tối thưởng nóng là đánh đổi hay, nên nói ra cho người chơi.
-5. **Đoạn mở đầu dài:** khoảng 20 lần bấm (3 tin nhắn, 6 dòng hướng dẫn, 9 dòng cảnh) mới được đi. Có thể dời hướng dẫn vào lúc đi bộ.
-6. **Lỗi nhỏ còn lại:**
-   - mũi tên vàng chỉ nhiệm vụ có lúc đè lên biển "Hẻm trọ · Phúc Tân";
-   - trình duyệt chưa từng chơi vẫn hiện "Chơi tiếp · Đã tới màn kết";
-   - một khoản thu 500.000đ trong dữ liệu truyện chưa có nhãn (`cash` không kèm `cash_label`).
-7. **Đo tải, bộ nhớ và khung hình trên web/thiết bị yếu.** Lọc màu, viền mực và khoảng 480 vết bẩn từ 1.13 chưa được đo trên điện thoại thật.
+1. **Chơi thử bằng người thật từ ngày 1 đến ngày 7.** Đo thêm độ khó của ba trò nghề và ba trò giải trí trên điện thoại (chạm, giữ, kéo).
+2. **Người chơi máy và các hệ thống mới.**
+   - `tests/playtest.gd` chọn lựa chọn đầu tiên còn mở, nên gặp cạm bẫy là sa bẫy: cần cho nó cách chọn theo Nhạy bén.
+   - `sim.gd` không vào khu nên không gặp cạm bẫy, mạch chú Thìn.
+   - Cả hai chưa học trường đêm, chưa đi hát, chưa đánh cờ.
+3. **Hậu quả dài của mạch chú Thìn và cạm bẫy.** Đã ghi cờ: `thinSoDienThoai`, `thinBiBoMac`, `biCaiQuyt`, `biCoLua`, `biNoHu`. Có thể nối vào tin nhắn chương 2, thẻ hậu truyện, sổ tay.
+4. **Trường đêm ở chương 1** vẫn là cái bẫy về tiền (học phí 1,5–1,8 triệu). Cân nhắc khóa tới chương 2 hoặc thêm gợi ý.
+5. **Lỗi nhỏ còn lại:**
+   - mũi tên vàng đè biển "Hẻm trọ";
+   - trình duyệt mới vẫn hiện "Chơi tiếp · Đã tới màn kết";
+   - khoản 500.000đ chưa có nhãn.
+6. **Hiệu năng web** trên điện thoại thật (lọc màu, viền mực, vết bẩn).
 
 Không tăng mật độ nhà chỉ để lấp khoảng trống; kiểm đường đi, mặt tiền và tầm nhìn ở góc camera chơi trước khi thêm chi tiết.

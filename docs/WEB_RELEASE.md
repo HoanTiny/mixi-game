@@ -1,3 +1,14 @@
+## Bản 1.19
+
+Làm theo đối chiếu tài liệu Nobody:
+- **Kiệt sức:** `exhausted()` tính cả những ngày gục vì Trầm cảm (`burnoutDays`).
+- **Màn xám:** `post_fx` gloom theo Tâm trạng và hiệu ứng `shock`, cập nhật mỗi khung.
+- **Lịch sự kiện:** thêm trường `until_day`, `requires_flag`; ba cạm bẫy, mạch chú Thìn (`events_and_jobs.json`).
+- **Trò cho việc cần bằng:** `weld_bead`, `ledger_check`, `ac_charge`, dạng `attach` gắn vào việc trong `careers.json`.
+- **Ba trò giải trí:** `xiangqi`, `karaoke`, `claw`.
+
+Kiểm bằng `tests/hardship.gd`, `tests/cert_minigames.gd`, `tests/leisure_minigames.gd`. Web 1.19 giữ gói Windows 1.13.
+
 ## Bản 1.18.1
 
 "Sinh hoạt cả nhà" chương 2–5: 140.000đ → 110.000đ/ngày, má đi 120.000đ → 90.000đ, vì An tự trả từng bữa. `tests/sim.gd -- trace <tuyến> <cách chơi> <chương> why` in thu, chi theo khoản và lý do việc không làm được.

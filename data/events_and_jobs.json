@@ -386,6 +386,162 @@
           }
         }
       ]
+    },
+    {
+      "day": 3,
+      "until_day": 12,
+      "event_id": "thin_gap",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        11,
+        14
+      ],
+      "title": "Chú Thìn gác bãi vật liệu",
+      "description": "Trưa ở bãi vật liệu ven sông, ông bảo vệ ngồi trên chồng gạch ăn hộp cơm nguội, mũ cối úp bên cạnh. Chú tên Thìn, quê Nông Cống, Thanh Hóa, gác bãi đêm, ban ngày đi bốc thêm. \"Con bé nhà chú năm nay thi đại học. Chú gửi về mỗi tháng ba triệu, còn đâu chú ăn cơm hộp.\"",
+      "choices": [
+        {
+          "text": "Chia nửa ổ bánh mì, ngồi nghe chú kể",
+          "outcome": {
+            "money": -10,
+            "mood": 6,
+            "perception_exp": 6,
+            "unlock_feature": "thinGap"
+          }
+        },
+        {
+          "text": "Hỏi chú bãi này ai thầu, trả công có đều không (cần Nhạy bén 2)",
+          "condition": {
+            "perception": 2
+          },
+          "outcome": {
+            "perception_exp": 12,
+            "mood": 3,
+            "unlock_feature": "thinGap"
+          }
+        },
+        {
+          "text": "Gật đầu chào rồi đi làm tiếp",
+          "outcome": {
+            "mood": -1
+          }
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "until_day": 17,
+      "event_id": "thin_gui_tien",
+      "requires_flag": "thinGap",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        6,
+        20
+      ],
+      "title": "Chú Thìn nhờ chuyển tiền",
+      "description": "Chú Thìn cầm cái điện thoại bàn phím, lóng ngóng: \"Con bé bảo chuyển qua tài khoản cho nhanh, chú không biết bấm.\" Tờ giấy ghi số tài khoản bị nhòe mất một chữ số.",
+      "choices": [
+        {
+          "text": "Gọi cho con bé đọc lại số tài khoản rồi mới chuyển hộ",
+          "outcome": {
+            "mood": 8,
+            "perception_exp": 8,
+            "unlock_feature": "thinTinAn"
+          }
+        },
+        {
+          "text": "Đoán chữ số bị nhòe rồi chuyển luôn cho kịp",
+          "outcome": {
+            "mood": -12,
+            "shock": 4,
+            "unlock_feature": "thinChuyenNham"
+          }
+        },
+        {
+          "text": "Bảo chú ra ngân hàng nhờ người ta làm",
+          "outcome": {
+            "mood": -2
+          }
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "until_day": 24,
+      "event_id": "thin_tai_nan",
+      "requires_flag": "thinGap",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        6,
+        18
+      ],
+      "title": "Giàn giáo đổ ở bãi",
+      "description": "Buổi sáng, giàn giáo dựng tạm đổ sập. Chú Thìn đẩy thằng phụ hồ ra kịp, còn chân chú bị thanh sắt đè. Cai thầu đứng nhìn, gọi điện cho ai đó rồi nói to: \"Ông ấy tự trèo lên, công trình không chịu. Mai khỏi đi làm.\"",
+      "choices": [
+        {
+          "text": "Đứng ra làm chứng giàn giáo dựng ẩu, đòi tiền thuốc cho chú (cần Nhạy bén 2)",
+          "condition": {
+            "perception": 2
+          },
+          "outcome": {
+            "mood": 4,
+            "perception_exp": 15,
+            "reputation": 5,
+            "unlock_feature": "thinDuocBoiThuong"
+          }
+        },
+        {
+          "text": "Cõng chú lên trạm y tế, góp 100 nghìn tiền chiếu chụp",
+          "outcome": {
+            "money": -100,
+            "mood": -4,
+            "unlock_feature": "thinDuocDuaDi"
+          }
+        },
+        {
+          "text": "Lặng lẽ quay đi làm cho xong ca",
+          "outcome": {
+            "mood": -15,
+            "shock": 5,
+            "unlock_feature": "thinBiBoMac"
+          }
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "until_day": 29,
+      "event_id": "thin_ve_que",
+      "requires_flag": "thinGap",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        5,
+        10
+      ],
+      "title": "Chú Thìn về quê",
+      "description": "Bến xe sáng sớm. Chú Thìn chống nạng, cái ba lô cũ buộc thêm bao tải. \"Chân thế này thì gác ai thuê. Về quê làm ruộng, con bé thi xong chú lại tính.\" Chú dúi cho An cái đèn pin đội đầu: \"Gác đêm cần cái này. Mày giữ mà dùng.\"",
+      "choices": [
+        {
+          "text": "Xách hộ ba lô ra tận xe, xin số điện thoại để hỏi thăm",
+          "outcome": {
+            "mood": 8,
+            "unlock_feature": "thinSoDienThoai"
+          }
+        },
+        {
+          "text": "Dúi lại cho chú 50 nghìn ăn đường",
+          "outcome": {
+            "money": -50,
+            "mood": 10,
+            "unlock_feature": "thinSoDienThoai"
+          }
+        },
+        {
+          "text": "Chào vội rồi đi, sắp muộn ca",
+          "outcome": {
+            "mood": -6
+          }
+        }
+      ]
     }
   ]
 }

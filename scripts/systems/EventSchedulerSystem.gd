@@ -144,6 +144,8 @@ static func enter_zone(g, zone: String) -> bool:
 	for e in data(g).get("scheduled_story_events",[]):
 		# until_day: sự kiện chờ tới ngày đó nếu hôm đầu An chưa ghé khu (cạm bẫy, việc nhờ không gắn ngày cố định).
 		if g.day() < int(e.day) or g.day() > int(e.get("until_day", e.day)) or e.trigger_zone!=zone or e.event_id in s.fired: continue
+		# requires_flag: đoạn sau của một mạch chuyện chỉ hiện khi đã qua đoạn trước (cờ do unlock_feature bật).
+		if e.has("requires_flag") and not g.s.flags.get(str(e.requires_flag), false): continue
 		if g.clock()<float(e.trigger_hour_range[0]) or g.clock()>=float(e.trigger_hour_range[1]): continue
 		s.fired.append(e.event_id)
 		g.s.queue.append({"id":"scheduler:"+e.event_id,"data":{}})

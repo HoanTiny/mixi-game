@@ -1,5 +1,21 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.19 · cờ thế, karaoke, cạm bẫy, chú Thìn** (làm theo đối chiếu tài liệu "Nobody: The Turnaround")
+
+- **Trò chơi nhỏ cho ba việc cần bằng:**
+  - rê que hàn bám rãnh (hàn khung cửa sắt);
+  - chọn số dư đúng trên bảng kê (ghi sổ cho tiểu thương);
+  - giữ kim áp suất trong vùng xanh (nạp ga điều hòa).
+
+  Tiền công theo kết quả, vẫn cộng theo tay nghề.
+- **Ba trò giải trí:**
+  - giải thế cờ tàn một nước chiếu bí với các cụ ven hồ Gươm (thế sinh ngẫu nhiên, luôn giải được);
+  - karaoke ở Tạ Hiện (60.000đ, xóa Trầm cảm);
+  - máy gắp thú ở quán net (gấu bông làm quà cho Hân).
+- **Cạm bẫy theo Nhạy bén:** cai thầu rủ đổ móng không giấy tờ, cò việc ở bến xe đòi phí hồ sơ, máy "nổ hũ" ở quán net. Sa bẫy thì mất tiền, Tâm trạng tụt, **màn hình ngả xám** rồi nhạt dần. Tâm trạng dưới 30 cũng xám dần.
+- **Mạch chú Thìn**, bảo vệ bãi vật liệu (ngày 3–29): gặp chú, chú nhờ chuyển tiền cho con, tai nạn giàn giáo bị cai thầu chối, tiễn chú về quê.
+- **Kết kiệt sức đạt lại được:** những ngày gục vì Tâm trạng chạm đáy mà không nghỉ cũng tính là kiệt sức.
+
 **Bản web 1.18.1 · tiền khó kiếm hơn, mục tiêu rõ hơn**
 
 - **1.18.1:** "Sinh hoạt cả nhà" chương 2–5 bỏ phần ăn của An (110.000đ/ngày, má đi 90.000đ), vì An đã tự trả từng bữa. Các cách chơi có nghỉ giờ đi đủ năm chương mà không cạn tiền.

@@ -137,6 +137,25 @@ func _init() -> void:
 	gt3.s["used"] = 9.0 - float(gt3.cfg.dayStart)
 	gt3.s["queue"] = []
 	_ok(not gt3.EventScheduler.enter_zone(gt3, "Zone3_IndustrialAndLogistics") or str(gt3.current_event().get("id", "")) != "scheduler:trap_cai_quyt", "quá ngày 13 thì không còn gặp cai thầu")
+	# Mạch chú Thìn: đoạn sau chỉ hiện khi đã gặp chú.
+	var gn := _new()
+	gn.s["day"] = 5
+	gn.s["used"] = 12.0 - float(gn.cfg.dayStart)
+	gn.s["queue"] = []
+	_ok(gn.EventScheduler.enter_zone(gn, "Zone3_IndustrialAndLogistics") and str(gn.current_event().get("id", "")) == "scheduler:thin_gap", "trưa ngày 5 ở bãi vật liệu gặp chú Thìn")
+	gn.resolve_choice(0)
+	_ok(gn.s.flags.get("thinGap", false), "ngồi nghe chú kể: ghi cờ đã gặp")
+	var gm := _new()
+	gm.s["day"] = 10
+	gm.s["used"] = 9.0 - float(gm.cfg.dayStart)
+	gm.s["queue"] = []
+	gm.EventScheduler.state(gm).fired.append("trap_cai_quyt")
+	gm.EventScheduler.enter_zone(gm, "Zone3_IndustrialAndLogistics")
+	_ok(str(gm.current_event().get("id", "")) != "scheduler:thin_gui_tien", "chưa gặp chú Thìn thì không có đoạn nhờ chuyển tiền")
+	gn.s["day"] = 10
+	gn.s["used"] = 9.0 - float(gn.cfg.dayStart)
+	gn.EventScheduler.state(gn).fired.append("trap_cai_quyt")
+	_ok(gn.EventScheduler.enter_zone(gn, "Zone3_IndustrialAndLogistics") and str(gn.current_event().get("id", "")) == "scheduler:thin_gui_tien", "đã gặp thì ngày 10 chú nhờ chuyển tiền")
 	# Tổng kết ngày.
 	var gs := _new()
 	gs.s["used"] = 13.0 - float(gs.cfg.dayStart)
