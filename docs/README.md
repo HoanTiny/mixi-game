@@ -31,6 +31,18 @@ Dữ liệu gốc dạng JSON (nhân vật, 30 ngày, kết thúc, nhánh) nằm
 - **Chương 4:** thêm 2 nhân vật (anh Quân, cô Mai) · 30 ngày · 37 cảnh chính · 119 lựa chọn · 6 việc mới · 4 việc nhờ · 21 đoạn thoại · 6 kết thúc · bảy thẻ hậu truyện.
 - **Chương 5:** thêm 1 nhân vật (thầy Phong) · 30 ngày · 41 cảnh chính (kể cả cảnh thay thế) · 111 lựa chọn · 8 việc mới · 2 việc nhờ · 17 đoạn thoại · 6 kết thúc · bảy thẻ hậu truyện.
 - **Mốc cố định:** mưa sớm ngày 15, mưa lớn ngày 29, trả chìa khóa ngày 30.
-- **Tiền khởi đầu:** 1,2 triệu tiền mặt, cộng 3,6 triệu lương cũ còn phải thu.
+- **Tiền khởi đầu:** bản thiết kế gốc là 1,2 triệu tiền mặt, cộng 3,6 triệu lương cũ còn phải thu. Từ bản 1.14 game chạy với 46.000đ trong ví, 1.400.000đ quỹ cọc nhà khóa riêng và 60.000đ tiền trọ mỗi đêm (xem [economy-balance.md](economy-balance.md)).
 
-Mọi con số tiền và thời gian là giả định để cân bằng, chưa được chơi thử, và không phải mức lương hay giá thuê thực tế ở Việt Nam.
+Mọi con số tiền và thời gian là giả định để cân bằng, và không phải mức lương hay giá thuê thực tế ở Việt Nam. Chương 1 đã được cân lại sau lượt người chơi máy chơi đủ 30 ngày trên phố (bản 1.18); chưa có lượt chơi thử bằng người thật.
+
+## Tài liệu kỹ thuật
+
+| Tài liệu | Nội dung |
+|---|---|
+| [economy-balance.md](economy-balance.md) | Số liệu kinh tế chương 1 đang dùng, trần lương, quỹ cọc, kết quả mô phỏng |
+| [NOBODY_STYLE.md](NOBODY_STYLE.md) | Bản 1.13: đồ họa gritty, viền mực, áp lực sinh tồn, tổng kết ngày, game juice |
+| [RELATIONSHIPS_COMMERCE.md](RELATIONSHIPS_COMMERCE.md) | Quan hệ NPC 0–100, tin nhắn, buff; hàng rong, livestream Shippy |
+| [WEEK_ONE_IMPLEMENTATION.md](WEEK_ONE_IMPLEMENTATION.md), [WEEK_ONE_QA.md](WEEK_ONE_QA.md) | Hợp đồng truyện tuần đầu, lưu game an toàn, việc còn phải nghiệm thu |
+| [service-minigame.md](service-minigame.md), [repair-work-site.md](repair-work-site.md) | QTE quán bia, ca sửa ở tiệm chú Sơn |
+| [WEB_RELEASE.md](WEB_RELEASE.md) | Cách xuất bản web, Windows và nhật ký từng bản |
+| [NEXT_UPDATE.md](NEXT_UPDATE.md) | Việc nên làm tiếp |

@@ -1,5 +1,57 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.19 · cờ thế, karaoke, cạm bẫy, chú Thìn** (làm theo đối chiếu tài liệu "Nobody: The Turnaround")
+
+- **Trò chơi nhỏ cho ba việc cần bằng:**
+  - rê que hàn bám rãnh (hàn khung cửa sắt);
+  - chọn số dư đúng trên bảng kê (ghi sổ cho tiểu thương);
+  - giữ kim áp suất trong vùng xanh (nạp ga điều hòa).
+
+  Tiền công theo kết quả, vẫn cộng theo tay nghề.
+- **Ba trò giải trí:**
+  - giải thế cờ tàn một nước chiếu bí với các cụ ven hồ Gươm (thế sinh ngẫu nhiên, luôn giải được);
+  - karaoke ở Tạ Hiện (60.000đ, xóa Trầm cảm);
+  - máy gắp thú ở quán net (gấu bông làm quà cho Hân).
+- **Cạm bẫy theo Nhạy bén:** cai thầu rủ đổ móng không giấy tờ, cò việc ở bến xe đòi phí hồ sơ, máy "nổ hũ" ở quán net. Sa bẫy thì mất tiền, Tâm trạng tụt, **màn hình ngả xám** rồi nhạt dần. Tâm trạng dưới 30 cũng xám dần.
+- **Mạch chú Thìn**, bảo vệ bãi vật liệu (ngày 3–29): gặp chú, chú nhờ chuyển tiền cho con, tai nạn giàn giáo bị cai thầu chối, tiễn chú về quê.
+- **Kết kiệt sức đạt lại được:** những ngày gục vì Tâm trạng chạm đáy mà không nghỉ cũng tính là kiệt sức.
+
+**Bản web 1.18.1 · tiền khó kiếm hơn, mục tiêu rõ hơn**
+
+- **1.18.1:** "Sinh hoạt cả nhà" chương 2–5 bỏ phần ăn của An (110.000đ/ngày, má đi 90.000đ), vì An đã tự trả từng bữa. Các cách chơi có nghỉ giờ đi đủ năm chương mà không cạn tiền.
+
+- **Cân lại kinh tế chương 1 sau chơi thử 30 ngày:**
+  - trần lương 28.000đ/giờ chỉ miễn cho việc thưởng nóng của đúng hôm đó;
+  - thưởng nóng ×1,5;
+  - góp sinh hoạt gia đình 20.000đ mỗi tối.
+  
+  Tiền cuối chương theo mô phỏng giảm từ 2,5–4,3 triệu xuống 0,35–1,7 triệu; vẫn thuê được phòng và ra kết tốt.
+- **Mục tiêu dễ hiểu hơn:**
+  - thanh mục tiêu cọc phòng ghi rõ là đã gồm quỹ cọc;
+  - khung "Ngày 26 chốt chỗ ở" tính cả quỹ cọc;
+  - không còn in "còn -1.454.000đ".
+- **Sửa giao diện:**
+  - ô chọn độ khó hiện đúng ○ ●;
+  - màn chọn truyện ghi đúng tiền mở đầu (46.000đ và 1.400.000đ quỹ cọc);
+  - thông báo 06:00 không còn che vòng đếm ngày, bản đồ, bảng chỉ số;
+  - vòng tâm trạng ẩn khi mở hết khung mục tiêu.
+- Chi tiết số liệu ở [docs/economy-balance.md](docs/economy-balance.md).
+
+**Bản web 1.14–1.17** (chi tiết từng bản ở [docs/WEB_RELEASE.md](docs/WEB_RELEASE.md)):
+
+- **1.17:**
+  - học nghề buổi tối ở trung tâm nghề Long Biên (hàn điện, kế toán sơ cấp), thi lấy chứng chỉ, ba việc chỉ nhận khi có bằng;
+  - cây kỹ năng sáu ô trong bảng Nhân vật;
+  - Shift chạy 4 m/s, hết hơi phải nghỉ.
+- **1.16:**
+  - bàn giao tuần đầu (ngày 5–6 chạy bằng máy trạng thái quest);
+  - lưu game qua tệp tạm và `.bak`;
+  - nướng sẵn mặt tiền để dựng phố nhanh hơn.
+- **1.15:** ca sửa ở tiệm chú Sơn (bỏ món, khay hoàn trả, giữ E để kiểm tra, lắp); khung hành động phố thu gọn.
+- **1.14:**
+  - ghép 1.13 với Balo, chuyển khu, QTE quán bia;
+  - ví mở đầu 46.000đ cộng 1.400.000đ quỹ cọc khóa.
+
 **Bản web 1.13 · phố bụi bặm, ngày khắc nghiệt**
 
 - **Đồ họa kiểu "Nobody":**
@@ -452,6 +504,58 @@ Các file `.wav` trong `assets/sounds/` là **tiếng tạm** do `tools/gen_soun
 "C:/Users/Admin/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe" --headless --path . -s res://tests/sim.gd
 ```
 
+Kết quả mô phỏng bản 1.18 (bỏ qua đường đi bộ; kết của từng chương và tiền mặt cuối chương sau khi đã trả chỗ ở). Cách chơi: "lắng nghe" hỏi ý người nhà và có nghỉ; "giữ tiếp", "áp đặt", "gồng" làm không nghỉ; "giấu" giấu chuyện và ép người nhà; "ít việc" mỗi ngày chỉ một việc ngắn; "để má chọn" như lắng nghe nhưng không giữ chỗ cho máy may của má; "một mình" (từ chương 3) không hỏi ai, nhận tiệm một mình:
+
+**30 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
+|---|---|---|---|---|---|---|---|
+| A | E1 · 2,35 tr | E6 · 0,12 tr | E8 · 0,58 tr | E6 · 0,39 tr | E5 · 2,35 tr | E1 · 0,94 tr | E1 · 2,35 tr |
+| B | E2 · 2,66 tr | E6 · 0,77 tr |  | E6 · 2,53 tr | E5 · 1,08 tr | E2 · 0,01 tr | E2 · 2,66 tr |
+| B>A |  |  | E8 · 0,58 tr |  |  |  |  |
+| C | E3 · 3,31 tr | E6 · 2,53 tr | E8 · 0,18 tr | E6 · 2,53 tr | E5 · 1,82 tr | E1 · 0,35 tr | E3 · 3,31 tr |
+
+**60 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
+|---|---|---|---|---|---|---|---|
+| A | K3 · 2,54 tr | K6 · 0,00 tr | K6 · 0,00 tr | K6 · 0,00 tr | K4 · 2,09 tr | K4 · 0,53 tr | K2 · 2,54 tr |
+| B | K3 · 5,45 tr | K6 · 0,00 tr | K6 · 0,00 tr | K6 · 0,00 tr | K3 · 0,37 tr | K4 · 0,46 tr | K2 · 5,45 tr |
+| C | K3 · 6,20 tr | K6 · 0,00 tr | K6 · 0,00 tr | K6 · 0,00 tr | K3 · 0,70 tr | K4 · 0,34 tr | K2 · 6,20 tr |
+
+**90 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | L3 · 0,01 tr | L6 · 0,00 tr | L6 · 0,00 tr | L6 · 0,00 tr | L5 · 0,02 tr | L4 · 0,00 tr | L1 · 1,26 tr | L4 · 0,87 tr |
+| B | L3 · 3,05 tr | L6 · 0,00 tr | L6 · 0,00 tr | L6 · 0,00 tr | L4 · 1,07 tr | L4 · 0,00 tr | L1 · 3,96 tr | L2 · 0,24 tr |
+| C | L3 · 3,20 tr | L6 · 0,00 tr | L6 · 0,00 tr | L6 · 0,00 tr | L4 · 0,08 tr | L4 · 0,00 tr | L1 · 4,41 tr | L2 · 1,20 tr |
+
+**120 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | M3 · 6,40 tr | M6 · 0,00 tr | M6 · 0,13 tr | M6 · 0,00 tr | M5 · 2,29 tr | M4 · 0,92 tr | M2 · 7,15 tr | M1 · 2,61 tr |
+| B | M3 · 9,65 tr | M6 · 0,00 tr | M6 · 0,13 tr | M6 · 0,00 tr | M5 · 2,77 tr | M4 · 0,92 tr | M2 · 9,60 tr | M1 · 5,25 tr |
+| C | M3 · 9,58 tr | M6 · 0,00 tr | M6 · 0,30 tr | M6 · 0,00 tr | M5 · 0,64 tr | M4 · 0,92 tr | M2 · 9,96 tr | M1 · 6,34 tr |
+
+**150 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | N3 · 5,54 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,00 tr | N5 · 0,81 tr | N4 · 0,57 tr | N1 · 9,37 tr | N2 · 4,02 tr |
+| B | N3 · 8,83 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,20 tr | N4 · 0,57 tr | N1 · 11,14 tr | N2 · 6,82 tr |
+| C | N3 · 8,95 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,00 tr | N5 · 0,37 tr | N4 · 0,57 tr | N1 · 11,88 tr | N2 · 7,95 tr |
+
+Điều đáng chú ý:
+
+- **Các cách chơi có nghỉ đi đủ năm chương:** lắng nghe K3 → L3 → M3 → N3, để má chọn K2 → L1 → M2 → N1, một mình L2 → M1 → N2. Ít việc thì thiếu tiền ở mọi chương (K4, L4, M4, N4).
+- **Sinh hoạt từ chương 2 bỏ tiền ăn của An:** "Sinh hoạt cả nhà" chương 2–5 giờ là 110.000đ/ngày (má đi: 90.000đ). Trước là 140.000đ (120.000đ), trùng với tiền ăn An tự trả từ khi có hệ đói/no.
+- **Kiệt sức có hai đường:** Mệt cao nhiều ngày, hoặc nhiều ngày gục vì Tâm trạng chạm đáy mà không nghỉ (`burnoutDays` trong `config.json` → `endings`). Ba cách chơi không nghỉ lại ra kết kiệt sức (E6, K6, L6, M6, N6) như thiết kế gốc; chương 3, 4, 5 mỗi chương đủ sáu kết.
+- **Lệnh xem kỹ một lượt:** `... -s res://tests/sim.gd -- trace A 1 3 why` in thu, chi từng chương theo khoản và lý do mỗi việc không làm được.
+
+<details><summary>Bảng cũ (trước 1.14, mở đầu 1,2 triệu tiền mặt)</summary>
+
 Kết quả gần nhất của bản 30 ngày (bỏ qua đường đi bộ; kết thúc và tiền mặt cuối tháng sau khi đã trả chỗ ở):
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng (làm 3 việc, không nghỉ) |
@@ -499,6 +603,8 @@ Chơi tiếp chương 5 (ngày 121–150) từ màn kết chương 4; kết chư
 | C | N3 · 15,63 tr | N6 · 16,39 tr | N6 · 16,58 tr | N6 · 11,11 tr | N5 · 8,41 tr | N4 · 0,29 tr | N1 · 18,36 tr | N2 · 12,07 tr |
 
 Đủ sáu kết. Học xong lớp điện lạnh ra N3; không học mà tiệm chia mái hiên với chị Lụa (đã hỏi người góp) ra N2; không có tiệm, không học ra N1. Cách chơi gồng khiêng một mình cái tủ lạnh rồi dán cao làm tiếp (N6, cùng với các cách chơi không nghỉ); cách chơi giấu nói "cả nhà khỏe là được", giấu chuyện tiền ôn thi của Linh, chuyện ba của Tín, bỏ dở sinh nhật má (N5).
+
+</details>
 
 - Đọc lại một lượt chơi chương 2 (lựa chọn và sổ tay ngày 31–60): `... -s res://tests/sim.gd -- trace C 0` (tuyến, cách chơi 0–6); thêm `3`, `4` hay `5` ở cuối (`trace A 0 3`) để đọc chương 3, 4, 5, kèm tiền và Mệt từng ngày, các khoản phải trả, các cờ.
 - Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, cảnh chính, việc nhờ, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Bỏ `--full` để chơi lát cắt; `--ch2` thay cho `--full` để chơi tiếp chương 2 tới ngày 60, thêm `--fast1` để chương 1 chạy nhanh không đi bộ; `--ch3` cho hai chương đầu chạy nhanh rồi chơi chương 3 trên phố, `--ch4` cho ba chương đầu chạy nhanh rồi chơi chương 4, `--ch5` cho bốn chương đầu chạy nhanh rồi chơi chương 5:

@@ -365,7 +365,8 @@ func _make_room() -> void:
 		_close_tip()
 	_top_row.visible = not busy
 	if _mood != null:
-		_mood.visible = game.is_started() and not _panel_open()
+		# Bảng mục tiêu mở hết thì dài xuống góc dưới trái, che vòng tâm trạng: tạm giấu vòng.
+		_mood.visible = game.is_started() and not _panel_open() and not _obj_expanded
 
 
 func set_prompt(id: String) -> void:
@@ -417,6 +418,7 @@ func _toggle_objectives() -> void:
 	if blocking() or world.title_open(): return
 	_obj_expanded = not _obj_expanded
 	if _obj_expanded: _close_tip()
+	_make_room()
 	_refresh()
 
 func _input(event: InputEvent) -> void:
@@ -544,6 +546,7 @@ func _build_objectives(parent: Control) -> void:
 			# Mở hết bảng thì cất ô gợi ý ở góc dưới (coi như đã đọc), khỏi đè lên các mục.
 			if _obj_expanded and _tip.visible:
 				_close_tip()
+			_make_room()
 			_refresh())
 
 
@@ -1116,6 +1119,9 @@ func _process(delta: float) -> void:
 	if _phone_tick <= 0.0:
 		_phone_tick = 0.25
 		_morning_toast()
+		# Mở bản đồ, túi đồ, hội thoại… thì cất thông báo sáng để nó không đè lên bảng đang mở.
+		if _toast != null and is_instance_valid(_toast) and blocking():
+			_toast.queue_free()
 		_refresh_guide_distance()
 		_warn_needs()
 		_update_tip(0.25)
@@ -1597,7 +1603,7 @@ func _morning_toast() -> void:
 	var hot := Hardship.hot(game)
 	if hot != "":
 		var a: Dictionary = game.get_action(hot)
-		lines.append(["Giao Nhanh · Việc thưởng nóng", "%s: lương ×2 hôm nay (%s)" % [str(a.get("name", "")), GameLogic.fmt_money(int(a.get("pay", 0)) * 2)], Color("0f9d58")])
+		lines.append(["Giao Nhanh · Việc thưởng nóng", "%s: lương %s hôm nay (%s)" % [str(a.get("name", "")), Hardship.mult_text(game), GameLogic.fmt_money(Hardship.hot_pay(game))], Color("0f9d58")])
 	var unread: int = Relationships.unread(game)
 	if unread > 0:
 		var who := []
@@ -1644,10 +1650,18 @@ func _morning_toast() -> void:
 			_toast.queue_free())
 	add_child(_toast)
 	_toast.reset_size()
-	_toast.position = Vector2((ScreenFit.view_size().x - _toast.custom_minimum_size.x) / 2.0, -160.0)
+	# Giữa màn hình, nhưng né sang phải nếu bảng chỉ số góc trái rộng (dòng thưởng nóng dài) để khỏi đè lên nó.
+	var left := (ScreenFit.view_size().x - _toast.custom_minimum_size.x) / 2.0
+	var card: Node = _st_hot
+	while card != null and not (card is PanelContainer):
+		card = card.get_parent()
+	if card != null and (card as Control).is_visible_in_tree():
+		left = clampf((card as Control).get_global_rect().end.x + 12.0, left, maxf(left, ScreenFit.view_size().x - _toast.custom_minimum_size.x - 12.0))
+	_toast.position = Vector2(left, -160.0)
 	world.audio.play("dialog")
 	var tw := create_tween()
-	tw.tween_property(_toast, "position:y", 14.0, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# Trượt xuống dưới hàng nút trên cùng (vòng đếm ngày, biểu tượng) thay vì che chúng.
+	tw.tween_property(_toast, "position:y", 82.0, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_interval(7.0)
 	tw.tween_property(_toast, "position:y", -200.0, 0.4).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func() -> void:
@@ -1928,12 +1942,14 @@ func _refresh_stats(s: Dictionary) -> void:
 		_st_bill.add_theme_color_override("font_color", UI.HUD_SOFT if paid else (Color("ff8a7a") if int(s.cash) < Hardship.rent(game) else UI.HUD_TEXT))
 		if _st_hot.visible:
 			var ha: Dictionary = game.get_action(Hardship.hot(game))
-			_st_hot.text = "Thưởng nóng ×2 hôm nay: %s" % str(ha.get("name", ""))
+			_st_hot.text = "Thưởng nóng %s hôm nay: %s" % [Hardship.mult_text(game), str(ha.get("name", ""))]
 	var goal := Hardship.goal(game)
 	_st_goal.visible = not goal.is_empty()
 	_st_goal_bar.visible = not goal.is_empty()
 	if not goal.is_empty():
-		_st_goal.text = "Mục tiêu: %s · %s/%s" % [goal.name, GameLogic.fmt_k(int(goal.have)), GameLogic.fmt_money(int(goal.need))]
+		# Mục tiêu cọc phòng tính cả quỹ cọc nhà; ghi rõ để khỏi lẫn với dự báo ngày chốt (đã trừ tiền trọ).
+		var src := " · gồm quỹ" if str(goal.id) == "phong" else ""
+		_st_goal.text = "Mục tiêu: %s · %s/%s%s" % [goal.name, GameLogic.fmt_k(int(goal.have)), GameLogic.fmt_k(int(goal.need)), src]
 		_st_goal.tooltip_text = str(goal.hint)
 		UI.set_bar(_st_goal_bar, float(goal.pct) * 100.0, 100.0, UI.GOLD)
 
@@ -2433,17 +2449,25 @@ func _fill_objectives(s: Dictionary) -> void:
 		_objective("Chỗ ở: " + str(game.cfg.housing[h.place].name), "Đã chốt" + (" · ở tạm, hẹn tìm tiếp" if game.cfg.housing[h.place].get("temp", false) else ""), "done")
 	else:
 		var proj: int = game.projected_cash(deadline)
-		var best: String = game.best_housing(proj)
-		var sub := "Không kiếm thêm thì sáng ngày %d còn %s" % [deadline, GameLogic.fmt_money(proj)]
-		sub += " · chưa đủ cả chỗ ở tạm" if best == "" else " · đủ cho %s" % game.cfg.housing[best].name
-		# Mốc kế tiếp: chỗ rẻ nhất mà chưa đủ tiền, để người chơi biết còn thiếu bao nhiêu.
+		# Quỹ cọc nhà chỉ trả được phần cọc của từng chỗ; tiền còn thiếu so với từng chỗ tính cả phần đó.
+		var short := {}
+		var best := ""
 		var next := ""
 		for k in game.cfg.housing:
 			var c := int(game.cfg.housing[k].cost)
-			if c > proj and (next == "" or c < int(game.cfg.housing[next].cost)):
+			var lack := c - (proj + mini(game.Economy.fund(game), int(game.cfg.housing[k].get("deposit", 0))))
+			short[k] = lack
+			if lack <= 0 and (best == "" or c > int(game.cfg.housing[best].cost)):
+				best = k
+			elif lack > 0 and (next == "" or c < int(game.cfg.housing[next].cost)):
 				next = k
+		var sub := ("Không kiếm thêm thì sáng ngày %d còn %s tiền mặt" % [deadline, GameLogic.fmt_money(proj)]) if proj >= 0 \
+			else ("Không kiếm thêm thì tiền trọ, sinh hoạt tới ngày %d còn thiếu %s" % [deadline, GameLogic.fmt_money(-proj)])
+		if best != "":
+			sub += " · đủ cho %s" % game.cfg.housing[best].name
+		# Mốc kế tiếp: chỗ rẻ nhất mà chưa đủ tiền, để người chơi biết còn thiếu bao nhiêu.
 		if next != "":
-			sub += " · thiếu %s cho %s" % [GameLogic.fmt_money(int(game.cfg.housing[next].cost) - proj), game.cfg.housing[next].name]
+			sub += " · cần thêm %s cho %s" % [GameLogic.fmt_money(int(short[next])), str(game.cfg.housing[next].name).left(1).to_lower() + str(game.cfg.housing[next].name).substr(1)]
 		if h.state == "reserved":
 			sub = "Đã cọc giữ %s, còn thiếu %s · " % [game.cfg.housing[h.place].name, GameLogic.fmt_money(game.housing_cost(h.place))] + sub
 		_objective("Ngày %d chốt chỗ ở" % deadline, sub, "current" if game.day() >= 20 else "normal")

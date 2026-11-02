@@ -58,7 +58,9 @@ static func base_pay(g, a: Dictionary, pay: int) -> int:
 	if not active(g) or str(a.get("group","")) != "work" or pay <= 0: return pay
 	# 1.13 authored job-board/hot-job quotes own their economy. Preserve those contracts;
 	# every other repeatable job (warehouse, brick carrying, beer service) stays capped.
-	if a.has("scheduler_job") or (g.Hardship.on(g) and g.Hardship.data(g).get("hotJob",{}).get("pool",[]).has(str(a.get("id","")))): return pay
+	# Only TODAY's hot job skips the cap: the pool lists candidates, not jobs that are always uncapped
+	# (exempting the whole pool paid "Sửa đồ lẻ" 130k every day, ~4m over chapter one).
+	if a.has("scheduler_job") or (g.Hardship.on(g) and g.Hardship.hot(g) == str(a.get("id",""))): return pay
 	# Certificate jobs (careers.json) are paid for the course An bought; the unskilled cap does not apply.
 	if a.get("require",{}).has("cert"): return pay
 	var overrides: Dictionary = data(g).get("basePayOverrides",{})
@@ -75,7 +77,7 @@ static func living_cost(g, legacy: int) -> int:
 	return int(data(g).get("familyUpkeep",60000)) if active(g) else legacy
 
 static func living_label(g) -> String:
-	return str(data(g).get("familyLabel","Góp sinh hoạt gia đình")) if active(g) else "Sinh hoạt cả nhà"
+	return str(data(g).get("familyLabel","Góp sinh hoạt gia đình")) if active(g) else "Sinh hoạt cả nhà (không gồm bữa ăn của An)"
 
 static func rent_due(g) -> int:
 	if not active(g): return 0

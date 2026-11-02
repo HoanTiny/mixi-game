@@ -35,13 +35,13 @@
   },
   "review": {"id": "on_bai_net", "location": "quan_net", "name": "Ôn bài, xem video bài giảng ở quán net", "cost": 10000, "hours": 1, "progress": 5, "xp": {"int": 3}},
   "jobs": [
-    {"id": "han_khung_sat", "group": "work", "location": "tiem_sau", "name": "Hàn khung cửa sắt ở dãy vòm Gầm Cầu", "hours": 4, "pay": 340000,
+    {"id": "han_khung_sat", "minigame": "han_khung_sat", "group": "work", "location": "tiem_sau", "name": "Hàn khung cửa sắt ở dãy vòm Gầm Cầu", "hours": 4, "pay": 340000,
       "window": [7, 17], "require": {"cert": "han"}, "tags": ["heavy"], "prof": "han", "profXp": 22,
       "effects": {"fatigue": 18, "need.clean": -20}, "xp": {"str": 6, "per": 4}},
-    {"id": "bao_duong_dieu_hoa", "group": "work", "location": "tiem_sau", "name": "Vệ sinh, nạp ga điều hòa cho khách quanh phường", "hours": 3, "pay": 320000,
+    {"id": "bao_duong_dieu_hoa", "minigame": "bao_duong_dieu_hoa", "group": "work", "location": "tiem_sau", "name": "Vệ sinh, nạp ga điều hòa cho khách quanh phường", "hours": 3, "pay": 320000,
       "window": [8, 18], "require": {"cert": "dien_lanh"}, "tags": ["outdoor"], "prof": "dien_lanh", "profXp": 20,
       "effects": {"fatigue": 12, "need.clean": -12}, "xp": {"int": 4, "per": 4}},
-    {"id": "so_sach_tieu_thuong", "group": "work", "location": "cho_cau_nho", "name": "Ghi sổ thu chi, đối soát công nợ cho tiểu thương chợ", "hours": 3, "pay": 280000,
+    {"id": "so_sach_tieu_thuong", "minigame": "so_sach_tieu_thuong", "group": "work", "location": "cho_cau_nho", "name": "Ghi sổ thu chi, đối soát công nợ cho tiểu thương chợ", "hours": 3, "pay": 280000,
       "window": [9, 19], "require": {"cert": "ke_toan"}, "prof": "ke_toan", "profXp": 20,
       "effects": {"fatigue": 6, "need.mood": -3}, "xp": {"int": 6}}
   ],

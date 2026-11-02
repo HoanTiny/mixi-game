@@ -1954,6 +1954,9 @@ func _process(delta: float) -> void:
 	camera.look_at(camera.position - cam_offset() + Vector3(0, lerpf(1.3, 1.0, minf(zoom, 1.0)), 0), Vector3.UP)
 	if juice != null:
 		juice.update(delta, game)
+	# Màn hình ngả xám theo Tâm trạng, cú sốc bị lừa (nhạt dần theo giờ game): cập nhật mỗi khung cho mượt.
+	if post_fx != null:
+		post_fx.set_gloom(game.Hardship.gloom(game))
 	# Nhìn toàn cảnh: bóng đổ phủ xa hơn (mờ hơn một chút), hai tầng bóng cho đỡ lần vẽ; góc chơi giữ bốn tầng để mặt
 	# phẳng rộng (nhà hạ, sân) không có sọc khi nắng sớm chiều chiếu xiên.
 	var far := clampf(zoom - 1.0, 0.0, 1.0)

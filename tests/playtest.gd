@@ -490,3 +490,28 @@ func _report() -> void:
 	print("Giờ đi bộ %.1f (TB %.2f giờ/ngày) · giờ làm %.1f · giờ nói chuyện %.1f · mạch chuyện %d · tán gẫu %d · ngủ ngoài đường %d · tới nơi không làm được %d" % [
 		stats.walk, stats.walk / days, stats.work, stats.talk, stats.talks, stats.chats, stats.sleep_out, stats.stuck])
 	print("Thân thiết: ", game.s.rep, " · Cờ: ", game.s.flags.keys())
+	_ledger()
+
+
+## Thu, chi cả chương gộp theo khoản (đọc từ nhật ký "+x · lý do"), để biết tiền đến từ đâu khi cân kinh tế.
+func _ledger() -> void:
+	var sums := {"plus": {}, "minus": {}}
+	var digits := RegEx.create_from_string("[0-9][0-9.,]*")
+	for e in game.s.log:
+		var k := str(e.get("k", ""))
+		var t := str(e.get("t", ""))
+		var cut := t.find(" · ")
+		if not sums.has(k) or cut < 0:
+			continue
+		var amount := int(t.substr(1, cut - 1).replace(".", "").replace("đ", ""))
+		var why := digits.sub(t.substr(cut + 3), "#", true).strip_edges()
+		sums[k][why] = int(sums[k].get(why, 0)) + amount
+	for k in ["plus", "minus"]:
+		var rows: Array = sums[k].keys()
+		rows.sort_custom(func(a, b) -> bool: return int(sums[k][a]) > int(sums[k][b]))
+		var total := 0
+		for r in rows:
+			total += int(sums[k][r])
+		print("%s %s:" % ["Thu" if k == "plus" else "Chi", GameLogic.fmt_money(total)])
+		for r in rows.slice(0, 10):
+			print("   %s  %s" % [GameLogic.fmt_money(int(sums[k][r])).lpad(12), str(r).left(70)])

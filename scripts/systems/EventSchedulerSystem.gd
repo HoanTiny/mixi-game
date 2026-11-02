@@ -33,6 +33,7 @@ static func effects(g, raw: Dictionary) -> Dictionary:
 			"hunger": out["need.fed"] = v
 			"hygiene": out["need.clean"] = v
 			"mood": out["need.mood"] = v
+			"shock": out["shock"] = v
 			"reputation": out.respect = v
 			"npc_affinity_add":
 				for npc in v: out["rep." + str(data(g).runtime_adapters.npc_ids.get(npc,npc))] = v[npc]
@@ -141,7 +142,10 @@ static func enter_zone(g, zone: String) -> bool:
 	if not g.is_started() or g.is_over() or not g.s.queue.is_empty(): return false
 	var s := state(g)
 	for e in data(g).get("scheduled_story_events",[]):
-		if int(e.day)!=g.day() or e.trigger_zone!=zone or e.event_id in s.fired: continue
+		# until_day: sự kiện chờ tới ngày đó nếu hôm đầu An chưa ghé khu (cạm bẫy, việc nhờ không gắn ngày cố định).
+		if g.day() < int(e.day) or g.day() > int(e.get("until_day", e.day)) or e.trigger_zone!=zone or e.event_id in s.fired: continue
+		# requires_flag: đoạn sau của một mạch chuyện chỉ hiện khi đã qua đoạn trước (cờ do unlock_feature bật).
+		if e.has("requires_flag") and not g.s.flags.get(str(e.requires_flag), false): continue
 		if g.clock()<float(e.trigger_hour_range[0]) or g.clock()>=float(e.trigger_hour_range[1]): continue
 		s.fired.append(e.event_id)
 		g.s.queue.append({"id":"scheduler:"+e.event_id,"data":{}})

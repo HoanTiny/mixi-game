@@ -1,20 +1,20 @@
-# Sau bản 1.6
+# Sau bản 1.18
 
-Đã áp dụng bố cục phố gọn và nối ba ngày đầu; chi tiết ở
-[NEIGHBORHOOD_UPDATE.md](NEIGHBORHOOD_UPDATE.md). Kế hoạch và đối chiếu tham khảo
-trước khi triển khai được lưu ở [NEIGHBORHOOD_DESIGN.md](NEIGHBORHOOD_DESIGN.md).
+Chơi thử 1.17 bằng người chơi máy đủ 30 ngày ba tuyến A, B, C, cộng một lượt chơi tay trên web tới sáng ngày 1. Kinh tế chương 1 và các lỗi giao diện tìm được đã sửa ở 1.18 (xem [WEB_RELEASE.md](WEB_RELEASE.md)).
 
-Ưu tiên tiếp theo:
+Ưu tiên tiếp theo (sau 1.19):
 
-1. Chơi thử bằng người thật từ ngày 1 đến ngày 7: ghi thời gian tới mục tiêu,
-   chỗ phải mở bản đồ, số lần thiếu tiền linh kiện và lỡ hẹn. Chưa coi số đo
-   đường đi hoặc mô phỏng logic là thay thế cho lượt chơi này.
-2. Nối các việc sau ngày 3 với những cụm phố đã mở: mỗi chuyến xa có người
-   giới thiệu, lý do và phản hồi khi quay về. Giữ các tuyến nghề và năm chương.
-3. Hoàn thiện sinh hoạt NPC, quay người, lên/xuống xe và vật liệu mặt phố.
-   Chuyến xe hiện là chuyển vị trí có phí/thời gian, chưa có hoạt cảnh lên xe.
-4. Đo tải lạnh, bộ nhớ và khung hình trên web/thiết bị yếu. Đo riêng khu chợ
-   đông người; không suy hiệu năng cả map từ một ảnh GPU hay một máy.
+1. **Chơi thử bằng người thật từ ngày 1 đến ngày 7.** Đo thêm độ khó của ba trò nghề và ba trò giải trí trên điện thoại (chạm, giữ, kéo).
+2. **Người chơi máy và các hệ thống mới.**
+   - `tests/playtest.gd` chọn lựa chọn đầu tiên còn mở, nên gặp cạm bẫy là sa bẫy: cần cho nó cách chọn theo Nhạy bén.
+   - `sim.gd` không vào khu nên không gặp cạm bẫy, mạch chú Thìn.
+   - Cả hai chưa học trường đêm, chưa đi hát, chưa đánh cờ.
+3. **Hậu quả dài của mạch chú Thìn và cạm bẫy.** Đã ghi cờ: `thinSoDienThoai`, `thinBiBoMac`, `biCaiQuyt`, `biCoLua`, `biNoHu`. Có thể nối vào tin nhắn chương 2, thẻ hậu truyện, sổ tay.
+4. **Trường đêm ở chương 1** vẫn là cái bẫy về tiền (học phí 1,5–1,8 triệu). Cân nhắc khóa tới chương 2 hoặc thêm gợi ý.
+5. **Lỗi nhỏ còn lại:**
+   - mũi tên vàng đè biển "Hẻm trọ";
+   - trình duyệt mới vẫn hiện "Chơi tiếp · Đã tới màn kết";
+   - khoản 500.000đ chưa có nhãn.
+6. **Hiệu năng web** trên điện thoại thật (lọc màu, viền mực, vết bẩn).
 
-Không tăng mật độ nhà chỉ để lấp khoảng trống; kiểm đường đi, mặt tiền và
-tầm nhìn ở góc camera chơi trước khi thêm chi tiết.
+Không tăng mật độ nhà chỉ để lấp khoảng trống; kiểm đường đi, mặt tiền và tầm nhìn ở góc camera chơi trước khi thêm chi tiết.

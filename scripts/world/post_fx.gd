@@ -13,21 +13,24 @@ uniform float tint_amount = 0.22;
 uniform float vignette = 0.42;
 uniform float grain = 0.035;
 uniform float night = 0.0;
+// U ám (Tâm trạng thấp, vừa bị lừa): rút màu, tối và lạnh đi.
+uniform float gloom = 0.0;
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 void fragment() {
 	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
 	float luma = dot(c, vec3(0.299, 0.587, 0.114));
-	c = mix(vec3(luma), c, saturation);
+	c = mix(vec3(luma), c, saturation * (1.0 - 0.85 * gloom));
 	// Đêm: bớt tương phản, nâng vùng tối một chút cho phố vẫn đọc được dưới đèn đường.
 	c = (c - 0.5) * mix(contrast, 1.02, night * 0.8) + 0.5 + night * 0.03;
 	// Ám vàng bụi: nhân vào vùng trung và sáng nhiều hơn vùng tối (bóng vẫn đen sạch).
 	float amt = tint_amount * mix(1.0, 0.35, night) * smoothstep(0.05, 0.6, luma);
 	c = mix(c, c * tint * 1.08, amt);
+	c = mix(c, c * vec3(0.86, 0.9, 0.97) * (1.0 - 0.14 * gloom), gloom);
 	vec2 d = (SCREEN_UV - 0.5) * vec2(1.0, 0.85);
 	float v = smoothstep(0.32, 0.82, length(d));
-	c *= 1.0 - vignette * mix(1.0, 0.65, night) * v;
+	c *= 1.0 - (vignette + 0.25 * gloom) * mix(1.0, 0.65, night) * v;
 	c += (hash(floor(FRAGCOORD.xy * 0.5) + fract(TIME * 7.0) * 61.0) - 0.5) * grain;
 	COLOR = vec4(clamp(c, 0.0, 1.0), 1.0);
 }
@@ -53,3 +56,8 @@ func _ready() -> void:
 func set_night(nf: float) -> void:
 	if mat != null:
 		mat.set_shader_parameter("night", nf)
+
+
+func set_gloom(v: float) -> void:
+	if mat != null:
+		mat.set_shader_parameter("gloom", v)

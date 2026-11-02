@@ -27,7 +27,8 @@ func _init() -> void:
 	seed(5)
 	var g := _new()
 	_ok(int(g.s.cash) == 46000, "ngày 1 trong túi 46.000đ (đang %s)" % GameLogic.fmt_money(int(g.s.cash)))
-	_ok(g.living_cost() == 0, "chương 1 bỏ tiền sinh hoạt cả nhà tự trừ mỗi tối")
+	var upkeep := int(g.cfg.economy.get("familyUpkeep", 0))
+	_ok(g.living_cost() == upkeep and upkeep <= 30000, "chương 1 chỉ góp sinh hoạt nhỏ mỗi tối (%s), không còn 120.000đ cả nhà" % GameLogic.fmt_money(upkeep))
 	var nghi: Dictionary = g.get_action("nghi")
 	_ok(str(g.action_status(nghi).reason).begins_with("Chưa trả tiền trọ"), "chưa trả tiền trọ: khóa Nghỉ ở phòng (%s)" % g.action_status(nghi).reason)
 	_ok(Hardship.sleep_lock(g) != "", "chưa trả tiền trọ: khóa đi ngủ")
@@ -72,7 +73,7 @@ func _init() -> void:
 	var ga := _new()
 	ga.s["cash"] = 100000
 	ga.finish_day()
-	_ok(int(ga.s.hard.debt) == 0 and int(ga.s.cash) == 40000, "quên trả mà đủ tiền: tự trừ 60.000đ lúc qua đêm")
+	_ok(int(ga.s.hard.debt) == 0 and int(ga.s.cash) == 40000 - ga.living_cost(), "quên trả mà đủ tiền: tự trừ 60.000đ tiền trọ (và góp sinh hoạt) lúc qua đêm")
 	# Việc thưởng nóng.
 	var hot := Hardship.hot(ga)
 	_ok(hot != "", "sáng ngày 2 có việc thưởng nóng: " + hot)
@@ -86,11 +87,75 @@ func _init() -> void:
 			_ok(int(ga.s.cash) >= int(a.pay) * 2 * 0.5, "làm việc thưởng nóng %s: nhận %s (lương gốc %s)" % [hot, GameLogic.fmt_money(int(ga.s.cash)), GameLogic.fmt_money(int(a.pay))])
 		else:
 			print("    (việc thưởng nóng chưa làm được lúc này: %s)" % st.reason)
+		_ok(Hardship.hot_pay(ga) == ga.round_k(float(a.pay) * Hardship.pay_mult(ga, hot)), "thông báo sáng ghi đúng tiền ca nóng: %s" % GameLogic.fmt_money(Hardship.hot_pay(ga)))
+	# Việc khác trong danh sách thưởng nóng nhưng không nóng hôm nay: vẫn theo trần lương chương 1.
+	for id in Hardship.data(ga).hotJob.pool:
+		var b: Dictionary = ga.get_action(str(id))
+		if str(id) != hot and not b.is_empty() and int(b.pay) > int(float(b.hours) * 28000.0):
+			_ok(ga.Economy.base_pay(ga, b, int(b.pay)) < int(b.pay), "%s không nóng hôm nay: theo trần lương (%s thay vì %s)" % [id, GameLogic.fmt_money(ga.Economy.base_pay(ga, b, int(b.pay))), GameLogic.fmt_money(int(b.pay))])
+			break
 	# Mục tiêu ngắn hạn.
 	var goal := Hardship.goal(g)
 	_ok(str(goal.get("id", "")) == "phong" and int(goal.need) == 1800000, "mục tiêu đầu: %s %s" % [goal.get("name", ""), GameLogic.fmt_money(int(goal.get("need", 0)))])
 	g.housing()["state"] = "reserved"
 	_ok(str(Hardship.goal(g).get("id", "")) == "dien_thoai", "cọc phòng xong thì sang mục tiêu smartphone")
+	# Kiệt sức vì Tâm trạng: ngày chạm đáy (Trầm cảm) đếm riêng; đủ ngày và bỏ nghỉ thì ra kết kiệt sức.
+	var gb := _new()
+	gb.need_adj("mood", -200.0)
+	gb.Survival.update(gb)
+	_ok(bool(gb.s.today.get("burnout", false)), "Tâm trạng chạm đáy: đánh dấu ngày gục")
+	gb.finish_day()
+	_ok(int(gb.s.get("burnout_days", 0)) == 1 and int(gb.s.get("burnout_skips", 0)) == 1 and int(gb.s.rest_skips) == 0, "ngày gục đếm riêng, không cộng vào bỏ nghỉ vì Mệt")
+	gb.s["burnout_days"] = int(gb.cfg.endings.burnoutDays)
+	gb.s["burnout_skips"] = int(gb.cfg.endings.exhaustSkips)
+	_ok(gb.exhausted(), "đủ ngày gục mà bỏ nghỉ: tính là kiệt sức (E6/K6/L6/M6/N6)")
+	gb.s["burnout_skips"] = 0
+	_ok(not gb.exhausted(), "gục mà có nghỉ: chưa tính kiệt sức")
+	# Màn hình ngả xám: bị lừa thì xám hẳn rồi nhạt dần; Tâm trạng thấp thì xám vừa.
+	var gx := _new()
+	gx.need_adj("mood", 100.0)
+	_ok(Hardship.gloom(gx) < 0.05, "Tâm trạng tốt: màn hình không xám")
+	gx.apply_effects({"shock": 4})
+	_ok(Hardship.gloom(gx) > 0.8, "vừa bị lừa: màn hình xám hẳn (%.2f)" % Hardship.gloom(gx))
+	gx.walk(5.0)
+	gx.need_adj("mood", 100.0)
+	_ok(Hardship.gloom(gx) < 0.05, "qua 5 giờ: hết xám")
+	gx.need_adj("mood", -200.0)
+	_ok(Hardship.gloom(gx) > 0.4 and Hardship.gloom(gx) < 0.7, "Tâm trạng chạm đáy: xám vừa (%.2f)" % Hardship.gloom(gx))
+	# Cạm bẫy: chờ trong khoảng ngày; chọn tin lời thì mất tiền, màn hình xám hẳn.
+	var gt2 := _new()
+	gt2.s["day"] = 10
+	gt2.s["used"] = 9.0 - float(gt2.cfg.dayStart)
+	gt2.s["queue"] = []
+	_ok(gt2.EventScheduler.enter_zone(gt2, "Zone3_IndustrialAndLogistics") and str(gt2.current_event().get("id", "")) == "scheduler:trap_cai_quyt", "ngày 10 vẫn gặp cai thầu (chờ tới ngày 13)")
+	gt2.need_adj("mood", 100.0)
+	gt2.s["cash"] = 100000
+	gt2.resolve_choice(1)
+	_ok(int(gt2.s.cash) == 60000 and Hardship.gloom(gt2) > 0.8 and gt2.s.flags.get("biCaiQuyt", false), "tin lời cai thầu: mất 40k tiền xe, màn hình xám, ghi cờ bị quỵt")
+	var gt3 := _new()
+	gt3.s["day"] = 20
+	gt3.s["used"] = 9.0 - float(gt3.cfg.dayStart)
+	gt3.s["queue"] = []
+	_ok(not gt3.EventScheduler.enter_zone(gt3, "Zone3_IndustrialAndLogistics") or str(gt3.current_event().get("id", "")) != "scheduler:trap_cai_quyt", "quá ngày 13 thì không còn gặp cai thầu")
+	# Mạch chú Thìn: đoạn sau chỉ hiện khi đã gặp chú.
+	var gn := _new()
+	gn.s["day"] = 5
+	gn.s["used"] = 12.0 - float(gn.cfg.dayStart)
+	gn.s["queue"] = []
+	_ok(gn.EventScheduler.enter_zone(gn, "Zone3_IndustrialAndLogistics") and str(gn.current_event().get("id", "")) == "scheduler:thin_gap", "trưa ngày 5 ở bãi vật liệu gặp chú Thìn")
+	gn.resolve_choice(0)
+	_ok(gn.s.flags.get("thinGap", false), "ngồi nghe chú kể: ghi cờ đã gặp")
+	var gm := _new()
+	gm.s["day"] = 10
+	gm.s["used"] = 9.0 - float(gm.cfg.dayStart)
+	gm.s["queue"] = []
+	gm.EventScheduler.state(gm).fired.append("trap_cai_quyt")
+	gm.EventScheduler.enter_zone(gm, "Zone3_IndustrialAndLogistics")
+	_ok(str(gm.current_event().get("id", "")) != "scheduler:thin_gui_tien", "chưa gặp chú Thìn thì không có đoạn nhờ chuyển tiền")
+	gn.s["day"] = 10
+	gn.s["used"] = 9.0 - float(gn.cfg.dayStart)
+	gn.EventScheduler.state(gn).fired.append("trap_cai_quyt")
+	_ok(gn.EventScheduler.enter_zone(gn, "Zone3_IndustrialAndLogistics") and str(gn.current_event().get("id", "")) == "scheduler:thin_gui_tien", "đã gặp thì ngày 10 chú nhờ chuyển tiền")
 	# Tổng kết ngày.
 	var gs := _new()
 	gs.s["used"] = 13.0 - float(gs.cfg.dayStart)

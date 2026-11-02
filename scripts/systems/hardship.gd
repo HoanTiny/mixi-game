@@ -81,6 +81,18 @@ static func pay_mult(g, id: String) -> float:
 	return float(data(g).get("hotJob", {}).get("mult", 2)) if on(g) and id == hot(g) else 1.0
 
 
+## Hệ số thưởng nóng viết cho người đọc: "×1,5", "×2".
+static func mult_text(g) -> String:
+	var m := float(data(g).get("hotJob", {}).get("mult", 2))
+	return "×" + (str(int(m)) if is_equal_approx(m, roundf(m)) else str(m).replace(".", ","))
+
+
+## Tiền công một ca của việc thưởng nóng hôm nay (giá gốc, không áp trần lương chương 1, nhân hệ số).
+static func hot_pay(g) -> int:
+	var a: Dictionary = g.get_action(hot(g))
+	return g.round_k(float(a.get("pay", 0)) * pay_mult(g, hot(g))) if not a.is_empty() else 0
+
+
 ## Lý do việc a bị chặn vì chưa trả tiền trọ, "" nếu không.
 static func block(g, a: Dictionary) -> String:
 	if not on(g) or paid(g):
@@ -179,8 +191,23 @@ static func check(g, k: String, v) -> Variant:
 
 ## Khóa hiệu ứng: "rent_pay": true trả tiền trọ đêm nay. true nếu đã xử lý.
 static func effect(g, k: String, v) -> bool:
+	if k == "shock":
+		# Bị lừa, bị quỵt: v giờ màn hình ngả xám u uất rồi nhạt dần (world.gd → post_fx gloom). Mọi chương.
+		g.s["shock_until"] = maxf(float(g.s.get("shock_until", 0.0)), g.now_abs() + float(v))
+		g.s["shock_hours"] = float(v)
+		return true
 	if k == "rent_pay":
 		if bool(v) and on(g) and not paid(g):
 			g.s.today["rent_paid"] = true
 		return true
 	return false
+
+
+## Độ u ám màn hình 0..1: Tâm trạng dưới 30 ngả xám dần; vừa bị lừa, bị quỵt thì xám hẳn rồi nhạt theo giờ game.
+static func gloom(g) -> float:
+	if not g.is_started() or not g.has_needs():
+		return 0.0
+	var low: float = clampf((30.0 - float(g.need("mood"))) / 30.0, 0.0, 1.0) * 0.55
+	var left: float = float(g.s.get("shock_until", 0.0)) - float(g.now_abs())
+	var shock: float = clampf(left / maxf(0.1, float(g.s.get("shock_hours", 1.0))), 0.0, 1.0) if left > 0.0 else 0.0
+	return clampf(low + shock * 0.9, 0.0, 1.0)

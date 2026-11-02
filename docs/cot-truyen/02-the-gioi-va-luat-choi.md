@@ -16,6 +16,13 @@
 
 ## Tiền
 
+> Bảng và phép tính dòng tiền dưới đây là của bản thiết kế 1.0. Game đang chạy (từ 1.14, cân lại ở 1.18) dùng:
+> - 46.000đ trong ví, 1.400.000đ quỹ cọc khóa;
+> - 60.000đ tiền trọ và 20.000đ góp sinh hoạt mỗi tối;
+> - ca thường chương 1 tối đa 28.000đ/giờ.
+>
+> Xem [../economy-balance.md](../economy-balance.md).
+
 | Khoản | Số tiền |
 |---|---|
 | Tiền mặt ban đầu | 1.200.000đ |

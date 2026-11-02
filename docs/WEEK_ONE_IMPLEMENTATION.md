@@ -6,6 +6,13 @@
 
 Giữ mô hình đã phát hành: 46.000đ tiền mặt và 1.400.000đ quỹ cọc riêng, 60.000đ tiền trọ/đêm; không thu thêm sinh hoạt gia đình tự động ở chương 1. Đây là thay đổi có chủ ý so với bản thiết kế nền 1.6 (1,2 triệu tiền mặt và 120.000đ sinh hoạt). `economy.json` cung cấp tiền khởi đầu, tiền trọ và sinh hoạt cho hệ hardship, tránh hai bộ số độc lập. Lời thoại đọc tiền thực, quỹ cọc và tiền trọ từ logic.
 
+> **Cập nhật 1.18:** sau chơi thử 30 ngày (ba tuyến cuối chương dư 1,3–2,7 triệu, ngày nào cũng làm được ca không bị trần lương), đã:
+> - thêm góp sinh hoạt gia đình 20.000đ mỗi tối (`familyUpkeep`);
+> - chỉ miễn trần lương cho việc thưởng nóng của đúng hôm đó;
+> - hạ thưởng nóng xuống ×1,5.
+>
+> Muốn trở lại quyết định "không thu sinh hoạt" ở trên thì đặt `familyUpkeep` = 0. Số liệu ở [economy-balance.md](economy-balance.md).
+
 Tiền công ca thường chụp hệ số phong độ trước khi trôi thời gian ca. Đơn sửa đã nhận giữ nguyên báo giá cũ. Hợp đồng ngày 5 là công khoán cố định 130k/160k nếu đạt tối thiểu 50% chỉ tiêu; không có thưởng nóng hoặc thưởng thành tích cộng thêm. Ca thử chưa đạt không trả công, có thể thử lại trong thời hạn. Các ca thường vẫn mở như phương án kiếm sống khác.
 
 ## Nhiệm vụ ngày 5–6

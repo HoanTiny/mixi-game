@@ -9,6 +9,12 @@ const VIEWS := {
 	"ring_toss": preload("res://scripts/minigames/views/ring_toss_view.gd"),
 	"brick_balance": preload("res://scripts/minigames/views/brick_balance_view.gd"),
 	"billiards": preload("res://scripts/work/billiards.gd"),
+	"weld_bead": preload("res://scripts/minigames/views/weld_bead_view.gd"),
+	"ledger_check": preload("res://scripts/minigames/views/ledger_check_view.gd"),
+	"ac_charge": preload("res://scripts/minigames/views/ac_charge_view.gd"),
+	"xiangqi": preload("res://scripts/minigames/views/xiangqi_view.gd"),
+	"karaoke": preload("res://scripts/minigames/views/karaoke_view.gd"),
+	"claw": preload("res://scripts/minigames/views/claw_view.gd"),
 }
 
 

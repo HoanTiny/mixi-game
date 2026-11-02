@@ -7,7 +7,7 @@
   "lockActions": ["nghi"],
   "unpaid": {"rep": -4, "mood": -8, "fatigue": 6, "log": "Không đủ tiền trọ: cô Duyên cho ngủ tạm ngoài hành lang, ghi nợ một đêm"},
   "hotJob": {
-    "mult": 2,
+    "mult": 1.5,
     "pool": ["phat_to_roi", "giao_com", "ca_phu_quan", "sua_do_le", "chay_ban_ta_hien", "keo_xe_tho", "xe_om", "boc_vac_toi", "lam_shop_vy", "lam_bia", "thu_dong_nat"]
   },
   "goals": [

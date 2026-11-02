@@ -1,3 +1,23 @@
+> Cân lại sau chơi thử 1.17:
+> - **Lỗi đã sửa:** trần lương 28.000đ/giờ trước đây miễn cho mọi việc trong danh sách thưởng nóng, ngày nào cũng vậy. Vì thế "Sửa đồ lẻ" ăn 130k mỗi ca, cả chương được 2,6–4 triệu. Giờ chỉ việc thưởng nóng của đúng hôm đó được trả giá gốc.
+> - **Thưởng nóng:** hệ số hạ từ ×2 xuống ×1,5 (`hardship.json` → `hotJob.mult`), chữ trên HUD, thông báo và tổng kết tự đọc hệ số này.
+> - **Góp sinh hoạt gia đình:** `familyUpkeep` 20.000đ mỗi tối (trước 0), trừ cùng tiền trọ 60k.
+> - **Kết quả mô phỏng nhanh 30 ngày** (`tests/playtest.gd -- --demo --full --fast1 --route=X`):
+>
+>   | Tuyến | Trước | Sau |
+>   |---|---|---|
+>   | A | 2,47 tr | 0,82 tr |
+>   | B | 2,80 tr | 0,35 tr |
+>   | C | 4,30 tr | 1,68 tr |
+>
+>   Cả ba vẫn thuê được phòng ngõ Gạch 5 triệu và ra kết tốt. Cuối bảng tổng kết playtest giờ in thu, chi theo khoản.
+> - **Chạy trên phố thật** (`--full --talk`, có lục thùng rác, bán đồng nát):
+>   - ngày 1 vẫn 46k sau một ca, trả trọ và góp sinh hoạt;
+>   - tuần đầu dưới 500k, tới ngày 16 dưới 650k (tuyến A);
+>   - ngày 30: A còn 806k (E1), B còn 38k (E2), C còn 687k (E3).
+> - **Chương 2–5:** "Sinh hoạt cả nhà" bỏ phần ăn của An (140k → 110k/ngày, má đi 120k → 90k), vì An đã tự trả từng bữa. Các cách chơi có nghỉ đi đủ năm chương; bảng ở README → "Chỉnh cân bằng".
+> - **Chưa quyết:** ba cách chơi không nghỉ bị "Tâm trạng chạm đáy" chặn đi làm trước khi Mệt lên cao. Vì thế kết kiệt sức E6, K6, L6, M6 không còn đạt được trong mô phỏng. Xem [NEXT_UPDATE.md](NEXT_UPDATE.md).
+>
 > Cập nhật Phúc Tân: mở đầu mới có **46.000đ trong ví + 1.400.000đ quỹ cọc khóa**. Quỹ chỉ thanh toán phần cọc nhà; không mua đồ, trả trọ hay bù chi phí sinh hoạt. Vì đã có sẵn phần lớn tiền cọc, mốc 20–30 ngày bên dưới chỉ còn là benchmark cũ bắt đầu với 180k và không có quỹ. Không áp mốc đó cho mở đầu mới. Trả trọ thủ công 60k sẽ bỏ khoản trọ tự thu của đúng đêm đó; hệ hardship hiện ghi số đêm nợ; cơ chế thu nợ tiền của Economy là nhánh riêng, chưa thống nhất. Save ngày 1 chưa tách quỹ có tiền mặt ≥1,4 triệu được chuyển 1,4 triệu sang quỹ một lần, giữ nguyên tổng tài sản. Save khác giữ nguyên tiền.
 
 # Economy, survival and relationships
@@ -7,8 +27,8 @@
 - `data/systems/economy.json` sets new full-game cash to 46,000đ plus a locked 1,400,000đ deposit fund. Loading an
   existing save never replaces the player's cash. Slice presets and later
   chapters keep their existing budgets.
-- Shipped chapter 1 uses hardship: 60,000đ nightly rent and zero automatic family upkeep. These values are loaded from economy.json. Meals are separate actions. Hardship records unpaid nights; the legacy Economy arrears API is still tested independently and is not the live chapter-one collection path.
-- With hardship active, ordinary authored job pay is retained (warehouse base 300,000đ); beer service retains the hourly cap. The 28,000đ/hour and 200,000đ warehouse cap apply to the legacy economy path. Work performance is sampled before action time passes.
+- Shipped chapter 1 uses hardship: 60,000đ nightly rent plus 20,000đ family upkeep each night since 1.18 (`familyUpkeep`; 0 in 1.14–1.17). These values are loaded from economy.json. Meals are separate actions. Hardship records unpaid nights; the legacy Economy arrears API is still tested independently and is not the live chapter-one collection path.
+- Chapter-one repeatable jobs are capped at 28,000đ/hour (`hourlyBaseCap`; warehouse override 200,000đ). Exempt: job-board/scheduler quotes, certificate jobs, and only *today's* hot job, paid at its authored price × `hotJob.mult` (1.5). Before 1.18 every job in the hot-job pool was exempt every day. Work performance is sampled before action time passes.
 - Repeatable 3D repair orders use the same economy data when quoted: fan
   90,000đ and kettle 110,000đ before the existing 10% independent-trade and
   20,000đ loyal-customer bonuses. Buying the part from the shop costs 50,000đ
