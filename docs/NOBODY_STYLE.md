@@ -7,6 +7,12 @@
 
 Từng phần bật tắt được trong `data/config.json` → `look` (`postFx`, `ink`, `sun45`, `grit`).
 
+> **Số liệu kinh tế đã đổi sau 1.13**, phần "Áp lực sinh tồn" dưới đây giữ nguyên như lúc phát hành:
+> - **1.14:** ví mở đầu 46.000đ cộng 1.400.000đ quỹ cọc khóa (`data/systems/economy.json`); tiền trọ, tiền khởi đầu đọc từ đó.
+> - **1.18:** thưởng nóng ×1,5 thay ×2; chỉ việc nóng của đúng hôm đó được bỏ trần lương 28.000đ/giờ; góp sinh hoạt 20.000đ mỗi tối.
+>
+> Số hiện hành ở [economy-balance.md](economy-balance.md).
+
 ## Đồ họa
 
 | Hạng mục | Cách làm | File |

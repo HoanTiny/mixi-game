@@ -1,6 +1,26 @@
+## Bản 1.18
+
+Cân lại kinh tế chương 1 sau lượt người chơi máy chơi đủ 30 ngày:
+- Trần lương 28.000đ/giờ chỉ miễn cho việc thưởng nóng của đúng hôm đó.
+- Thưởng nóng ×1,5.
+- Góp sinh hoạt gia đình 20.000đ mỗi tối.
+
+Sửa giao diện:
+- Phông ○ ● ở màn chọn độ khó.
+- Tiền mở đầu ở màn chọn truyện.
+- Thanh mục tiêu cọc phòng và dự báo ngày 26 khớp nhau.
+- Thông báo 06:00 không che HUD và bản đồ.
+- Vòng tâm trạng ẩn khi mở hết khung mục tiêu.
+
+Kiểm bằng `tests/hardship.gd`; `tests/playtest.gd` in thêm thu, chi theo khoản. Web 1.18 giữ gói Windows 1.13; `export_presets.cfg` đã đặt 1.18.0.0 cho lần đóng gói Windows sau.
+
 ## Bản 1.17
 
 Học nghề buổi tối ở trung tâm nghề cạnh điểm xe buýt Long Biên (lớp hàn điện, kế toán sơ cấp; thi lấy chứng chỉ, lớp điện lạnh chương 5 đổi thành chứng chỉ), ba việc chỉ nhận khi có bằng, cây kỹ năng sáu ô trong bảng Nhân vật (`scripts/systems/careers.gd`). Giữ Shift chạy 4 m/s, chạy được trong ngõ; hết hơi phải nghỉ, thanh hơi trên đầu An (`scripts/world/stamina.gd`). Sửa các test headless cũ; việc cần bằng không bị trần lương chương 1. Kiểm bằng `tests/careers.gd`, `tests/stamina.gd`, `tests/locomotion_pacing.gd`. Web 1.17 giữ gói Windows 1.13.
+
+## Bản 1.16
+
+Bàn giao tuần đầu: các nhánh ngày 5–6 chạy bằng máy trạng thái quest (xem phòng với bà, công khoán phụ quán, chia tuyến giao cơm); lưu game qua tệp tạm và `.bak`. Nướng sẵn hình học các mặt tiền (`assets/architecture/baked/`) để dựng phố nhanh hơn. Chi tiết ở `docs/WEEK_ONE_IMPLEMENTATION.md`, kiểm bằng `tests/story_week_one.gd`. Web 1.16 giữ gói Windows 1.13.
 
 ## Bản 1.15
 

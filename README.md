@@ -19,6 +19,21 @@
   - vòng tâm trạng ẩn khi mở hết khung mục tiêu.
 - Chi tiết số liệu ở [docs/economy-balance.md](docs/economy-balance.md).
 
+**Bản web 1.14–1.17** (chi tiết từng bản ở [docs/WEB_RELEASE.md](docs/WEB_RELEASE.md)):
+
+- **1.17:**
+  - học nghề buổi tối ở trung tâm nghề Long Biên (hàn điện, kế toán sơ cấp), thi lấy chứng chỉ, ba việc chỉ nhận khi có bằng;
+  - cây kỹ năng sáu ô trong bảng Nhân vật;
+  - Shift chạy 4 m/s, hết hơi phải nghỉ.
+- **1.16:**
+  - bàn giao tuần đầu (ngày 5–6 chạy bằng máy trạng thái quest);
+  - lưu game qua tệp tạm và `.bak`;
+  - nướng sẵn mặt tiền để dựng phố nhanh hơn.
+- **1.15:** ca sửa ở tiệm chú Sơn (bỏ món, khay hoàn trả, giữ E để kiểm tra, lắp); khung hành động phố thu gọn.
+- **1.14:**
+  - ghép 1.13 với Balo, chuyển khu, QTE quán bia;
+  - ví mở đầu 46.000đ cộng 1.400.000đ quỹ cọc khóa.
+
 **Bản web 1.13 · phố bụi bặm, ngày khắc nghiệt**
 
 - **Đồ họa kiểu "Nobody":**
@@ -471,6 +486,57 @@ Các file `.wav` trong `assets/sounds/` là **tiếng tạm** do `tools/gen_soun
 "C:/Users/Admin/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe" --headless --path . -s res://tests/sim.gd
 ```
 
+Kết quả mô phỏng bản 1.18 (bỏ qua đường đi bộ; kết của từng chương và tiền mặt cuối chương sau khi đã trả chỗ ở). Cách chơi: "lắng nghe" hỏi ý người nhà và có nghỉ; "giữ tiếp", "áp đặt", "gồng" làm không nghỉ; "giấu" giấu chuyện và ép người nhà; "ít việc" mỗi ngày chỉ một việc ngắn; "để má chọn" như lắng nghe nhưng không giữ chỗ cho máy may của má; "một mình" (từ chương 3) không hỏi ai, nhận tiệm một mình:
+
+**30 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
+|---|---|---|---|---|---|---|---|
+| A | E1 · 2,35 tr | E7 · 0,12 tr | E8 · 0,58 tr | E7 · 0,39 tr | E5 · 2,35 tr | E1 · 0,94 tr | E1 · 2,35 tr |
+| B | E2 · 2,66 tr | E7 · 0,77 tr |  | E7 · 2,53 tr | E5 · 1,08 tr | E2 · 0,01 tr | E2 · 2,66 tr |
+| B>A |  |  | E8 · 0,58 tr |  |  |  |  |
+| C | E3 · 3,31 tr | E7 · 2,53 tr | E8 · 0,18 tr | E7 · 2,53 tr | E5 · 1,82 tr | E1 · 0,35 tr | E3 · 3,31 tr |
+
+**60 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
+|---|---|---|---|---|---|---|---|
+| A | K3 · 1,60 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K4 · 1,14 tr | K4 · 0,00 tr | K2 · 1,60 tr |
+| B | K3 · 4,19 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K6 · 0,25 tr | K4 · 0,00 tr | K2 · 4,19 tr |
+| C | K3 · 5,52 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K3 · 0,00 tr | K4 · 0,00 tr | K2 · 5,52 tr |
+
+**90 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | L4 · 0,33 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 1,21 tr | L4 · 0,00 tr | L4 · 1,83 tr | L4 · 1,15 tr |
+| B | L3 · 0,93 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 0,32 tr | L4 · 0,00 tr | L1 · 1,84 tr | L4 · 0,66 tr |
+| C | L3 · 1,97 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 0,07 tr | L4 · 0,00 tr | L1 · 3,13 tr | L4 · 0,48 tr |
+
+**120 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | M3 · 3,47 tr | M4 · 0,00 tr | M4 · 0,07 tr | M4 · 0,00 tr | M5 · 2,20 tr | M4 · 0,64 tr | M2 · 3,98 tr | M4 · 2,79 tr |
+| B | M3 · 6,63 tr | M4 · 0,00 tr | M4 · 0,07 tr | M4 · 0,00 tr | M5 · 0,34 tr | M4 · 0,68 tr | M2 · 6,67 tr | M1 · 2,30 tr |
+| C | M3 · 7,70 tr | M4 · 0,00 tr | M4 · 0,00 tr | M4 · 0,00 tr | M5 · 0,69 tr | M4 · 0,68 tr | M2 · 8,12 tr | M1 · 3,59 tr |
+
+**150 Ngày**
+
+| Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
+|---|---|---|---|---|---|---|---|---|
+| A | N3 · 1,81 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,43 tr | N4 · 0,02 tr | N1 · 4,02 tr | N2 · 0,37 tr |
+| B | N3 · 4,97 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,18 tr | N4 · 0,06 tr | N1 · 7,70 tr | N2 · 2,97 tr |
+| C | N3 · 5,88 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,55 tr | N4 · 0,06 tr | N1 · 9,44 tr | N2 · 4,26 tr |
+
+Điều đáng chú ý (so với bảng cũ bên dưới, thời mở đầu 1,2 triệu):
+
+- **Không nghỉ thì cạn tiền:** ba cách chơi không nghỉ hết chương 1 ở tạm nhà dì Nga. Từ chương 2 cuối chương nào cũng 0đ và ra các kết thiếu tiền (K5, L4/L5, M4, N4/N6). Bản 1.17 đã như vậy, từ khi ví mở đầu còn 46.000đ (1.14).
+- **Chương 3 lệch:** 14/24 lượt ra L4, kể cả "lắng nghe" tuyến A. Ở 1.17 là 9/24. Kết L2 ("một mình") không còn xuất hiện.
+- **Ít việc vẫn được phòng tốt:** "ít việc" ở chương 1 vẫn thuê được phòng ngõ Gạch, vì lương cũ 3,6 triệu cộng quỹ cọc 1,4 triệu đã gần đủ giá phòng.
+
+<details><summary>Bảng cũ (trước 1.14, mở đầu 1,2 triệu tiền mặt)</summary>
+
 Kết quả gần nhất của bản 30 ngày (bỏ qua đường đi bộ; kết thúc và tiền mặt cuối tháng sau khi đã trả chỗ ở):
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng (làm 3 việc, không nghỉ) |
@@ -518,6 +584,8 @@ Chơi tiếp chương 5 (ngày 121–150) từ màn kết chương 4; kết chư
 | C | N3 · 15,63 tr | N6 · 16,39 tr | N6 · 16,58 tr | N6 · 11,11 tr | N5 · 8,41 tr | N4 · 0,29 tr | N1 · 18,36 tr | N2 · 12,07 tr |
 
 Đủ sáu kết. Học xong lớp điện lạnh ra N3; không học mà tiệm chia mái hiên với chị Lụa (đã hỏi người góp) ra N2; không có tiệm, không học ra N1. Cách chơi gồng khiêng một mình cái tủ lạnh rồi dán cao làm tiếp (N6, cùng với các cách chơi không nghỉ); cách chơi giấu nói "cả nhà khỏe là được", giấu chuyện tiền ôn thi của Linh, chuyện ba của Tín, bỏ dở sinh nhật má (N5).
+
+</details>
 
 - Đọc lại một lượt chơi chương 2 (lựa chọn và sổ tay ngày 31–60): `... -s res://tests/sim.gd -- trace C 0` (tuyến, cách chơi 0–6); thêm `3`, `4` hay `5` ở cuối (`trace A 0 3`) để đọc chương 3, 4, 5, kèm tiền và Mệt từng ngày, các khoản phải trả, các cờ.
 - Chơi thử trên màn phố thật (đi bộ, thanh làm việc, ăn uống, nói chuyện, cảnh chính, việc nhờ, về xóm trọ ngủ đều chạy như người chơi bấm), in nhật ký từng ngày. Bỏ `--full` để chơi lát cắt; `--ch2` thay cho `--full` để chơi tiếp chương 2 tới ngày 60, thêm `--fast1` để chương 1 chạy nhanh không đi bộ; `--ch3` cho hai chương đầu chạy nhanh rồi chơi chương 3 trên phố, `--ch4` cho ba chương đầu chạy nhanh rồi chơi chương 4, `--ch5` cho bốn chương đầu chạy nhanh rồi chơi chương 5:

@@ -15,6 +15,7 @@
 >   - ngày 1 vẫn 46k sau một ca, trả trọ và góp sinh hoạt;
 >   - tuần đầu dưới 500k, tới ngày 16 dưới 650k (tuyến A);
 >   - ngày 30: A còn 806k (E1), B còn 38k (E2), C còn 687k (E3).
+> - **Chưa cân:** chuyển tiếp sang chương 2–5. Cách chơi không nghỉ ở tạm nhà dì Nga rồi cạn tiền từ chương 2; chương 3 lệch về L4. Xem README → "Chỉnh cân bằng" và [NEXT_UPDATE.md](NEXT_UPDATE.md).
 >
 > Cập nhật Phúc Tân: mở đầu mới có **46.000đ trong ví + 1.400.000đ quỹ cọc khóa**. Quỹ chỉ thanh toán phần cọc nhà; không mua đồ, trả trọ hay bù chi phí sinh hoạt. Vì đã có sẵn phần lớn tiền cọc, mốc 20–30 ngày bên dưới chỉ còn là benchmark cũ bắt đầu với 180k và không có quỹ. Không áp mốc đó cho mở đầu mới. Trả trọ thủ công 60k sẽ bỏ khoản trọ tự thu của đúng đêm đó; hệ hardship hiện ghi số đêm nợ; cơ chế thu nợ tiền của Economy là nhánh riêng, chưa thống nhất. Save ngày 1 chưa tách quỹ có tiền mặt ≥1,4 triệu được chuyển 1,4 triệu sang quỹ một lần, giữ nguyên tổng tài sản. Save khác giữ nguyên tiền.
 
@@ -25,8 +26,8 @@
 - `data/systems/economy.json` sets new full-game cash to 46,000đ plus a locked 1,400,000đ deposit fund. Loading an
   existing save never replaces the player's cash. Slice presets and later
   chapters keep their existing budgets.
-- Shipped chapter 1 uses hardship: 60,000đ nightly rent and zero automatic family upkeep. These values are loaded from economy.json. Meals are separate actions. Hardship records unpaid nights; the legacy Economy arrears API is still tested independently and is not the live chapter-one collection path.
-- With hardship active, ordinary authored job pay is retained (warehouse base 300,000đ); beer service retains the hourly cap. The 28,000đ/hour and 200,000đ warehouse cap apply to the legacy economy path. Work performance is sampled before action time passes.
+- Shipped chapter 1 uses hardship: 60,000đ nightly rent plus 20,000đ family upkeep each night since 1.18 (`familyUpkeep`; 0 in 1.14–1.17). These values are loaded from economy.json. Meals are separate actions. Hardship records unpaid nights; the legacy Economy arrears API is still tested independently and is not the live chapter-one collection path.
+- Chapter-one repeatable jobs are capped at 28,000đ/hour (`hourlyBaseCap`; warehouse override 200,000đ). Exempt: job-board/scheduler quotes, certificate jobs, and only *today's* hot job, paid at its authored price × `hotJob.mult` (1.5). Before 1.18 every job in the hot-job pool was exempt every day. Work performance is sampled before action time passes.
 - Repeatable 3D repair orders use the same economy data when quoted: fan
   90,000đ and kettle 110,000đ before the existing 10% independent-trade and
   20,000đ loyal-customer bonuses. Buying the part from the shop costs 50,000đ
