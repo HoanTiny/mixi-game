@@ -99,6 +99,18 @@ func _init() -> void:
 	_ok(str(goal.get("id", "")) == "phong" and int(goal.need) == 1800000, "mục tiêu đầu: %s %s" % [goal.get("name", ""), GameLogic.fmt_money(int(goal.get("need", 0)))])
 	g.housing()["state"] = "reserved"
 	_ok(str(Hardship.goal(g).get("id", "")) == "dien_thoai", "cọc phòng xong thì sang mục tiêu smartphone")
+	# Kiệt sức vì Tâm trạng: ngày chạm đáy (Trầm cảm) đếm riêng; đủ ngày và bỏ nghỉ thì ra kết kiệt sức.
+	var gb := _new()
+	gb.need_adj("mood", -200.0)
+	gb.Survival.update(gb)
+	_ok(bool(gb.s.today.get("burnout", false)), "Tâm trạng chạm đáy: đánh dấu ngày gục")
+	gb.finish_day()
+	_ok(int(gb.s.get("burnout_days", 0)) == 1 and int(gb.s.get("burnout_skips", 0)) == 1 and int(gb.s.rest_skips) == 0, "ngày gục đếm riêng, không cộng vào bỏ nghỉ vì Mệt")
+	gb.s["burnout_days"] = int(gb.cfg.endings.burnoutDays)
+	gb.s["burnout_skips"] = int(gb.cfg.endings.exhaustSkips)
+	_ok(gb.exhausted(), "đủ ngày gục mà bỏ nghỉ: tính là kiệt sức (E6/K6/L6/M6/N6)")
+	gb.s["burnout_skips"] = 0
+	_ok(not gb.exhausted(), "gục mà có nghỉ: chưa tính kiệt sức")
 	# Tổng kết ngày.
 	var gs := _new()
 	gs.s["used"] = 13.0 - float(gs.cfg.dayStart)

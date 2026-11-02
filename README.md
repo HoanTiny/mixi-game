@@ -494,48 +494,48 @@ Kết quả mô phỏng bản 1.18 (bỏ qua đường đi bộ; kết của t�
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
 |---|---|---|---|---|---|---|---|
-| A | E1 · 2,35 tr | E7 · 0,12 tr | E8 · 0,58 tr | E7 · 0,39 tr | E5 · 2,35 tr | E1 · 0,94 tr | E1 · 2,35 tr |
-| B | E2 · 2,66 tr | E7 · 0,77 tr |  | E7 · 2,53 tr | E5 · 1,08 tr | E2 · 0,01 tr | E2 · 2,66 tr |
+| A | E1 · 2,35 tr | E6 · 0,12 tr | E8 · 0,58 tr | E6 · 0,39 tr | E5 · 2,35 tr | E1 · 0,94 tr | E1 · 2,35 tr |
+| B | E2 · 2,66 tr | E6 · 0,77 tr |  | E6 · 2,53 tr | E5 · 1,08 tr | E2 · 0,01 tr | E2 · 2,66 tr |
 | B>A |  |  | E8 · 0,58 tr |  |  |  |  |
-| C | E3 · 3,31 tr | E7 · 2,53 tr | E8 · 0,18 tr | E7 · 2,53 tr | E5 · 1,82 tr | E1 · 0,35 tr | E3 · 3,31 tr |
+| C | E3 · 3,31 tr | E6 · 2,53 tr | E8 · 0,18 tr | E6 · 2,53 tr | E5 · 1,82 tr | E1 · 0,35 tr | E3 · 3,31 tr |
 
 **60 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
 |---|---|---|---|---|---|---|---|
-| A | K3 · 2,54 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K4 · 2,09 tr | K4 · 0,53 tr | K2 · 2,54 tr |
-| B | K3 · 5,45 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K3 · 0,37 tr | K4 · 0,46 tr | K2 · 5,45 tr |
-| C | K3 · 6,20 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K3 · 0,70 tr | K4 · 0,34 tr | K2 · 6,20 tr |
+| A | K3 · 2,54 tr | K6 · 0,00 tr | K6 · 0,00 tr | K6 · 0,00 tr | K4 · 2,09 tr | K4 · 0,53 tr | K2 · 2,54 tr |
+| B | K3 · 5,45 tr | K6 · 0,00 tr | K6 · 0,00 tr | K6 · 0,00 tr | K3 · 0,37 tr | K4 · 0,46 tr | K2 · 5,45 tr |
+| C | K3 · 6,20 tr | K6 · 0,00 tr | K6 · 0,00 tr | K6 · 0,00 tr | K3 · 0,70 tr | K4 · 0,34 tr | K2 · 6,20 tr |
 
 **90 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
 |---|---|---|---|---|---|---|---|---|
-| A | L3 · 0,01 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L5 · 0,02 tr | L4 · 0,00 tr | L1 · 1,26 tr | L4 · 0,87 tr |
-| B | L3 · 3,05 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 1,07 tr | L4 · 0,00 tr | L1 · 3,96 tr | L2 · 0,24 tr |
-| C | L3 · 3,20 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 0,08 tr | L4 · 0,00 tr | L1 · 4,41 tr | L2 · 1,20 tr |
+| A | L3 · 0,01 tr | L6 · 0,00 tr | L6 · 0,00 tr | L6 · 0,00 tr | L5 · 0,02 tr | L4 · 0,00 tr | L1 · 1,26 tr | L4 · 0,87 tr |
+| B | L3 · 3,05 tr | L6 · 0,00 tr | L6 · 0,00 tr | L6 · 0,00 tr | L4 · 1,07 tr | L4 · 0,00 tr | L1 · 3,96 tr | L2 · 0,24 tr |
+| C | L3 · 3,20 tr | L6 · 0,00 tr | L6 · 0,00 tr | L6 · 0,00 tr | L4 · 0,08 tr | L4 · 0,00 tr | L1 · 4,41 tr | L2 · 1,20 tr |
 
 **120 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
 |---|---|---|---|---|---|---|---|---|
-| A | M3 · 6,40 tr | M4 · 0,00 tr | M4 · 0,13 tr | M4 · 0,00 tr | M5 · 2,29 tr | M4 · 0,92 tr | M2 · 7,15 tr | M1 · 2,61 tr |
-| B | M3 · 9,65 tr | M4 · 0,00 tr | M4 · 0,13 tr | M4 · 0,00 tr | M5 · 2,77 tr | M4 · 0,92 tr | M2 · 9,60 tr | M1 · 5,25 tr |
-| C | M3 · 9,58 tr | M4 · 0,00 tr | M4 · 0,30 tr | M4 · 0,00 tr | M5 · 0,64 tr | M4 · 0,92 tr | M2 · 9,96 tr | M1 · 6,34 tr |
+| A | M3 · 6,40 tr | M6 · 0,00 tr | M6 · 0,13 tr | M6 · 0,00 tr | M5 · 2,29 tr | M4 · 0,92 tr | M2 · 7,15 tr | M1 · 2,61 tr |
+| B | M3 · 9,65 tr | M6 · 0,00 tr | M6 · 0,13 tr | M6 · 0,00 tr | M5 · 2,77 tr | M4 · 0,92 tr | M2 · 9,60 tr | M1 · 5,25 tr |
+| C | M3 · 9,58 tr | M6 · 0,00 tr | M6 · 0,30 tr | M6 · 0,00 tr | M5 · 0,64 tr | M4 · 0,92 tr | M2 · 9,96 tr | M1 · 6,34 tr |
 
 **150 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
 |---|---|---|---|---|---|---|---|---|
-| A | N3 · 5,54 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,81 tr | N4 · 0,57 tr | N1 · 9,37 tr | N2 · 4,02 tr |
-| B | N3 · 8,83 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,20 tr | N4 · 0,57 tr | N1 · 11,14 tr | N2 · 6,82 tr |
-| C | N3 · 8,95 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,37 tr | N4 · 0,57 tr | N1 · 11,88 tr | N2 · 7,95 tr |
+| A | N3 · 5,54 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,00 tr | N5 · 0,81 tr | N4 · 0,57 tr | N1 · 9,37 tr | N2 · 4,02 tr |
+| B | N3 · 8,83 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,20 tr | N4 · 0,57 tr | N1 · 11,14 tr | N2 · 6,82 tr |
+| C | N3 · 8,95 tr | N6 · 0,00 tr | N6 · 0,00 tr | N6 · 0,00 tr | N5 · 0,37 tr | N4 · 0,57 tr | N1 · 11,88 tr | N2 · 7,95 tr |
 
 Điều đáng chú ý:
 
 - **Các cách chơi có nghỉ đi đủ năm chương:** lắng nghe K3 → L3 → M3 → N3, để má chọn K2 → L1 → M2 → N1, một mình L2 → M1 → N2. Ít việc thì thiếu tiền ở mọi chương (K4, L4, M4, N4).
 - **Sinh hoạt từ chương 2 bỏ tiền ăn của An:** "Sinh hoạt cả nhà" chương 2–5 giờ là 110.000đ/ngày (má đi: 90.000đ). Trước là 140.000đ (120.000đ), trùng với tiền ăn An tự trả từ khi có hệ đói/no.
-- **Không nghỉ thì bị chặn việc:** ba cách chơi không nghỉ bị Tâm trạng chạm đáy chặn đi làm trước khi Mệt kịp lên cao. Vì thế chúng cạn tiền từ chương 2, và kết kiệt sức E6, K6, L6, M6 không còn xuất hiện (N6 còn). Máy không biết nghỉ cho lại sức như người thật, nên phần 0đ chủ yếu do cách chơi của máy; việc không còn kết kiệt sức là thay đổi thật trong luật.
+- **Kiệt sức có hai đường:** Mệt cao nhiều ngày, hoặc nhiều ngày gục vì Tâm trạng chạm đáy mà không nghỉ (`burnoutDays` trong `config.json` → `endings`). Ba cách chơi không nghỉ lại ra kết kiệt sức (E6, K6, L6, M6, N6) như thiết kế gốc; chương 3, 4, 5 mỗi chương đủ sáu kết.
 - **Lệnh xem kỹ một lượt:** `... -s res://tests/sim.gd -- trace A 1 3 why` in thu, chi từng chương theo khoản và lý do mỗi việc không làm được.
 
 <details><summary>Bảng cũ (trước 1.14, mở đầu 1,2 triệu tiền mặt)</summary>

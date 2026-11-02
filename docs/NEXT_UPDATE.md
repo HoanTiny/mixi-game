@@ -4,11 +4,7 @@ Chơi thử 1.17 bằng người chơi máy đủ 30 ngày ba tuyến A, B, C, c
 
 Ưu tiên tiếp theo:
 
-1. **Kết kiệt sức không còn đạt được.** Từ khi có Tâm trạng (chạm đáy thì không đi làm được), làm không nghỉ bị chặn trước khi Mệt đủ cao. Mô phỏng không còn lượt nào ra E6, K6, L6, M6; chỉ N6 còn. Cần chọn một trong hai:
-   - tính những ngày Tâm trạng chạm đáy vào điều kiện kiệt sức;
-   - hoặc chấp nhận kiệt sức giờ thể hiện bằng Tâm trạng và sửa điều kiện các kết đó.
-
-   Phần chuyển tiếp tiền chương 1 → 2–5 cho các cách chơi có nghỉ đã cân ở 1.18 (sinh hoạt chương 2–5 bỏ tiền ăn của An).
+1. **Đã xong:** kết kiệt sức tính cả những ngày gục vì Tâm trạng chạm đáy (`exhausted()` trong `game_logic.gd`, `burnoutDays`). Sinh hoạt chương 2–5 bỏ tiền ăn của An.
 2. **Chơi thử bằng người thật từ ngày 1 đến ngày 7.** Lượt máy đi bộ, làm việc, nói chuyện như người chơi bấm, nhưng không thay được cảm nhận. Ghi:
    - thời gian tới mục tiêu;
    - chỗ phải mở bản đồ;

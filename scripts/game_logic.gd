@@ -1840,6 +1840,11 @@ func finish_day() -> void:
 		s["warn_days"] = int(s.warn_days) + 1
 		if not s.today.get("rested", false):
 			s["rest_skips"] = int(s.rest_skips) + 1
+	if s.today.get("burnout", false):
+		# Gục vì Tâm trạng chạm đáy: đếm riêng (không cộng vào ngày cảnh báo Mệt), cùng số ngày gục mà không nghỉ.
+		s["burnout_days"] = int(s.get("burnout_days", 0)) + 1
+		if not s.today.get("rested", false):
+			s["burnout_skips"] = int(s.get("burnout_skips", 0)) + 1
 	add_fatigue(float(cfg.fatigue.sleep) + hours_left() * float(cfg.fatigue.freeHour))
 
 	# Khoản phải thu đến hạn. Đợt nghiệm thu chỉ về khi đủ tiến độ.
@@ -1961,6 +1966,8 @@ func start_chapter2() -> void:
 	s["used"] = 0.0
 	s["warn_days"] = 0
 	s["rest_skips"] = 0
+	s["burnout_days"] = 0
+	s["burnout_skips"] = 0
 	s.erase("fatigue_end")
 	s["yesterday"] = s.today
 	s["today"] = {"list": []}
@@ -2004,6 +2011,8 @@ func start_chapter3() -> void:
 	s["used"] = 0.0
 	s["warn_days"] = 0
 	s["rest_skips"] = 0
+	s["burnout_days"] = 0
+	s["burnout_skips"] = 0
 	s.erase("fatigue_end")
 	s["yesterday"] = s.today
 	s["today"] = {"list": []}
@@ -2057,8 +2066,7 @@ func _end_chapter_n(n: int) -> void:
 func ending3_key() -> String:
 	var f: Dictionary = s.flags
 	var e: Dictionary = cfg.endings
-	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
-			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+	if exhausted():
 		return "L6"
 	var exposed: bool = (f.get("linhBietGiau", false) and not f.get("suaGiauLinh", false)) \
 		or (f.get("luaBietGiau", false) and not f.get("suaGiauLua", false))
@@ -2133,6 +2141,8 @@ func start_next_chapter(n: int) -> void:
 	s["used"] = 0.0
 	s["warn_days"] = 0
 	s["rest_skips"] = 0
+	s["burnout_days"] = 0
+	s["burnout_skips"] = 0
 	s.erase("fatigue_end")
 	s["yesterday"] = s.today
 	s["today"] = {"list": []}
@@ -2187,8 +2197,7 @@ func tiem_partners() -> int:
 func ending4_key() -> String:
 	var f: Dictionary = s.flags
 	var e: Dictionary = cfg.endings
-	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
-			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+	if exhausted():
 		return "M6"
 	var decided_for: bool = (f.get("quyetThayTin", false) and not f.get("rutLaiTin", false)) \
 		or (f.get("cheLoiLinh", false) and not f.get("suaCheLoi", false))
@@ -2224,8 +2233,7 @@ func _moving_next_month() -> bool:
 func ending5_key() -> String:
 	var f: Dictionary = s.flags
 	var e: Dictionary = cfg.endings
-	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
-			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+	if exhausted():
 		return "N6"
 	if f.get("gongLung", false) and not f.get("khamLung", false):
 		return "N6"
@@ -2257,13 +2265,23 @@ func _end_chapter2() -> void:
 	add_log("Kết chương 2: " + str(story2.endings[key].title), "event")
 
 
+## Kiệt sức (E6, K6, L6, M6, N6): làm quá sức nhiều ngày mà bỏ nghỉ. Hai đường: Mệt ở mức cảnh báo nhiều ngày và cuối
+## chương còn Mệt cao; hoặc nhiều ngày gục vì Tâm trạng chạm đáy (Trầm cảm chặn đi làm trước khi Mệt kịp lên).
+func exhausted() -> bool:
+	var e: Dictionary = cfg.endings
+	var tired: bool = int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
+		and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue)
+	var burnt: bool = int(s.get("burnout_days", 0)) >= int(e.get("burnoutDays", 6)) \
+		and int(s.get("burnout_skips", 0)) >= int(e.exhaustSkips)
+	return tired or burnt
+
+
 ## Thứ tự xét K6 → K5 → K4 → K3 → K2 → K1 (cfg.endings dùng chung ngưỡng Mệt với chương 1).
 ## K5 đi theo quyết định của má ở ngày 58 (ma_decides đã tính chuyện giấu, ép người nhà).
 func ending2_key() -> String:
 	var f: Dictionary = s.flags
 	var e: Dictionary = cfg.endings
-	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
-			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+	if exhausted():
 		return "K6"
 	if f.get("maDiIm", false):
 		return "K5"
@@ -2308,8 +2326,7 @@ func ending_key() -> String:
 	var e: Dictionary = cfg.endings
 	if f.get("falseCompletion", false) and not f.get("suaSai", false):
 		return "E8"
-	if int(s.warn_days) >= int(e.exhaustWarnDays) and int(s.rest_skips) >= int(e.exhaustSkips) \
-			and float(s.get("fatigue_end", s.fatigue)) >= float(e.exhaustFatigue):
+	if exhausted():
 		return "E6"
 	if not has_long_home():
 		return "E7"

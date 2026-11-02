@@ -188,7 +188,7 @@
     "toolsId": "do_nghe_sau_3",
     "toolsLabel": "Đợt cuối tiền đồ nghề trả chú Sơn"
   },
-  "endings": { "exhaustWarnDays": 4, "exhaustSkips": 3, "exhaustFatigue": 60, "distantMarks": 3, "ownTableCash": 600000 },
+  "endings": { "exhaustWarnDays": 4, "exhaustSkips": 3, "exhaustFatigue": 60, "burnoutDays": 6, "distantMarks": 3, "ownTableCash": 600000 },
   "full": {
     "name": "Ba mươi ngày trước mùa mưa",
     "cash": 1200000, "fatigue": 20, "progress": 0, "progressNeed": 0, "linhWish": "xa",

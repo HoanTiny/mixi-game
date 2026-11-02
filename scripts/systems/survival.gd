@@ -91,6 +91,10 @@ static func update(g) -> void:
 			add(g, id, 0.0, "need")
 		elif has(g, id) and str(conds(g)[id].get("src", "")) == "need" and v >= float(d.get("release", d.below)):
 			clear(g, id)
+		# Ngày từng chạm đáy Tâm trạng tính như một ngày kiệt sức (game_logic.exhausted): làm không nghỉ giờ
+		# thường gục vì tinh thần trước khi Mệt kịp lên cao.
+		if has(g, id) and d.get("blocks", []).has("work") and str(d.need) == "mood" and g.s.has("today"):
+			g.s.today["burnout"] = true
 
 
 ## Tổng một hiệu ứng (mods) của các trạng thái đang có.
