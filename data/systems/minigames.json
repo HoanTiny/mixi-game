@@ -467,6 +467,203 @@
           "when": "xả ga, nạp thiếu"
         }
       ]
+    },
+    "giai_the_co": {
+      "type": "leisure",
+      "view": "xiangqi",
+      "action": {
+        "id": "giai_the_co",
+        "location": "ho_guom",
+        "name": "Giải thế cờ tàn với các cụ ven hồ",
+        "window": [
+          7,
+          18
+        ],
+        "perDay": 2,
+        "note": "Một nước chiếu bí; các cụ chấm"
+      },
+      "hours": 1,
+      "cost": 0,
+      "require": {},
+      "params": {
+        "puzzles": 3,
+        "seconds": 60,
+        "tries": 2,
+        "defenders": 1
+      },
+      "scaling": {
+        "seconds": {
+          "mg.time": 1.0,
+          "stat.int": 0.1
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.66,
+          "win": true,
+          "label": "Các cụ gật gù",
+          "effects": {
+            "need.mood": 10
+          },
+          "xp": {
+            "int": 8,
+            "per": 8
+          },
+          "when": "giải từ 2 thế"
+        },
+        {
+          "atLeast": 0.33,
+          "win": true,
+          "label": "Giải được một thế",
+          "effects": {
+            "need.mood": 6
+          },
+          "xp": {
+            "int": 5,
+            "per": 5
+          },
+          "when": "giải 1 thế"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Bí nước",
+          "effects": {
+            "need.mood": 2
+          },
+          "xp": {
+            "int": 3
+          },
+          "when": "chưa giải thế nào"
+        }
+      ]
+    },
+    "karaoke": {
+      "type": "leisure",
+      "view": "karaoke",
+      "action": {
+        "id": "karaoke",
+        "location": "quan_bia",
+        "name": "Hát karaoke một giờ ở phố Tạ Hiện",
+        "window": [
+          18,
+          24
+        ],
+        "perDay": 1,
+        "note": "Đắt, nhưng xả hết buồn bực"
+      },
+      "hours": 1.5,
+      "cost": 60000,
+      "require": {},
+      "params": {
+        "seconds": 40,
+        "bpm": 96,
+        "window": 0.18,
+        "speed": 0.28
+      },
+      "scaling": {
+        "window": {
+          "stat.agi": 0.06
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.75,
+          "win": true,
+          "label": "Cả quán vỗ tay",
+          "effects": {
+            "need.mood": 40,
+            "cond_clear.tram_cam": true
+          },
+          "xp": {
+            "agi": 3
+          },
+          "when": "trúng từ 3/4 nốt"
+        },
+        {
+          "atLeast": 0.4,
+          "win": true,
+          "label": "Hát cũng được",
+          "effects": {
+            "need.mood": 30,
+            "cond_clear.tram_cam": true
+          },
+          "xp": {
+            "agi": 2
+          },
+          "when": "trúng từ 40% nốt"
+        },
+        {
+          "atLeast": 0.0,
+          "win": true,
+          "label": "Lạc giọng mà vui",
+          "effects": {
+            "need.mood": 22,
+            "cond_clear.tram_cam": true
+          },
+          "xp": {},
+          "when": "dưới 40% nốt"
+        }
+      ]
+    },
+    "gap_thu": {
+      "type": "leisure",
+      "view": "claw",
+      "action": {
+        "id": "gap_thu",
+        "location": "quan_net",
+        "name": "Chơi máy gắp thú ở cửa quán net",
+        "window": [
+          8,
+          23
+        ],
+        "perDay": 3,
+        "note": "20.000đ năm lượt; gấu bông làm quà được"
+      },
+      "hours": 0.5,
+      "cost": 20000,
+      "require": {},
+      "params": {
+        "tries": 5,
+        "sweep": 0.35,
+        "grip": 0.55,
+        "reach": 0.06
+      },
+      "scaling": {
+        "reach": {
+          "stat.agi": 0.08
+        },
+        "sweep": {
+          "stat.agi": -0.05
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 1.0,
+          "win": true,
+          "label": "Gắp được gấu bông",
+          "effects": {
+            "need.mood": 15,
+            "item.gau_bong": 1
+          },
+          "xp": {
+            "agi": 3
+          },
+          "when": "gắp được ít nhất một con"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Tuột cả",
+          "effects": {
+            "need.mood": -2
+          },
+          "xp": {
+            "agi": 1
+          },
+          "when": "không gắp được con nào"
+        }
+      ]
     }
   }
 }
