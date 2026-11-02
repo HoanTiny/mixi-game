@@ -114,9 +114,9 @@ func _ready() -> void:
 	column.add_child(UI.label("Chuột trái: kéo / siết vít · Chuột phải: xoay góc nhìn · Lăn chuột: phóng · Esc: rời bàn",13,UI.HUD_SOFT))
 	_build_scene()
 	_foley=AudioStreamPlayer.new(); add_child(_foley); _foley.volume_db=-19
-	_foley.stream=load("res://assets/sounds/neighborhood/screw.wav")
+	_foley.stream=load("res://assets/sounds/neighborhood/screw.ogg")
 	_hum=AudioStreamPlayer.new(); add_child(_hum); _hum.volume_db=-28
-	_hum.stream=preload("res://scripts/world/audio.gd")._load("res://assets/sounds/neighborhood/fan.wav",true)
+	_hum.stream=preload("res://scripts/world/audio.gd")._load("res://assets/sounds/neighborhood/fan.ogg",true)
 	game.changed.connect(refresh)
 	refresh()
 	popup_centered()

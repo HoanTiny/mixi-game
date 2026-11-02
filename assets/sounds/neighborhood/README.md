@@ -1,13 +1,13 @@
 # Neighborhood foley
 
-Original procedural effects synthesized by `tools/gen_neighborhood_foley.py`.
-No external recordings, voice cloning, speech or music. 22.05 kHz mono PCM.
+Original procedural effects synthesized by `tools/gen_sounds.py` (ogg, 22.05 kHz mono).
+No external recordings, voice cloning, speech or music. Sources for all sounds: `../NGUON.md`.
 
-- fan.wav: periodic motor/air loop, workbench and workshop
-- screw.wav: short tool/metal contact, action feedback
-- dishes.wav: damped ceramic resonances, restaurant during meals
-- sweep.wav: broom friction, courtyard cleaning hours
-- scooter_pass.wav: engine pass, existing nearby traffic positions
+- fan.ogg: quạt cây loop (motor hum, three-blade air), workbench and workshop
+- screw.ogg: ratchet screwdriver clicks and a small metal knock, action feedback
+- dishes.ogg: porcelain bowls, chopsticks and spoons, restaurant during meals
+- sweep.ogg: two strokes of a straw broom, courtyard cleaning hours
+- scooter_pass.ogg: 110cc step-through passing with Doppler, existing nearby traffic positions
 
 World emitters fade outside opening hours and have bounded audible distances.
 The HUD music-note button mutes/unmutes the Master bus, including these effects.

@@ -388,11 +388,11 @@ func _point_at(pts: PackedVector2Array, s: float) -> Vector2:
 	return pts[pts.size() - 1]
 
 
-## Chỗ xe bán rong đang ở (null nếu chưa tới giờ ra phố), để phát tiếng rao từ xe.
-func vendor_pos(id: String):
+## Người bán rong đang ra phố (null nếu chưa tới giờ), để tiếng rao gắn vào và đi theo họ.
+func vendor_node(id: String) -> Node3D:
 	for v in vendors:
 		if str(v.id) == id and (v.node as Node3D).visible:
-			return (v.node as Node3D).position
+			return v.node
 	return null
 
 

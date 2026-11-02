@@ -10,7 +10,7 @@ func setup(w) -> void:
 	world=w
 	for spec in [["tiem_sau","fan",-25.0,0.0],["tiem_sau","screw",-17.0,7.0],["com_hanh","dishes",-17.0,4.5],["xom_bo_me","sweep",-24.0,3.0]]:
 		var p := AudioStreamPlayer3D.new()
-		p.stream=Audio._load(ROOT+str(spec[1])+".wav",spec[1]=="fan")
+		p.stream=Audio._load(ROOT+str(spec[1])+".ogg",spec[1]=="fan")
 		p.unit_size=3.0; p.max_distance=15.0; p.volume_db=-60
 		add_child(p); p.global_position=world.loc_point(spec[0],.6,-1.2)+Vector3.UP
 		sources.append({"player":p,"loc":spec[0],"kind":spec[1],"db":float(spec[2]),"every":float(spec[3]),"wait":float(spec[3])})
@@ -37,4 +37,4 @@ func _process(delta: float) -> void:
 	if pass_wait<=0:
 		pass_wait=randf_range(12,22)
 		var spot=world.horn_spot() if hour>=6 and hour<21 else null
-		if spot!=null: world.audio._play_at(Audio._load(ROOT+"scooter_pass.wav",false),spot,-23)
+		if spot!=null: world.audio._play_at(Audio._load(ROOT+"scooter_pass.ogg",false),spot,-23)
