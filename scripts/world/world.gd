@@ -3100,6 +3100,7 @@ func _update_lighting(hour: float) -> void:
 	var on := hour >= (16.0 if rain else 18.0)
 	if post_fx != null:
 		post_fx.set_night(nf)
+		post_fx.set_gloom(game.Hardship.gloom(game))
 	for h in lamp_halos:
 		h.visible = on
 		h.modulate.a = clampf(nf * 1.4, 0.35, 1.0)

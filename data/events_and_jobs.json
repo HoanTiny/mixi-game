@@ -264,6 +264,128 @@
         },
         "unlock_confession_quest": true
       }
+    },
+    {
+      "day": 8,
+      "until_day": 13,
+      "event_id": "trap_cai_quyt",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        7,
+        17
+      ],
+      "title": "Cai thầu rủ đổ móng",
+      "description": "Anh cai tên Lực đứng ở bãi bốc vác, rủ làm ba ngày đổ móng nhà ở Ngọc Thụy, 600.000đ trả một lần cuối đợt. \"Anh em cả, giấy tờ làm gì cho mệt.\" Mấy người đứng cạnh nhìn nhau, không ai nói gì.",
+      "choices": [
+        {
+          "text": "Đòi ứng trước một nửa, ghi giấy có người làm chứng (cần Nhạy bén 2)",
+          "condition": {
+            "perception": 2
+          },
+          "outcome": {
+            "money": 300,
+            "perception_exp": 15,
+            "mood": 4
+          }
+        },
+        {
+          "text": "Nhận lời, tin lời hứa trả cuối đợt",
+          "outcome": {
+            "money": -40,
+            "mood": -18,
+            "shock": 6,
+            "perception_exp": 8,
+            "unlock_feature": "biCaiQuyt"
+          }
+        },
+        {
+          "text": "Từ chối: việc không giấy tờ thì thôi",
+          "outcome": {
+            "mood": -2
+          }
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "until_day": 19,
+      "event_id": "trap_co_viec",
+      "trigger_zone": "Zone3_IndustrialAndLogistics",
+      "trigger_hour_range": [
+        6,
+        20
+      ],
+      "title": "Cò việc ở bến xe",
+      "description": "Một chị đeo thẻ \"tuyển dụng\" ở bến xe chìa tờ rơi: bảo vệ tòa nhà, 9 triệu một tháng, bao ăn ở. \"Em nộp 300 nghìn phí hồ sơ hôm nay là mai đi làm luôn.\"",
+      "choices": [
+        {
+          "text": "Hỏi tên công ty, gọi thử số tổng đài in trên tờ rơi (cần Nhạy bén 2)",
+          "condition": {
+            "perception": 2
+          },
+          "outcome": {
+            "perception_exp": 15,
+            "mood": 3
+          }
+        },
+        {
+          "text": "Nộp 300.000đ phí hồ sơ",
+          "outcome": {
+            "money": -300,
+            "mood": -20,
+            "shock": 8,
+            "perception_exp": 10,
+            "unlock_feature": "biCoLua"
+          }
+        },
+        {
+          "text": "Cầm tờ rơi, bảo để về hỏi nhà đã",
+          "outcome": {
+            "mood": -1
+          }
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "until_day": 26,
+      "event_id": "trap_no_hu",
+      "trigger_zone": "Zone2_ParkAndEntertainment",
+      "trigger_hour_range": [
+        18,
+        23
+      ],
+      "title": "Máy \"nổ hũ\" ở quán net",
+      "description": "Góc trong cùng quán net có ba máy chơi \"nổ hũ\", đèn nhấp nháy. Thằng bé trông quán nạp hộ An 20 nghìn chơi thử: ván đầu ăn ngay 100 nghìn. \"Đang hên đấy anh, đánh tiếp đi.\"",
+      "choices": [
+        {
+          "text": "Nhận ra máy chỉnh tỷ lệ cho thắng ván đầu, rút tiền rồi đi (cần Nhạy bén 3)",
+          "condition": {
+            "perception": 3
+          },
+          "outcome": {
+            "money": 80,
+            "perception_exp": 20,
+            "mood": 5
+          }
+        },
+        {
+          "text": "Đánh tiếp vài ván cho \"gỡ\" thêm",
+          "outcome": {
+            "money": -400,
+            "mood": -25,
+            "shock": 10,
+            "unlock_feature": "biNoHu"
+          }
+        },
+        {
+          "text": "Lấy 100 nghìn rồi về luôn",
+          "outcome": {
+            "money": 80,
+            "mood": 2
+          }
+        }
+      ]
     }
   ]
 }

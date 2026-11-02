@@ -191,8 +191,23 @@ static func check(g, k: String, v) -> Variant:
 
 ## Khóa hiệu ứng: "rent_pay": true trả tiền trọ đêm nay. true nếu đã xử lý.
 static func effect(g, k: String, v) -> bool:
+	if k == "shock":
+		# Bị lừa, bị quỵt: v giờ màn hình ngả xám u uất rồi nhạt dần (world.gd → post_fx gloom). Mọi chương.
+		g.s["shock_until"] = maxf(float(g.s.get("shock_until", 0.0)), g.now_abs() + float(v))
+		g.s["shock_hours"] = float(v)
+		return true
 	if k == "rent_pay":
 		if bool(v) and on(g) and not paid(g):
 			g.s.today["rent_paid"] = true
 		return true
 	return false
+
+
+## Độ u ám màn hình 0..1: Tâm trạng dưới 30 ngả xám dần; vừa bị lừa, bị quỵt thì xám hẳn rồi nhạt theo giờ game.
+static func gloom(g) -> float:
+	if not g.is_started() or not g.has_needs():
+		return 0.0
+	var low: float = clampf((30.0 - float(g.need("mood"))) / 30.0, 0.0, 1.0) * 0.55
+	var left: float = float(g.s.get("shock_until", 0.0)) - float(g.now_abs())
+	var shock: float = clampf(left / maxf(0.1, float(g.s.get("shock_hours", 1.0))), 0.0, 1.0) if left > 0.0 else 0.0
+	return clampf(low + shock * 0.9, 0.0, 1.0)

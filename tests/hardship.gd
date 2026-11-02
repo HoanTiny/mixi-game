@@ -111,6 +111,32 @@ func _init() -> void:
 	_ok(gb.exhausted(), "đủ ngày gục mà bỏ nghỉ: tính là kiệt sức (E6/K6/L6/M6/N6)")
 	gb.s["burnout_skips"] = 0
 	_ok(not gb.exhausted(), "gục mà có nghỉ: chưa tính kiệt sức")
+	# Màn hình ngả xám: bị lừa thì xám hẳn rồi nhạt dần; Tâm trạng thấp thì xám vừa.
+	var gx := _new()
+	gx.need_adj("mood", 100.0)
+	_ok(Hardship.gloom(gx) < 0.05, "Tâm trạng tốt: màn hình không xám")
+	gx.apply_effects({"shock": 4})
+	_ok(Hardship.gloom(gx) > 0.8, "vừa bị lừa: màn hình xám hẳn (%.2f)" % Hardship.gloom(gx))
+	gx.walk(5.0)
+	gx.need_adj("mood", 100.0)
+	_ok(Hardship.gloom(gx) < 0.05, "qua 5 giờ: hết xám")
+	gx.need_adj("mood", -200.0)
+	_ok(Hardship.gloom(gx) > 0.4 and Hardship.gloom(gx) < 0.7, "Tâm trạng chạm đáy: xám vừa (%.2f)" % Hardship.gloom(gx))
+	# Cạm bẫy: chờ trong khoảng ngày; chọn tin lời thì mất tiền, màn hình xám hẳn.
+	var gt2 := _new()
+	gt2.s["day"] = 10
+	gt2.s["used"] = 9.0 - float(gt2.cfg.dayStart)
+	gt2.s["queue"] = []
+	_ok(gt2.EventScheduler.enter_zone(gt2, "Zone3_IndustrialAndLogistics") and str(gt2.current_event().get("id", "")) == "scheduler:trap_cai_quyt", "ngày 10 vẫn gặp cai thầu (chờ tới ngày 13)")
+	gt2.need_adj("mood", 100.0)
+	gt2.s["cash"] = 100000
+	gt2.resolve_choice(1)
+	_ok(int(gt2.s.cash) == 60000 and Hardship.gloom(gt2) > 0.8 and gt2.s.flags.get("biCaiQuyt", false), "tin lời cai thầu: mất 40k tiền xe, màn hình xám, ghi cờ bị quỵt")
+	var gt3 := _new()
+	gt3.s["day"] = 20
+	gt3.s["used"] = 9.0 - float(gt3.cfg.dayStart)
+	gt3.s["queue"] = []
+	_ok(not gt3.EventScheduler.enter_zone(gt3, "Zone3_IndustrialAndLogistics") or str(gt3.current_event().get("id", "")) != "scheduler:trap_cai_quyt", "quá ngày 13 thì không còn gặp cai thầu")
 	# Tổng kết ngày.
 	var gs := _new()
 	gs.s["used"] = 13.0 - float(gs.cfg.dayStart)
