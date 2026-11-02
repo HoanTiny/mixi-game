@@ -1,3 +1,7 @@
+## Bản 1.20
+
+Âm thanh phố cổ làm lại: tiếng nền phố ngày, phố tối, loa phường (6–7h), ếch nhái, mưa là bản thu thật ở Hà Nội trên Freesound (CC0, CC BY 4.0; ghi công trong màn Giới thiệu, nguồn ở `assets/sounds/NGUON.md`). Tiếng động tổng hợp lại theo vật thật (dép trên vỉa hè, bước ướt khi mưa, tiền polymer, chuông xe đạp, bát đũa), cân lại độ to, bỏ còi rời. Tiếng rao chưa có bản thu nên chỉ hiện chữ trên đầu người bán. Kiểm bằng `tests/street_sounds.gd`. Web 1.20 giữ gói Windows 1.13.
+
 ## Bản 1.19
 
 Làm theo đối chiếu tài liệu Nobody:

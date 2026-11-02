@@ -7,7 +7,7 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const SETTINGS := "user://settings.json"
-const VERSION := "Bản 1.19 · cờ thế, karaoke, cạm bẫy, chú Thìn"
+const VERSION := "Bản 1.20 · tiếng phố thu thật ở Hà Nội, tiếng động mới"
 const BRUSH := preload("res://assets/fonts/SedgwickAveDisplay-Regular.ttf")
 const HAND := preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CREAM := Color("ece3d3")
@@ -673,7 +673,7 @@ func _open_settings() -> void:
 func _open_about() -> void:
 	var v := _modal_panel("Giới thiệu", 620.0)
 	v.add_child(_modal_text("Trên Phố là game mô phỏng đời sống ở phố cổ Hà Nội. Truyện chính Trước mùa mưa: An, 27 tuổi, vừa mất việc ở tiệm điện máy, cả nhà còn ba mươi ngày để dọn khỏi xóm trọ Phúc Tân ngoài đê sông Hồng trước mùa mưa. Kiếm tiền bằng các việc làm có thật ngoài phố, lo ăn ngủ tắm giặt, nói chuyện với hàng xóm, và chọn: lo một mình, hay để người khác cùng lo.", 16))
-	v.add_child(_modal_text("Phố dựng theo phố cổ Hà Nội (tên phố thật, bố cục giản lược); bản đồ thật ven kênh Tàu Hủ từ OpenStreetMap, Open Buildings. Người: Microsoft Rocketbox (MIT). Đồ vật, vật liệu: Poly Haven (CC0). Chữ: Sedgwick Ave Display, Patrick Hand (SIL OFL). Làm bằng Godot.", 14))
+	v.add_child(_modal_text("Phố dựng theo phố cổ Hà Nội (tên phố thật, bố cục giản lược); bản đồ thật ven kênh Tàu Hủ từ OpenStreetMap, Open Buildings. Người: Microsoft Rocketbox (MIT). Đồ vật, vật liệu: Poly Haven (CC0). Chữ: Sedgwick Ave Display, Patrick Hand (SIL OFL). Tiếng phố thu ở Hà Nội, freesound.org: _Evile, bamboopurrs (CC0); aUREa, LG, Veridiansunrise (CC BY 4.0, đã cắt và chỉnh). Làm bằng Godot.", 14))
 	var close := _dark_button("Đóng", _close_modal)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(close)
