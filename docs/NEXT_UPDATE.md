@@ -4,14 +4,11 @@ Chơi thử 1.17 bằng người chơi máy đủ 30 ngày ba tuyến A, B, C, c
 
 Ưu tiên tiếp theo:
 
-1. **Cân lại chuyển tiếp chương 1 → 2–5.** Bị lệch từ khi ví mở đầu còn 46.000đ (1.14); bảng đầy đủ ở README → "Chỉnh cân bằng". Theo `tests/sim.gd`:
-   - Ba cách chơi không nghỉ (giữ tiếp, áp đặt, gồng) hết chương 1 ở tạm nhà dì Nga. Từ chương 2 cuối chương nào cũng 0đ, ra K5, L4/L5, M4, N4/N6.
-   - Chương 3: 14/24 lượt ra L4 (1.17: 9/24). Kết L2 không còn.
+1. **Kết kiệt sức không còn đạt được.** Từ khi có Tâm trạng (chạm đáy thì không đi làm được), làm không nghỉ bị chặn trước khi Mệt đủ cao. Mô phỏng không còn lượt nào ra E6, K6, L6, M6; chỉ N6 còn. Cần chọn một trong hai:
+   - tính những ngày Tâm trạng chạm đáy vào điều kiện kiệt sức;
+   - hoặc chấp nhận kiệt sức giờ thể hiện bằng Tâm trạng và sửa điều kiện các kết đó.
 
-   Hướng sửa có thể:
-   - khoản đầu chương 2 cho người ở tạm (tiền dì Nga cho mượn, việc của má);
-   - giảm tiền nhà và cọc tiệm chương 2–3 cho người ở tạm;
-   - hoặc xét lại L4 để không bắt cả những người có nghỉ.
+   Phần chuyển tiếp tiền chương 1 → 2–5 cho các cách chơi có nghỉ đã cân ở 1.18 (sinh hoạt chương 2–5 bỏ tiền ăn của An).
 2. **Chơi thử bằng người thật từ ngày 1 đến ngày 7.** Lượt máy đi bộ, làm việc, nói chuyện như người chơi bấm, nhưng không thay được cảm nhận. Ghi:
    - thời gian tới mục tiêu;
    - chỗ phải mở bản đồ;

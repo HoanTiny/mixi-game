@@ -15,7 +15,8 @@
 >   - ngày 1 vẫn 46k sau một ca, trả trọ và góp sinh hoạt;
 >   - tuần đầu dưới 500k, tới ngày 16 dưới 650k (tuyến A);
 >   - ngày 30: A còn 806k (E1), B còn 38k (E2), C còn 687k (E3).
-> - **Chưa cân:** chuyển tiếp sang chương 2–5. Cách chơi không nghỉ ở tạm nhà dì Nga rồi cạn tiền từ chương 2; chương 3 lệch về L4. Xem README → "Chỉnh cân bằng" và [NEXT_UPDATE.md](NEXT_UPDATE.md).
+> - **Chương 2–5:** "Sinh hoạt cả nhà" bỏ phần ăn của An (140k → 110k/ngày, má đi 120k → 90k), vì An đã tự trả từng bữa. Các cách chơi có nghỉ đi đủ năm chương; bảng ở README → "Chỉnh cân bằng".
+> - **Chưa quyết:** ba cách chơi không nghỉ bị "Tâm trạng chạm đáy" chặn đi làm trước khi Mệt lên cao. Vì thế kết kiệt sức E6, K6, L6, M6 không còn đạt được trong mô phỏng. Xem [NEXT_UPDATE.md](NEXT_UPDATE.md).
 >
 > Cập nhật Phúc Tân: mở đầu mới có **46.000đ trong ví + 1.400.000đ quỹ cọc khóa**. Quỹ chỉ thanh toán phần cọc nhà; không mua đồ, trả trọ hay bù chi phí sinh hoạt. Vì đã có sẵn phần lớn tiền cọc, mốc 20–30 ngày bên dưới chỉ còn là benchmark cũ bắt đầu với 180k và không có quỹ. Không áp mốc đó cho mở đầu mới. Trả trọ thủ công 60k sẽ bỏ khoản trọ tự thu của đúng đêm đó; hệ hardship hiện ghi số đêm nợ; cơ chế thu nợ tiền của Economy là nhánh riêng, chưa thống nhất. Save ngày 1 chưa tách quỹ có tiền mặt ≥1,4 triệu được chuyển 1,4 triệu sang quỹ một lần, giữ nguyên tổng tài sản. Save khác giữ nguyên tiền.
 

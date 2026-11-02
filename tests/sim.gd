@@ -35,9 +35,14 @@ const POLICIES := {
 }
 
 
+var _why := false
+
+
 func _init() -> void:
 	# -- trace <tuyến> <cách chơi 0..6>: in các lựa chọn và sổ tay chương 2 của một lượt chơi.
 	var args := OS.get_cmdline_user_args()
+	# Thêm "why" ở cuối lệnh trace: in lý do mỗi việc trong kế hoạch không làm được.
+	_why = args.has("why")
 	if args.size() >= 3 and args[0] == "trace":
 		_trace(str(args[1]), int(args[2]), int(args[3]) if args.size() >= 4 else 2)
 		quit()
@@ -284,6 +289,10 @@ func _days(g, route: String, pick: int) -> int:
 					missed += _scene(g, sid, route, pick)
 				late = []
 			_care(g)
+			if _why and not g.get_action(id).is_empty():
+				var st: Dictionary = g.action_status(g.get_action(id))
+				if not st.ok:
+					print("  ngày %d %s %s: %s (tiền %s, no %d)" % [g.day(), GameLogic.hh(g.clock()), id, st.reason, GameLogic.fmt_money(int(g.s.cash)), int(g.need("fed")) if g.has_needs() else -1])
 			if g.get_action(id).has("minigame"):
 				g.do_action(id, {"ratio": 1.0, "bonus": 0})
 			else:
@@ -537,4 +546,29 @@ func _trace(route: String, pick: int, chapter := 2) -> void:
 			if g.s.flags[k]:
 				fl.append(k)
 		print("  cờ: ", ", ".join(fl))
+	for c in range(1, chapter + 1):
+		_ledger(g, 30 * (c - 1) + 1, 30 * c)
+
+
+## Thu, chi trong một khoảng ngày gộp theo khoản (đọc nhật ký "+x · lý do"), để biết chương nào hụt tiền vì đâu.
+func _ledger(g, from: int, to: int) -> void:
+	var sums := {"plus": {}, "minus": {}}
+	var digits := RegEx.create_from_string("[0-9][0-9.,]*")
+	for e in g.s.log:
+		var k := str(e.get("k", ""))
+		var t := str(e.get("t", ""))
+		var cut := t.find(" · ")
+		if not sums.has(k) or cut < 0 or int(e.get("day", 0)) < from or int(e.get("day", 0)) > to:
+			continue
+		var why := digits.sub(t.substr(cut + 3), "#", true).strip_edges()
+		sums[k][why] = int(sums[k].get(why, 0)) + int(t.substr(1, cut - 1).replace(".", "").replace("đ", ""))
+	for k in ["plus", "minus"]:
+		var rows: Array = sums[k].keys()
+		rows.sort_custom(func(a, b) -> bool: return int(sums[k][a]) > int(sums[k][b]))
+		var total := 0
+		for r in rows:
+			total += int(sums[k][r])
+		print("Ngày %d–%d · %s %s:" % [from, to, "thu" if k == "plus" else "chi", GameLogic.fmt_money(total)])
+		for r in rows.slice(0, 12):
+			print("   %s  %s" % [GameLogic.fmt_money(int(sums[k][r])).lpad(12), str(r).left(70)])
 

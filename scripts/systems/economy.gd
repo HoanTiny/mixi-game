@@ -77,7 +77,7 @@ static func living_cost(g, legacy: int) -> int:
 	return int(data(g).get("familyUpkeep",60000)) if active(g) else legacy
 
 static func living_label(g) -> String:
-	return str(data(g).get("familyLabel","Góp sinh hoạt gia đình")) if active(g) else "Sinh hoạt cả nhà"
+	return str(data(g).get("familyLabel","Góp sinh hoạt gia đình")) if active(g) else "Sinh hoạt cả nhà (không gồm bữa ăn của An)"
 
 static func rent_due(g) -> int:
 	if not active(g): return 0

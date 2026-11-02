@@ -1,3 +1,7 @@
+## Bản 1.18.1
+
+"Sinh hoạt cả nhà" chương 2–5: 140.000đ → 110.000đ/ngày, má đi 120.000đ → 90.000đ, vì An tự trả từng bữa. `tests/sim.gd -- trace <tuyến> <cách chơi> <chương> why` in thu, chi theo khoản và lý do việc không làm được.
+
 ## Bản 1.18
 
 Cân lại kinh tế chương 1 sau lượt người chơi máy chơi đủ 30 ngày:

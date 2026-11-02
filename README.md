@@ -1,6 +1,8 @@
 # Trên Phố · Trước mùa mưa
 
-**Bản web 1.18 · tiền khó kiếm hơn, mục tiêu rõ hơn**
+**Bản web 1.18.1 · tiền khó kiếm hơn, mục tiêu rõ hơn**
+
+- **1.18.1:** "Sinh hoạt cả nhà" chương 2–5 bỏ phần ăn của An (110.000đ/ngày, má đi 90.000đ), vì An đã tự trả từng bữa. Các cách chơi có nghỉ giờ đi đủ năm chương mà không cạn tiền.
 
 - **Cân lại kinh tế chương 1 sau chơi thử 30 ngày:**
   - trần lương 28.000đ/giờ chỉ miễn cho việc thưởng nóng của đúng hôm đó;
@@ -501,39 +503,40 @@ Kết quả mô phỏng bản 1.18 (bỏ qua đường đi bộ; kết của t�
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn |
 |---|---|---|---|---|---|---|---|
-| A | K3 · 1,60 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K4 · 1,14 tr | K4 · 0,00 tr | K2 · 1,60 tr |
-| B | K3 · 4,19 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K6 · 0,25 tr | K4 · 0,00 tr | K2 · 4,19 tr |
-| C | K3 · 5,52 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K3 · 0,00 tr | K4 · 0,00 tr | K2 · 5,52 tr |
+| A | K3 · 2,54 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K4 · 2,09 tr | K4 · 0,53 tr | K2 · 2,54 tr |
+| B | K3 · 5,45 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K3 · 0,37 tr | K4 · 0,46 tr | K2 · 5,45 tr |
+| C | K3 · 6,20 tr | K5 · 0,00 tr | K5 · 0,00 tr | K5 · 0,00 tr | K3 · 0,70 tr | K4 · 0,34 tr | K2 · 6,20 tr |
 
 **90 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
 |---|---|---|---|---|---|---|---|---|
-| A | L4 · 0,33 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 1,21 tr | L4 · 0,00 tr | L4 · 1,83 tr | L4 · 1,15 tr |
-| B | L3 · 0,93 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 0,32 tr | L4 · 0,00 tr | L1 · 1,84 tr | L4 · 0,66 tr |
-| C | L3 · 1,97 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 0,07 tr | L4 · 0,00 tr | L1 · 3,13 tr | L4 · 0,48 tr |
+| A | L3 · 0,01 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L5 · 0,02 tr | L4 · 0,00 tr | L1 · 1,26 tr | L4 · 0,87 tr |
+| B | L3 · 3,05 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 1,07 tr | L4 · 0,00 tr | L1 · 3,96 tr | L2 · 0,24 tr |
+| C | L3 · 3,20 tr | L5 · 0,00 tr | L4 · 0,00 tr | L5 · 0,00 tr | L4 · 0,08 tr | L4 · 0,00 tr | L1 · 4,41 tr | L2 · 1,20 tr |
 
 **120 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
 |---|---|---|---|---|---|---|---|---|
-| A | M3 · 3,47 tr | M4 · 0,00 tr | M4 · 0,07 tr | M4 · 0,00 tr | M5 · 2,20 tr | M4 · 0,64 tr | M2 · 3,98 tr | M4 · 2,79 tr |
-| B | M3 · 6,63 tr | M4 · 0,00 tr | M4 · 0,07 tr | M4 · 0,00 tr | M5 · 0,34 tr | M4 · 0,68 tr | M2 · 6,67 tr | M1 · 2,30 tr |
-| C | M3 · 7,70 tr | M4 · 0,00 tr | M4 · 0,00 tr | M4 · 0,00 tr | M5 · 0,69 tr | M4 · 0,68 tr | M2 · 8,12 tr | M1 · 3,59 tr |
+| A | M3 · 6,40 tr | M4 · 0,00 tr | M4 · 0,13 tr | M4 · 0,00 tr | M5 · 2,29 tr | M4 · 0,92 tr | M2 · 7,15 tr | M1 · 2,61 tr |
+| B | M3 · 9,65 tr | M4 · 0,00 tr | M4 · 0,13 tr | M4 · 0,00 tr | M5 · 2,77 tr | M4 · 0,92 tr | M2 · 9,60 tr | M1 · 5,25 tr |
+| C | M3 · 9,58 tr | M4 · 0,00 tr | M4 · 0,30 tr | M4 · 0,00 tr | M5 · 0,64 tr | M4 · 0,92 tr | M2 · 9,96 tr | M1 · 6,34 tr |
 
 **150 Ngày**
 
 | Tuyến | Lắng nghe | Giữ tiếp | Áp đặt | Gồng | Giấu | Ít việc | Để má chọn | Một mình |
 |---|---|---|---|---|---|---|---|---|
-| A | N3 · 1,81 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,43 tr | N4 · 0,02 tr | N1 · 4,02 tr | N2 · 0,37 tr |
-| B | N3 · 4,97 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,18 tr | N4 · 0,06 tr | N1 · 7,70 tr | N2 · 2,97 tr |
-| C | N3 · 5,88 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,55 tr | N4 · 0,06 tr | N1 · 9,44 tr | N2 · 4,26 tr |
+| A | N3 · 5,54 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,81 tr | N4 · 0,57 tr | N1 · 9,37 tr | N2 · 4,02 tr |
+| B | N3 · 8,83 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,20 tr | N4 · 0,57 tr | N1 · 11,14 tr | N2 · 6,82 tr |
+| C | N3 · 8,95 tr | N6 · 0,00 tr | N4 · 0,00 tr | N6 · 0,00 tr | N5 · 0,37 tr | N4 · 0,57 tr | N1 · 11,88 tr | N2 · 7,95 tr |
 
-Điều đáng chú ý (so với bảng cũ bên dưới, thời mở đầu 1,2 triệu):
+Điều đáng chú ý:
 
-- **Không nghỉ thì cạn tiền:** ba cách chơi không nghỉ hết chương 1 ở tạm nhà dì Nga. Từ chương 2 cuối chương nào cũng 0đ và ra các kết thiếu tiền (K5, L4/L5, M4, N4/N6). Bản 1.17 đã như vậy, từ khi ví mở đầu còn 46.000đ (1.14).
-- **Chương 3 lệch:** 14/24 lượt ra L4, kể cả "lắng nghe" tuyến A. Ở 1.17 là 9/24. Kết L2 ("một mình") không còn xuất hiện.
-- **Ít việc vẫn được phòng tốt:** "ít việc" ở chương 1 vẫn thuê được phòng ngõ Gạch, vì lương cũ 3,6 triệu cộng quỹ cọc 1,4 triệu đã gần đủ giá phòng.
+- **Các cách chơi có nghỉ đi đủ năm chương:** lắng nghe K3 → L3 → M3 → N3, để má chọn K2 → L1 → M2 → N1, một mình L2 → M1 → N2. Ít việc thì thiếu tiền ở mọi chương (K4, L4, M4, N4).
+- **Sinh hoạt từ chương 2 bỏ tiền ăn của An:** "Sinh hoạt cả nhà" chương 2–5 giờ là 110.000đ/ngày (má đi: 90.000đ). Trước là 140.000đ (120.000đ), trùng với tiền ăn An tự trả từ khi có hệ đói/no.
+- **Không nghỉ thì bị chặn việc:** ba cách chơi không nghỉ bị Tâm trạng chạm đáy chặn đi làm trước khi Mệt kịp lên cao. Vì thế chúng cạn tiền từ chương 2, và kết kiệt sức E6, K6, L6, M6 không còn xuất hiện (N6 còn). Máy không biết nghỉ cho lại sức như người thật, nên phần 0đ chủ yếu do cách chơi của máy; việc không còn kết kiệt sức là thay đổi thật trong luật.
+- **Lệnh xem kỹ một lượt:** `... -s res://tests/sim.gd -- trace A 1 3 why` in thu, chi từng chương theo khoản và lý do mỗi việc không làm được.
 
 <details><summary>Bảng cũ (trước 1.14, mở đầu 1,2 triệu tiền mặt)</summary>
 
