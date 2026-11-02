@@ -289,6 +289,184 @@
           "when": "dưới 60%"
         }
       ]
+    },
+    "han_khung_sat": {
+      "type": "labor",
+      "attach": true,
+      "view": "weld_bead",
+      "hours": 4,
+      "params": {
+        "seconds": 18,
+        "seams": 3,
+        "tolerance": 0.07,
+        "wobble": 0.13,
+        "speed": 0.7
+      },
+      "scaling": {
+        "seconds": {
+          "mg.time": 1.0
+        },
+        "tolerance": {
+          "prof": 0.08,
+          "stat.agi": 0.05
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.85,
+          "win": true,
+          "label": "Đạt",
+          "payRatio": 1.1,
+          "effects": {
+            "need.mood": 4
+          },
+          "xp": {},
+          "when": "mối hàn đạt từ 85%"
+        },
+        {
+          "atLeast": 0.55,
+          "win": true,
+          "label": "Được",
+          "payRatio": 0.9,
+          "effects": {},
+          "xp": {},
+          "when": "từ 55%"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Phải làm lại",
+          "payRatio": 0.4,
+          "effects": {
+            "need.mood": -4
+          },
+          "xp": {},
+          "when": "dưới 55%"
+        }
+      ],
+      "risk": {
+        "base": 0.02,
+        "perFail": 0.02,
+        "tired": 0.04,
+        "max": 0.3,
+        "injuries": [
+          {
+            "cond": "dap_ngon",
+            "w": 1,
+            "bill": 80000,
+            "log": "Tia hàn bắn bỏng mu bàn tay, phải băng ở trạm y tế"
+          }
+        ]
+      }
+    },
+    "so_sach_tieu_thuong": {
+      "type": "labor",
+      "attach": true,
+      "view": "ledger_check",
+      "hours": 3,
+      "params": {
+        "rounds": 6,
+        "lines": 4,
+        "secondsPerSheet": 14,
+        "unit": 1000
+      },
+      "scaling": {
+        "secondsPerSheet": {
+          "mg.time": 1.0,
+          "stat.int": 0.1,
+          "prof": 0.06
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.85,
+          "win": true,
+          "label": "Đạt",
+          "payRatio": 1.1,
+          "effects": {
+            "need.mood": 4
+          },
+          "xp": {},
+          "when": "khớp từ 5/6 tờ"
+        },
+        {
+          "atLeast": 0.55,
+          "win": true,
+          "label": "Được",
+          "payRatio": 0.9,
+          "effects": {},
+          "xp": {},
+          "when": "khớp từ 4/6 tờ"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Phải làm lại",
+          "payRatio": 0.4,
+          "effects": {
+            "need.mood": -4
+          },
+          "xp": {},
+          "when": "lệch nhiều tờ"
+        }
+      ]
+    },
+    "bao_duong_dieu_hoa": {
+      "type": "labor",
+      "attach": true,
+      "view": "ac_charge",
+      "hours": 3,
+      "params": {
+        "units": 3,
+        "holdSeconds": 4,
+        "seconds": 22,
+        "rise": 0.55,
+        "fall": 0.32,
+        "band": 0.07,
+        "jitter": 0.02
+      },
+      "scaling": {
+        "seconds": {
+          "mg.time": 1.0
+        },
+        "band": {
+          "prof": 0.08,
+          "stat.per": 0.05
+        }
+      },
+      "outcomes": [
+        {
+          "atLeast": 0.85,
+          "win": true,
+          "label": "Đạt",
+          "payRatio": 1.1,
+          "effects": {
+            "need.mood": 4
+          },
+          "xp": {},
+          "when": "nạp đủ cả máy"
+        },
+        {
+          "atLeast": 0.55,
+          "win": true,
+          "label": "Được",
+          "payRatio": 0.9,
+          "effects": {},
+          "xp": {},
+          "when": "nạp được phần lớn"
+        },
+        {
+          "atLeast": 0.0,
+          "win": false,
+          "label": "Phải làm lại",
+          "payRatio": 0.4,
+          "effects": {
+            "need.mood": -4
+          },
+          "xp": {},
+          "when": "xả ga, nạp thiếu"
+        }
+      ]
     }
   }
 }

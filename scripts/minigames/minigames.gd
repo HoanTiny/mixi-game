@@ -30,7 +30,9 @@ static func register(g) -> void:
 		g.cfg["minigames"] = {}
 	for id in data(g).get("games", {}):
 		var d: Dictionary = data(g).games[id]
-		g.cfg.actions.append(action_of(id, d))
+		# attach: trò gắn vào việc đã có (việc cần bằng của careers.json mang trường minigame), không sinh việc mới.
+		if not bool(d.get("attach", false)):
+			g.cfg.actions.append(action_of(id, d))
 		g.cfg.minigames[id] = d.get("params", {}).merged({"view": str(d.get("view", ""))})
 
 

@@ -115,7 +115,8 @@ static func mod(g, id: String, k: String) -> float:
 
 ## Hệ số tiền công của việc a theo cấp nghề và kỹ năng "việc cần bằng" (việc có trò chơi nhỏ đã cộng ở minigames.gd).
 static func pay_mult(g, a: Dictionary) -> float:
-	if a.has("minigame"):
+	# Trò chơi nhỏ tự cộng tiền theo tay nghề (minigames.normalize); việc cần bằng gắn trò (attach) vẫn tính ở đây.
+	if a.has("minigame") and not a.get("require", {}).has("cert"):
 		return 1.0
 	var m := 1.0
 	if a.has("prof"):
