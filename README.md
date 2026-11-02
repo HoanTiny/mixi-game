@@ -1,5 +1,24 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.18 · tiền khó kiếm hơn, mục tiêu rõ hơn**
+
+- **Cân lại kinh tế chương 1 sau chơi thử 30 ngày:**
+  - trần lương 28.000đ/giờ chỉ miễn cho việc thưởng nóng của đúng hôm đó;
+  - thưởng nóng ×1,5;
+  - góp sinh hoạt gia đình 20.000đ mỗi tối.
+  
+  Tiền cuối chương theo mô phỏng giảm từ 2,5–4,3 triệu xuống 0,35–1,7 triệu; vẫn thuê được phòng và ra kết tốt.
+- **Mục tiêu dễ hiểu hơn:**
+  - thanh mục tiêu cọc phòng ghi rõ là đã gồm quỹ cọc;
+  - khung "Ngày 26 chốt chỗ ở" tính cả quỹ cọc;
+  - không còn in "còn -1.454.000đ".
+- **Sửa giao diện:**
+  - ô chọn độ khó hiện đúng ○ ●;
+  - màn chọn truyện ghi đúng tiền mở đầu (46.000đ và 1.400.000đ quỹ cọc);
+  - thông báo 06:00 không còn che vòng đếm ngày, bản đồ, bảng chỉ số;
+  - vòng tâm trạng ẩn khi mở hết khung mục tiêu.
+- Chi tiết số liệu ở [docs/economy-balance.md](docs/economy-balance.md).
+
 **Bản web 1.13 · phố bụi bặm, ngày khắc nghiệt**
 
 - **Đồ họa kiểu "Nobody":**

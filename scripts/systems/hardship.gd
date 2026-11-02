@@ -81,6 +81,18 @@ static func pay_mult(g, id: String) -> float:
 	return float(data(g).get("hotJob", {}).get("mult", 2)) if on(g) and id == hot(g) else 1.0
 
 
+## Hệ số thưởng nóng viết cho người đọc: "×1,5", "×2".
+static func mult_text(g) -> String:
+	var m := float(data(g).get("hotJob", {}).get("mult", 2))
+	return "×" + (str(int(m)) if is_equal_approx(m, roundf(m)) else str(m).replace(".", ","))
+
+
+## Tiền công một ca của việc thưởng nóng hôm nay (giá gốc, không áp trần lương chương 1, nhân hệ số).
+static func hot_pay(g) -> int:
+	var a: Dictionary = g.get_action(hot(g))
+	return g.round_k(float(a.get("pay", 0)) * pay_mult(g, hot(g))) if not a.is_empty() else 0
+
+
 ## Lý do việc a bị chặn vì chưa trả tiền trọ, "" nếu không.
 static func block(g, a: Dictionary) -> String:
 	if not on(g) or paid(g):

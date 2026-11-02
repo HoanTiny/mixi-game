@@ -27,7 +27,8 @@ func _init() -> void:
 	seed(5)
 	var g := _new()
 	_ok(int(g.s.cash) == 46000, "ngày 1 trong túi 46.000đ (đang %s)" % GameLogic.fmt_money(int(g.s.cash)))
-	_ok(g.living_cost() == 0, "chương 1 bỏ tiền sinh hoạt cả nhà tự trừ mỗi tối")
+	var upkeep := int(g.cfg.economy.get("familyUpkeep", 0))
+	_ok(g.living_cost() == upkeep and upkeep <= 30000, "chương 1 chỉ góp sinh hoạt nhỏ mỗi tối (%s), không còn 120.000đ cả nhà" % GameLogic.fmt_money(upkeep))
 	var nghi: Dictionary = g.get_action("nghi")
 	_ok(str(g.action_status(nghi).reason).begins_with("Chưa trả tiền trọ"), "chưa trả tiền trọ: khóa Nghỉ ở phòng (%s)" % g.action_status(nghi).reason)
 	_ok(Hardship.sleep_lock(g) != "", "chưa trả tiền trọ: khóa đi ngủ")
@@ -72,7 +73,7 @@ func _init() -> void:
 	var ga := _new()
 	ga.s["cash"] = 100000
 	ga.finish_day()
-	_ok(int(ga.s.hard.debt) == 0 and int(ga.s.cash) == 40000, "quên trả mà đủ tiền: tự trừ 60.000đ lúc qua đêm")
+	_ok(int(ga.s.hard.debt) == 0 and int(ga.s.cash) == 40000 - ga.living_cost(), "quên trả mà đủ tiền: tự trừ 60.000đ tiền trọ (và góp sinh hoạt) lúc qua đêm")
 	# Việc thưởng nóng.
 	var hot := Hardship.hot(ga)
 	_ok(hot != "", "sáng ngày 2 có việc thưởng nóng: " + hot)
@@ -86,6 +87,13 @@ func _init() -> void:
 			_ok(int(ga.s.cash) >= int(a.pay) * 2 * 0.5, "làm việc thưởng nóng %s: nhận %s (lương gốc %s)" % [hot, GameLogic.fmt_money(int(ga.s.cash)), GameLogic.fmt_money(int(a.pay))])
 		else:
 			print("    (việc thưởng nóng chưa làm được lúc này: %s)" % st.reason)
+		_ok(Hardship.hot_pay(ga) == ga.round_k(float(a.pay) * Hardship.pay_mult(ga, hot)), "thông báo sáng ghi đúng tiền ca nóng: %s" % GameLogic.fmt_money(Hardship.hot_pay(ga)))
+	# Việc khác trong danh sách thưởng nóng nhưng không nóng hôm nay: vẫn theo trần lương chương 1.
+	for id in Hardship.data(ga).hotJob.pool:
+		var b: Dictionary = ga.get_action(str(id))
+		if str(id) != hot and not b.is_empty() and int(b.pay) > int(float(b.hours) * 28000.0):
+			_ok(ga.Economy.base_pay(ga, b, int(b.pay)) < int(b.pay), "%s không nóng hôm nay: theo trần lương (%s thay vì %s)" % [id, GameLogic.fmt_money(ga.Economy.base_pay(ga, b, int(b.pay))), GameLogic.fmt_money(int(b.pay))])
+			break
 	# Mục tiêu ngắn hạn.
 	var goal := Hardship.goal(g)
 	_ok(str(goal.get("id", "")) == "phong" and int(goal.need) == 1800000, "mục tiêu đầu: %s %s" % [goal.get("name", ""), GameLogic.fmt_money(int(goal.get("need", 0)))])

@@ -7,7 +7,7 @@ extends CanvasLayer
 const UI := preload("res://scripts/ui/ui_kit.gd")
 const GameLogic := preload("res://scripts/game_logic.gd")
 const SETTINGS := "user://settings.json"
-const VERSION := "Bản 1.17 · học nghề lấy bằng, cây kỹ năng, chạy có hơi"
+const VERSION := "Bản 1.18 · tiền khó kiếm hơn, mục tiêu rõ hơn"
 const BRUSH := preload("res://assets/fonts/SedgwickAveDisplay-Regular.ttf")
 const HAND := preload("res://assets/fonts/PatrickHand-Regular.ttf")
 const CREAM := Color("ece3d3")
@@ -342,7 +342,12 @@ func _brush_band(tint: Color) -> ColorRect:
 # ---------------------------------------------------------------- chọn câu chuyện
 
 func _build_stories() -> void:
-	_stories = [{"id": "full", "name": "Trước mùa mưa", "meta": "Truyện chính · 5 chương · 150 ngày · 1.200.000đ tiền mặt",
+	# Tiền mở đầu đọc từ cấu hình (economy.json ghi đè cfg.full.cash), để dòng này không lệch khi cân lại kinh tế.
+	var start := "%s trong túi" % GameLogic.fmt_money(int(game.cfg.full.cash))
+	var fund := int(game.cfg.get("economy", {}).get("initialHousingFund", 0))
+	if fund > 0:
+		start += " · %s quỹ cọc nhà" % GameLogic.fmt_money(fund)
+	_stories = [{"id": "full", "name": "Trước mùa mưa", "meta": "Truyện chính · 5 chương · 150 ngày · " + start,
 		"desc": str(game.story.prologue.text)}]
 	for k in GameLogic.ROUTES:
 		var pre: Dictionary = game.cfg.presets[k]
@@ -570,7 +575,11 @@ func _check(text: String, on: bool, group: ButtonGroup = null) -> CheckBox:
 			"radio_checked_disabled", "radio_unchecked_disabled"]:
 		c.add_theme_icon_override(icon, none)
 	c.toggled.connect(func(pressed: bool) -> void: c.text = marks[int(pressed)] + text)
-	c.add_theme_font_override("font", HAND)
+	# Patrick Hand không có ○ ● ☐ ☑: thiếu ký hiệu thì lấy từ DejaVu Sans, nếu không bản web hiện ô vuông mã 25CB.
+	var hand := FontVariation.new()
+	hand.base_font = HAND
+	hand.fallbacks = [preload("res://assets/fonts/DejaVuSans.ttf")]
+	c.add_theme_font_override("font", hand)
 	c.add_theme_font_size_override("font_size", 26)
 	c.add_theme_color_override("font_color", CREAM)
 	c.add_theme_color_override("font_pressed_color", GOLDEN)

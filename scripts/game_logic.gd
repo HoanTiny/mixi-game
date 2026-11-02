@@ -1313,7 +1313,7 @@ func do_action(id: String, result: Dictionary = {}) -> void:
 		pay = round_k(float(pay) * Careers.pay_mult(self, a))
 	if pay > 0 and Hardship.pay_mult(self, id) > 1.0:
 		pay = round_k(float(pay) * Hardship.pay_mult(self, id))
-		add_log("Việc thưởng nóng hôm nay: lương ×%d" % int(Hardship.pay_mult(self, id)), "event")
+		add_log("Việc thưởng nóng hôm nay: lương " + Hardship.mult_text(self), "event")
 	if a.group == "work" and pay > 0 and accepted_pay_mult < 1.0:
 		pay = round_k(float(pay) * accepted_pay_mult)
 		add_log("Phong độ khi nhận ca: %d%% tiền công" % int(accepted_pay_mult * 100.0), "warn")

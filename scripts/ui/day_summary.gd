@@ -109,7 +109,7 @@ func _build() -> void:
 		v.add_child(UI.wrap("\n".join(today.slice(-3)), 14, UI.TIM, 720))
 	var next: String = game.teaser(game.day() + 1)
 	v.add_child(UI.label("SÁNG MAI", 11, UI.INK_SOFT))
-	v.add_child(UI.wrap((next + "\n" if next != "" else "") + "06:00 điện thoại sẽ báo việc thưởng nóng ×2 lương và tin nhắn mới.", 13, UI.INK, 720))
+	v.add_child(UI.wrap((next + "\n" if next != "" else "") + "06:00 điện thoại sẽ báo việc thưởng nóng (lương %s) và tin nhắn mới." % Hardship.mult_text(game), 13, UI.INK, 720))
 	# Nút.
 	var foot := HBoxContainer.new()
 	foot.add_theme_constant_override("separation", 10)

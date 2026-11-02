@@ -1,3 +1,21 @@
+> Cân lại sau chơi thử 1.17:
+> - **Lỗi đã sửa:** trần lương 28.000đ/giờ trước đây miễn cho mọi việc trong danh sách thưởng nóng, ngày nào cũng vậy. Vì thế "Sửa đồ lẻ" ăn 130k mỗi ca, cả chương được 2,6–4 triệu. Giờ chỉ việc thưởng nóng của đúng hôm đó được trả giá gốc.
+> - **Thưởng nóng:** hệ số hạ từ ×2 xuống ×1,5 (`hardship.json` → `hotJob.mult`), chữ trên HUD, thông báo và tổng kết tự đọc hệ số này.
+> - **Góp sinh hoạt gia đình:** `familyUpkeep` 20.000đ mỗi tối (trước 0), trừ cùng tiền trọ 60k.
+> - **Kết quả mô phỏng nhanh 30 ngày** (`tests/playtest.gd -- --demo --full --fast1 --route=X`):
+>
+>   | Tuyến | Trước | Sau |
+>   |---|---|---|
+>   | A | 2,47 tr | 0,82 tr |
+>   | B | 2,80 tr | 0,35 tr |
+>   | C | 4,30 tr | 1,68 tr |
+>
+>   Cả ba vẫn thuê được phòng ngõ Gạch 5 triệu và ra kết tốt. Cuối bảng tổng kết playtest giờ in thu, chi theo khoản.
+> - **Chạy trên phố thật** (`--full --talk`, có lục thùng rác, bán đồng nát):
+>   - ngày 1 vẫn 46k sau một ca, trả trọ và góp sinh hoạt;
+>   - tuần đầu dưới 500k, tới ngày 16 dưới 650k (tuyến A);
+>   - ngày 30: A còn 806k (E1), B còn 38k (E2), C còn 687k (E3).
+>
 > Cập nhật Phúc Tân: mở đầu mới có **46.000đ trong ví + 1.400.000đ quỹ cọc khóa**. Quỹ chỉ thanh toán phần cọc nhà; không mua đồ, trả trọ hay bù chi phí sinh hoạt. Vì đã có sẵn phần lớn tiền cọc, mốc 20–30 ngày bên dưới chỉ còn là benchmark cũ bắt đầu với 180k và không có quỹ. Không áp mốc đó cho mở đầu mới. Trả trọ thủ công 60k sẽ bỏ khoản trọ tự thu của đúng đêm đó; hệ hardship hiện ghi số đêm nợ; cơ chế thu nợ tiền của Economy là nhánh riêng, chưa thống nhất. Save ngày 1 chưa tách quỹ có tiền mặt ≥1,4 triệu được chuyển 1,4 triệu sang quỹ một lần, giữ nguyên tổng tài sản. Save khác giữ nguyên tiền.
 
 # Economy, survival and relationships
