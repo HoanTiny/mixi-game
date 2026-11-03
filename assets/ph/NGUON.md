@@ -9,3 +9,4 @@ lại cho rõ nguồn). Ảnh vật liệu thu nhỏ về 512 px cho bản web n
   industrial_storage_cart.
 - Vật liệu (`textures/`): concrete_floor_02, concrete_floor_worn_001, worn_tile_floor, painted_plaster_wall,
   plastered_wall_04, brown_planks_05, corrugated_iron, rusty_metal_sheet.
+- Vật liệu cho cảnh trò chơi nhỏ 2D (chỉ ảnh màu, 512 px): metal_plate (phôi hàn), fine_grained_wood (bàn cờ tướng), dark_wood (mặt bàn sổ sách, bàn trà), rusty_metal_02 (phôi hàn, đã giảm bão hòa màu).

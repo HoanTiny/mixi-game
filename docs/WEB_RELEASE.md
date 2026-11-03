@@ -1,3 +1,7 @@
+## Bản 1.20.1
+
+Vẽ lại sáu cảnh trò chơi nhỏ (`scripts/minigames/views/`): hàm vẽ chung trong `minigame_view.gd` (vật liệu ảnh lặp, dải màu, bóng mềm, quầng sáng bằng GradientTexture2D, đĩa nổi khối, tối góc, ống cong); thêm bốn vật liệu CC0 512 px ở `assets/ph/textures/` (metal_plate, rusty_metal_02, fine_grained_wood, dark_wood). Luật chơi không đổi. Cảnh nạp ga dùng nền tường plastered_wall_04 (aged-plaster.png bị loại khỏi bản xuất). Web 1.20.1 giữ gói Windows 1.13.
+
 ## Bản 1.20
 
 Âm thanh phố cổ làm lại: tiếng nền phố ngày, phố tối, loa phường (6–7h), ếch nhái, mưa là bản thu thật ở Hà Nội trên Freesound (CC0, CC BY 4.0; ghi công trong màn Giới thiệu, nguồn ở `assets/sounds/NGUON.md`). Tiếng động tổng hợp lại theo vật thật (dép trên vỉa hè, bước ướt khi mưa, tiền polymer, chuông xe đạp, bát đũa), cân lại độ to, bỏ còi rời. Tiếng rao chưa có bản thu nên chỉ hiện chữ trên đầu người bán. Kiểm bằng `tests/street_sounds.gd`. Web 1.20 giữ gói Windows 1.13.

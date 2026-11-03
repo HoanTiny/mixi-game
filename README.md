@@ -1,5 +1,16 @@
 # Trên Phố · Trước mùa mưa
 
+**Bản web 1.20.1 · cảnh trò chơi nhỏ vẽ lại**
+
+- Vẽ lại sáu cảnh trò chơi nhỏ cho thật hơn, dùng vật liệu ảnh CC0 (Poly Haven), bóng đổ mềm, quầng sáng, đạo cụ:
+  - **hàn:** phôi thép gỉ, mối hàn có vảy và màu nhiệt, kẹp chữ C, mỏ hàn MIG, kính hàn tối lại, tia lửa, khói;
+  - **sổ sách:** sổ kẻ dòng viết tay trên bàn gỗ, hóa đơn, máy tính, trà đá, giấy nhớ;
+  - **nạp ga:** dàn nóng quạt quay, bộ đồng hồ đôi, dây ga ba màu, bình R32;
+  - **cờ tướng:** bàn cờ gỗ trên vỉa hè, quân gỗ nổi khối, ghế nhựa, ấm chén;
+  - **karaoke:** màn hình phòng hát, phố đêm nhòe đèn, lời đổi màu theo nhịp, điểm số;
+  - **máy gắp:** tủ máy neon, biển đèn, đống thú bông, cần gắp ba ngàm, bảng điều khiển.
+- **1.20:** tiếng phố cổ thu thật ở Hà Nội (Freesound), tiếng động mới, tiếng rao hiện chữ. Chi tiết ở [docs/WEB_RELEASE.md](docs/WEB_RELEASE.md).
+
 **Bản web 1.19 · cờ thế, karaoke, cạm bẫy, chú Thìn** (làm theo đối chiếu tài liệu "Nobody: The Turnaround")
 
 - **Trò chơi nhỏ cho ba việc cần bằng:**
