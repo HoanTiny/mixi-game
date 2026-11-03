@@ -3,22 +3,22 @@ extends RefCounted
 
 const GameLogic := preload("res://scripts/game_logic.gd")
 
-const PAPER := Color("f5f6fb")
-const CARD := Color("ffffff")
-const LINE := Color("d3d8eb")
-const INK := Color("1c2145")
-const INK_SOFT := Color("596086")
-const TIM := Color("6a3db8")
-const TIM_SOFT := Color("eee7fb")
-const STAMP := Color("c0352b")
-const GOOD := Color("2d7a4c")
-const WARN := Color("a5690f")
-const GOLD := Color("f2c14e")
+const PAPER := Color("262823")
+const CARD := Color("1c201df5")
+const LINE := Color("56594b")
+const INK := Color("e8e2d2")
+const INK_SOFT := Color("b7b6a6")
+const TIM := Color("c4ad76")
+const TIM_SOFT := Color("3b3e31")
+const STAMP := Color("e08c75")
+const GOOD := Color("a3b995")
+const WARN := Color("d5b576")
+const GOLD := Color("d3bd86")
 ## Nền tối trong suốt cho HUD đè lên cảnh 3D, giống bảng mục tiêu của Nobody.
-const HUD_BG := Color(0.08, 0.09, 0.14, 0.78)
+const HUD_BG := Color(0.07, 0.085, 0.07, 0.84)
 const HUD_TEXT := Color("f3f1ea")
 const HUD_SOFT := Color("b9bccb")
-const LOG_COLORS := {"plus": "2d7a4c", "minus": "c0352b", "warn": "a5690f", "event": "6a3db8", "info": "1c2145"}
+const LOG_COLORS := {"plus": "a3b995", "minus": "e08c75", "warn": "d5b576", "event": "c4ad76", "info": "e8e2d2"}
 
 
 static var _text_font: SystemFont
@@ -48,6 +48,13 @@ static func make_theme() -> Theme:
 	t.set_stylebox("disabled", "Button", box(PAPER, LINE, 8, 10))
 	t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
 	t.set_stylebox("panel", "PanelContainer", box(CARD, LINE, 10, 14))
+	t.set_stylebox("panel", "TabContainer", box(CARD, LINE, 8, 12))
+	t.set_stylebox("tab_selected", "TabContainer", box(CARD, LINE, 6, 8))
+	t.set_stylebox("tab_unselected", "TabContainer", box(PAPER, LINE, 6, 8))
+	t.set_stylebox("tab_hovered", "TabContainer", box(TIM_SOFT, LINE, 6, 8))
+	t.set_color("font_selected_color", "TabContainer", INK)
+	t.set_color("font_unselected_color", "TabContainer", INK_SOFT)
+	t.set_color("font_hovered_color", "TabContainer", TIM)
 	t.set_color("default_color", "RichTextLabel", INK)
 	return t
 
@@ -127,6 +134,19 @@ static func choice(title: String, hint: String, lock: String, on_press: Callable
 		t.modulate.a = 0.5
 	elif hint != "":
 		v.add_child(small(hint, INK_SOFT))
+	for child in v.get_children():
+		if child is Label:
+			child.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			child.text_overrun_behavior=TextServer.OVERRUN_NO_TRIMMING
+	# The VBox is a child of Button, so its minimum does not propagate upwards.
+	# Measure wrapped multi-line hints after layout instead of clipping into the next card.
+	var fit := func() -> void:
+		if is_instance_valid(btn) and is_instance_valid(v):
+			var wanted := maxf(42.0, v.get_combined_minimum_size().y + 16.0)
+			if not is_equal_approx(btn.custom_minimum_size.y,wanted): btn.custom_minimum_size.y=wanted
+	v.minimum_size_changed.connect(fit)
+	btn.resized.connect(fit)
+	fit.call_deferred()
 	return btn
 
 
@@ -154,12 +174,8 @@ static func action_card(game, a: Dictionary, width := 270, on_press := Callable(
 	var meta := ["%s giờ" % GameLogic.num(float(a.hours))]
 	if a.has("window"):
 		meta.append("%s–%s" % [GameLogic.hh(a.window[0]), GameLogic.hh(a.window[1])])
-	if a.get("weekend", false):
-		meta.append("cuối tuần")
-	if a.has("max_times") and not a.has("days") and not a.has("set_flag"):
-		meta.append("buổi %d/%d" % [game.count(a.id), int(a.max_times)])
 	if a.has("days"):
-		meta.append("đến hết ngày %d" % int(a.days[1]))
+		meta.append("chỉ hôm nay" if int(a.days[1]) == game.day() else "đến hết ngày %d" % int(a.days[1]))
 	v.add_child(small(" · ".join(meta), INK_SOFT))
 	v.add_child(small(effects_text(game, a), INK_SOFT))
 
@@ -170,15 +186,22 @@ static func action_card(game, a: Dictionary, width := 270, on_press := Callable(
 		foot_color = STAMP
 	elif st.ok and float(st.start) > game.clock():
 		foot = "Chờ tới %s mới bắt đầu" % GameLogic.hh(st.start)
-	elif st.ok and a.has("fee") and game.count(a.id) == 0:
-		foot = "Buổi đầu đóng học phí %s" % GameLogic.fmt_k(int(a.fee))
+	elif st.ok and a.group == "work" and float(st.start) + float(a.hours) > float(game.cfg.lateHour):
+		foot = "Làm tới cuối tối: Mệt thêm %d" % int(game.cfg.lateFatigue)
+		foot_color = WARN
 	elif a.has("note"):
 		foot = a.note
-	if st.ok and a.has("hold_days") and game.day() >= int(a.hold_days[0]) and game.day() <= int(a.hold_days[1]):
-		foot = "Sổ tay: lương hôm nay sẽ bị quỵt" if game.notes.has("quyt_luong") else "Lương tuần này trả vào ngày 8"
-		foot_color = STAMP
 	if foot != "":
-		v.add_child(small(foot, foot_color))
+		var note_label := label(foot,12,foot_color)
+		note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note_label.custom_minimum_size.x = width-24
+		v.add_child(note_label)
+	var fit := func() -> void:
+		if is_instance_valid(btn) and is_instance_valid(v):
+			btn.custom_minimum_size.y = maxf(104.0,v.get_combined_minimum_size().y+24.0)
+	v.minimum_size_changed.connect(fit)
+	btn.resized.connect(fit)
+	fit.call_deferred()
 	if btn.disabled:
 		for i in range(0, 3):
 			v.get_child(i).modulate.a = 0.5
@@ -189,42 +212,98 @@ static func effects_text(game, a: Dictionary) -> String:
 	var out := []
 	var eff: Dictionary = a.get("effects", {})
 	for key in eff:
+		if not (eff[key] is float or eff[key] is int):
+			continue
 		var v := float(eff[key])
 		var mark := "+" if v > 0 else "−"
-		if key == "health":
-			out.append("Sức khỏe %s%s" % [mark, GameLogic.num(absf(v))])
-		elif key == "mood":
-			out.append("Tinh thần %s%s" % [mark, GameLogic.num(absf(v))])
-		elif key.begins_with("xp."):
-			out.append("%s +%s" % [GameLogic.SKILLS.get(key.substr(3), key), GameLogic.num(v)])
+		if key == "fatigue":
+			out.append("Mệt %s%d" % [mark, int(absf(v))])
+		elif key.begins_with("need."):
+			var need_name: String = {"fed": "No bụng", "clean": "Vệ sinh", "neat": "Quần áo", "mood": "Tâm trạng"}.get(key.substr(5), key)
+			out.append("%s %s%d" % [need_name, mark, int(absf(v))])
+		elif key == "progress":
+			out.append("Tiến độ +%d" % int(v))
+		elif key == "respect":
+			out.append("Linh tin %s%d" % [mark, int(absf(v))])
 		elif key.begins_with("rep."):
-			out.append("%s %s%d" % [GameLogic.REPS.get(key.substr(4), key), mark, int(absf(v))])
-	if a.has("focus_xp"):
-		out.append("%s +%s" % [GameLogic.SKILLS[game.s.focus], GameLogic.num(float(a.focus_xp))])
+			out.append("%s %s%d" % [game.rep_name(key.substr(4)), mark, int(absf(v))])
 	return " · ".join(out)
 
 
 static func pay_text(game, a: Dictionary) -> Array:
+	if a.has("quest_contract"):
+		var q: Dictionary = game.quest_def(str(a.quest_contract))
+		return [GameLogic.fmt_k(int(q.get("reward",{}).get("cash",0))) + " khi bàn giao", GOOD]
 	if a.has("pay"):
-		return ["+" + GameLogic.fmt_k(int(a.pay)) + (" + tip" if a.has("tip") else ""), GOOD]
-	if a.has("pay_range"):
-		return ["+%s–%s" % [GameLogic.fmt_k(int(a.pay_range[0])), GameLogic.fmt_k(int(a.pay_range[1]))], GOOD]
+		return ["+" + GameLogic.fmt_k(game.Economy.base_pay(game, a, int(a.pay))), GOOD]
 	var cost: int = game.action_money(a)
 	if cost > 0:
 		return ["−" + GameLogic.fmt_k(cost), STAMP]
 	return ["", INK]
 
 
-## Nhật ký dạng BBCode, ngày mới nhất ở trên, kèm Sổ tay của Minh nếu có.
+## Hai cột tiền: tiền mặt và tiền phải thu (trước / sau ngày 30), khoản phải trả, dự kiến ngày chốt chỗ ở.
+static func money_lines(game) -> Array:
+	var deadline := int(game.cfg.housingDeadline)
+	var proj: int = game.projected_cash(deadline)
+	var best: String = game.best_housing(proj)
+	var best_name := "chưa đủ cả chỗ ở tạm" if best == "" else str(game.cfg.housing[best].name)
+	return [
+		["Tiền mặt", GameLogic.fmt_money(int(game.s.cash))],
+		["Quỹ chỉ dùng đặt cọc", GameLogic.fmt_money(game.Economy.fund(game))],
+		["Phải thu trước ngày 30", GameLogic.fmt_money(game.receivable_sum(0, 30))],
+		["Phải thu sau ngày 30", GameLogic.fmt_money(game.receivable_sum(31, 999))],
+		["Phải trả", GameLogic.fmt_money(game.payable_sum(999))],
+		["Dự kiến sáng ngày %d" % deadline, GameLogic.fmt_money(proj)],
+		["Đủ cho", best_name],
+	]
+
+
+## Sổ: khoản phải thu, phải trả, lời hứa và sổ gia đình, dạng BBCode.
+static func ledger_bbcode(game) -> String:
+	if not game.is_started():
+		return ""
+	var s: Dictionary = game.s
+	var lines := ["[b]Tiền và chỗ ở[/b]", "Trong ví: %s · Quỹ cọc riêng: %s" % [GameLogic.fmt_money(int(s.cash)),GameLogic.fmt_money(game.Economy.fund(game))]]
+	for id in ["hem_dua","cau_tre","di_nam"]:
+		if not game.cfg.housing.has(id): continue
+		var room: Dictionary = game.cfg.housing[id]
+		var paid := int(game.housing().paid) if game.housing().place == id else 0
+		var deposit := maxi(0,int(room.get("deposit",0))-paid)
+		lines.append("• %s: cọc còn %s · tổng còn phải trả để vào ở %s" % [esc(str(room.name)),GameLogic.fmt_money(deposit),GameLogic.fmt_money(game.housing_cost(id))])
+	lines.append("Đủ tiền cọc chưa có nghĩa đã thanh toán đủ tiền vào ở.")
+	lines.append("")
+	lines.append("[b]Phải thu[/b]")
+	for r in s.receivables:
+		var state := "đã nhận" if r.status == "collected" else "ngày %d" % int(r.due)
+		var mark := "" if r.status == "collected" else ("  (cần nghiệm thu)" if r.get("needsProgress", false) else "")
+		lines.append("• %s: %s · %s%s" % [esc(r.label), GameLogic.fmt_money(int(r.amount)), state, mark])
+	lines.append("")
+	lines.append("[b]Phải trả[/b]")
+	if s.payables.is_empty():
+		lines.append("• Không có")
+	for x in s.payables:
+		var state: String = {"paid": "đã trả", "unpaid": "[color=#c0352b]chưa trả được[/color]"}.get(x.status, "ngày %d" % int(x.due))
+		lines.append("• %s: %s · %s" % [esc(x.label), GameLogic.fmt_money(int(x.amount)), state])
+	lines.append("")
+	lines.append("[b]Sổ lời hứa[/b]")
+	for p in s.promises:
+		var st: String = GameLogic.PROMISE_STATUS.get(p.status, p.status)
+		var col := "2d7a4c" if p.status == "done" else ("c0352b" if p.status == "overdue" else "1c2145")
+		lines.append("• %s · hạn ngày %d · [color=#%s]%s[/color]" % [esc(p.text), int(p.due), col, st])
+	if not s.family.is_empty():
+		lines.append("")
+		lines.append("[b]Sổ gia đình[/b]")
+		for f in s.family:
+			lines.append("• Ngày %d · %s · %s: %s" % [int(f.day), game.rep_name(f.who), GameLogic.FAMILY_KIND.get(f.kind, f.kind), esc(f.text)])
+	return "\n".join(lines)
+
+
+## Nhật ký dạng BBCode, ngày mới nhất ở trên.
 static func log_bbcode(game) -> String:
 	var lines := []
-	if not game.notes.is_empty():
-		lines.append("[b][color=#6a3db8]Sổ tay của Minh[/color][/b]")
-		for n in game.notes:
-			lines.append("• " + esc(str(game.story.notes.get(n, n))))
-		lines.append("")
 	if not game.is_started():
-		return "\n".join(lines)
+		return ""
 	var entries: Array = game.s.log
 	var by_day := {}
 	var order := []

@@ -1,0 +1,85 @@
+[
+ {
+  "id": "rel_han_chuot",
+  "title": "Kho hoa dưới gầm cầu thang",
+  "who": "Hân",
+  "eyebrow": "Quan hệ · Hân",
+  "text": "Chín giờ tối, Hân nhắn: chuột gặm hết một xô hồng nhung vừa nhập ở chợ Quảng An. Kho hoa của chị là gầm cầu thang một nhà ống ở Hàng Lược, cửa gỗ mục một góc. An soi đèn điện thoại thấy lỗ hổng sau bao xốp và vết răng trên cuống hoa.\nHân: \"Em sợ chuột lắm, mà mai năm giờ đã phải ra chợ rồi.\"",
+  "quote": "Hân: \"Hoa thì em biết chăm. Chuột thì em chịu.\"",
+  "choices": [
+   {"label": "Ở lại tới khuya, chặn lỗ và đặt bẫy cùng Hân", "hint": "Mệt +8 · Hân +6 · Tâm trạng +3",
+    "effects": {"fatigue": 8, "rep.HAN": 6, "need.mood": 3, "flag.phoHanChuot": true,
+     "log": "Mười một giờ đêm, con chuột thứ hai sập bẫy. Hân bật cười, rồi ngồi thụp xuống thở ra một hơi dài.",
+     "diary": "Bắt chuột ở kho hoa của Hân tới khuya. Chị pha cho mình cốc trà gừng trong cái ấm nhôm méo."}},
+   {"label": "Chỉ chỗ cần bịt, hẹn mai mang lưới thép tới", "hint": "Hân +3 · Trí tuệ thêm kinh nghiệm",
+    "effects": {"rep.HAN": 3, "xp.int": 4, "log": "An vẽ lên vỏ hộp chỗ cần bịt lưới. Hân chụp lại, bảo mai sẽ tự làm."}},
+   {"label": "Bảo Hân gọi dịch vụ diệt chuột cho chắc", "hint": "Không mất giờ",
+    "effects": {"rep.HAN": -1, "log": "Hân nhắn \"vâng\" rồi tắt máy."}}
+  ]
+ },
+ {
+  "id": "rel_han_con_do",
+  "title": "Phí đứng đường",
+  "who": "Hân",
+  "eyebrow": "Quan hệ · Hân",
+  "text": "Gần trưa, ba thanh niên dựng xe chắn ngang xe hoa của Hân ở đầu Hàng Mã, đòi \"phí đứng đường\" hai trăm nghìn. Một đứa đá đổ xô cúc họa mi, nước loang ra vỉa hè. Hân đứng chắn trước xe, tay run nhưng không lùi.",
+  "quote": "Hân: \"Em đứng ở đây bốn năm rồi, chưa trả ai đồng nào.\"",
+  "choices": [
+   {"label": "Đứng cạnh Hân, gọi công an phường", "hint": "Mệt +4 · Tâm trạng −3 · Hân +6",
+    "effects": {"fatigue": 4, "need.mood": -3, "rep.HAN": 6, "flag.phoHanQuaChuyen": true,
+     "log": "Bọn chúng bỏ đi trước khi xe công an tới. Hân ngồi xuống bậc thềm, nhặt từng cành hoa còn lành.",
+     "diary": "Hân không khóc. Chị chỉ nói: lần sau anh đừng đứng trước mặt em, đứng cạnh thôi."}},
+   {"label": "Nhặt hoa cùng Hân, động viên chị sau khi chúng đi", "hint": "Hân +5 · Tâm trạng +2",
+    "effects": {"rep.HAN": 5, "need.mood": 2, "flag.phoHanQuaChuyen": true,
+     "log": "Hai người ngồi tỉa lại xô cúc. Hân bảo hoa dập một nửa thì bán rẻ cho mấy cô lễ chùa."}},
+   {"label": "Đưa hai trăm nghìn cho xong chuyện", "hint": "−200.000đ · Hân +1",
+    "effects": {"cash": -200000, "rep.HAN": 1, "flag.phoHanQuaChuyen": true,
+     "log": "Tiền đưa rồi, Hân lặng đi: \"Mai chúng lại đến đấy anh.\""}}
+  ]
+ },
+ {
+  "id": "rel_han_to_tinh",
+  "title": "Bún ốc ở ngõ Hàng Chai",
+  "who": "Hân",
+  "eyebrow": "Quan hệ · Hân",
+  "text": "Chủ nhật, Hân rủ An ăn bún ốc nguội ở ngõ Hàng Chai, đúng hẹn chị nhắc từ hôm bắt chuột. Ăn xong hai người đi bộ ra bờ hồ. Hân kể chuyện bố mẹ chị ở Mê Linh trồng hoa, kể cả chuyện chị định thuê sạp ở chợ hoa Quảng An khi nào đủ vốn.\nĐèn đường bật. Hân dừng lại: \"Anh định cứ đứng cạnh em thế này đến bao giờ?\"",
+  "quote": "Hân: \"Em hỏi thật đấy. Anh trả lời thật nhé.\"",
+  "choices": [
+   {"label": "Nói thật: anh thích em, muốn đi cùng em lâu dài", "hint": "Trở thành Cặp đôi: Tâm trạng hồi dần mỗi giờ, mệt chậm hơn",
+    "effects": {"rel_status.HAN": "cap_doi", "need.mood": 15, "rep.HAN": 4,
+     "log": "Hân không trả lời ngay. Chị nắm lấy tay áo An, kéo nhẹ về phía hàng kem Tràng Tiền.",
+     "diary": "Từ hôm nay có người hỏi mình ăn cơm chưa mà không phải bà."}},
+   {"label": "Anh chưa lo được cho nhà, xin làm bạn thêm một thời gian", "hint": "Hân −4 · giữ là bạn",
+    "effects": {"rep.HAN": -4, "flag.phoHanCho": true,
+     "log": "Hân gật đầu, bảo chị hiểu. Đoạn đường về hai người nói chuyện giá hoa ngày rằm."}}
+  ]
+ },
+ {
+  "id": "rel_han_nguoi",
+  "title": "Tin nhắn không trả lời",
+  "who": "Hân",
+  "eyebrow": "Quan hệ · Hân",
+  "text": "Mấy hôm nay An bận tối mặt. Tin nhắn của Hân nằm đó, chưa mở. Sáng nay xe hoa đứng chỗ khác, Hân nhờ một cô bán xôi nhắn lại: \"Chị ấy bảo anh cứ lo việc của anh đi.\"",
+  "choices": [
+   {"label": "Nhắn xin lỗi, hẹn gặp nói chuyện cho rõ", "hint": "Hân +4, không còn là Cặp đôi",
+    "effects": {"rep.HAN": 4, "log": "Hân trả lời sau một tiếng: \"Ừ. Khi nào anh rảnh thật thì gặp.\""}},
+   {"label": "Để mọi chuyện lắng xuống", "hint": "Tâm trạng −6",
+    "effects": {"need.mood": -6, "log": "An xóa dòng tin nhắn gõ dở."}}
+  ]
+ },
+ {
+  "id": "rel_vy_live",
+  "title": "Chị Vy lên sóng",
+  "who": "Chị Vy",
+  "eyebrow": "Quan hệ · Chị Vy",
+  "text": "Tối thứ Sáu, chị Vy dựng điện thoại lên giá ba chân giữa đống hàng thùng, bật đèn vòng. \"Một hôm live hai tiếng chị bán bằng cả tuần đứng shop.\" Chị chỉ An cách đọc bình luận, lúc nào tung voucher, và kể vụ năm ngoái chị ôm lô áo mốc, bị hoàn gần nửa đơn, mất trắng tiền ship hai chiều.",
+  "quote": "Chị Vy: \"Live là bán uy tín trước, bán hàng sau.\"",
+  "choices": [
+   {"label": "Ngồi học chị Vy cả buổi", "hint": "Mở app Shippy · Nhạy bén thêm kinh nghiệm · Mệt +4",
+    "effects": {"flag.phoVyLive": true, "xp.per": 10, "fatigue": 4, "rep.VY": 2,
+     "log": "Điện thoại An có thêm app Shippy. Chị Vy dặn: muốn live thì phải thuê kho trước đã."}},
+   {"label": "Để hôm khác, giờ còn việc", "hint": "Có thể nhờ lại ở shop chị Vy",
+    "effects": {"log": "Chị Vy nhún vai: \"Lúc nào muốn học thì qua.\""}}
+  ]
+ }
+]

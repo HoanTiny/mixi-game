@@ -1,0 +1,590 @@
+{
+ "_ghi_chu": "Hội thoại của gói đời sống phố cổ (nạp sau 5 chương, GameLogic._merge_pack), cùng cú pháp talks.json. VY: chị Vy shop si-đa Hàng Đào (hàng thùng Lạng Sơn, nợ lô hàng mốc, con gái Ngân học lớp 9), mở dần theo số túi mù đã bóc (count.tui_mu_1), điểm phong cách (style_min). DUNG: anh Dũng quán bi-a Lương Ngọc Quyến (thợ điện cũ ngã giàn giáo, ghét cược nợ, có giải tối thứ Bảy), mở theo count.bia_choi, count.bia_cuoc. Cờ mới đều bắt đầu bằng pho. Mở việc nhờ: vy_lo_moc → pho_vy_hang_uot, dg_minh → pho_minh_no_bia.",
+ "VY": {
+  "story": [
+   {
+    "id": "vy_chao",
+    "when": {},
+    "title": "Túi mù của chị Vy",
+    "text": "Chị Vy ngồi trên cái ghế nhựa giữa hai sào áo, tay vẫn gấp đồ. \"Lần đầu vào à em? Túi nào chị cũng bỏ ít nhất một món mặc được, chị nói thật. Còn bóc ra áo khoác da hay quần đùi thì do tay em. Đừng bóc bằng tiền đi chợ là được.\"",
+    "choices": [
+     {
+      "label": "Hỏi chị món nào trong shop đáng tiền nhất",
+      "hint": "Chị Vy +2",
+      "effects": {
+       "rep.VY": 2,
+       "log": "Chị Vy chỉ lên cái móc cao nhất: \"Món tuần này đấy. Còn đáng tiền nhất là con mắt chọn đồ, cái ấy chị không bán.\""
+      }
+     },
+     {
+      "label": "\"Em xem đã, chưa bóc vội.\"",
+      "hint": "Chị Vy +1",
+      "effects": {
+       "rep.VY": 1,
+       "log": "Chị Vy gật: \"Xem chán thì bóc. Chị không đuổi ai bao giờ.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_dung_boc",
+    "when": {
+     "count.tui_mu_1": 12
+    },
+    "title": "Chị Vy cất rổ túi đi",
+    "text": "An vừa với tay lấy túi nữa thì chị Vy kéo cái rổ túi mù về phía mình. \"Em bóc mười mấy túi rồi đấy. Chị bán thì chị lãi, nhưng chị hỏi thật: tiền nhà tháng này đóng chưa? Chị từng thấy người bóc túi bằng tiền nhà rồi, chị không muốn thấy lần nữa.\"",
+    "choices": [
+     {
+      "label": "Nói thật: còn một khoản chưa đóng, hôm nay em thôi",
+      "hint": "Chị Vy +4, Tâm trạng +3",
+      "effects": {
+       "rep.VY": 4,
+       "need.mood": 3,
+       "flag.phoVyKhuyen": true,
+       "diary": "Chị Vy cất rổ túi mù đi, hỏi tiền nhà đóng chưa. Nói thật là chưa. Chị không bán nữa, rót cho mình cốc trà đá. Người bán hàng mà can khách mua."
+      }
+     },
+     {
+      "label": "\"Em tính rồi chị ạ, tiền này là tiền riêng.\"",
+      "hint": "Chị Vy +1",
+      "effects": {
+       "rep.VY": 1,
+       "log": "Chị Vy đẩy rổ túi về chỗ cũ, không nói thêm. Nhưng chị vẫn đếm từng túi An bóc."
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_hang_thung",
+    "when": {
+     "count.tui_mu_1": 3
+    },
+    "title": "Kiện hàng từ Lạng Sơn",
+    "text": "Chị Vy rọc một kiện hàng mới về, mùi long não bốc lên. \"Hàng thùng đấy em. Chị lên tận cửa khẩu Tân Thanh ở Lạng Sơn mua theo cân, đêm ngồi xe khách ôm kiện về. Cân về rồi mới biết bên trong có gì. Nói thật, chị bóc túi mù to nhất phố này.\"",
+    "choices": [
+     {
+      "label": "Ngồi phụ chị rũ đồ, nghe chị kể chuyện đi buôn",
+      "hint": "Chị Vy +3, Mệt +2",
+      "effects": {
+       "rep.VY": 3,
+       "fatigue": 2,
+       "diary": "Phụ chị Vy rũ một kiện hàng thùng. Chị đi Lạng Sơn mười hai năm, ngủ trên xe khách nhiều hơn ngủ ở nhà. Chị bảo cái nghề này giống người: bóc ra mới biết."
+      }
+     },
+     {
+      "label": "\"Thế chị có hồi hộp không?\"",
+      "hint": "Chị Vy +2",
+      "effects": {
+       "rep.VY": 2,
+       "log": "Chị Vy cười: \"Hồi đầu thì có. Giờ chỉ hồi hộp lúc đếm tiền trả hàng.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_nho_lam",
+    "when": {
+     "count.tui_mu_1": 3,
+     "rep.VY": 53
+    },
+    "title": "Chị Vy cần người phân hàng",
+    "text": "\"Em có rảnh ban ngày không? Hàng về mỗi tuần mấy kiện, chị phân một mình không kịp. Áo nào mặc được, áo nào phải giặt, áo nào bỏ. Bốn tiếng một buổi, chị trả một trăm bảy mươi nghìn. Không cao, nhưng chị trả đúng ngày.\"",
+    "choices": [
+     {
+      "label": "Nhận lời, hôm nào rảnh em qua phân hàng",
+      "hint": "Chị Vy +3",
+      "effects": {
+       "rep.VY": 3,
+       "flag.phoVyNhanLam": true,
+       "log": "Chị Vy ghi tên An vào cuốn sổ bìa xanh, cạnh chữ \"phân hàng\"."
+      }
+     },
+     {
+      "label": "\"Em đang có việc, để em xem lịch đã.\"",
+      "hint": "Chị Vy +1",
+      "effects": {
+       "rep.VY": 1,
+       "log": "\"Ừ, lúc nào cũng được. Hàng thì tuần nào chả về.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_ngan",
+    "when": {
+     "from_day": 15,
+     "to_day": 45,
+     "rep.VY": 55
+    },
+    "title": "Con bé ngồi học góc shop",
+    "text": "Ngân, con gái chị Vy, học lớp 9, ngồi ôn thi vào lớp 10 trên cái bàn gấp sau sào áo. Lúc chị Vy ra ngoài lấy hàng, Ngân hỏi nhỏ: \"Anh ơi, mẹ em muốn em thi trường chuyên. Em chỉ muốn vào trường gần nhà, chiều còn trông shop cho mẹ. Em không dám nói. Anh nói hộ em được không?\"",
+    "choices": [
+     {
+      "label": "\"Em tự nói với mẹ đi. Anh ngồi đây, em nói thì anh không bỏ đi.\"",
+      "hint": "Chị Vy +4",
+      "effects": {
+       "rep.VY": 4,
+       "flag.phoNganTuNoi": true,
+       "diary": "Ngân nhờ nói hộ với chị Vy chuyện chọn trường. Bảo em tự nói, mình ngồi đó. Em nói run run, chị Vy im lâu, rồi hỏi em vì sao. Ngân bảo đấy là lần đầu mẹ hỏi."
+      }
+     },
+     {
+      "label": "Đợi chị Vy về, nói hộ Ngân",
+      "hint": "Chị Vy +1",
+      "effects": {
+       "rep.VY": 1,
+       "flag.phoNoiHoNgan": true,
+       "log": "Chị Vy nghe An nói, quay sang nhìn Ngân: \"Sao không nói với mẹ?\" Ngân cúi xuống quyển vở."
+      }
+     },
+     {
+      "label": "\"Mẹ em lo cho em thôi, em cứ nghe mẹ.\"",
+      "hint": "Không ai thêm",
+      "effects": {
+       "log": "Ngân gật, lật trang vở, không hỏi gì nữa."
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_lo_moc",
+    "when": {
+     "from_day": 31,
+     "rep.VY": 56
+    },
+    "title": "Lô hàng năm ngoái",
+    "text": "Trời mưa từ trưa. Chị Vy ngồi nhìn hai kiện hàng mới về, bao tải sẫm nước một góc. \"Năm ngoái chị dính một lô mốc, kho dưới chân cầu ngấm nồm cả tháng. Chị vay nóng trả tiền hàng, giờ vẫn còn nợ. Hai kiện này mà mốc nữa là chị…\" Chị không nói hết câu. \"Em phân gấp với chị được không, cho kịp phiên chợ đêm cuối tuần?\"",
+    "choices": [
+     {
+      "label": "Xắn tay áo, giúp chị cứu hai kiện hàng",
+      "hint": "Nhận việc nhờ: Hai kiện hàng ngấm mưa",
+      "effects": {
+       "rep.VY": 2,
+       "quest_start": "pho_vy_hang_uot"
+      }
+     },
+     {
+      "label": "\"Hôm nay em không kịp, chị gọi thêm người đi.\"",
+      "hint": "Chị Vy +0",
+      "effects": {
+       "log": "Chị Vy gật, rút điện thoại gọi đứa cháu. Chị không trách, chỉ thở dài một cái."
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_phong_cach",
+    "when": {
+     "style_min": 10
+    },
+    "title": "Chị Vy huýt sáo",
+    "text": "Chị Vy đang treo đồ, nhìn An từ đầu xuống chân rồi huýt sáo một tiếng. \"Ơ, ai đây? Đồ si của chị mà em mặc ra dáng thế à. Đứng đấy chị chụp mấy kiểu đăng trang bán hàng được không? Chị trả tiền mẫu hẳn hoi, không trả bằng túi mù đâu.\"",
+    "choices": [
+     {
+      "label": "Đứng chụp mấy kiểu trước cửa shop",
+      "hint": "+100.000đ, Chị Vy +3, Tâm trạng +5",
+      "effects": {
+       "cash": 100000,
+       "cash_label": "Chị Vy trả tiền chụp ảnh mẫu",
+       "rep.VY": 3,
+       "need.mood": 5,
+       "flag.phoChupMau": true,
+       "diary": "Làm mẫu cho chị Vy chụp ảnh trước cửa shop Hàng Đào. Khách Tây đi qua cũng giơ máy lên chụp. Lần đầu mặc đồ cũ mà không thấy ngại."
+      }
+     },
+     {
+      "label": "\"Thôi chị ơi, em ngại lắm.\"",
+      "hint": "Chị Vy +1",
+      "effects": {
+       "rep.VY": 1,
+       "log": "Chị Vy cười: \"Ngại gì. Thôi để chị chụp cái ma-nơ-canh vậy, nó không biết ngại.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "vy_ngan_do",
+    "when": {
+     "from_day": 56,
+     "flag_any": [
+      "phoNganTuNoi",
+      "phoNoiHoNgan"
+     ]
+    },
+    "title": "Ngân có điểm thi",
+    "text": "Chị Vy dán tờ giấy lên cột shop, chữ bút dạ: \"Hôm nay mua 2 tặng 1\". \"Ngân đỗ rồi em. Trường gần nhà, đúng trường nó chọn. Chị khóc ngoài chợ một trận, mấy bà bán hoa quả cứ tưởng chị bị mất hàng.\" Chị đưa An một cái túi mù. \"Túi này chị tặng, không tính tiền.\"",
+    "choices": [
+     {
+      "label": "Nhận túi, mua cho Ngân que kem cốm",
+      "hint": "Một túi mù, Chị Vy +4, Tâm trạng +4",
+      "effects": {
+       "special": "tui_mu_1",
+       "cash": -15000,
+       "cash_label": "Que kem mừng Ngân đỗ",
+       "rep.VY": 4,
+       "need.mood": 4,
+       "diary": "Ngân đỗ vào trường gần nhà, đúng trường em chọn. Chị Vy tặng một túi mù, mình mua cho Ngân que kem cốm. Con bé bảo chiều nay em trông shop, mẹ đi ngủ đi."
+      }
+     },
+     {
+      "label": "\"Chị cứ để túi mà bán, em mừng cho Ngân thôi.\"",
+      "hint": "Chị Vy +3",
+      "effects": {
+       "rep.VY": 3,
+       "log": "Chị Vy cất túi lại, gọi Ngân ra: \"Anh An mừng con đấy.\" Ngân chào to hơn mọi khi."
+      }
+     }
+    ]
+   }
+  ],
+  "chat": [
+   {
+    "text": "\"Áo nào có mùi long não là hàng mới về đấy em, giặt hai nước là hết.\""
+   },
+   {
+    "text": "\"Khách Tây cứ hỏi đồ cổ điển là chị biết bán cái áo khoác bò.\""
+   },
+   {
+    "text": "\"Chị không bán đồ rách rồi bảo là mốt. Rách thì chị ghi là rách.\""
+   },
+   {
+    "text": "\"Ngân nhà chị học xong lại ra trông hàng, chị bảo về ngủ mà nó không nghe.\""
+   },
+   {
+    "text": "\"Mưa thế này phố Hàng Đào vắng, chị ngồi gấp đồ cho đỡ sốt ruột.\""
+   },
+   {
+    "when": {
+     "count.tui_mu_1": 5
+    },
+    "text": "\"Em bóc nhiều thế, chị nhớ mặt rồi đấy. Đồ trùng thì mang lại chị mua.\""
+   },
+   {
+    "text": "\"Món tuần này chị treo cao, ai thích thật mới với tới.\""
+   },
+   {
+    "text": "\"Hồi mới đi buôn chị toàn ngủ trên kiện hàng ở bến xe Lạng Sơn.\""
+   },
+   {
+    "when": {
+     "style_min": 6
+    },
+    "text": "\"Hôm nay mặc được đấy. Cổ áo là thêm tí nữa là đẹp.\""
+   },
+   {
+    "text": "\"Đồ cũ thì có người mặc trước rồi, nhưng mình mặc vào là của mình.\""
+   }
+  ]
+ },
+ "DUNG": {
+  "story": [
+   {
+    "id": "dg_chao",
+    "when": {},
+    "title": "Quán bi-a anh Dũng",
+    "text": "Quán bi-a ở phố Lương Ngọc Quyến có bốn bàn, đèn vàng treo thấp. Anh Dũng đứng sau quầy lau gậy, đi lại hơi tập tễnh. \"Thuê bàn ba chục một giờ, đánh vui thoải mái. Ai rủ cược ghi nợ thì em bảo anh, anh mời ra. Quán anh nhỏ, nhưng có luật.\"",
+    "choices": [
+     {
+      "label": "\"Em đánh vui thôi anh.\"",
+      "hint": "Anh Dũng +2",
+      "effects": {
+       "rep.DUNG": 2,
+       "log": "Anh Dũng đưa An viên phấn xanh: \"Thế thì đánh được lâu.\""
+      }
+     },
+     {
+      "label": "Hỏi anh sao ghét cược nợ thế",
+      "hint": "Anh Dũng +1",
+      "effects": {
+       "rep.DUNG": 1,
+       "log": "Anh Dũng nhún vai: \"Anh thấy đủ nhà tan vì một cuốn sổ rồi.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "dg_luat",
+    "when": {
+     "count.bia_cuoc": 2
+    },
+    "title": "Luật của quán",
+    "text": "Anh Dũng gọi An ra quầy sau ván cược thứ hai. \"Cược năm chục tiền mặt, anh không cấm. Người ta bỏ tiền trong túi ra thì biết mình mất bao nhiêu. Còn ghi nợ, hẹn mai trả, là anh không cho. Em hứa với anh một câu: hết tiền trong túi là thôi.\"",
+    "choices": [
+     {
+      "label": "Hứa: chỉ cược tiền có trong túi, hết là thôi",
+      "hint": "Anh Dũng +3",
+      "effects": {
+       "rep.DUNG": 3,
+       "flag.phoHuaTienMat": true,
+       "log": "Anh Dũng gật, gõ viên phấn xuống mặt quầy như đóng dấu."
+      }
+     },
+     {
+      "label": "\"Em đánh cho vui thôi mà anh.\"",
+      "hint": "Anh Dũng −1",
+      "effects": {
+       "rep.DUNG": -1,
+       "log": "\"Ai cũng bảo thế.\" Anh Dũng quay đi tính tiền bàn."
+      }
+     }
+    ]
+   },
+   {
+    "id": "dg_tho_dien",
+    "when": {
+     "count.bia_choi": 2
+    },
+    "title": "Cái chân của anh Dũng",
+    "text": "Quán vắng, anh Dũng gác chân lên ghế, xoa đầu gối. \"Ngày trước anh là thợ điện công trình, đi dây cho mấy cái chung cư ngoài Mỹ Đình. Hôm ấy giàn giáo không ai buộc dây an toàn, anh ngã từ tầng ba. Nằm viện bốn tháng. Tiền đền bù với tiền vay, anh mở cái quán này.\" Anh nhìn An. \"Nghe nói em cũng làm điện à?\"",
+    "choices": [
+     {
+      "label": "Kể anh nghe chuyện ở trung tâm Thăng Long, chuyện mất việc",
+      "hint": "Anh Dũng +4",
+      "effects": {
+       "rep.DUNG": 4,
+       "flag.phoDungThoDien": true,
+       "diary": "Anh Dũng quán bi-a ngày xưa làm điện công trình, ngã giàn giáo tầng ba vì không ai buộc dây an toàn. Kể anh nghe chuyện mất việc. Anh không khuyên gì, chỉ bảo: \"Làm điện thì phải sống lâu mới làm được lâu.\""
+      }
+     },
+     {
+      "label": "\"Sao anh không kiện công trình?\"",
+      "hint": "Anh Dũng +1",
+      "effects": {
+       "rep.DUNG": 1,
+       "log": "\"Kiện ai? Thầu phụ bỏ trốn từ hôm anh còn nằm viện.\" Anh Dũng đứng dậy, đi lau bàn."
+      }
+     }
+    ]
+   },
+   {
+    "id": "dg_minh",
+    "when": {
+     "from_day": 20,
+     "rep.DUNG": 53
+    },
+    "title": "Minh ở bàn số bốn",
+    "text": "Anh Dũng hất hàm về bàn số bốn, nói nhỏ: \"Thằng Minh bạn em đúng không? Tuần này tối nào nó cũng ghé, đánh với thằng Toản. Ở quán anh thì đánh tiền mặt, nhưng anh nghe chúng nó ghi sổ với nhau ở ngoài. Mặt nó lúc thua anh nhìn quen lắm. Ngày trước anh cũng có cái mặt ấy.\"",
+    "choices": [
+     {
+      "label": "\"Để em nói chuyện với Minh.\"",
+      "hint": "Nhận việc nhờ: Khoản nợ ở bàn số bốn",
+      "effects": {
+       "rep.DUNG": 2,
+       "quest_start": "pho_minh_no_bia"
+      }
+     },
+     {
+      "label": "\"Chuyện của Minh, nó lớn rồi anh ạ.\"",
+      "hint": "Anh Dũng −1",
+      "effects": {
+       "rep.DUNG": -1,
+       "flag.phoMinhBoQua": true,
+       "log": "Anh Dũng gật, không nói gì. Tối ấy anh tắt đèn bàn số bốn sớm hơn mọi hôm."
+      }
+     }
+    ]
+   },
+   {
+    "id": "dg_lam_trong",
+    "when": {
+     "count.bia_choi": 4,
+     "rep.DUNG": 55
+    },
+    "title": "Trông quán ca tối",
+    "text": "\"Thứ Bảy anh có giải, mấy tối thường thì anh phải đi tập vật lý trị liệu cái chân. Em trông quán hộ anh ca tối được không? Dọn bàn, tính giờ, ai đòi ghi nợ thì bảo không. Một trăm tám mươi nghìn một ca.\"",
+    "choices": [
+     {
+      "label": "Nhận trông quán ca tối",
+      "hint": "Anh Dũng +3",
+      "effects": {
+       "rep.DUNG": 3,
+       "flag.phoDungNhoTrong": true,
+       "log": "Anh Dũng đưa An chùm chìa khóa có cái móc hình quả bi số tám."
+      }
+     },
+     {
+      "label": "\"Tối em hay về ăn cơm với bà.\"",
+      "hint": "Anh Dũng +1",
+      "effects": {
+       "rep.DUNG": 1,
+       "log": "\"Thế là đúng. Cơm với bà trước, bi-a sau.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "dg_sua_dien",
+    "when": {
+     "rep.DUNG": 57
+    },
+    "title": "Cái ổ điện sau quầy",
+    "text": "Đèn bàn số hai chập chờn, cái ổ điện sau quầy nóng ran. Anh Dũng cầm cái bút thử điện, tay hơi run. \"Từ hôm ngã, anh cứ leo thang là chân run. Em xem hộ anh cái ổ với, anh trả công như thợ ngoài.\"",
+    "choices": [
+     {
+      "label": "Ngắt aptomat, thay ổ, đi lại đoạn dây chập",
+      "hint": "+150.000đ, Anh Dũng +3, Mệt +4",
+      "effects": {
+       "cash": 150000,
+       "cash_label": "Anh Dũng trả công sửa điện quán",
+       "fatigue": 4,
+       "rep.DUNG": 3,
+       "flag.phoSuaDienDung": true,
+       "log": "Thay xong ổ, đèn bàn số hai sáng đều. Anh Dũng sờ tay lên mặt ổ: \"Mát rồi.\""
+      }
+     },
+     {
+      "label": "Bảo anh giữ thang, đọc từng bước cho em làm",
+      "hint": "+150.000đ, Anh Dũng +6, Mệt +4",
+      "effects": {
+       "cash": 150000,
+       "cash_label": "Anh Dũng trả công sửa điện quán",
+       "fatigue": 4,
+       "rep.DUNG": 6,
+       "flag.phoSuaDienDung": true,
+       "diary": "Thay cái ổ điện cháy sém sau quầy quán anh Dũng. Anh đứng dưới giữ thang, gọi đúng tên từng thứ trước khi mình cầm vào. Thợ cũ vẫn là thợ, chỉ là đứng dưới đất."
+      }
+     }
+    ]
+   },
+   {
+    "id": "dg_bang",
+    "when": {
+     "quest_done": "pho_minh_no_bia"
+    },
+    "title": "Tấm bảng mới trên tường",
+    "text": "Anh Dũng đóng một tấm bảng gỗ lên tường cạnh quầy, chữ phấn trắng: \"Quán không ghi nợ. Không cho mượn tiền đánh. Thua thì về ngủ.\" \"Chuyện thằng Minh làm anh nghĩ mãi. Cái bảng này anh treo muộn mất mấy năm.\"",
+    "choices": [
+     {
+      "label": "Giữ thang cho anh đóng nốt cái đinh",
+      "hint": "Anh Dũng +3",
+      "effects": {
+       "rep.DUNG": 3,
+       "diary": "Anh Dũng treo bảng \"Quán không ghi nợ\" lên tường. Giữ thang cho anh. Anh bảo đáng lẽ phải treo từ ngày mở quán."
+      }
+     },
+     {
+      "label": "\"Thua thì về ngủ. Câu cuối hay nhất anh ạ.\"",
+      "hint": "Anh Dũng +2",
+      "effects": {
+       "rep.DUNG": 2,
+       "log": "Anh Dũng cười: \"Câu ấy vợ anh viết đấy.\""
+      }
+     }
+    ]
+   }
+  ],
+  "chat": [
+   {
+    "text": "\"Đánh bi-a thì đứng cho vững đã, tay đến sau.\""
+   },
+   {
+    "text": "\"Phấn xanh dùng xong thì để lại chỗ cũ, khách sau còn tìm.\""
+   },
+   {
+    "text": "\"Tối thứ Bảy có giải, muốn đánh thì ghi tên từ chiều.\""
+   },
+   {
+    "text": "\"Mưa to là quán anh đông, ai cũng trú mưa bằng một giờ bàn.\""
+   },
+   {
+    "text": "\"Ngày trước anh leo cột điện như leo cầu thang. Giờ leo cầu thang như leo cột điện.\""
+   },
+   {
+    "text": "\"Bàn số một mới thay mặt dạ, đánh nhẹ tay thôi em nhé.\""
+   },
+   {
+    "when": {
+     "count.bia_choi": 5
+    },
+    "text": "\"Cú đánh của em khá lên rồi đấy. Bớt nhìn lỗ, nhìn bi nhiều vào.\""
+   },
+   {
+    "text": "\"Ai hỏi vay tiền đánh tiếp thì em bảo: quán anh Dũng không có chữ vay.\""
+   },
+   {
+    "text": "\"Vợ anh bảo mở quán bi-a là dở hơi. Được cái dở hơi mà có lãi.\""
+   },
+   {
+    "text": "\"Làm điện thì phải sống lâu mới làm được lâu. Em nhớ đấy.\""
+   }
+  ]
+ },
+ "HAN": {
+  "story": [
+   {
+    "id": "han_chao",
+    "when": {},
+    "title": "Xe hoa đầu ngõ",
+    "text": "Chiếc xe đạp Phượng Hoàng chở hai sọt hoa dựng sát gốc bàng: cúc họa mi, sen trắng, mấy bó hồng nhung. Cô gái đứng bên xe đang cắt chéo cuống hoa bằng con dao nhỏ, tay thoăn thoắt. \"Anh mua hoa cúng hay hoa cắm? Hoa cúng thì em lấy cành thẳng, hoa cắm thì lấy cành có dáng.\" Tấm bìa cát-tông treo ghi nắn nót: Hoa Hân - Mê Linh.",
+    "choices": [
+     {
+      "label": "Hỏi hoa nào để được lâu nhất",
+      "hint": "Hân +3",
+      "effects": {
+       "rep.HAN": 3,
+       "log": "Hân bảo cúc họa mi để được cả tuần nếu ngày nào cũng cắt đầu cuống. \"Mà hết mùa rồi anh ạ, mua nhanh kẻo hết.\""
+      }
+     },
+     {
+      "label": "Khen cái xe đạp cũ đẹp",
+      "hint": "Hân +2",
+      "effects": {
+       "rep.HAN": 2,
+       "log": "\"Xe của bố em đấy. Phanh không ăn đâu, anh đừng mượn.\""
+      }
+     }
+    ]
+   },
+   {
+    "id": "han_me_linh",
+    "when": {
+     "rep.HAN": 45
+    },
+    "title": "Hoa từ Mê Linh",
+    "text": "Hân kể bốn giờ sáng chị đã ở chợ Quảng An, có hôm bố chị chở hoa từ Mê Linh xuống tận nơi. Hoa ế thì chiều chị bán rẻ cho mấy cô lễ chùa Bà Đá. \"Bán hoa sướng nhất là được nhìn người ta cầm bó hoa đi về. Khổ nhất là trời mưa.\"",
+    "choices": [
+     {
+      "label": "Hỏi chuyện chị định thuê sạp",
+      "hint": "Hân +3 · Nhạy bén thêm kinh nghiệm",
+      "effects": {
+       "rep.HAN": 3,
+       "xp.per": 3,
+       "log": "Hân muốn thuê một sạp ở chợ hoa, đang để dành mỗi ngày năm mươi nghìn."
+      }
+     },
+     {
+      "label": "Kể chuyện An sửa quạt ở tiệm chú Sơn",
+      "hint": "Hân +2",
+      "effects": {
+       "rep.HAN": 2,
+       "log": "Hân cười: \"Thế hôm nào cái đèn xe em hỏng thì em biết tìm ai.\""
+      }
+     }
+    ]
+   }
+  ],
+  "chat": [
+   {
+    "text": "\"Hoa sen phải mua lúc còn búp, về nhà mới nở. Mua nở sẵn là mất phần đẹp nhất.\""
+   },
+   {
+    "text": "\"Sáng nay khách Tây mua cả sọt cúc, em chưa kịp hỏi họ cắm ở đâu.\""
+   },
+   {
+    "text": "\"Trời này hoa héo nhanh lắm, em phải phun nước liên tục.\""
+   },
+   {
+    "text": "\"Anh có biết bà cụ đầu ngõ không? Ngày rằm nào bà cũng mua của em một bó hồng.\"",
+    "when": {
+     "rep.HAN": 40
+    }
+   },
+   {
+    "text": "\"Anh đến muộn thế, em để phần anh mấy cành đẹp rồi đây này.\"",
+    "when": {
+     "rep.HAN": 70
+    }
+   }
+  ]
+ }
+}

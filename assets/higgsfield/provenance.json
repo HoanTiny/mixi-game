@@ -1,0 +1,29 @@
+{
+  "provider": "Higgsfield",
+  "model": "gpt_image_2_5",
+  "created": "2026-10-28",
+  "quotedCreditsPerImage": 0.25,
+  "notes": "Generated base-colour textures, not captured PBR scans. Original generator output retained. No normal/height maps are inferred from these images.",
+  "assets": [
+    {
+      "file": "appliance_enamel.png",
+      "jobId": "d7514132-45e9-439b-91ca-fb0e66f80073",
+      "prompt": "Square seamless diffuse albedo texture for a realistic 3D small household electric fan repaired in a Vietnamese neighbourhood workshop. Flat orthographic close-up material scan of faded muted sage green enamel paint over metal, restrained tiny irregular chips exposing dull grey metal, fine scratches from years of handling, faint greasy wear, slight age mottling. Predominantly intact matte paint, approximately 40 cm square, believable used appliance not abandoned rust. No large rust patches. Entire image is only flat material, no fan shape, no objects, no text, no trim, no borders, no perspective, no directional light, no cast shadows, no highlights, no vignette. Consistent matching opposite edges for tiling, low contrast subtle detail, high resolution. Base colour only; lighting is supplied by a game engine."
+    },
+    {
+      "file": "repair_wood.png",
+      "jobId": "bc6e3091-437e-4689-ac8e-7c708c2c7b32",
+      "prompt": "Photorealistic game texture, diffuse albedo only, square seamless tile. Orthographic straight overhead scan of a well-used Vietnamese electronics repair workbench surface, three very wide longitudinal hardwood boards, muted medium warm grey-brown wood, subtle grain, worn varnish, fine screwdriver scratches, tiny shallow solder burn marks and faint old oil marks distributed irregularly. Boards run vertically, no end joints, no framing. Physical surface covers about 1.6 by 1.6 metres. Quiet believable everyday wear, not dramatic damage. Entire image is flat surface, edge to edge. Uniform soft diffuse illumination, no shadows, no directional lighting, no ambient occlusion, no vignette, no perspective, no bevelled edges, no objects, no tools, no lettering, no watermark. Matching opposite edges for repeat texture, avoid conspicuous repeated marks, restrained contrast. This will be mapped onto real 3D geometry."
+    },
+    {
+      "file": "hanoi_plaster.png",
+      "jobId": "0b6c3798-597c-4969-b53d-fe7cb301e04f",
+      "prompt": "Photorealistic square seamlessly tileable diffuse albedo texture for a 3D Hanoi old quarter building. Flat straight-on orthographic scan of aged lime plaster, pale neutral warm ivory-grey, subtle irregular limewash layers, fine gritty pores, gently mottled plaster repairs, scattered tiny chipped flecks and fine hairline cracks, faint grey-green humidity traces. Surface represents about two metres square. Lived-in modest Vietnamese neighbourhood, believable maintained old walls, not abandoned ruins. Neutral desaturated base so material tint can vary per house. Entire frame wall material, no buildings, no bricks exposed, no window, no doors, no ground, no props, no lettering, no borders. Even diffuse lighting with no cast shadows, no AO, no sunlight, no vignette or perspective. Matching opposite edges, no dominant central stain, no geometric repeated pattern. Actual usable albedo texture, not a scene illustration."
+    },
+    {
+      "file": "billiards_felt.png",
+      "jobId": "6cc7e089-40a6-4833-98ae-d00d3870bbc7",
+      "prompt": "Photorealistic square seamless tileable diffuse albedo texture of worn billiards table wool felt, muted deep forest green teal. Straight overhead orthographic macro surface scan covering about 60 centimetres square. Fine dense short wool fibres, subdued irregular nap direction, delicate natural colour variation, very faint chalk dust specks, modest wear from regular use, mostly clean and even. Low contrast uniform textile field. No weave grid, no stripes, no large stains, no holes. Matching opposite edges in both axes. No table, balls, cue, markings, lettering, hands, borders, perspective, highlights, directional light, shadows or vignette. Flat evenly lit base colour only for a physically shaded 3D game material, full-bleed material swatch."
+    }
+  ]
+}

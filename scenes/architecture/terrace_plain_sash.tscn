@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/architecture/terrace_plain_sash_ground.res" id="1_5gil7"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/terrace_plain_sash_upper.res" id="2_qs2ps"]
+[ext_resource type="ArrayMesh" path="res://assets/architecture/terrace_plain_sash_roof.res" id="3_mucnu"]
+
+[node name="terrace_plain_sash" type="Node3D" unique_id=1601025465]
+metadata/kind = "residential"
+metadata/width = 5.8
+metadata/depth = 8.0
+metadata/height = 7.2
+metadata/seed = 4
+
+[node name="GroundArchitecture" type="Node3D" parent="." unique_id=862396898]
+metadata/blockers = Array[Rect2]([Rect2(-2.9, -8, 0.3, 8), Rect2(2.6, -8, 0.3, 8), Rect2(-2.9, -8, 5.8, 0.3), Rect2(-2.9, -0.3, 1.305, 0.6), Rect2(1.595, -0.3, 1.305, 0.6)])
+
+[node name="MasonryAndDetails" type="MeshInstance3D" parent="GroundArchitecture" unique_id=744907440]
+mesh = ExtResource("1_5gil7")
+
+[node name="UpperArchitecture" type="Node3D" parent="." unique_id=777821633]
+
+[node name="UpperAndBalcony" type="MeshInstance3D" parent="UpperArchitecture" unique_id=1258604015]
+mesh = ExtResource("2_qs2ps")
+
+[node name="RoofArchitecture" type="Node3D" parent="." unique_id=1376931599]
+
+[node name="RoofAndCornice" type="MeshInstance3D" parent="RoofArchitecture" unique_id=915672754]
+mesh = ExtResource("3_mucnu")

@@ -1,0 +1,668 @@
+{
+ "_ghi_chu": "Chương 5 · Tháng Chín gió heo may (ngày 121–150). reps: tên nhân vật mới (TIEM là tên gọi chung những người góp tiệm trong sổ tay, không có độ thân thiết); npcs: nhân vật mới đứng trước cửa địa điểm (when là lúc có mặt); locations: lời tả địa điểm đổi ở chương 5; endings N1–N6 xét theo thứ tự N6 → N5 → N4 → N3 → N2 → N1 (game_logic.ending5_key); cards: thẻ hậu truyện, mỗi thẻ lấy dòng pick đầu tiên thỏa điều kiện; npcCards, keepsakes, codas, teasers như các chương trước.",
+ "title": "Chương 5 · Tháng Chín gió heo may",
+ "continue": "Ngày 121–150: gió heo may đầu mùa, lớp điện lạnh buổi tối, nước sông lên rằm tháng Chín, mẹ tròn năm mươi, và một câu hỏi chưa ai hỏi An: còn con, con muốn gì",
+ "reps": {
+  "PHONG": "Thầy Phong",
+  "TIEM": "Người góp tiệm"
+ },
+ "npcs": [
+  {
+   "id": "PHONG",
+   "name": "Thầy Phong",
+   "loc": "ben_xe_6",
+   "color": "7a6a3a",
+   "slot": 1,
+   "when": {
+    "from_day": 122
+   }
+  }
+ ],
+ "locations": {
+  "ben_xe_6": {
+   "desc": "Điểm xe buýt Long Biên ở đầu phố Hàng Chiếu. Bên trái là trung tâm bảo hành Thăng Long đèn trắng, bên phải là trung tâm nghề có lớp điện lạnh buổi tối, cửa sổ tầng hai sáng đèn tới chín giờ."
+  },
+  "cho_cau_nho": {
+   "desc": "Chợ Long Biên đang lợp lại mái tôn, giàn giáo dựng ở cổng, dãy sạp phía bãi sông dời ra chân cầu. Sau chợ có trạm y tế phường, cửa sơn xanh."
+  }
+ },
+ "endings": {
+  "N1": {
+   "tag": "Giữ nhịp",
+   "title": "Gió heo may đầu mùa",
+   "text": "Đêm ba mươi tháng Chín, tờ lịch tháng Mười dán trên cánh tủ có một dòng bút mực của An. Không phải chuyện lớn: một tối không làm gì, một lần nói \"không\", một câu trả lời thật khi có người hỏi con muốn gì. Tiệm vẫn đứng, nhà vẫn đủ, gió heo may vẫn thổi. An không ôm hết. Anh chừa một chỗ cho mình.",
+   "quote": "Bà Thoa: \"Bốn tháng con lo cho cả nhà. Tháng này con lo cho con một chút. Bà thấy nhà vững hơn.\"",
+   "epilogue": "Ba tháng sau, Tết. Trên tờ danh sách ăn Tết của bà, tên An tô mực, bên cạnh có thêm một dòng bút chì của bà: \"muốn gì thì nói\". An nói. Có lần nói được, có lần không, mà lần nào cũng có người nghe.",
+   "variants": [
+    {
+     "when": {
+      "flag.vaoTrungTam": true
+     },
+     "text": "Đêm ba mươi tháng Chín, tháng đầu đi làm công khép lại. Lương đúng ngày, giờ hành chính, Chủ Nhật không ai gọi. Tờ lịch tháng Mười có một dòng bút mực của An: điều anh muốn cho mình, không phải điều nhà cần. Gió heo may thổi qua điểm xe buýt Long Biên mỗi sáng bảy giờ."
+    }
+   ]
+  },
+  "N2": {
+   "tag": "Chung mái",
+   "title": "Hai cái bếp một mái hiên",
+   "text": "Đêm ba mươi tháng Chín, dưới mái hiên tiệm có hai cái bếp: bếp than rán bánh của chị Lụa, và cái bàn hàn ống đồng của An. Tờ giấy ghi chia điện nước dán ở cột, chữ ký của mọi người đứng tên tiệm, chữ ký của chị Lụa sau cùng. Khách ăn bánh xong ghé hỏi sửa quạt, khách sửa quạt xong ở lại ăn bánh. Không ai quyết hộ ai.",
+   "quote": "Chị Lụa: \"Chợ lợp mái xong rồi. Mà tôi ở thêm một tháng được không? Lần này tôi hỏi trước.\"",
+   "epilogue": "Ba tháng sau, chợ Long Biên đã có mái mới, mà sạp bánh rán vẫn đứng dưới hiên tiệm, có tờ giấy thuê ký lại, có đồng hồ điện phụ. Tín ngồi giữa hai cái bếp làm bài, ngửi mùi bánh, nghe tiếng máy. Nó bảo đây là chỗ học tốt nhất phường."
+  },
+  "N3": {
+   "tag": "Có giấy",
+   "title": "Tờ giấy có con dấu đỏ",
+   "text": "Đêm ba mươi tháng Chín, trên vách tiệm cạnh bảng giá có một tờ giấy chứng nhận lớp điện lạnh, con dấu đỏ, dán bằng bốn miếng băng dính. Mười lăm buổi tối, sáu buổi thực hành, một mối hàn không xì. Lần đầu An tiêu tiền và thời gian cho chính mình, mà nhà không thiếu gì. Năm sau của anh đã tới.",
+   "quote": "Thầy Phong: \"Năm sau của cậu tới rồi đấy.\" An: \"Dạ. Em tưởng nó không tới.\"",
+   "epilogue": "Ba tháng sau, tiệm có thêm một dòng trên bảng giá: \"Điều hòa · có giấy · báo giá trước\". Cô giáo ngõ 42 giới thiệu cả dãy. Tối thứ Ba, thứ Năm, An phụ thực hành lớp khóa sau của thầy Phong, ngồi bàn đầu, dạy mấy đứa trẻ sờ ống đồng trước khi nhìn đồng hồ.",
+   "variants": [
+    {
+     "when": {
+      "flag.vaoTrungTam": true
+     },
+     "text": "Đêm ba mươi tháng Chín, trong ngăn bàn ở trung tâm có tờ giấy chứng nhận lớp điện lạnh, con dấu đỏ. Trung tâm trả học phí, An trả mười lăm buổi tối. Anh Quân xếp An vào tổ điều hòa mới, tổ trưởng. Lần đầu An nhận một chức mà không thấy mình mắc nợ ai."
+    }
+   ]
+  },
+  "N4": {
+   "tag": "Lỡ hẹn",
+   "title": "Gió thổi tờ giấy hẹn",
+   "text": "Đêm ba mươi tháng Chín, có một khoản chưa trả đủ: tiền nhà, tiền mặt bằng, đợt cuối tiền đồ nghề của chú Sơn, hay chỗ ở vẫn chưa chắc qua tháng Mười. An viết giấy hẹn, dán ở cửa, gió heo may thổi bay hai lần, lần thứ ba anh đóng đinh. Người đọc có người lắc đầu, có người gật.",
+   "quote": "Chú Sơn (qua điện thoại, từ Thái Bình): \"Đợt cuối muộn thì muộn. Chú không cần tiền gấp. Chú cần cháu nói trước.\"",
+   "epilogue": "Ba tháng sau, khoản muộn đã trả, tờ giấy hẹn gỡ xuống, còn bốn lỗ đinh trên cửa. An để nguyên bốn lỗ đinh, không trát. Mỗi lần nhận một việc mới, anh nhìn bốn cái lỗ ấy trước khi nói \"được\"."
+  },
+  "N5": {
+   "tag": "Ôm vào tay",
+   "title": "Dòng cuối vẫn trống",
+   "text": "Đêm ba mươi tháng Chín, dòng cuối tờ lịch vẫn trống. Tháng này An lại quyết thay người khác, giấu người nhà chuyện của mình: cái lưng, cái lớp học, cái tiền. Không ai giận to. Người ta chỉ thôi hỏi An muốn gì, vì hỏi mãi không ai trả lời.",
+   "quote": "Bà Thoa: \"Bà hỏi con ba lần trong tháng. Lần thứ tư bà không hỏi nữa. Không phải bà giận. Bà mệt.\"",
+   "epilogue": "Một tháng sau, An tập một việc khó hơn sửa điều hòa: khi có người hỏi \"con muốn gì\", không trả lời \"cả nhà khỏe\". Lần đầu nói ra, giọng anh lạ như giọng người khác. Bà gật, ghi vào dòng cuối tờ lịch tháng Mười, bút mực."
+  },
+  "N6": {
+   "tag": "Kiệt sức",
+   "title": "Cái lưng không thẳng lại",
+   "text": "Đêm ba mươi tháng Chín, An nằm sấp trên tấm phản cứng, lưng không thẳng lại được, tờ giấy dặn của bác sĩ đè dưới hũ mắm của chị Cả. Một tháng nhận hết, khiêng hết, trực hết, học hết. Cái lưng nói thay An điều anh không nói: con người cũng có giới hạn tải.",
+   "quote": "Bà Thoa: \"Ông ngoại con không nói. Bà biết bằng cách ông đứng dậy. Con cũng thế.\"",
+   "epilogue": "Hai tuần sau, An đứng dậy được, đeo cái đai lưng, không khiêng gì quá hai chục cân. Tiệm hụt một khoản, lớp học dời sang khóa sau, tổ an toàn điện giao cho Trâm. Không ai trách. Chỉ có tờ giấy dặn của bác sĩ dán trên cánh tủ, ngay dòng cuối tờ lịch, chỗ lẽ ra An phải tự ghi."
+  }
+ },
+ "cards": [
+  {
+   "id": "phong",
+   "title": "THẦY PHONG",
+   "pick": [
+    {
+     "when": {
+      "flag.phuGiangKhoaSau": true
+     },
+     "key": "ban_dau"
+    },
+    {
+     "when": {
+      "flag.hocXong": true
+     },
+     "key": "hoc_tro"
+    },
+    {
+     "when": {
+      "flag.hocDo": true
+     },
+     "key": "hoc_lai"
+    },
+    {
+     "when": {
+      "flag.phongNoiCon": true
+     },
+     "key": "con_ve"
+    },
+    {
+     "when": {},
+     "key": "nam_sau"
+    }
+   ],
+   "items": {
+    "ban_dau": {
+     "title": "Cái bàn đầu",
+     "text": "Tối thứ Ba, thứ Năm, An ngồi bàn đầu lớp điện lạnh khóa mới, phụ thầy Phong. Thầy giảng bằng chữ, An giảng bằng tay. Mấy đứa trẻ hỏi chú An sao không học từ hồi mười chín. An bảo hồi ấy chú để năm sau."
+    },
+    "hoc_tro": {
+     "title": "Học trò bàn đầu",
+     "text": "Thầy Phong kể với lớp khóa sau về một học trò bàn đầu, mối hàn không xì, học xong mà vẫn ghé lớp hỏi chữ. Thầy không nói tên. Ai ở phường cũng biết."
+    },
+    "hoc_lai": {
+     "title": "Danh sách một tên",
+     "text": "Khóa sau, danh sách học lại của thầy Phong vẫn có một tên. Tối thứ Hai đầu tiên, cái tên ấy tới sớm nhất lớp."
+    },
+    "con_ve": {
+     "title": "Một buổi dạy",
+     "text": "Tết, con trai thầy Phong từ Úc về, ngồi hàng ghế cuối xem bố dạy một buổi. Thầy giảng vòng tuần hoàn ga lạnh lần thứ một nghìn, mà giọng run như lần đầu."
+    },
+    "nam_sau": {
+     "title": "Tờ rơi năm sau",
+     "text": "Thầy Phong vẫn để tờ rơi lớp điện lạnh ở quán chị Hạnh mỗi khóa, sau lưng viết bằng bút mực: \"Còn ghi danh được.\""
+    }
+   }
+  },
+  {
+   "id": "lua",
+   "title": "CHỊ LỤA",
+   "pick": [
+    {
+     "when": {
+      "flag.choLuaBan": true
+     },
+     "key": "chung_hien"
+    },
+    {
+     "when": {
+      "flag.luaSanTruong": true
+     },
+     "key": "san_truong"
+    },
+    {
+     "when": {
+      "flag.luaDoiCau": true
+     },
+     "key": "chan_cau"
+    },
+    {
+     "when": {},
+     "key": "cho_moi"
+    }
+   ],
+   "items": {
+    "chung_hien": {
+     "title": "Đồng hồ điện phụ",
+     "text": "Dưới mái hiên tiệm có một cái đồng hồ điện phụ, số ghi mỗi tối bằng chữ của chị Lụa. Chợ lợp mái xong, chị xin ở thêm, lần này chị hỏi trước, có giấy."
+    },
+    "san_truong": {
+     "title": "Sân cổng phụ",
+     "text": "Chị Lụa rán bánh ở sân cổng phụ trường cuối phố Hàng Khoai sáu tuần, quét sân sạch hơn lao công. Học trò tan học xếp hàng mua bánh, cô Mai cũng xếp hàng."
+    },
+    "chan_cau": {
+     "title": "Khói tạt chân cầu",
+     "text": "Sáu tuần chị Lụa rán bánh ở chân cầu Long Biên, gió heo may tạt khói vào mặt. Khách quen vẫn tới, có người đứng ăn, có người mang về. Chị bảo chị khóc sáu tuần mà không buồn."
+    },
+    "cho_moi": {
+     "title": "Mái tôn mới",
+     "text": "Chợ Long Biên lợp mái xong, sạp bánh rán về chỗ cũ, dưới mái tôn mới sáng loáng. Chị Lụa bảo mái mới nóng hơn, mà không dột."
+    }
+   }
+  },
+  {
+   "id": "tin",
+   "title": "THẰNG TÍN",
+   "pick": [
+    {
+     "when": {
+      "flag.luaCam": true,
+      "flag.luaBotCam": false
+     },
+     "key": "ben_kia"
+    },
+    {
+     "when": {
+      "flag.baoLuaBaTin": true
+     },
+     "key": "ba_gap"
+    },
+    {
+     "when": {
+      "flag.kemToan": true
+     },
+     "key": "toan_dien"
+    },
+    {
+     "when": {
+      "flag.tinToanLen": true
+     },
+     "key": "toan_len"
+    },
+    {
+     "when": {},
+     "key": "lop8"
+    }
+   ],
+   "items": {
+    "ben_kia": {
+     "title": "Năm điểm qua đường",
+     "text": "Tín vẫn không được tới tiệm. Nó giơ bài kiểm tra từ bên kia đường, lần đầu năm điểm Toán, hét to cho An nghe. Chị Lụa đứng sau lưng nó, không kéo nó về."
+    },
+    "ba_gap": {
+     "title": "Ban ngày, ở chợ",
+     "text": "Tín gặp bố nó mỗi tháng một lần, ban ngày, ở quán nước đầu chợ, mẹ nó ngồi bàn bên. Bố nó biết thêm Tín thích sửa quạt. Tín biết thêm bố nó thích câu cá. Chưa ai học được cách nói chuyện lâu hơn mười lăm phút."
+    },
+    "toan_dien": {
+     "title": "Phân số bằng dây điện",
+     "text": "Tín bảy điểm Toán, câu cuối cô chấm \"cách lạ\". Tối thứ Ba, thứ Năm nó vẫn ngồi bàn chung, mà giờ nó giảng lại cho cu Bin đếm số bằng mấy sợi dây điện vụn."
+    },
+    "toan_len": {
+     "title": "Vách sạp hết chỗ",
+     "text": "Vách sạp bánh rán dán ba bài kiểm tra: Vật lý chín, Toán sáu, Công nghệ mười. Chị Lụa bảo vách hết chỗ rồi, học giỏi thêm thì dán lên trần."
+    },
+    "lop8": {
+     "title": "Bàn cuối",
+     "text": "Tín học lớp Tám, ngồi bàn cuối cạnh cửa sổ, nghe cánh quạt nào quay lệch. Toán vẫn kém, mà nó không sợ nữa."
+    }
+   }
+  },
+  {
+   "id": "ba_tu",
+   "title": "BÀ THOA",
+   "pick": [
+    {
+     "when": {
+      "flag.ghiMuon": true
+     },
+     "key": "but_muc"
+    },
+    {
+     "when": {
+      "flag.baVeChamHai": true
+     },
+     "key": "can_giuoc"
+    },
+    {
+     "when": {
+      "flag.canBa": true
+     },
+     "key": "o_nha"
+    },
+    {
+     "when": {},
+     "key": "dong_trong"
+    }
+   ],
+   "items": {
+    "but_muc": {
+     "title": "Cái bút buộc chỉ đỏ",
+     "text": "Trên đinh cạnh tờ lịch có cái bút mực buộc sợi chỉ đỏ. Tháng nào bà cũng chừa dòng cuối, và tháng nào dòng ấy cũng có chữ của An, bút mực. Bà đọc, không sửa chữ nào."
+    },
+    "can_giuoc": {
+     "title": "Hai tuần ở Giao Thủy",
+     "text": "Bà về từ Giao Thủy gầy đi, đi nhanh hơn. Tối Chủ Nhật nào bà cũng gọi chị Cả, xem chị cầm đũa tay phải, khen từng hạt lạc chị gắp được."
+    },
+    "o_nha": {
+     "title": "Cuộc gọi tới khuya",
+     "text": "Bà không về Giao Thủy. Tối nào bà cũng gọi chị Cả tới khuya, giọng nhỏ, như người ngồi bên giường mà không với tới được."
+    },
+    "dong_trong": {
+     "title": "Dòng bút chì",
+     "text": "Dòng cuối tờ lịch tháng Mười, bà lại để trống. Bà bảo bà chờ. Bà không nói chờ tới bao giờ."
+    }
+   }
+  },
+  {
+   "id": "ma",
+   "title": "MẸ",
+   "pick": [
+    {
+     "when": {
+      "flag.keMaNghe": true,
+      "flag.hoiMaSinhNhat": true
+     },
+     "key": "tam_hinh"
+    },
+    {
+     "when": {
+      "flag.keMaHoc": true
+     },
+     "key": "lop_may"
+    },
+    {
+     "when": {
+      "flag.keMaNghe": true
+     },
+     "key": "dem_khuya"
+    },
+    {
+     "when": {
+      "flag.batNgoMa": true
+     },
+     "key": "dong_vui"
+    },
+    {
+     "when": {
+      "flag.maVe": true,
+      "flag.maDaDi": false
+     },
+     "key": "o_nha"
+    },
+    {
+     "when": {},
+     "key": "xa"
+    }
+   ],
+   "items": {
+    "tam_hinh": {
+     "title": "Năm người, không ai cầm điện thoại",
+     "text": "Tấm ảnh sinh nhật năm mươi của mẹ lồng khung, treo trên cánh tủ: năm người, không ai cầm điện thoại, bà nhắm mắt, mẹ cười hở răng. Mẹ bảo tấm ảnh ấy là lần đầu mẹ được hỏi."
+    },
+    "lop_may": {
+     "title": "Lớp may buổi tối",
+     "text": "Tháng Mười, mẹ ghi danh lớp may buổi tối ở trung tâm nghề, tầng một, ngay dưới lớp điện lạnh. Hai mẹ con đi chung một chuyến xe buýt, về chung một chuyến."
+    },
+    "dem_khuya": {
+     "title": "Năm sau có con",
+     "text": "Mẹ kể với An chuyện hồi hai mươi, muốn học may mà để năm sau. Kể xong mẹ không buồn. Mẹ bảo kể ra rồi thì nó nhẹ."
+    },
+    "dong_vui": {
+     "title": "Đồ đi làm",
+     "text": "Tiệc sinh nhật năm mươi đông vui, mẹ mặc đồ đi làm. Mẹ cảm ơn từng người. Lúc về mẹ nói nhỏ: lần sau hỏi mẹ trước, mẹ thích ít người."
+    },
+    "o_nha": {
+     "title": "Máy khâu đạp chân",
+     "text": "Mẹ vẫn ngồi máy khâu đạp chân mỗi tối, lên gấu cho khách quen. Mẹ năm mươi rồi, mà đạp máy nhanh hơn hồi bốn mươi."
+    },
+    "xa": {
+     "title": "Thổi nến hai lần",
+     "text": "Mẹ thổi nến sinh nhật năm mươi ở xưởng, rồi thổi lại một lần qua điện thoại cho nhà xem. Mẹ bảo thổi hai lần thì điều ước chắc gấp đôi."
+    }
+   }
+  },
+  {
+   "id": "linh",
+   "title": "LINH",
+   "pick": [
+    {
+     "when": {
+      "flag.giauTienLinh": true
+     },
+     "key": "chu_da"
+    },
+    {
+     "when": {
+      "flag.hoiLinhC5": true
+     },
+     "key": "giang_lai"
+    },
+    {
+     "when": {
+      "flag.tienLinhThi": true
+     },
+     "key": "tu_di"
+    },
+    {
+     "when": {},
+     "key": "thi_xong"
+    }
+   ],
+   "items": {
+    "chu_da": {
+     "title": "Một chữ \"Dạ\"",
+     "text": "Linh đi thi liên thông bằng tiền anh chuyển, nói là của bà. Em biết. Em không hỏi. Tin nhắn của em từ đó ngắn hơn, ít dấu chấm than hơn."
+    },
+    "giang_lai": {
+     "title": "Bài máy biến áp",
+     "text": "Tối thứ Bảy nào Linh cũng gọi, giảng lại cho anh một bài. Em đỗ liên thông, giấy mượn sáu trăm dán sau cửa phòng trọ, gạch dần từng trăm."
+    },
+    "tu_di": {
+     "title": "Ghế cạnh cửa sổ",
+     "text": "Linh đi thi một mình, ngồi ghế cạnh cửa sổ xe buýt, giơ thẻ dự thi lên cho anh xem. Em đỗ. Em bảo cái làm em vui nhất là anh không đưa."
+    },
+    "thi_xong": {
+     "title": "Câu Văn về bà",
+     "text": "Linh thi xong, câu mạch điện làm hết, câu Văn viết về bà. Em đỗ nhờ câu Văn."
+    }
+   }
+  },
+  {
+   "id": "ong_ba",
+   "title": "ÔNG BẢO",
+   "pick": [
+    {
+     "when": {
+      "flag.trucDemXong": true
+     },
+     "key": "chiec_do"
+    },
+    {
+     "when": {
+      "flag.ongBaDi": true
+     },
+     "key": "tang_chin"
+    },
+    {
+     "when": {
+      "flag.ongBaXuatVien": true
+     },
+     "key": "go_van"
+    },
+    {
+     "when": {},
+     "key": "radio"
+    }
+   ],
+   "items": {
+    "chiec_do": {
+     "title": "Kể tiếp từ chiếc đò",
+     "text": "Ông Bảo kể chuyện năm 1976 lần thứ tám, bắt đầu từ chiếc đò, chỗ ông ngủ quên ở bệnh viện. Ông bảo ông để dành đoạn cuối, kể cho người trực đêm thứ ba."
+    },
+    "tang_chin": {
+     "title": "Cái gì gõ được",
+     "text": "Ông Bảo ở tầng chín với anh Tài. An lên thăm, mang theo một miếng ván xoan cũ. Ông đặt miếng ván trên bậu cửa sổ, sáng nào cũng gõ hai tiếng."
+    },
+    "go_van": {
+     "title": "Hai tiếng trên mặt ván",
+     "text": "Ông Bảo ngồi bậc ván cái hiên mỗi chiều, gõ hai tiếng. Ai đi qua cũng gõ lại một tiếng. Ông bảo nằm viện mười một ngày, về mới biết cả xóm biết gõ."
+    },
+    "radio": {
+     "title": "Đài mở to bù",
+     "text": "Ông Bảo khỏi bệnh, mở đài to hơn ngày trước, bảo là bù mười một ngày ở bệnh viện không được mở to."
+    }
+   }
+  }
+ ],
+ "npcCards": {
+  "PHONG": {
+   "good": "Thầy Phong giữ một mẩu ống đồng có mối hàn của An trong hộp bút, đưa học trò khóa sau xem.",
+   "bad": "Thầy Phong gật đầu chào ở điểm xe buýt, hỏi câu cũ: \"Năm sau à?\""
+  },
+  "TIN": {
+   "good": "Tín có hai cái tua vít trong túi, một cái khắc chữ T, và một tờ bài Toán dán trên vách sạp.",
+   "bad": "Tín ít ghé, có ghé thì đứng ở cửa."
+  },
+  "LUA": {
+   "good": "Chị Lụa phát phiếu \"Khách chị Lụa · bớt 10%\" cho mỗi người ăn bánh.",
+   "bad": "Chị Lụa gật đầu chào, rán bánh tiếp."
+  },
+  "KHA": {
+   "good": "Kha gửi từ Thanh Hóa ra một thùng cá khô, trên nắp viết: \"Phần góp tháng này. Lãi thì ăn, lỗ thì nhắn.\"",
+   "bad": "Kha về Thanh Hóa, ít nhắn."
+  },
+  "TRAM": {
+   "good": "Trâm ghi lên trang đầu sổ tay của tổ: \"Quyết gì cũng hỏi trước. Kể cả chuyện nhỏ.\"",
+   "bad": "Trâm giữ khoảng cách nghề nghiệp, gặp ở chợ vẫn chào."
+  },
+  "HANH": {
+   "good": "Chị Hạnh mở quán thứ hai bên kia cầu Long Biên, biển hiệu ghi \"Cơm Hạnh 2 · giá thường\".",
+   "bad": "Chị Hạnh vẫn để miếng cao dán ghi tên An trong ngăn kéo quầy."
+  },
+  "MINH": {
+   "good": "Cu Bin bảo lớn lên làm thợ điện có giấy. Minh mua cho nó cái bút chì có cục tẩy hình cái quạt.",
+   "bad": "Minh chạy ba gác ngược gió heo may, ít ghé."
+  },
+  "DUYEN": {
+   "good": "Tổ an toàn điện mùa nước có danh sách mười một nhà, mỗi đợt nước lên một người trực, tên ghi bằng chữ cô Duyên.",
+   "bad": "Cô Duyên tự đi kiểm mười một nhà mỗi đợt nước lên, chống cái chổi cán gỗ."
+  },
+  "QUAN": {
+   "good": "Anh Quân ghi trong điện thoại: \"Thằng An · điều hòa phường · có giá.\"",
+   "bad": "Anh Quân nhắn chúc tháng mới, không nhắc việc."
+  },
+  "MAI": {
+   "good": "Cô Mai ghi trong sổ phụ đạo: \"Dạy phân số bằng dây điện · gọi An.\"",
+   "bad": "Cô Mai gọi tiệm khác khi trường cần sửa quạt."
+  },
+  "ONG_BA": {
+   "good": "Ông Bảo đánh dấu nước lên rằm tháng Chín vào cuốn lịch cũ: \"Năm nay bậc ba. Thằng An kể.\"",
+   "bad": "Ông Bảo gật đầu chào, không kể chuyện gì."
+  },
+  "SAU": {
+   "good": "Chú Sơn gọi từ Thái Bình, hỏi cái ghế đẩu còn đứng không, không hỏi tiền đợt cuối.",
+   "bad": "Chú Sơn về quê, ít gọi."
+  }
+ },
+ "keepsakes": [
+  {
+   "id": "giay_chung_nhan",
+   "name": "Giấy chứng nhận lớp điện lạnh",
+   "when": {
+    "flag.hocXong": true
+   },
+   "text": "con dấu đỏ, dán bằng bốn miếng băng dính cạnh bảng giá."
+  },
+  {
+   "id": "ong_dong",
+   "name": "Mẩu ống đồng có mối hàn",
+   "when": {
+    "flag.ghiDanhHoc": true
+   },
+   "text": "ngâm chậu nước không có bọt nào."
+  },
+  {
+   "id": "giay_bac_si",
+   "name": "Tờ giấy dặn của bác sĩ",
+   "when": {
+    "flag.khamLung": true
+   },
+   "text": "hai tuần không khiêng gì quá hai chục cân, dán trên cánh tủ dưới tờ lịch."
+  },
+  {
+   "id": "ghe_va",
+   "name": "Cái ghế đẩu chân mới",
+   "when": {
+    "flag.gheVa": true
+   },
+   "text": "chân gỗ xoan nhạt màu hơn ba chân kia, không sơn."
+  },
+  {
+   "id": "giay_lua",
+   "name": "Tờ giấy chia mái hiên",
+   "when": {
+    "flag.giayLua": true
+   },
+   "text": "bếp bên trái, khói ra đường, đồng hồ điện phụ, chữ ký chị Lụa sau cùng."
+  },
+  {
+   "id": "hinh_ca_nha",
+   "name": "Tấm ảnh sinh nhật năm mươi của mẹ",
+   "when": {
+    "flag.hinhCaNha": true
+   },
+   "text": "năm người, không ai cầm điện thoại."
+  },
+  {
+   "id": "danh_sach_11",
+   "name": "Danh sách mười một nhà",
+   "when": {
+    "flag.toAnToan": true
+   },
+   "text": "người già ở một mình, ổ cắm ở đâu, CB ở đâu, chữ cô Duyên."
+  },
+  {
+   "id": "but_chi_do",
+   "name": "Cái bút mực buộc chỉ đỏ",
+   "when": {
+    "flag.ghiMuon": true
+   },
+   "text": "treo trên đinh cạnh tờ lịch, mỗi tháng một dòng."
+  },
+  {
+   "id": "hop_mam",
+   "name": "Hũ mắm của chị Cả",
+   "when": {
+    "flag.baVeChamHai": true
+   },
+   "text": "năm nay mặn, vì bà đứng canh."
+  }
+ ],
+ "codas": [
+  {
+   "when": {
+    "flag.hocXong": true
+   },
+   "text": "Cô giáo về hưu ngõ 42 gọi tiệm: điều hòa nhà cô hàng xóm chạy mà không mát. Cô nói trước: \"Cô giới thiệu thợ có giấy.\""
+  },
+  {
+   "when": {
+    "flag.choLuaBan": true
+   },
+   "text": "Chợ lợp mái xong. Chị Lụa gõ cửa tiệm, tờ giấy thuê mới trong tay, hỏi trước khi ngồi: \"Một tháng nữa được không?\""
+  },
+  {
+   "when": {
+    "flag.giaoBot": true
+   },
+   "text": "Tờ lịch tuần trên cánh tủ có một ô khoanh tròn bút chì: \"không làm gì\". Tối thứ Năm ấy An ngủ lúc chín giờ, bà kéo chăn hộ."
+  },
+  {
+   "when": {
+    "flag.noiKhong": true
+   },
+   "text": "Trâm làm tổ trưởng tổ an toàn điện mùa nước. Cô Duyên bảo tổ có hai người làm được, vì có một người biết nói không."
+  },
+  {
+   "when": {
+    "flag.baoLuaBaTin": true
+   },
+   "text": "Tháng Mười, bố của Tín đứng ở đầu chợ lần nữa. Lần này chị Lụa vẫy vào, kéo ghế, rót trà."
+  },
+  {
+   "when": {
+    "flag.muaPhanKha": true
+   },
+   "text": "Tết, Kha từ Thanh Hóa gửi ra giấy biên nhận đợt một, ký tên, kèm câu: \"Bớt cho mày năm chục, tiền ăn cơm Hạnh.\""
+  },
+  {
+   "when": {
+    "flag.giuGiaMatBang": true
+   },
+   "text": "Cô Tâm đi qua tiệm, ngó cái hợp đồng một năm dán sau cửa, gật đầu. Bên kia đường người ta trả hai triệu, mà mặt bằng bên ấy vẫn trống."
+  },
+  {
+   "when": {
+    "flag.phongNoiCon": true
+   },
+   "text": "Thầy Phong nhắn: \"Con tôi trả lời rồi. Tết nó về xem tôi dạy một buổi.\""
+  },
+  {
+   "when": {
+    "flag.gheVa": true
+   },
+   "text": "Chú Sơn gọi từ Thái Bình, nhờ bật video, xem cái chân ghế mới. Chú xem lâu, rồi bảo: \"Nhạt màu. Cứ để thế. Mười năm nữa nó cũng cũ.\""
+  }
+ ],
+ "teasers": {
+  "121": "Mai mùng một tháng Chín. Gió heo may thổi về từ phía bãi sông.",
+  "122": "Mai có người chở một cái tủ lạnh mini sau xe đạp, buộc bằng dây chun.",
+  "123": "Mai có cái tủ lạnh hai cửa chảy nước ở trên tầng ba.",
+  "124": "Mai phường dán thông báo ở cổng chợ Long Biên.",
+  "125": "Sáng mai cái nút băng dính đỏ trên điện thoại của bà sẽ nháy đèn.",
+  "126": "Mai Chủ Nhật. Có đứa bé làm bài Toán gạch xóa tới thủng giấy.",
+  "127": "Tối mai lớp điện lạnh khai giảng ở trung tâm nghề cạnh điểm xe buýt Long Biên.",
+  "128": "Mai có người ngồi trên cái ghế đẩu mà không động vào chén trà.",
+  "129": "Mai trời mưa. Có người đứng dưới mái hiên giũ ô, nói chuyện giá cả nhỏ nhẹ như nói chuyện thời tiết.",
+  "130": "Sáng mai mở cửa cuốn sẽ thấy một món đồ ba mươi lăm năm chưa ai sửa.",
+  "131": "Mai trưa ở quán chị Hạnh có người cúi xuống nhặt đôi đũa.",
+  "132": "Tối mai có cuộc gọi video. Sau lưng người gọi là tấm lịch khoanh đỏ ngày 147.",
+  "133": "Mai Chủ Nhật. Điện thoại reo từ sáng sớm, số của anh Tài.",
+  "134": "Mai có người chỉ tin thợ nói thay hay không thay.",
+  "135": "Mai rằm tháng Chín, nước sông Hồng lên to nhất năm.",
+  "136": "Tối mai tổ dân phố họp ở sân kho, ghế nhựa kê trên ván.",
+  "137": "Mai có đứa bé đứng ở đầu chợ, cặp còn đeo trên vai, không về nhà.",
+  "138": "Tối mai buổi thực hành hàn ống đồng. Mỗi mối hàn ngâm vào một chậu nước.",
+  "139": "Mai chiều có người ngồi xuống bàn sửa, mở cuốn sổ tiệm, chỉ vào một dòng.",
+  "140": "Mai Chủ Nhật. Chuyến xe chín giờ từ dưới quê về tới điểm xe Long Biên.",
+  "141": "Mai mưa từ sáng. Có cái máy giặt cửa ngang chờ mở nắp.",
+  "142": "Tối mai có một tờ giấy kín hai mặt mà không có ô nào ghi tên mình.",
+  "143": "Mai có người gọi, nói nhỏ như sợ ai nghe: tối thứ Sáu này mẹ tròn năm mươi.",
+  "144": "Mai có chiếc xe ba gác chở một ông già ôm cái đài trước ngực.",
+  "145": "Tối mai mẹ tròn năm mươi tuổi.",
+  "146": "Mai thứ Bảy. Có đứa bé cầm tờ giấy kiểm tra như cầm vé số.",
+  "147": "Mai Chủ Nhật, sáu giờ sáng, có người đứng ở điểm xe với hai cái bút chì gọt sẵn.",
+  "148": "Tối mai lớp điện lạnh bế giảng. Mười bốn tờ giấy, con dấu đỏ còn thơm mực.",
+  "149": "Tối mai bà trải tờ lịch tháng Chín lên bàn, chỉ còn dòng cuối.",
+  "150": "Tối mai là đêm cuối tháng Chín. Gió heo may thổi lùa qua khe cửa."
+ }
+}

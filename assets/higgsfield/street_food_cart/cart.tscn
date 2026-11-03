@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/higgsfield/street_food_cart/cart.glb" id="1_model"]
+[ext_resource type="Script" path="res://scripts/world/street_food_cart.gd" id="2_script"]
+
+[sub_resource type="BoxShape3D" id="Box_body"]
+size = Vector3(0.72, 0.76, 1.48)
+
+[node name="VietnameseFoodCart" type="Node3D"]
+script = ExtResource("2_script")
+metadata/asset_family = "higgsfield_street_food_cart"
+
+[node name="Visual" parent="." instance=ExtResource("1_model")]
+
+[node name="BodyCollision" type="StaticBody3D" parent="."]
+
+[node name="Shape" type="CollisionShape3D" parent="BodyCollision"]
+position = Vector3(0, 0.56, -0.02)
+shape = SubResource("Box_body")

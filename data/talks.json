@@ -1,142 +1,435 @@
 {
-  "_ghi_chu": "Hội thoại khi bấm Nói chuyện với nhân vật. story: các đoạn mạch chuyện, mở lần lượt khi thỏa 'when' (cùng cú pháp điều kiện với events.json), mỗi đoạn chỉ kể một lần. chat: chuyện phiếm khi chưa có đoạn mạch nào mở, mỗi lần cộng chatRep thân thiết.",
-  "coSau": {
+  "_ghi_chu": "Hội thoại khi bấm Nói chuyện với nhân vật (khóa theo story.reps). story: các đoạn mạch chuyện, mở lần lượt khi thỏa 'when' (cùng cú pháp điều kiện với events.json), mỗi đoạn chỉ kể một lần. chat: chuyện phiếm khi chưa có đoạn mạch nào mở, mỗi lần cộng chatRep thân thiết.",
+  "BA_TU": {
     "story": [
-      { "id": "cs_noi_quy", "when": { "from_day": 1 },
-        "title": "Nội quy dãy trọ",
-        "text": "\"Cổng khóa lúc 11 giờ. Điện 3.500 một số, nước tính theo đầu người. Đi đâu khuya thì nhắn cô một tiếng.\"",
+      { "id": "bt_ma_goi", "when": {"from_day": 2, "to_day": 8},
+        "title": "Cuộc gọi hồi trưa",
+        "text": "Bà đưa An cái điện thoại cũ. \"Mẹ con gọi hồi trưa, hỏi con về tới chưa. Con gọi lại cho mẹ đi. Đừng chỉ nhắn chữ.\"",
         "choices": [
-          { "label": "\"Dạ, con nhớ rồi cô.\"", "hint": "Cô Sáu +3", "effects": { "rep.coSau": 3 } },
-          { "label": "Hỏi chỗ mua đồ ăn rẻ", "hint": "Cô Sáu +2, Tinh thần +2",
-            "effects": { "rep.coSau": 2, "mood": 2, "log": "Cô Sáu: \"Cơm tấm đầu hẻm, nói người quen của cô là được thêm chén canh.\"" } }
+          { "label": "Gọi lại cho mẹ, nói thật chuyện tiệm cho nghỉ", "hint": "Bà Thoa +3",
+            "effects": {"rep.BA_TU": 3, "flag.maBietMatViec": true, "diary": "Gọi cho mẹ, nói tiệm cho nghỉ. Mẹ im một lúc rồi hỏi: \"Con ăn cơm chưa?\" Giống bà y hệt. Mẹ bảo xưởng mẹ dạo này cũng ít hàng, nói nhanh rồi hỏi sang chuyện khác."} },
+          { "label": "Gọi cho mẹ, chỉ nói \"con khỏe, mẹ đừng lo\"", "hint": "Bà Thoa +1",
+            "effects": {"rep.BA_TU": 1, "flag.goiMaConKhoe": true, "diary": "Gọi cho mẹ, nói con khỏe. Mẹ bảo mẹ cũng khỏe. Hai mẹ con nói dối nhau giỏi như nhau."} },
+          { "label": "Nhắn cho mẹ: \"Con bận, mai con gọi.\"", "hint": "Bà Thoa −1",
+            "effects": {"rep.BA_TU": -1, "flag.maChoGoi": true, "log": "Bà nhìn cái tin nhắn trên màn hình, không nói gì.", "diary": "Nhắn cho mẹ: con bận, mai gọi. \"Mai\" là chữ dễ nói nhất."} }
         ] },
-      { "id": "cs_mot_minh", "when": { "room": "rieng", "rep.coSau": 25, "from_day": 4 },
-        "title": "Cô Sáu ngồi ở bậc thềm",
-        "text": "\"Chồng cô đi làm Bình Dương, ba tháng mới về một lần. Một mình cô vừa coi dãy trọ vừa lo cho thằng Bin.\" Cô thở dài, nhìn vô trong nhà.",
+      { "id": "bt_ke_bep", "when": {"from_day": 3, "to_day": 9},
+        "title": "Cái kệ bếp của ông",
+        "text": "Bà Thoa lau cái kệ bếp gỗ đã sẫm màu. \"Cái kệ này ông con đóng hồi mới về đây. Sang chỗ mới không biết có chỗ kê không con.\"",
         "choices": [
-          { "label": "Ngồi nghe cô kể", "hint": "Cô Sáu +5, Tinh thần +3", "effects": { "rep.coSau": 5, "mood": 3 } },
-          { "label": "\"Bin có bài khó thì cô cứ kêu con.\"", "hint": "Cô Sáu +8", "effects": { "rep.coSau": 8 } }
+          { "label": "Lấy thước đo kệ, đi xem phòng thì xem chỗ kê", "hint": "Bà Thoa +4",
+            "effects": {"rep.BA_TU": 4, "flag.doKeBep": true, "family": {"who": "BA_TU", "kind": "support", "text": "Đo cái kệ bếp của bà để chọn phòng có chỗ kê"}} },
+          { "label": "\"Kệ cũ rồi bà, sang bên ấy mua cái mới.\"", "hint": "Bà Thoa −1",
+            "effects": {"rep.BA_TU": -1, "log": "Bà gật đầu, tay vẫn lau cái kệ."} }
         ] },
-      { "id": "cs_bua_com", "when": { "rep.coSau": 45, "from_day": 12 },
-        "title": "Mâm cơm chiều",
-        "text": "\"Bữa nay cô nấu canh chua cá lóc, dư nhiều lắm. Vô ăn chung với cô và thằng Bin đi, khách sáo gì.\"",
+      { "id": "bt_tien_cho", "when": {"from_day": 10, "to_day": 17},
+        "title": "Tờ giấy tiền chợ",
+        "text": "Bà đưa An tờ giấy ghi tiền chợ mấy hôm nay, chữ to và nghiêng. \"Bà ghi cho con xem. Bà không tiêu hoang. Mà tiền nhà thì con cũng đừng giấu bà.\"",
         "choices": [
-          { "label": "Vô ăn cơm", "hint": "Sức khỏe +10, Tinh thần +8", "effects": { "health": 10, "mood": 8, "rep.coSau": 3 } }
+          { "label": "Kẹp tờ giấy vào sổ, đọc cho bà nghe các khoản nhà", "hint": "Bà Thoa +4",
+            "effects": {"rep.BA_TU": 4, "flag.toGiayTienCho": true, "family": {"who": "BA_TU", "kind": "support", "text": "Cho bà xem sổ tiền nhà cùng tờ tiền chợ của bà"}} },
+          { "label": "\"Bà không cần ghi, con lo được hết.\"", "hint": "Bà Thoa −1",
+            "effects": {"rep.BA_TU": -1, "log": "Bà gấp tờ giấy làm tư, cất vào túi áo."} }
+        ] },
+      { "id": "bt_an_chua", "when": { "from_day": 18 },
+        "title": "Bà ngồi nhặt rau ngoài hiên",
+        "text": "\"Con ăn gì chưa? Ăn rồi thì ngồi đây nhặt rau với bà một lúc. Mấy hôm nay con về là cắm mặt vào điện thoại.\"",
+        "choices": [
+          { "label": "Cất điện thoại, ngồi nhặt rau với bà", "hint": "Bà Thoa +4, Mệt −3", "effects": { "rep.BA_TU": 4, "fatigue": -3 } },
+          { "label": "\"Con đang tính tiền phòng bà ơi.\"", "hint": "Bà Thoa +1",
+            "effects": { "rep.BA_TU": 1, "log": "Bà gật đầu, không hỏi thêm. Bà nhặt rau tiếp, chậm hơn." } }
+        ] },
+      { "id": "bt_xom_moi", "when": { "from_day": 20, "rep.BA_TU": 55, "chapter": 1 },
+        "title": "Câu bà hỏi mãi",
+        "text": "\"Bên chỗ mới, sáng ra có ai ngồi ngoài cửa không con? Ở đây sáng nào bà cũng có người hỏi chuyện. Bà không sợ phòng nhỏ. Bà sợ đóng cửa lại là không ai biết mình.\"",
+        "choices": [
+          { "label": "Ghi lại điều bà cần vào sổ", "hint": "Bà Thoa +6, sổ gia đình: hỗ trợ",
+            "effects": { "rep.BA_TU": 6, "family": { "who": "BA_TU", "kind": "support", "text": "Ghi lại điều bà cần ở chỗ mới: có người quen ngồi trước cửa buổi sáng" } } },
+          { "label": "\"Chỗ nào rẻ thì mình ở, bà cố chịu.\"", "hint": "Bà Thoa −3",
+            "effects": { "rep.BA_TU": -3, "family": { "who": "BA_TU", "kind": "pressure", "text": "Gạt nhu cầu chỗ ở của bà sang một bên" } } }
+        ] },
+      { "id": "bt_canh_tu", "when": {"from_day": 13, "to_day": 21},
+        "title": "Cánh tủ có hai cột vạch",
+        "text": "Bà lau cánh tủ gỗ trong góc bằng cái khăn ướt, lau rất chậm. Trên cánh tủ có hai cột vạch bút bi, cột \"An\", cột \"Linh\", Tết nào cũng một vạch. \"Tủ thì mọt rồi. Bán đồng nát được thì bán. Mà cánh này…\" Bà không nói hết câu.",
+        "choices": [
+          { "label": "\"Bà muốn giữ cánh này thì mình tính chỗ để.\"", "hint": "Bà Thoa +4",
+            "effects": {"rep.BA_TU": 4, "flag.huaCanhTu": true, "family": {"who": "BA_TU", "kind": "support", "text": "Hỏi bà muốn giữ gì từ cái tủ cũ"}, "diary": "Bà lau cánh tủ có hai cột vạch. Nói với bà: muốn giữ thì mình tính chỗ để. Bà không trả lời, mà lau chậm lại."} },
+          { "label": "\"Chụp ảnh lại rồi bán luôn bà, phòng mới chật.\"", "hint": "Bà Thoa −2",
+            "effects": {"rep.BA_TU": -2, "log": "Bà gật, gấp cái khăn lại cho vào túi áo."} }
+        ] },
+      { "id": "bt_hop_thiec", "when": {"from_day": 22, "to_day": 28, "rep.BA_TU": 60},
+        "title": "Cái hộp thiếc đựng bánh",
+        "text": "Bà mở cái hộp thiếc đựng bánh cũ. Bên trong là mấy chục tờ biên lai chuyển tiền xếp thẳng: của mẹ An từ hồi An còn đi học, rồi tới của An mấy năm nay. Dưới đáy hộp có một xấp kẹp riêng bằng dây chun, bà đặt lại chỗ cũ, không mở. \"Bà giữ hết. Không phải để tính tiền. Tờ nào cũng là một tháng bà không nghe tiếng chúng mày. Hồi đó mẹ con cũng thế, cứ gửi tiền thay cho về.\"",
+        "choices": [
+          { "label": "Tối nay gọi cho mẹ, kể hết chuyện tháng này", "hint": "Bà Thoa +5",
+            "effects": {"rep.BA_TU": 5, "flag.goiMaKeHet": true, "family": {"who": "BA_TU", "kind": "support", "text": "Gọi cho mẹ kể chuyện thật, thay vì chỉ gửi tiền"}, "diary": "Gọi cho mẹ, kể hết: tiệm cũ, Tạ Hiện, phòng mới, chậu húng. Mẹ nghe gần một tiếng. Cuối cùng mẹ bảo: \"Tết này mẹ về.\""} },
+          { "label": "Ngồi với bà và cái hộp, không nói được gì", "hint": "Bà Thoa +3",
+            "effects": {"rep.BA_TU": 3, "diary": "Ngồi với bà và cái hộp thiếc tới khuya. Không nói được câu nào. Bà cũng không cần mình nói."} },
+          { "label": "\"Con gửi tiền là để bà đỡ vất vả mà bà.\"", "hint": "Bà Thoa −1",
+            "effects": {"rep.BA_TU": -1, "log": "Bà đậy nắp hộp: \"Bà biết. Bà có trách đâu.\"", "diary": "Nói với bà là gửi tiền để bà đỡ vất vả. Bà bảo bà biết. Bà đậy nắp hộp lại rất nhẹ."} }
+        ] },
+      { "id": "bt_dem_cuoi", "when": {"from_day": 29, "chapter": 1},
+        "title": "Đêm cuối ở Phúc Tân",
+        "text": "Đêm cuối ở Phúc Tân, bà không ngủ, ngồi ngoài hiên nghe mưa nhỏ dần. \"Hồi con mới về ở với bà, con sợ sấm. Giờ đến lượt bà sợ.\" Bà cười. \"Bà sợ sang bên ấy không ai biết bà bán bánh khúc ở đây ba chục năm.\"",
+        "choices": [
+          { "label": "Hứa sáng đầu tiên dẫn bà đi chào hàng xóm mới", "hint": "Bà Thoa +3",
+            "effects": {"rep.BA_TU": 3, "flag.chaoHangXom": true, "family": {"who": "BA_TU", "kind": "support", "text": "Hẹn dẫn bà đi chào hàng xóm ở chỗ mới"}, "diary": "Đêm cuối ở Phúc Tân, bà bảo bà sợ không ai biết bà từng bán bánh khúc. Hứa sáng đầu tiên dẫn bà đi chào từng nhà."} },
+          { "label": "Ngồi im với bà tới khi mưa tạnh", "hint": "Bà Thoa +3",
+            "effects": {"rep.BA_TU": 3, "diary": "Ngồi với bà ngoài hiên tới khi mưa tạnh. Không ai nói gì. Thế mà đủ."} }
         ] }
     ],
     "chat": [
-      { "text": "\"Hôm nay trời oi quá ha. Ra đường nhớ mang theo chai nước.\"" },
-      { "text": "\"Thằng Bin nó cứ hỏi anh Minh hoài đó.\"", "when": { "room": "rieng" } },
-      { "text": "\"Phòng ghép bên kia nghe nói lại mất đồ. Con giữ đồ cho kỹ nghen.\"", "when": { "room": "ghep" } },
-      { "text": "\"Con ăn uống gì chưa? Nhìn ốm nhom vậy.\"" }
+      { "text": "\"Nồi canh bà để trên bếp đấy, con múc ăn đi.\"" },
+      { "text": "\"Chậu húng này bà trồng từ hồi con còn đi học.\"" },
+      { "text": "\"Con mệt thì nói mệt. Cứ bảo ổn mãi bà biết đường nào mà đỡ.\"" },
+      { "text": "\"Con đọc hộ bà tờ giấy này, chữ in nhỏ quá.\"", "when": {"chapter": 1, "from_day": 8} },
+      { "text": "\"Kim chỉ bà xâu mãi không lọt. Chắc tại chỉ mới.\"", "when": {"chapter": 1, "from_day": 15} }
     ]
   },
-  "chuBay": {
+  "LINH": {
     "story": [
-      { "id": "cb_nghe", "when": { "from_day": 3 },
-        "title": "Tiệm điện lạnh đầu hẻm",
-        "text": "Chú Bảy lau tay vào cái giẻ. \"Chú làm nghề này ba chục năm rồi. Máy móc nó không biết nói dối đâu con, hư chỗ nào là hư chỗ đó.\"",
+      { "id": "li_trang_gioi_thieu", "when": {"from_day": 4, "to_day": 8},
+        "title": "Câu cuối trong trang giới thiệu",
+        "text": "Linh đọc thử trang giới thiệu bản thân. \"Câu cuối em viết: em muốn được đánh giá bằng việc em làm. Nghe có cứng quá không anh?\"",
         "choices": [
-          { "label": "Hỏi chú về nghề", "hint": "Chú Bảy +4", "effects": { "rep.chuBay": 4 } },
-          { "label": "Chào chú rồi đi", "effects": { "rep.chuBay": 1 } }
+          { "label": "\"Câu đó là của em. Em thấy đúng thì giữ.\"", "hint": "Linh tin +1, Linh +4",
+            "effects": {"respect": 1, "rep.LINH": 4} },
+          { "label": "\"Sửa mềm lại đi, người ta dễ nhận hơn.\"", "hint": "Linh −1",
+            "effects": {"rep.LINH": -1, "log": "Linh không cãi. Em lưu file lại, không sửa chữ nào."} }
         ] },
-      { "id": "cb_thieu_nguoi", "when": { "rep.chuBay": 20, "from_day": 6 },
-        "title": "Tiệm thiếu người",
-        "text": "\"Mùa nóng máy lạnh hư quá trời, một mình chú làm không xuể. Qua ngày 11 rảnh thì ghé đây, chú chỉ cho vài đường.\"",
+      { "id": "li_sang_thu_bay", "when": {"from_day": 11, "to_day": 17},
+        "title": "Sáng thứ Bảy đi chợ",
+        "text": "Linh hỏi nhỏ: \"Nếu em đi thực tập xa thì cuối tuần em mới về. Thế sáng thứ Bảy ai đưa bà đi chợ?\"",
         "choices": [
-          { "label": "\"Dạ, con nhất định ghé.\"", "hint": "Chú Bảy +5, Tinh thần +3", "effects": { "rep.chuBay": 5, "mood": 3 } }
+          { "label": "\"Mình lập lịch chung, em không phải lo một mình.\"", "hint": "Linh +4",
+            "effects": {"rep.LINH": 4, "family": {"who": "LINH", "kind": "support", "text": "Cùng Linh lập lịch đưa bà đi chợ khi em đi xa"}} },
+          { "label": "\"Em lo học đi, chuyện nhà anh lo.\"", "hint": "Linh +1",
+            "effects": {"rep.LINH": 1, "log": "Linh gật, nhưng vẫn ghi giờ đi chợ của bà vào sổ của em."} }
         ] },
-      { "id": "cb_con_trai", "when": { "rep.chuBay": 40, "from_day": 14 },
-        "title": "Tấm hình trên vách",
-        "text": "Trên vách có tấm hình một thanh niên mặc áo thợ. \"Thằng con chú đó. Nó chê nghề cực, lên Quận 1 đi buôn, mấy năm nay không về.\"",
+      { "id": "li_may_do", "when": { "from_day": 18, "chapter": 1},
+        "title": "Linh và cái máy đo",
+        "text": "Linh đang tập đọc số trên máy chẩn đoán mô phỏng của trường. \"Anh xem thử này, em đo ra lỗi này rồi mà chưa chắc. Anh đừng nói đáp án, chỉ hỏi em thôi.\"",
         "choices": [
-          { "label": "\"Con sẽ theo nghề tới cùng.\"", "hint": "Chú Bảy +8, Tay nghề tăng", "effects": { "rep.chuBay": 8, "xp.tayNghe": 1 } },
-          { "label": "Im lặng ngồi phụ chú", "hint": "Chú Bảy +5", "effects": { "rep.chuBay": 5 } }
+          { "label": "Hỏi Linh từng bước, để em tự ra đáp án", "hint": "Linh tin +1, Linh +4",
+            "effects": { "respect": 1, "rep.LINH": 4 } },
+          { "label": "Chỉ luôn chỗ sai cho nhanh", "hint": "Linh +1",
+            "effects": { "rep.LINH": 1, "log": "Linh gật đầu, ghi lại. Em không hỏi thêm câu nào." } }
+        ] },
+      { "id": "li_tien_rieng", "when": { "from_day": 21, "rep.LINH": 52, "chapter": 1},
+        "title": "Cuốn sổ nhỏ của Linh",
+        "text": "\"Em có để dành được một ít từ hồi phụ tiệm. Tiền đi xe, ăn trưa lúc thực tập em tính rồi. Anh đừng lo phần ấy. Anh lo phần anh đã hứa với bà đi.\"",
+        "choices": [
+          { "label": "\"Ừ. Cần gì thì em nói, anh không đoán.\"", "hint": "Linh tin +1, Linh +5",
+            "effects": { "respect": 1, "rep.LINH": 5, "family": { "who": "LINH", "kind": "support", "text": "Để Linh tự lo phần tiền thực tập, hỗ trợ khi em đề nghị" } } },
+          { "label": "\"Để anh đưa thêm, em đừng làm thêm nữa.\"", "hint": "Linh −2",
+            "effects": { "rep.LINH": -2, "family": { "who": "LINH", "kind": "pressure", "text": "Muốn quyết thay Linh chuyện tiền riêng" } } }
+        ] },
+      { "id": "li_vach_tu", "when": {"from_day": 9, "to_day": 15},
+        "title": "Vạch cuối của anh",
+        "text": "Linh kéo An ra cánh tủ gỗ trong góc. Hai cột vạch bút bi, mỗi Tết một vạch. Cột của An dừng ở năm lớp chín. \"Vạch cuối của anh là Tết năm anh đi học nghề. Sau đó anh toàn về sau Tết, bà không đo được.\"",
+        "choices": [
+          { "label": "Đứng dựa lưng vào cánh tủ cho Linh đo", "hint": "Linh +4, Bà Thoa +2",
+            "effects": {"rep.LINH": 4, "rep.BA_TU": 2, "flag.vachMoi": true, "diary": "Linh đo mình bằng cái thước của bà. Hai mươi bảy tuổi, cao hơn vạch năm lớp chín đúng hai phân. Bà cười chảy nước mắt."} },
+          { "label": "\"Lớn rồi, đo gì nữa em.\"", "hint": "Linh +1",
+            "effects": {"rep.LINH": 1, "log": "Linh vẫn ghi ngày hôm nay bên cạnh cột của anh, bỏ trống chỗ vạch."} }
+        ] },
+      { "id": "li_chia_khoa", "when": {"from_day": 27, "to_day": 81, "linh_decision": "xa"},
+        "title": "Cái chìa móc con cá",
+        "text": "Linh đưa An một chiếc chìa khóa có cái móc hình con cá. \"Chìa phòng trọ thực tập của em. Em làm hai cái. Anh giữ một cái, lỡ có chuyện thì anh có chỗ tới.\" Em nói như chuyện thường.",
+        "choices": [
+          { "label": "Móc chìa vào chùm chìa của mình", "hint": "Linh +3",
+            "effects": {"rep.LINH": 3, "flag.chiaLinh": true, "diary": "Linh đưa một chìa phòng trọ thực tập, móc hình con cá. \"Lỡ có chuyện thì anh có chỗ tới.\" Lần này là em lo cho mình."} },
+          { "label": "Đưa cho bà giữ", "hint": "Linh +2, Bà Thoa +2",
+            "effects": {"rep.LINH": 2, "rep.BA_TU": 2, "flag.chiaLinh": true, "diary": "Đưa chìa khóa của Linh cho bà giữ. Bà buộc vào sợi dây chung với chìa nhà mới, đeo trên cổ."} }
+        ] },
+      { "id": "li_lich_hoc", "when": {"from_day": 27, "linh_decision": ["gan", "hoan"]},
+        "title": "Tờ lịch trên cửa tủ lạnh",
+        "text": "Linh dán tờ lịch học lên cửa tủ lạnh, ghi cả giờ về. \"Em ở lại, mà không phải vì anh cần em ở đây. Anh nhớ hộ em thế nhé.\"",
+        "choices": [
+          { "label": "\"Ừ, anh nhớ.\"", "hint": "Linh tin +1, Linh +3",
+            "effects": {"respect": 1, "rep.LINH": 3, "diary": "Linh dán lịch học lên cửa tủ lạnh, nhắc: em ở lại vì em chọn. Ghi câu đó vào sổ, gạch chân."} },
+          { "label": "\"Anh biết mà.\"", "hint": "Linh +1",
+            "effects": {"rep.LINH": 1} }
         ] }
     ],
     "chat": [
-      { "text": "\"Cái máy này thay cái tụ là chạy ngon. Nhìn đây nè.\"" },
-      { "text": "\"Học nghề thì phải chịu dơ tay. Sạch sẽ quá thì đi làm văn phòng.\"" },
-      { "text": "\"Uống miếng trà đi con, nóng quá.\"" }
+      { "text": "\"Anh hỏi em có đi được không, hay hỏi em có được đi không?\"", "when": { "linh_decided": false } },
+      { "text": "\"Bạn em bảo xưởng bên ấy có thầy hướng dẫn kỹ lắm.\"", "when": { "linh_decided": false } },
+      { "text": "\"Anh ăn cơm chưa? Bà hỏi em mãi.\"" },
+      { "text": "\"Em in lịch xe về cuối tuần rồi, dán trên tủ cho bà xem.\"", "when": { "linh_decided": true } },
+      { "text": "\"Anh đừng nhắn hỏi em ăn chưa mỗi tiếng nhé. Em lớn rồi.\"", "when": { "linh_decided": true } }
     ]
   },
-  "vy": {
+  "DUYEN": {
     "story": [
-      { "id": "vy_chao", "when": { "from_day": 2 },
-        "title": "Cô phục vụ quán Góc Phố",
-        "text": "\"Bạn mới tới khu này hả? Mình là Vy, học năm ba Luật, làm thêm ở đây buổi chiều.\" Trên bàn thu ngân để cuốn Bộ luật Dân sự dày cộm.",
+      { "id": "du_giu_chia", "when": {"from_day": 3, "to_day": 7},
+        "title": "Người giữ chìa",
+        "text": "Cô Duyên đứng lâu trước bảng thông báo dọn nhà. \"Cô biết các cháu trách cô. Cô chỉ giữ chìa, nhà là của người ta.\"",
         "choices": [
-          { "label": "Giới thiệu mình", "hint": "Vy +4", "effects": { "rep.vy": 4 } },
-          { "label": "Hỏi cuốn sách dày vậy đọc hết hả", "hint": "Vy +3, Tinh thần +2", "effects": { "rep.vy": 3, "mood": 2 } }
+          { "label": "\"Cháu hiểu. Cô cần giúp gì thì bảo cháu.\"", "hint": "Cô Duyên +4",
+            "effects": {"rep.DUYEN": 4} },
+          { "label": "\"Cô nói với chủ cho chúng cháu ở thêm đi cô.\"", "hint": "Cô Duyên −1",
+            "effects": {"rep.DUYEN": -1, "log": "Cô Duyên thở dài: \"Cô nói rồi, cháu ạ.\""} }
         ] },
-      { "id": "vy_bai_tap", "when": { "rep.vy": 15, "from_day": 8 },
-        "title": "Bài tập luật dân sự",
-        "text": "Vy gõ bút xuống tập. \"Đề bài: một người cho vay lãi 10% một tháng. Hỏi hợp đồng có hợp pháp không. Bạn đoán thử?\"",
+      { "id": "du_thung_ghi_ten", "when": {"from_day": 9, "to_day": 17},
+        "title": "Cái bút dạ",
+        "text": "Cô Duyên đưa An cái bút dạ. \"Thùng nào gửi tạm thì ghi tên, ghi luôn ngày lấy. Hôm trước có nhà quên, cô giữ đến giờ.\"",
         "choices": [
-          { "label": "\"Người ta chịu vay thì chắc hợp pháp chớ.\"", "hint": "Vy +3",
-            "effects": { "rep.vy": 3, "log": "Vy cười: \"Sai rồi. Lãi vay có mức trần đó, mai mốt mình chỉ cho.\"" } },
-          { "label": "Kể nhà mình cũng đang vay lãi", "hint": "Vy +6", "require": { "skill.giaoTiep": 1 },
-            "effects": { "rep.vy": 6, "log": "Vy nhíu mày: \"Nghe không ổn rồi. Hôm nào rảnh kể kỹ mình nghe.\"" } }
+          { "label": "Ghi tên và ngày lấy lên từng thùng", "hint": "Cô Duyên +3, Mệt +2",
+            "effects": {"rep.DUYEN": 3, "fatigue": 2, "flag.ghiTenThung": true} },
+          { "label": "\"Gần ngày cháu ghi.\"", "hint": "",
+            "effects": {"log": "Cô Duyên để cái bút lên bậu cửa phòng An."} }
         ] },
-      { "id": "vy_ap_luc", "when": { "rep.vy": 28, "from_day": 12 },
-        "title": "Vy về muộn",
-        "text": "Quán vắng. Vy ngồi đếm tiền tip. \"Học phí kỳ này tăng. Mẹ mình bán hàng ở chợ, mình không muốn xin thêm.\"",
+      { "id": "du_lich_don", "when": { "from_day": 18, "chapter": 1 },
+        "title": "Bảng lịch dọn xóm",
+        "text": "Cô Duyên dán thêm một tờ giấy cạnh thông báo cũ: lịch mượn xe ba gác và chỗ gửi đồ tạm. \"Cô hứa cái nào làm được thì cô hứa. Chuyện hết tháng phải dọn, cô không nói khác được.\"",
         "choices": [
-          { "label": "Kể chuyện Lan và học phí", "hint": "Vy +8", "effects": { "rep.vy": 8, "mood": 3 } },
-          { "label": "Ngồi nghe Vy nói", "hint": "Vy +5", "effects": { "rep.vy": 5 } }
+          { "label": "Ghi tên giữ một lượt xe ba gác", "hint": "Cô Duyên +4", "effects": { "rep.DUYEN": 4, "flag.giuXeBaGac": true } },
+          { "label": "\"Cô cho xóm ở thêm một tuần được không?\"", "hint": "Cô Duyên −1",
+            "effects": { "rep.DUYEN": -1, "log": "Cô Duyên lắc đầu: \"Cô không có quyền ấy, cháu ạ.\"" } }
+        ] },
+      { "id": "du_bang_ten", "when": {"from_day": 27, "chapter": 1},
+        "title": "Tấm bảng \"Phòng 4\"",
+        "text": "Cô Duyên gỡ tấm bảng nhựa ghi \"Phòng 4\" trên cửa phòng bà Thoa. \"Tuần sau người ta dỡ rồi. Cô giữ chẳng để làm gì. Cháu mang theo cho bà.\"",
+        "choices": [
+          { "label": "Nhận tấm bảng, nhắn cô địa chỉ mới", "hint": "Cô Duyên +3",
+            "effects": {"rep.DUYEN": 3, "flag.bangPhong4": true, "diary": "Cô Duyên gỡ tấm bảng \"Phòng 4\" đưa cho bà. Nhắn cô địa chỉ mới, kèm giờ bà hay ngồi trước cửa."} },
+          { "label": "\"Cô giữ làm kỷ niệm đi cô.\"", "hint": "Cô Duyên +2",
+            "effects": {"rep.DUYEN": 2, "log": "Cô Duyên cất tấm bảng vào ngăn kéo, chung với chùm chìa khóa của cả xóm."} }
         ] }
     ],
     "chat": [
-      { "text": "\"Bữa nay quán đông quá trời. Bạn uống gì không, mình pha cho.\"" },
-      { "text": "\"Thi giữa kỳ xong rồi, nhẹ cả người.\"" },
-      { "text": "\"Đi đâu nhớ mang giấy tờ theo nghen. Công an phường hay kiểm tra tạm trú lắm.\"" }
+      { "text": "\"Đồ gửi tạm thì ghi tên lên thùng hộ cô.\"", "when": {"chapter": 1} },
+      { "text": "\"Ngày 30 cô nhận chìa khóa lúc sáng nhé.\"", "when": {"chapter": 1} },
+      { "text": "\"Bà Thoa đã hỏi cháu chưa? Bà ấy lo cái kệ bếp lắm.\"", "when": {"chapter": 1} }
     ]
   },
-  "tuan": {
+  "HANH": {
     "story": [
-      { "id": "tu_xe_moi", "when": { "from_day": 1 },
-        "title": "Chiếc tay ga mới",
-        "text": "Tuấn vỗ yên chiếc xe tay ga bóng loáng. \"Lên đây cực mấy tháng đầu thôi. Biết đường làm ăn là có hết mày ơi.\"",
+      { "id": "ha_so_no", "when": {"from_day": 2, "to_day": 8},
+        "title": "Sổ nợ dưới lọ tăm",
+        "text": "Chị Hạnh dò cuốn sổ nợ dưới lọ tăm. \"Khách quen ghi nợ thì chị ghi. Chị không sợ người ta nợ. Chị sợ người ta im luôn rồi mất.\"",
         "choices": [
-          { "label": "Khen xe đẹp", "hint": "Tuấn +3", "effects": { "rep.tuan": 3 } },
-          { "label": "Hỏi phụ hồ sao mua nổi xe này", "hint": "Tuấn −2",
-            "effects": { "rep.tuan": -2, "log": "Tuấn cười trừ, đánh trống lảng sang chuyện khác." } }
+          { "label": "\"Em nợ chị hôm nào thì em nói trước.\"", "hint": "Chị Hạnh +3",
+            "effects": {"rep.HANH": 3} },
+          { "label": "\"Em có nợ chị đâu.\"", "hint": "Chị Hạnh +1",
+            "effects": {"rep.HANH": 1, "log": "Chị Hạnh cười: \"Chưa thôi.\""} }
         ] },
-      { "id": "tu_say", "when": { "rep.tuan": 42, "from_day": 9 },
-        "title": "Tuấn ngồi một mình",
-        "text": "Tuấn ngồi bệt trước công trình, mùi bia nồng nặc. \"Tao muốn về quê mở tiệm sửa xe. Mà tao nợ người ta, đâu có dễ rút ra…\"",
+      { "id": "ha_ca_cho_minh", "when": {"from_day": 9, "to_day": 17},
+        "title": "Xếp ca cho đỡ Minh",
+        "text": "Chị Hạnh lau tay vào tạp dề. \"Minh chạy đơn từ sáng đến tối, đón con cũng muộn. Em rảnh giờ nào thì bảo chị, chị xếp ca cho đỡ nó.\"",
         "choices": [
-          { "label": "\"Mày tính đường khác đi Tuấn.\"", "hint": "Tuấn +6", "effects": { "rep.tuan": 6 } },
-          { "label": "Đưa Tuấn về rồi thôi", "hint": "Tuấn +3", "effects": { "rep.tuan": 3 } }
+          { "label": "Báo giờ rảnh cụ thể từng ngày", "hint": "Chị Hạnh +3, Minh +2",
+            "effects": {"rep.HANH": 3, "rep.MINH": 2} },
+          { "label": "\"Rảnh thì em ghé.\"", "hint": "Chị Hạnh +1",
+            "effects": {"rep.HANH": 1} }
+        ] },
+      { "id": "ha_gio_con", "when": { "from_day": 18 },
+        "title": "Giờ đón con",
+        "text": "Chị Hạnh vừa xới cơm vừa liếc đồng hồ. \"Năm giờ chị phải đi đón con. Ai đỡ chị được ca chiều thì chị trả đàng hoàng. Mà nhận rồi thì đừng có muộn nhé.\"",
+        "choices": [
+          { "label": "\"Em nhận được thì em nói, không được em cũng nói.\"", "hint": "Chị Hạnh +4", "effects": { "rep.HANH": 4 } },
+          { "label": "\"Để em cố.\"", "hint": "Chị Hạnh +1",
+            "effects": { "rep.HANH": 1, "log": "Chị Hạnh nhìn An: \"Cố là được hay không được?\"" } }
+        ] },
+      { "id": "ha_tui_giu_nhiet", "when": {"from_day": 26, "chapter": 1},
+        "title": "Cái túi giữ nhiệt vá hai chỗ",
+        "text": "Chị Hạnh dúi vào tay An cái túi giữ nhiệt cũ đã vá hai chỗ. \"Sang bên ấy có giao cơm thì dùng cái này. Chị mua cái mới rồi.\" Chị nói nhanh, như sợ nói chậm thì thành chuyện lớn.",
+        "choices": [
+          { "label": "Nhận túi, hẹn tuần đầu vẫn ghé ăn trưa", "hint": "Chị Hạnh +3",
+            "effects": {"rep.HANH": 3, "flag.tuiGiuNhiet": true, "diary": "Chị Hạnh cho cái túi giữ nhiệt cũ, vá hai chỗ. Hẹn tuần sau vẫn ghé ăn trưa. Hẹn có ngày, có giờ."} },
+          { "label": "\"Thôi ạ, chị giữ mà dùng.\"", "hint": "Chị Hạnh +1",
+            "effects": {"rep.HANH": 1, "log": "Chị Hạnh nhét cái túi lên kệ: \"Ừ, khi nào cần thì lấy.\""} }
         ] }
     ],
     "chat": [
-      { "text": "\"Ê Minh! Bữa nào làm vài ly không?\"" },
-      { "text": "\"Phụ hồ cực mà lương bèo. Tao kiếm mối khác ngon hơn rồi.\"" },
-      { "text": "\"Thành phố này không có chỗ cho người hiền đâu mày.\"" }
+      { "text": "\"Chị trả tiền giao cơm, chứ có trả tiền em chạy liều đâu.\"" },
+      { "text": "\"Hôm nay có canh chua, ăn không em?\"" },
+      { "text": "\"Tờ giấy dưới lọ tăm là sổ nợ của chị đấy, đừng có động vào.\"" }
     ]
   },
-  "ongTu": {
+  "SAU": {
     "story": [
-      { "id": "ot_tra", "when": { "from_day": 2 },
-        "title": "Ly trà đá đầu hẻm",
-        "text": "Ông Tư rót cho Minh ly trà. \"Hồi ông mới lên, khúc này còn là ruộng rau muống. Giờ nhà cao như vầy đó.\"",
+      { "id": "sa_dong_ho_do", "when": {"from_day": 2, "to_day": 6},
+        "title": "Cái đồng hồ đo cũ",
+        "text": "Chú Sơn đưa An cái đồng hồ đo điện cũ. \"Đo thử xem kim còn đúng không. Đồ của tiệm, đo xong để lại chỗ cũ.\"",
         "choices": [
-          { "label": "Ngồi nghe ông kể chuyện phố xưa", "hint": "Ông Tư +4, Tinh thần +3", "effects": { "rep.ongTu": 4, "mood": 3 } }
+          { "label": "Đo, ghi sai số lên băng dính, để đúng chỗ cũ", "hint": "Chú Sơn +4",
+            "effects": {"rep.SAU": 4} },
+          { "label": "Đo bừa cho xong", "hint": "",
+            "effects": {"log": "Chú Sơn đo lại lần nữa, không nói gì."} }
         ] },
-      { "id": "ot_kien", "when": { "flag.returnedWallet": true, "from_day": 14 },
-        "title": "Chuyện cũ của ông Tư",
-        "text": "\"Hồi trước thằng con ông cũng bị vay nặng lãi, tụi nó tới tận nhà. Ông đi kiện, thắng. Con nhớ nghen: giấy vay giữ cho kỹ, tụi nó gọi điện thì ghi âm lại.\"",
+      { "id": "sa_bao_ngay_xong", "when": {"from_day": 10, "to_day": 17},
+        "title": "Báo giá thì báo luôn ngày xong",
+        "text": "Chú Sơn gạch giá trên tờ giấy. \"Báo giá thì báo luôn ngày xong. Khách không sợ giá cao bằng sợ chờ mà không biết đến bao giờ.\"",
         "choices": [
-          { "label": "Gọi má gửi bản gốc giấy vay lên", "hint": "Bằng chứng +1, Ông Tư +5",
-            "effects": { "rep.ongTu": 5, "evidence": 1, "log": "Ông Tư dặn: giữ giấy vay, ghi âm cuộc gọi đòi nợ. Má gửi bản gốc giấy vay lên theo xe khách." } },
-          { "label": "Ghi nhớ lời ông", "hint": "Ông Tư +5", "effects": { "rep.ongTu": 5 } }
+          { "label": "Chép câu đó vào sổ", "hint": "Chú Sơn +3",
+            "effects": {"rep.SAU": 3} },
+          { "label": "\"Vâng.\"", "hint": "Chú Sơn +1",
+            "effects": {"rep.SAU": 1} }
+        ] },
+      { "id": "sa_tay_run", "when": { "from_day": 18, "to_day": 62 },
+        "title": "Cái tua vít rơi",
+        "text": "Chú Sơn làm rơi cái tua vít lần thứ hai. Chú cười gượng. \"Tay chú dạo này hay run. Cái bàn sửa đồ này, chú cũng chưa biết giao cho ai.\"",
+        "choices": [
+          { "label": "Nhặt lên, ngồi phụ chú không nói gì", "hint": "Chú Sơn +4", "effects": { "rep.SAU": 4 } },
+          { "label": "\"Chú để cháu làm phần đó cho.\"", "hint": "Chú Sơn +2",
+            "effects": { "rep.SAU": 2, "log": "Chú Sơn gắt nhẹ: \"Chú còn làm được.\" Rồi chú đưa cái tua vít cho An." } }
+        ] },
+      { "id": "sa_mo_let", "when": {"from_day": 26, "rep.SAU": 55},
+        "title": "Tên cháu khắc thì cháu giữ",
+        "text": "Chú Sơn đặt cái mỏ lết có khắc tên An lên bàn. Tay chú run nhẹ lúc buông ra. \"Hồi đó chú bảo đồ là của chú. Giờ chú nói lại: tên cháu khắc thì cháu giữ. Tay chú cũng không cầm lâu được nữa.\"",
+        "choices": [
+          { "label": "Nhận cái mỏ lết, hứa mỗi tuần ghé phụ chú một buổi", "hint": "Chú Sơn +4",
+            "effects": {"rep.SAU": 4, "flag.moLet": true, "diary": "Chú Sơn đưa lại cái mỏ lết khắc tên. \"Tên cháu thì cháu giữ.\" Tay chú run, mà câu nói thì chắc."} },
+          { "label": "\"Chú để nó ở bàn. Cháu ghé thì cháu dùng.\"", "hint": "Chú Sơn +5",
+            "effects": {"rep.SAU": 5, "flag.moLetOBan": true, "diary": "Để cái mỏ lết khắc tên ở lại bàn chú Sơn. Có một thứ của mình nằm ở đó thì mình còn lý do để ghé."} }
+        ] },
+      { "id": "sa_doi_soat", "when": {"from_day": 26, "rep_lt": {"SAU": 55}, "chapter": 1},
+        "title": "Trả đủ rồi mình nói tiếp",
+        "text": "Chú Sơn lau bàn, không ngẩng lên. \"Đồ cháu mượn trả đủ chưa? Trả đủ rồi thì mình nói chuyện tiếp.\"",
+        "choices": [
+          { "label": "Kiểm lại từng món với chú, trả đủ", "hint": "Chú Sơn +5",
+            "effects": {"rep.SAU": 5, "diary": "Ngồi kiểm từng món đồ nghề với chú Sơn, trả đủ. Chú gật: \"Rồi. Giờ nói chuyện tiếp được.\""} },
+          { "label": "\"Để dọn nhà xong cháu kiểm.\"", "hint": "Chú Sơn −1",
+            "effects": {"rep.SAU": -1} }
         ] }
     ],
     "chat": [
-      { "text": "\"Ngồi xuống uống ly trà đã con, đi đâu mà vội.\"" },
-      { "text": "\"Sống ở đâu cũng vậy, cái tử tế là vốn liếng lớn nhất.\"" },
-      { "text": "\"Bữa nay trời mát, ông ngồi đây từ sáng tới giờ.\"" }
+      { "text": "\"Không sửa được thì nói không sửa được. Cái tiếng nhận rồi bỏ mới khó sửa.\"" },
+      { "text": "\"Phần điện công trình chú không động vào. Hỏi Trâm.\"" },
+      { "text": "\"Uống ngụm trà đi cháu.\"" }
+    ]
+  },
+  "MINH": {
+    "story": [
+      { "id": "mi_tre_hai_muoi_phut", "when": {"from_day": 2, "to_day": 8},
+        "title": "Muộn hai mươi phút",
+        "text": "Minh ngồi trên yên xe xem điện thoại. \"Hôm qua tao đón thằng Bin muộn hai mươi phút. Nó đứng ôm cặp ngoài cổng, không khóc. Thế mà tao thấy còn tệ hơn khóc.\"",
+        "choices": [
+          { "label": "\"Hôm nào kẹt thì báo sớm, tao xem giờ được không.\"", "hint": "Minh +4",
+            "effects": {"rep.MINH": 4} },
+          { "label": "\"Ai mà chẳng muộn.\"", "hint": "Minh +1",
+            "effects": {"rep.MINH": 1} }
+        ] },
+      { "id": "mi_hen_gio_cho", "when": {"from_day": 11, "to_day": 17},
+        "title": "Hẹn giờ chở",
+        "text": "Minh hỏi: \"Mày nhận vụ Tạ Hiện à? Chở đồ thì hẹn giờ trước, đừng gọi lúc tao đang chở khách.\"",
+        "choices": [
+          { "label": "Hẹn giờ cố định, trả tiền chuyến rõ ràng", "hint": "Minh +3",
+            "effects": {"rep.MINH": 3} },
+          { "label": "\"Gấp thì tao gọi.\"", "hint": "Minh −1",
+            "effects": {"rep.MINH": -1} }
+        ] },
+      { "id": "mi_don_bap", "when": { "from_day": 18, "chapter": 1},
+        "title": "Lịch đón cu Bin",
+        "text": "Minh dựa vào xe, lướt điện thoại nhận đơn. \"Tao tới được. Nhưng tới mấy giờ thì mày phải nói thật. Năm rưỡi tao đón thằng Bin, muộn là vợ tao mắng.\"",
+        "choices": [
+          { "label": "\"Mai tao cần mày chở đồ lúc 3 giờ, xong trước 5 giờ.\"", "hint": "Minh +4", "effects": { "rep.MINH": 4 } },
+          { "label": "\"Lúc nào rảnh mày ghé.\"", "hint": "Minh +0",
+            "effects": { "log": "Minh nhíu mày: \"Lúc nào rảnh là lúc nào?\"" } }
+        ] },
+      { "id": "mi_nha_moi", "when": {"from_day": 26, "rep.MINH": 55},
+        "title": "Nhà mới của chú An",
+        "text": "Minh đưa An một tờ giấy gấp tư. \"Thằng Bin vẽ cái nhà mới của chú An. Nó hỏi nhà chú An có cửa sổ không, tao bảo không biết, nó vẽ bừa ba cái.\"",
+        "choices": [
+          { "label": "Hứa chụp ảnh cái cửa sổ thật gửi cu Bin", "hint": "Minh +3",
+            "effects": {"rep.MINH": 3, "flag.hinhNhaMoi": true, "diary": "Cu Bin vẽ nhà mới của mình, có ba cửa sổ. Hứa chụp ảnh cửa sổ thật gửi nó. Phòng chỉ có một cái, chắc nó không giận."} },
+          { "label": "Dán tờ giấy vào nắp hộp đồ nghề", "hint": "Minh +3",
+            "effects": {"rep.MINH": 3, "flag.hinhNhaMoi": true, "diary": "Dán tranh cu Bin vẽ vào nắp hộp đồ nghề. Mỗi lần mở hộp là thấy ba cái cửa sổ."} }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Thằng Bin vẽ cái xe chở cả xóm, tao dán trên tủ lạnh rồi.\"" },
+      { "text": "\"App hôm nay đơn ít, chắc mưa đến.\"" },
+      { "text": "\"Chở được thì tao chở, mà phải đúng giờ hẹn.\"" }
+    ]
+  },
+  "TRAM": {
+    "story": [
+      { "id": "tr_lam_duoc_toi_dau", "when": {"from_day": 2, "to_day": 9},
+        "title": "Làm được tới đâu",
+        "text": "Trâm đang dò dây ở quán đầu dãy. \"Em là thợ tiệm cũ à? Nghe nói tiệm đóng rồi. Cần tiền thì nhận việc, mà nhớ xem mình làm được đến đâu.\"",
+        "choices": [
+          { "label": "\"Vâng. Phần nào em chưa chắc, em hỏi chị.\"", "hint": "Trâm +4",
+            "effects": {"rep.TRAM": 4} },
+          { "label": "\"Việc gì em cũng làm được hết chị.\"", "hint": "",
+            "effects": {"log": "Trâm nhướng mày: \"Không ai làm gì cũng được hết.\""} }
+        ] },
+      { "id": "tr_ai_lam_gi", "when": {"from_day": 11, "to_day": 17, "route": ["B", "C"]},
+        "title": "Ai làm phần nào",
+        "text": "Trâm đưa danh sách đã khảo sát. \"Phần tủ điện tổng chị đứng tên. Phần ổ cắm, bóng đèn em làm. Mình viết rõ ai làm gì trước khi nhận tiền.\"",
+        "choices": [
+          { "label": "Viết rõ phần của từng người vào sổ hợp đồng", "hint": "Trâm +4",
+            "effects": {"rep.TRAM": 4} },
+          { "label": "\"Cứ làm đi, tới đâu tính tới đó.\"", "hint": "Trâm −2",
+            "effects": {"rep.TRAM": -2} }
+        ] },
+      { "id": "tr_ghi_chua_xong", "when": { "from_day": 18 },
+        "title": "Tờ phiếu nghiệm thu",
+        "text": "Trâm gõ bút lên tờ phiếu. \"Chưa xong thì ghi chưa xong. Mình còn làm tiếp được. Ghi xong rồi mới khó.\"",
+        "choices": [
+          { "label": "\"Chị chỉ em cách ghi phần chưa xong.\"", "hint": "Trâm +5", "effects": { "rep.TRAM": 5 } },
+          { "label": "\"Gần xong rồi, ghi xong luôn cho kịp tiền.\"", "hint": "Trâm −4",
+            "effects": { "rep.TRAM": -4, "log": "Trâm đặt bút xuống: \"Thế em tự ký. Chị không đứng tên phần chưa đạt.\"" } }
+        ] },
+      { "id": "tr_phieu_trang", "when": {"from_day": 26, "rep.TRAM": 45, "flag.falseCompletion": false},
+        "title": "Tờ phiếu trắng",
+        "text": "Trâm đưa An một tờ phiếu kiểm tra còn trắng, có sẵn tên cô ở cột người nghiệm thu. \"Lần sau có việc, em mang phiếu này tới trước khi nhận tiền. Chị ký khi đạt.\"",
+        "choices": [
+          { "label": "Kẹp tờ phiếu vào sổ", "hint": "Trâm +3",
+            "effects": {"rep.TRAM": 3, "flag.phieuTram": true, "diary": "Trâm đưa tờ phiếu trắng có tên cô ở cột nghiệm thu. Không phải lời khen. Là một lời hẹn làm chung."} },
+          { "label": "\"Cảm ơn chị, để em tự lo.\"", "hint": "",
+            "effects": {"log": "Trâm gật: \"Cũng được. Cần thì gọi.\""} }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Phần nào vượt khả năng thì nói, chị làm phần đó.\"" },
+      { "text": "\"Kiểm tra lại không phải vì chị không tin em.\"" },
+      { "text": "\"Công của người phụ cũng là tiền thật.\"" }
+    ]
+  },
+  "PHUC": {
+    "story": [
+      { "id": "ph_loi_khen", "when": {"from_day": 3, "to_day": 9},
+        "title": "Lời khen của chị Hạnh",
+        "text": "Anh Phúc ngồi uống cà phê. \"Chị Hạnh khen em kỹ. Mấy quán dưới này lo điện trước mùa mưa mà anh chưa biết hỏi ai.\"",
+        "choices": [
+          { "label": "\"Anh cần thì em xem trước, báo rõ phần em làm được.\"", "hint": "Anh Phúc +3",
+            "effects": {"rep.PHUC": 3} },
+          { "label": "\"Việc gì em cũng nhận.\"", "hint": "Anh Phúc +1",
+            "effects": {"rep.PHUC": 1} }
+        ] },
+      { "id": "ph_noi_som", "when": {"from_day": 12, "to_day": 17, "route": ["B", "C"]},
+        "title": "Nói sớm",
+        "text": "Anh Phúc nhắn: \"Tiền đợt đầu anh chuyển rồi đấy. Cần thêm gì thì nói, mà nói sớm nhé. Để sát ngày anh xoay không kịp.\"",
+        "choices": [
+          { "label": "Gửi anh bảng chi từng khoản đã ứng", "hint": "Anh Phúc +3",
+            "effects": {"rep.PHUC": 3} },
+          { "label": "\"Vâng, có gì em nói.\"", "hint": "Anh Phúc +1",
+            "effects": {"rep.PHUC": 1} }
+        ] },
+      { "id": "ph_nam_quan", "when": { "from_day": 18, "chapter": 1 },
+        "title": "Năm quán, năm cái lịch",
+        "text": "Anh Phúc cầm xấp giấy ghi yêu cầu của năm quán. \"Quán đầu xin làm sáng, quán cuối xin làm tối. Anh gom lại cho em đây. Cuối tuần anh gom đủ tiền.\"",
+        "choices": [
+          { "label": "\"Anh gom đủ ngày nào thì ghi ngày đó hộ em.\"", "hint": "Anh Phúc +3", "effects": { "rep.PHUC": 3 } },
+          { "label": "\"Vâng, cuối tuần cũng được.\"", "hint": "Anh Phúc +1", "effects": { "rep.PHUC": 1 } }
+        ] },
+      { "id": "ph_nam_chu_ky", "when": {"from_day": 26, "route": ["B", "C"], "flag.falseCompletion": false},
+        "title": "Năm chữ ký",
+        "text": "Anh Phúc đưa An một tờ giấy có năm chữ ký, nét nào cũng khác. \"Năm bà chủ quán ký cái này. Không phải hợp đồng. Các bà ấy ghi là thợ An làm có nói trước.\" Anh gãi đầu. \"Anh tưởng có tí tẹo, hóa ra cũng nhiều.\"",
+        "choices": [
+          { "label": "Giữ tờ giấy, hẹn qua mùa mưa ghé xem lại dây điện", "hint": "Anh Phúc +3",
+            "effects": {"rep.PHUC": 3, "flag.giayNamQuan": true, "diary": "Năm bà chủ quán Tạ Hiện ký vào một tờ giấy: \"thợ An làm có nói trước\". Tờ giấy này không đổi ra tiền được, mà mình cất kỹ hơn tiền."} },
+          { "label": "\"Vâng, anh giữ hộ em.\"", "hint": "Anh Phúc +1",
+            "effects": {"rep.PHUC": 1} }
+        ] }
+    ],
+    "chat": [
+      { "text": "\"Anh tưởng có một tí tẹo.\"" },
+      { "text": "\"Quán thứ ba đang kẹt tiền, anh đang nói chuyện với chị ấy.\"", "when": {"chapter": 1} },
+      { "text": "\"Mưa tới là lối đi ngập, phải xong trước mùa mưa.\"", "when": {"chapter": 1} }
     ]
   }
 }

@@ -1,0 +1,90 @@
+{
+  "status": "Rigged avatar integrated in Godot with idle/walk blending and editable hair/shirt/pants colors",
+  "reference": "reference-v1.png",
+  "generator": "Built-in image_gen",
+  "date": "2026-10-27",
+  "prompt": "Create one original game character production reference image for An, a 27-year-old Vietnamese appliance repair worker in a grounded urban life simulator. Use the two attached Nobody screenshots only as reference for grounded realism and worn clothing material quality, do not reproduce the exact character or UI. Full-body single FRONT view, neutral relaxed A-pose, arms 25 degrees away from torso, hands separate from hips, fingers naturally apart, feet apart, entire shoes visible, centered with generous margins on plain medium-gray background. Human anatomy realistic seven-and-a-half-head proportions, natural shoulders, slim ordinary working man's build, short slightly messy black hair, original Vietnamese face, no exaggerated features, no cap. Worn gray-beige small-plaid short-sleeve button shirt open at neck over a faded rust-red undershirt; faded dusty blue straight jeans with natural wrinkles at hips and knees, plain brown belt, scuffed dark-brown practical work shoes. Clothes drape convincingly on body, subtle dirt at hems and cuffs, woven cloth and stitching visible. Realistic game-ready PBR character appearance suitable for a grounded third-person PC game, convincing face and hands, no cartoon, no low-poly primitive shapes, no plastic skin, no oversized head, no outline. Soft neutral even studio light without dramatic baked shadows. No backpack, tools, accessories in hands, weapon, text, UI, scenery, floor platform, logo or watermark. This image is a source reference for image-to-3D mesh generation and rigging, not a gameplay screenshot.",
+  "proposed_mesh": {
+    "model": "tripo_h3_1_image_to_3d",
+    "face_limit": 18000,
+    "texture": true,
+    "pbr": true,
+    "texture_quality": "detailed",
+    "geometry_quality": "standard",
+    "quoted_credits": 12,
+    "submitted": true
+  },
+  "rigging": {
+    "provider": "Higgsfield / Meshy",
+    "height_meters": 1.75,
+    "output": "an-rigged.glb",
+    "walk_action_id": 30,
+    "walk_clip": "Casual_Walk",
+    "idle": "Local four-second breathing loop from bind pose",
+    "jobs": [
+      {
+        "id": "91b39f53-1f51-4e94-a050-5df8e19b9ffe",
+        "credits": 8,
+        "status": "completed_rejected_quality",
+        "reason": "Original +X input produced incorrect knee weighting",
+        "file": "an-rig-rejected.glb"
+      },
+      {
+        "id": "618c9f44-094e-4c93-b1a7-c171ae159655",
+        "credits": 8,
+        "status": "completed_accepted",
+        "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3LHWKo0eUp00Xi1HgGR6eSUhGDj/hf_20261027_151207_618c9f44-094e-4c93-b1a7-c171ae159655.glb"
+      }
+    ],
+    "total_credits": 16,
+    "balance_after": 122
+  },
+  "generation_attempt": {
+    "model": "tripo_h3_1_image_to_3d",
+    "media_id": "0a1ec498-ab93-40cf-9703-98c4f411ac37",
+    "result": "rejected_out_of_credits",
+    "available_credits": 0,
+    "job_created": false
+  },
+  "current_generation": {
+    "job_id": "d444ea39-7559-46c4-8d7e-54706996d91d",
+    "account_email": "hoantn@vtvlive.vn",
+    "quoted_credits": 12,
+    "status": "completed",
+    "output": "an-tripo-v1.glb",
+    "credits_spent": 12,
+    "remaining_credits": 138,
+    "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3LHWKo0eUp00Xi1HgGR6eSUhGDj/hf_20261027_150245_d444ea39-7559-46c4-8d7e-54706996d91d.glb"
+  },
+  "validation": {
+    "bytes": 15567872,
+    "meshes": 1,
+    "materials": 1,
+    "embedded_images": 3,
+    "skins": 0,
+    "animations": 0,
+    "triangles": 17756,
+    "godot_preview": "passed",
+    "previews": [
+      "preview-front.png",
+      "preview-back.png"
+    ],
+    "notes": [
+      "Raw model faces +X, height 1 unit and origin at body center; normalize before gameplay integration",
+      "Skin highlights and high-contrast cloth textures require art polish"
+    ]
+  },
+  "runtime": {
+    "script": "scripts/world/an_character.gd",
+    "material": "scripts/world/an_material.gdshader",
+    "mask": "Bind-pose vertex height and texture-color classification; inspect boundaries when replacing asset",
+    "colors_saved_in": "game.s.appearance",
+    "validation": [
+      "24-bone skeleton and walking clip",
+      "Godot rendered idle/walk/color previews",
+      "UI color callbacks, save/cancel, save migration and JSON round trip",
+      "Movement blocked during wardrobe",
+      "Daily life regression"
+    ]
+  }
+}

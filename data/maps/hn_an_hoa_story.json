@@ -1,0 +1,277 @@
+{
+ "_ghi_chu": "Đặt truyện lên map dựng tay kiểu phố Hà Nội (data/maps/hn_an_hoa.json, sinh bằng tools/gen_hanoi_map.py). locations: at là giữa nhà của địa điểm, road là phố nó quay mặt ra, inset là khoảng lùi khỏi mép đường (mặc định bằng vỉa hè của phố đó). names: tên phố giữ nguyên.",
+ "map": "hn_an_hoa",
+ "displayName": "Phường An Hòa",
+ "walkHoursPerMeter": 0.0018,
+ "locations": {
+  "xom_bo_me": {
+   "at": [
+    -60,
+    -104
+   ],
+   "w": 13,
+   "d": 10,
+   "road": "Ngõ Bờ Me"
+  },
+  "com_hanh": {
+   "at": [
+    -38,
+    -93
+   ],
+   "w": 8,
+   "d": 11,
+   "road": "Phố Bờ Me"
+  },
+  "tiem_sau": {
+   "at": [
+    -70,
+    -93
+   ],
+   "w": 8,
+   "d": 11,
+   "road": "Phố Bờ Me"
+  },
+  "ben_can": {
+   "at": [
+    22,
+    -93
+   ],
+   "w": 24,
+   "d": 10,
+   "road": "Phố Bờ Me"
+  },
+  "cho_cau_nho": {
+   "at": [
+    82,
+    -66
+   ],
+   "w": 18,
+   "d": 13,
+   "road": "Phố Bờ Me"
+  },
+  "hem_dua": {
+   "at": [
+    45,
+    -58
+   ],
+   "w": 5.5,
+   "d": 8,
+   "road": "Ngõ Dừa"
+  },
+  "cau_tre": {
+   "at": [
+    112,
+    -142
+   ],
+   "w": 9,
+   "d": 9,
+   "road": "Phố Bên Kia Rạch"
+  },
+  "ben_xe_6": {
+   "at": [
+    -160,
+    -76
+   ],
+   "w": 7,
+   "d": 3,
+   "road": "Phố Bờ Me",
+   "inset": 0.0
+  },
+  "nha_di_nam": {
+   "at": [
+    -166,
+    8
+   ],
+   "w": 7,
+   "d": 10,
+   "road": "Phố An Hòa"
+  }
+ },
+ "names": {
+  "Cầu Nhỏ": "Cầu Nhỏ",
+  "Ngõ Bên Kia": "Ngõ Bên Kia",
+  "Ngõ Bờ Me": "Ngõ Bờ Me",
+  "Ngõ Dừa": "Ngõ Dừa",
+  "Ngõ Giếng": "Ngõ Giếng",
+  "Ngõ Hàng Than": "Ngõ Hàng Than",
+  "Ngõ Hồ": "Ngõ Hồ",
+  "Ngõ Trạm": "Ngõ Trạm",
+  "Ngõ Tập Thể": "Ngõ Tập Thể",
+  "Ngõ Đông": "Ngõ Đông",
+  "Ngõ Đường Tàu": "Ngõ Đường Tàu",
+  "Phố An Hòa": "Phố An Hòa",
+  "Phố Bên Kia Rạch": "Phố Bên Kia Rạch",
+  "Phố Bờ Me": "Phố Bờ Me",
+  "Phố Chợ Cầu Nhỏ": "Phố Chợ Cầu Nhỏ",
+  "Phố Hàng Than": "Phố Hàng Than",
+  "Phố Hồ": "Phố Hồ",
+  "Phố Tập Thể": "Phố Tập Thể",
+  "Phố Ven Hồ": "Phố Ven Hồ",
+  "Phố Đình": "Phố Đình",
+  "Phố Đường Tàu": "Phố Đường Tàu"
+ },
+ "fallbackNames": [
+  "Phố Xóm Mới"
+ ],
+ "descriptions": {
+  "ben_xe_6": "Điểm đón xe đưa rước công nhân trên vỉa hè phố Bờ Me, gần đầu phố đường tàu. Xe chạy ra khu công nghiệp; trung tâm nghề của Linh cũng đi xe ở đây.",
+  "cho_cau_nho": "Chợ ở góc phố Bờ Me và phố Chợ Cầu Nhỏ, ngay chân Cầu Nhỏ bắc qua rạch: sạp vật tư, hàng đồ cũ, tiệm photo, sạp ve chai của cô Út và quán trà đá có bảng tin cho thuê phòng.",
+  "com_hanh": "Quán cơm bình dân cho người làm ca trên phố Bờ Me, cạnh đầu ngõ vào xóm trọ. Nhận ca phụ, giao cơm, nghe chuyện dãy quán cần sửa điện.",
+  "tiem_sau": "Tiệm sửa xe ngay đầu ngõ Bờ Me, cách xóm trọ vài bước, có thêm một bàn sửa đồ gia dụng.",
+  "xom_bo_me": "Tám phòng quanh khoảng sân cuối ngõ Bờ Me, sau lưng là rạch; vòi nước chung, dây phơi dưới mái tôn. Về đây để nghỉ và đi ngủ.",
+  "hem_dua": "Phòng trong ngõ Dừa rẽ ra từ phố Bờ Me, sát chân Cầu Nhỏ, đầu ngõ có cây dừa, cách chợ vài bước. Phòng nhỏ, cửa sát mặt ngõ, ít chỗ phơi.",
+  "cau_tre": "Bên kia rạch, phải đi vòng qua Cầu Nhỏ. Dãy nhà trên phố Bên Kia Rạch, lưng quay ra kênh; phòng thoáng, có hiên rộng, đi làm xa hơn.",
+  "nha_di_nam": "Nhà dì Năm trên phố An Hòa, gần phố đường tàu và điểm đón xe. Ở tạm được bảy ngày, phải gửi bớt đồ.",
+  "ben_can": "Năm quán ven rạch trên phố Bờ Me, gần chân Cầu Nhỏ, lưng quay ra kênh, chung lối đi và đường điện cũ. Hợp đồng của anh Phúc."
+ },
+ "questAreas": {
+  "meo_be_bap": {
+   "around": "cho_cau_nho",
+   "radius": 70
+  }
+ },
+ "vendorRoutes": {
+  "banh_mi": [
+   [
+    -170,
+    -76
+   ],
+   [
+    -40,
+    -76
+   ],
+   [
+    55,
+    -76
+   ],
+   [
+    55,
+    16
+   ],
+   [
+    -40,
+    16
+   ],
+   [
+    -170,
+    16
+   ],
+   [
+    -170,
+    -76
+   ]
+  ],
+  "xoi": [
+   [
+    -120,
+    24
+   ],
+   [
+    -120,
+    150
+   ],
+   [
+    -104,
+    144
+   ],
+   [
+    -104,
+    52
+   ],
+   [
+    -40,
+    46
+   ],
+   [
+    -40,
+    24
+   ],
+   [
+    -120,
+    24
+   ]
+  ],
+  "ve_chai": [
+   [
+    -120,
+    -30
+   ],
+   [
+    56,
+    -30
+   ],
+   [
+    146,
+    -30
+   ],
+   [
+    150,
+    -76
+   ],
+   [
+    60,
+    -76
+   ],
+   [
+    -60,
+    -84
+   ],
+   [
+    -120,
+    -30
+   ]
+  ],
+  "che": [
+   [
+    -40,
+    46
+   ],
+   [
+    24,
+    52
+   ],
+   [
+    24,
+    138
+   ],
+   [
+    -104,
+    138
+   ],
+   [
+    -104,
+    52
+   ],
+   [
+    -40,
+    46
+   ]
+  ],
+  "hu_tieu": [
+   [
+    55,
+    24
+   ],
+   [
+    55,
+    140
+   ],
+   [
+    150,
+    146
+   ],
+   [
+    150,
+    62
+   ],
+   [
+    58,
+    62
+   ],
+   [
+    55,
+    24
+   ]
+  ]
+ }
+}

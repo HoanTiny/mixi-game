@@ -1,0 +1,49 @@
+{
+  "map": "hn_pho_co",
+  "road": "Phố Hàng Chiếu",
+  "frontage_origin": [12.0, -136.8],
+  "frontage_normal": [0.0, 1.0],
+  "length": 64.0,
+  "locations": [
+    {"id": "com_hanh", "along": 24.0, "w": 8.0, "d": 8.0, "kind": "restaurant", "seed": 12},
+    {"id": "tiem_sau", "along": 37.0, "w": 9.0, "d": 8.0, "kind": "repair", "seed": 28},
+    {"id": "xom_bo_me", "along": 53.0, "w": 13.0, "d": 8.0, "kind": "lodging", "seed": 36}
+  ],
+  "fillers": [
+    {"id": "pilot_west_home", "along": 4.0, "w": 7.0, "d": 8.0, "kind": "residential", "seed": 103, "use": "home"},
+    {"id": "pilot_grocer", "along": 13.0, "w": 7.0, "d": 7.0, "kind": "residential", "seed": 127, "use": "grocer"},
+    {"id": "pilot_narrow_home", "along": 30.3, "w": 3.6, "d": 7.0, "kind": "residential", "seed": 151, "use": "home"},
+    {"id": "pilot_shutter_shop", "along": 44.2, "w": 3.4, "d": 7.0, "kind": "residential", "seed": 179, "use": "closed_shop"},
+    {"id": "pilot_east_home", "along": 62.0, "w": 3.2, "d": 8.0, "kind": "residential", "seed": 197, "use": "home"}
+  ],
+  "clear_regions": [
+    [12.0, -145.3, 64.0, 8.8],
+    [12.0, -124.0, 64.0, 22.0]
+  ],
+  "height_region": [9.0, -158.0, 70.0, 56.0],
+  "height_limit": 7.0,
+  "home_blockers": [
+    [-6.5, -4.0, 5.0, 4.0],
+    [1.5, -4.0, 5.0, 4.0],
+    [-6.5, -7.7, 3.0, 3.7],
+    [3.5, -7.7, 3.0, 3.7],
+    [-6.5, -8.0, 13.0, 0.3]
+  ],
+  "courtyard": [53.0, -5.5],
+  "walk_surfaces": [
+    [0.0, 0.2, 64.0, 3.0],
+    [51.5, -4.0, 3.0, 4.2],
+    [49.5, -7.7, 7.0, 3.7]
+  ],
+  "walk_points": {
+    "west": [1.0, 1.9],
+    "food": [24.0, 1.9],
+    "repair": [37.0, 1.9],
+    "home": [53.0, 1.9],
+    "alley": [53.0, -2.0],
+    "courtyard": [53.0, -5.5],
+    "courtyard_left": [50.5, -5.5],
+    "courtyard_right": [55.5, -5.5],
+    "east": [63.0, 1.9]
+  }
+}

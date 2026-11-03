@@ -1,0 +1,508 @@
+{
+ "_ghi_chu": "Gói đời sống phố cổ (không theo chương, nạp sau 5 chương, GameLogic._merge_pack): hàng rong (location vendor:<id> trong schedules.json, đứng cạnh xe bấm E hay 1–3), shop si-đa túi mù (data/clothes.json), quán bi-a (trò chơi bàn bi-a scripts/work/billiards.gd).",
+ "actions": [
+  {
+   "id": "hr_banh_mi",
+   "group": "life",
+   "location": "vendor:banh_mi",
+   "name": "Mua ổ bánh mì pa-tê",
+   "hours": 0.1,
+   "cost": 15000,
+   "perDay": 2,
+   "effects": {
+    "need.fed": 40
+   }
+  },
+  {
+   "id": "hr_xoi",
+   "group": "life",
+   "location": "vendor:xoi",
+   "name": "Mua gói xôi xéo",
+   "hours": 0.1,
+   "cost": 20000,
+   "perDay": 2,
+   "effects": {
+    "need.fed": 50
+   }
+  },
+  {
+   "id": "hr_che",
+   "group": "life",
+   "location": "vendor:che",
+   "name": "Ăn cốc chè đỗ đen",
+   "hours": 0.2,
+   "cost": 15000,
+   "perDay": 2,
+   "effects": {
+    "need.fed": 15,
+    "need.mood": 5
+   }
+  },
+  {
+   "id": "hr_pho_dem",
+   "group": "life",
+   "location": "vendor:hu_tieu",
+   "name": "Ăn bát phở đêm",
+   "hours": 0.3,
+   "cost": 35000,
+   "perDay": 2,
+   "effects": {
+    "need.fed": 60,
+    "need.mood": 3
+   }
+  },
+  {
+   "id": "hr_dong_nat",
+   "group": "life",
+   "location": "vendor:ve_chai",
+   "name": "Bán đồng nát cho người thu mua",
+   "hours": 0.1,
+   "perDay": 3,
+   "effects": {
+    "special": "ban_dong_nat"
+   }
+  },
+  {
+   "id": "hr_kem",
+   "group": "life",
+   "location": "vendor:kem",
+   "name": "Mua que kem cốm Tràng Tiền",
+   "hours": 0.1,
+   "cost": 15000,
+   "perDay": 3,
+   "effects": {
+    "need.mood": 6,
+    "need.fed": 5
+   }
+  },
+  {
+   "id": "hr_kem_nha",
+   "group": "life",
+   "location": "vendor:kem",
+   "name": "Mua hộp kem mang về cho bà và Linh",
+   "hours": 0.1,
+   "cost": 45000,
+   "effects": {
+    "rep.BA_TU": 2,
+    "rep.LINH": 2,
+    "need.mood": 3
+   }
+  },
+  {
+   "id": "hr_nhan",
+   "group": "life",
+   "location": "vendor:hoa_qua",
+   "name": "Mua cân nhãn ăn dọc đường",
+   "hours": 0.1,
+   "cost": 30000,
+   "effects": {
+    "need.fed": 15,
+    "need.mood": 3
+   }
+  },
+  {
+   "id": "hr_qua_ba",
+   "group": "life",
+   "location": "vendor:hoa_qua",
+   "name": "Mua túi hoa quả biếu bà",
+   "hours": 0.1,
+   "cost": 40000,
+   "effects": {
+    "rep.BA_TU": 3
+   }
+  },
+  {
+   "id": "hr_hoa",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Mua bó cúc họa mi cắm ở nhà",
+   "hours": 0.1,
+   "cost": 30000,
+   "effects": {
+    "need.mood": 5,
+    "rep.BA_TU": 2
+   }
+  },
+  {
+   "id": "hr_bong_bay",
+   "group": "life",
+   "location": "vendor:bong_bay",
+   "name": "Mua quả bóng bay hình con cá",
+   "hours": 0.1,
+   "cost": 15000,
+   "effects": {
+    "need.mood": 3
+   }
+  },
+  {
+   "id": "hr_banh_ran",
+   "group": "life",
+   "location": "vendor:banh_ran",
+   "name": "Mua hai cái bánh rán đường",
+   "hours": 0.1,
+   "cost": 10000,
+   "perDay": 2,
+   "effects": {
+    "need.fed": 20,
+    "need.mood": 2
+   }
+  },
+  {
+   "id": "tui_mu_1",
+   "group": "life",
+   "location": "shop_ao",
+   "name": "Bóc một túi mù si-đa",
+   "hours": 0.2,
+   "cost": 99000,
+   "perDay": 10,
+   "note": "Bóc ra gì mặc nấy; 10 túi liền chưa có món Hiếm thì túi sau chắc chắn Hiếm",
+   "effects": {
+    "special": "tui_mu_1",
+    "need.mood": 2
+   }
+  },
+  {
+   "id": "tui_mu_5",
+   "group": "life",
+   "location": "shop_ao",
+   "name": "Bóc năm túi một lúc (chắc chắn có món từ Khá)",
+   "hours": 0.5,
+   "cost": 450000,
+   "perDay": 2,
+   "effects": {
+    "special": "tui_mu_5",
+    "need.mood": 4
+   }
+  },
+  {
+   "id": "hang_tuan",
+   "group": "life",
+   "location": "shop_ao",
+   "name": "Mua món hàng hiệu cũ bày bán tuần này",
+   "hours": 0.2,
+   "cost": 350000,
+   "effects": {
+    "special": "hang_tuan"
+   }
+  },
+  {
+   "id": "ban_do_trung",
+   "group": "life",
+   "location": "shop_ao",
+   "name": "Bán lại đồ trùng cho chị Vy",
+   "hours": 0.2,
+   "effects": {
+    "special": "ban_do_trung"
+   }
+  },
+  {
+   "id": "thu_do_shop",
+   "group": "life",
+   "location": "shop_ao",
+   "name": "Thử đồ, mở tủ đồ",
+   "hours": 0.1,
+   "perDay": 20,
+   "effects": {
+    "special": "mo_tu_do"
+   }
+  },
+  {
+   "id": "lam_shop_vy",
+   "group": "work",
+   "location": "shop_ao",
+   "name": "Phân loại hàng thùng cho chị Vy",
+   "hours": 4,
+   "pay": 170000,
+   "window": [
+    8,
+    18
+   ],
+   "dirty": {
+    "neat": -6
+   },
+   "effects": {
+    "fatigue": 12,
+    "rep.VY": 2
+   }
+  },
+  {
+   "id": "bia_choi",
+   "group": "life",
+   "location": "bi_a",
+   "name": "Thuê bàn đánh bi-a một giờ",
+   "hours": 1,
+   "cost": 30000,
+   "perDay": 2,
+   "minigame": "bida_choi",
+   "effects": {
+    "need.mood": 8
+   }
+  },
+  {
+   "id": "bia_cuoc",
+   "group": "life",
+   "location": "bi_a",
+   "name": "Đánh một ván cược 50.000đ với khách quen",
+   "hours": 1,
+   "cost": 50000,
+   "pay": 100000,
+   "perDay": 2,
+   "minigame": "bida_cuoc",
+   "require": {
+    "cash_min": 50000
+   },
+   "note": "Vào đủ 3 bi trong 10 cơ thì ăn 100.000đ, không thì mất tiền cược",
+   "effects": {
+    "need.mood": 2
+   }
+  },
+  {
+   "id": "lam_bia",
+   "group": "work",
+   "location": "bi_a",
+   "name": "Trông quán, dọn bàn ca tối cho anh Dũng",
+   "hours": 4,
+   "pay": 180000,
+   "window": [
+    18,
+    22
+   ],
+   "effects": {
+    "fatigue": 10,
+    "rep.DUNG": 2
+   }
+  },
+  {
+   "id": "toc_cut_neat",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Cắt gọn",
+   "hours": 0.5,
+   "cost": 40000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:cut_neat"
+   }
+  },
+  {
+   "id": "toc_cut_natural",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Tỉa tự nhiên",
+   "hours": 0.5,
+   "cost": 40000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:cut_natural"
+   }
+  },
+  {
+   "id": "toc_dye_black",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Nhuộm đen",
+   "hours": 1.0,
+   "cost": 80000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:dye_black"
+   }
+  },
+  {
+   "id": "toc_dye_brown",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Nhuộm nâu hạt dẻ",
+   "hours": 1.0,
+   "cost": 80000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:dye_brown"
+   }
+  },
+  {
+   "id": "toc_dye_ash",
+   "group": "life",
+   "location": "tiem_toc",
+   "name": "Nhuộm nâu khói",
+   "hours": 1.0,
+   "cost": 100000,
+   "window": [
+    8,
+    19
+   ],
+   "effects": {
+    "special": "toc:dye_ash"
+   }
+  },
+  {
+   "id": "han_bo_hoa",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Phụ Hân bó hoa, tỉa lá",
+   "hours": 0.5,
+   "window": [
+    6,
+    11
+   ],
+   "effects": {
+    "rep.HAN": 4,
+    "need.mood": 3,
+    "xp.per": 2
+   },
+   "note": "Hân bán hoa xe đạp: cành nào cắt chéo, lá nào phải tỉa, chị chỉ rất kỹ"
+  },
+  {
+   "id": "han_ca_phe",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Mua hai cốc cà phê muối, mời Hân một cốc",
+   "hours": 0.3,
+   "cost": 50000,
+   "effects": {
+    "rep.HAN": 3,
+    "need.mood": 4
+   },
+   "require": {
+    "rep.HAN": 35
+   }
+  },
+  {
+   "id": "han_tang_qua",
+   "group": "life",
+   "location": "vendor:hoa",
+   "name": "Tặng Hân con gấu bông ném vòng được",
+   "hours": 0.1,
+   "effects": {
+    "rep.HAN": 8,
+    "need.mood": 3,
+    "item.gau_bong": -1
+   },
+   "require": {
+    "has_item": "gau_bong"
+   },
+   "perDay": 1,
+   "note": "Gấu bông lấy ở trò ném vòng"
+  },
+  {
+   "id": "vy_hoc_live",
+   "group": "optional",
+   "location": "shop_ao",
+   "name": "Nhờ chị Vy chỉ cách bán hàng livestream",
+   "hours": 1.0,
+   "effects": {
+    "flag.phoVyLive": true,
+    "xp.per": 8,
+    "xp.int": 4,
+    "rep.VY": 2
+   },
+   "require": {
+    "rep.VY": 60
+   },
+   "hideIfFlag": "phoVyLive",
+   "note": "Mở app Shippy: lên sóng ở phòng trọ hay quán net"
+  },
+  {
+   "id": "tra_tien_tro",
+   "group": "life",
+   "location": "home",
+   "name": "Trả tiền trọ đêm nay cho cô Duyên",
+   "hours": 0.05,
+   "cost": 60000,
+   "perDay": 1,
+   "showIf": {
+    "rent_paid": false
+   },
+   "effects": {
+    "rent_pay": true
+   },
+   "note": "Chưa trả thì không ngủ, không nghỉ ở phòng được"
+  },
+  {
+   "id": "giat_tiem",
+   "group": "life",
+   "location": "home",
+   "name": "Gửi tiệm giặt đầu ngõ",
+   "hours": 0.2,
+   "cost": 20000,
+   "perDay": 1,
+   "effects": {
+    "need.neat": 100
+   },
+   "note": "Tối lấy về, quần áo thơm mùi nước xả"
+  },
+  {
+   "id": "mua_xa_phong",
+   "group": "life",
+   "location": "cho_cau_nho",
+   "name": "Mua bánh xà phòng giặt (3 lần giặt)",
+   "hours": 0.1,
+   "cost": 15000,
+   "perDay": 2,
+   "effects": {
+    "item.xa_phong": 3
+   }
+  },
+  {
+   "id": "tam_nong",
+   "group": "life",
+   "location": "nha_tro_giuong",
+   "name": "Tắm nước nóng ở nhà tắm công cộng",
+   "hours": 0.4,
+   "cost": 25000,
+   "perDay": 1,
+   "effects": {
+    "need.clean": 100,
+    "need.mood": 4,
+    "cond.cam_lanh": false
+   },
+   "note": "Nước nóng, xà phòng thơm: trị dứt cảm lạnh"
+  },
+  {
+   "id": "mua_smartphone",
+   "group": "life",
+   "location": "cam_do",
+   "name": "Mua lại chiếc smartphone đời mới khách cầm quá hạn",
+   "hours": 0.3,
+   "cost": 1500000,
+   "perDay": 1,
+   "hideIfFlag": "phoSmartphone",
+   "effects": {
+    "flag.phoSmartphone": true,
+    "need.mood": 10,
+    "log": "Màn hình không vết nứt, pin cả ngày. App Giao Nhanh báo đơn nhanh hơn hẳn.",
+    "diary": "Mua được cái điện thoại tử tế đầu tiên từ hồi mất việc."
+   }
+  }
+ ],
+ "minigames": {
+  "bida_choi": {
+   "scene": "billiards",
+   "heading": "Thuê bàn một giờ",
+   "rules": "Mười cơ, vào được bao nhiêu bi thì vào.\nKéo lùi ra sau bi trắng để ngắm, thả ra là đánh.",
+   "shots": 10,
+   "balls": 7,
+   "target": 0
+  },
+  "bida_cuoc": {
+   "scene": "billiards",
+   "heading": "Ván cược với khách quen",
+   "rules": "Cược 50.000đ: trong 10 cơ vào đủ 3 bi thì ăn 100.000đ.\nBi trắng rơi lỗ là phí một cơ.",
+   "shots": 10,
+   "balls": 7,
+   "target": 3
+  }
+ }
+}

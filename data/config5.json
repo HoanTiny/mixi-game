@@ -1,0 +1,219 @@
+{
+ "_ghi_chu": "Việc làm, sinh hoạt, việc tùy chọn thêm ở chương 5 (cùng cú pháp actions trong config.json). \"home\" là chỗ ở hiện tại.",
+ "actions": [
+  {
+   "id": "hoc_dien_lanh",
+   "group": "optional",
+   "location": "ben_xe_6",
+   "name": "Đi học lớp điện lạnh buổi tối (thầy Phong)",
+   "hours": 2.5,
+   "perDay": 1,
+   "window": [
+    18,
+    21
+   ],
+   "days": [
+    127,
+    148
+   ],
+   "showIfFlag": "ghiDanhHoc",
+   "require": {
+    "weekend": false
+   },
+   "effects": {
+    "fatigue": 6,
+    "rep.PHONG": 1
+   },
+   "desc": "Trung tâm nghề cạnh điểm xe buýt Long Biên, tối thứ Hai đến thứ Sáu. Ống đồng, ga lạnh, block, sơ đồ điện điều hòa. Học đủ sáu buổi thực hành thì được thi lấy giấy."
+  },
+  {
+   "id": "ghi_danh_hoc",
+   "group": "optional",
+   "location": "ben_xe_6",
+   "name": "Ghi danh lớp điện lạnh buổi tối (học phí 2.400.000đ)",
+   "hours": 0.5,
+   "days": [
+    123,
+    129
+   ],
+   "showIfFlag": "hoanHoc",
+   "hideIfFlag": "ghiDanhHoc",
+   "require": {
+    "cash_min": 2400000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "cash": -2400000,
+    "cash_label": "Học phí lớp điện lạnh buổi tối",
+    "rep.PHONG": 2,
+    "flag.ghiDanhHoc": true,
+    "flag.ghiDanhTre": true,
+    "quest_start": "khoa_dien_lanh",
+    "diary": "Đổi ý, ra trung tâm nghề ghi danh lớp điện lạnh. Thầy Phong không hỏi sao đổi ý, chỉ ghi tên vào cuối danh sách: \"Người ghi danh sau cùng thường học tới cuối cùng.\""
+   },
+   "desc": "Thầy Phong còn nhận ghi danh tới tối thứ Tư (ngày 129)."
+  },
+  {
+   "id": "ghi_danh_hoc_to_roi",
+   "group": "optional",
+   "location": "ben_xe_6",
+   "name": "Ghi danh lớp điện lạnh theo tờ rơi (học phí 2.400.000đ)",
+   "hours": 0.5,
+   "days": [
+    123,
+    129
+   ],
+   "showIfFlag": "toRoiHoc",
+   "hideIfFlag": "ghiDanhHoc",
+   "require": {
+    "cash_min": 2400000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "cash": -2400000,
+    "cash_label": "Học phí lớp điện lạnh buổi tối",
+    "rep.PHONG": 2,
+    "flag.ghiDanhHoc": true,
+    "flag.ghiDanhTre": true,
+    "quest_start": "khoa_dien_lanh",
+    "diary": "Cầm tờ rơi chị Hạnh đưa ra trung tâm nghề ghi danh lớp điện lạnh. Thầy Phong nhận ra cái tủ lạnh mini: \"À, cậu dò bằng tay.\""
+   },
+   "desc": "Tờ rơi thầy Phong để lại ở quán chị Hạnh: còn ghi danh được tới tối thứ Tư (ngày 129)."
+  },
+  {
+   "id": "kem_toan_tin",
+   "group": "optional",
+   "location": "tiem_sau",
+   "name": "Kèm Tín học Toán ở bàn chung",
+   "hours": 1.5,
+   "perDay": 1,
+   "window": [
+    18,
+    21
+   ],
+   "days": [
+    127,
+    150
+   ],
+   "showIfFlag": "kemToan",
+   "effects": {
+    "fatigue": 3,
+    "rep.TIN": 1
+   },
+   "desc": "Phân số, phương trình, bài toán chuyển động. Tín hiểu nhanh khi đổi bài toán thành dòng điện trong dây."
+  },
+  {
+   "id": "kham_lung",
+   "group": "optional",
+   "location": "cho_cau_nho",
+   "name": "Đi khám lưng ở phòng khám phường",
+   "hours": 2,
+   "window": [
+    7,
+    17
+   ],
+   "days": [
+    123,
+    150
+   ],
+   "showIfFlag": "dauLung",
+   "hideIfFlag": "khamLung",
+   "maxTimes": 1,
+   "effects": {
+    "cash": -250000,
+    "cash_label": "Khám lưng, chụp phim, thuốc",
+    "flag.khamLung": true,
+    "fatigue": -4,
+    "diary": "Đi khám lưng ở phòng khám phường. Bác sĩ nói cơ lưng căng, chưa tới đĩa đệm, mà đi tiếp kiểu này thì tới. Dặn: hai tuần không khiêng gì quá hai chục cân, tối nằm ván cứng. Đưa tờ giấy dặn cho bà đọc. Bà dán lên cánh tủ, ngay dưới tờ lịch."
+   },
+   "desc": "Phòng khám phường ở dãy sau chợ Long Biên. Khám, chụp phim, lấy thuốc."
+  },
+  {
+   "id": "coc_hem_dua_t10",
+   "group": "optional",
+   "location": "hem_dua",
+   "name": "Đặt cọc phòng ngõ Gạch, hẹn dọn mùng 1 tháng Mười",
+   "hours": 1,
+   "days": [
+    121,
+    146
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 2200000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "hem_dua",
+    "flag.datCocC5": true,
+    "payable": {
+     "id": "phong_moi_t10",
+     "to": "",
+     "label": "Phần còn lại phòng ngõ Gạch (dọn mùng 1 tháng Mười)",
+     "amount": 2800000,
+     "due": 150
+    },
+    "diary": "Đặt cọc phòng ngõ Gạch, hẹn dọn vào mùng một tháng Mười. Còn hai triệu tám, hạn tối ngày 150."
+   },
+   "desc": "Chủ phòng giữ chỗ tới hết tháng Chín. Phần còn lại trả trước tối ngày 150."
+  },
+  {
+   "id": "coc_cau_tre_t10",
+   "group": "optional",
+   "location": "cau_tre",
+   "name": "Đặt cọc phòng Ngọc Thụy, hẹn dọn mùng 1 tháng Mười",
+   "hours": 1,
+   "days": [
+    121,
+    146
+   ],
+   "showIf": {
+    "home": "di_nam",
+    "housing_state": "signed"
+   },
+   "require": {
+    "cash_min": 1800000
+   },
+   "maxTimes": 1,
+   "effects": {
+    "housing_reserve": "cau_tre",
+    "flag.datCocC5": true,
+    "payable": {
+     "id": "phong_moi_t10",
+     "to": "",
+     "label": "Phần còn lại phòng Ngọc Thụy (dọn mùng 1 tháng Mười)",
+     "amount": 2400000,
+     "due": 150
+    },
+    "diary": "Đặt cọc phòng Ngọc Thụy, hẹn dọn vào mùng một tháng Mười. Còn hai triệu tư, hạn tối ngày 150."
+   },
+   "desc": "Chủ phòng giữ chỗ tới hết tháng Chín. Phần còn lại trả trước tối ngày 150."
+  },
+  {
+   "id": "truc_dem_benh_vien",
+   "group": "optional",
+   "location": "ben_xe_6",
+   "name": "Vào bệnh viện quận trực đêm cho ông Bảo",
+   "hours": 2,
+   "perDay": 1,
+   "window": [
+    19.5,
+    22
+   ],
+   "days": [
+    133,
+    140
+   ],
+   "showIfFlag": "trucDem",
+   "hideIfFlag": "trucDemXong",
+   "effects": {
+    "fatigue": 10,
+    "rep.ONG_BA": 1
+   },
+   "desc": "Đi xe buýt từ điểm Long Biên tới bệnh viện quận, ngồi đầu giường ông Bảo, ngủ trên ghế gấp. Sáng anh Tài đến thay."
+  }
+ ]
+}

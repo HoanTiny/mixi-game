@@ -1,0 +1,12 @@
+{
+  "maxStack": 99,
+  "shopZone": "phuc_tan",
+  "purchaseMinutes": 5,
+  "items": {
+    "banh_mi": {"id":"banh_mi", "name":"Bánh mì", "price":15000, "kind":"bread", "minutes":5, "effects":{"fed":20,"mood":5}, "description":"Một ổ bánh mì để dành lúc bận việc."},
+    "nuoc_loc": {"id":"nuoc_loc", "name":"Nước lọc", "price":5000, "kind":"bottle", "minutes":5, "effects":{"stamina":5,"mood":2}, "description":"Chai nước nhỏ mang theo trong ngày."},
+    "thuoc_cam": {"id":"thuoc_cam", "name":"Thuốc cảm", "price":25000, "kind":"medicine", "minutes":5, "effects":{"stamina":8,"mood":3}, "description":"Vật phẩm hồi phục trong game. Không chữa các chấn thương như trẹo lưng hay dập ngón."},
+    "khan_uot": {"id":"khan_uot", "name":"Khăn ướt", "price":10000, "kind":"paper", "minutes":5, "effects":{"clean":15}, "description":"Lau mặt và tay trước ca phục vụ; vẫn cần tắm khi về nhà."},
+    "com_hop_cua_ba": {"id":"com_hop_cua_ba", "name":"Cơm hộp của bà", "price":0, "kind":"bowl", "minutes":15, "effects":{"fed":55}, "action":"an_com_hop", "purchasable":false, "description":"Bà chuẩn bị một hộp mỗi ngày. Ăn ở khu khác, hết hạn vào sáng hôm sau."}
+  }
+}
